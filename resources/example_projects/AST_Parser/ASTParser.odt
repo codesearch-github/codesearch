@@ -1,0 +1,24 @@
+﻿How to use th Eclipse AST-Parser.
+Required Libraries:
+To use the Eclipse AST-Parser there are several libraries required. All of those can be found in the plugins folder of eclipse (<ECLIPSE_HOME>/plugins) in the current version (3.6 - Helios). 
+Note that most tutorials in the Internet provide an outdated list of libraries, so several additional libraries are required.
+The complete list of required libraries can be found here:
+org.eclipse.jdt.core_3.6.0.v_A58.jar
+org.eclipse.osgi_3.6.0.v20100517.jar
+org.eclipse.core.resources_3.6.0.v20100526-0737.jar
+org.eclipse.core.equinox.common_3.6.0.v2.0100503.jar
+org.eclipse.core.jobs_3.5.0.v20100515.jar
+org.eclipse.core.runtime.compatibility_3.2.100.v20100505.jar
+org.eclipse.core.runtime_3.6.0v20100505.jar
+org.eclipse.core.contenttype_3.4.100.v20100503.jar
+org.eclipse.osgi.services_3.2.100.v20100503.jar
+org.eclipse.osgi.util_3.2.100v20100503.jar
+org.eclipse.equinox.preferences_3.3.0v20100503.jar
+
+Creating an AST-Parser:
+The creation of an AST with the AST-Parser is very easy. After instantiating an ASTParser via the ASTParser.newParser(int level) (the level representing the Java version). It can be used by setting the source code with the .setSource(char[] code) method and starting the parsing with the .createAst() method, this method returns the ASTNode representing the lowest tier of the tree (in most cases this would be the node representing the file itself).
+
+Walking the Tree:
+
+
+When starting the parse process with a certain code input a single AST-Node is returned for further usage. An AST-Node is the representation of a code element (a class, a method, an attribute, etc.) and depending on the node different information is stored. So a TypeDefinition would store the position of itself in the code, the name of the package (folder), the name of the file and all the contained AST-Nodes.

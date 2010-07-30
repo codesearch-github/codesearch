@@ -5,3 +5,5 @@
 *.project
 *.buildpath
 *bin*
+*.jar
+resources/example_projects/scrumbeard/war/scrumbeard/

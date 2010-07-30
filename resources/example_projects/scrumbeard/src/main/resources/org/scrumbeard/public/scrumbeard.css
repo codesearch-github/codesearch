@@ -1,0 +1,16 @@
+/* 
+    Document   : scrumbeard
+    Created on : Jul 30, 2010, 5:22:15 PM
+    Author     : Samuel Kogler
+    Description:
+*/
+
+/* Syntax recommendation http://www.w3.org/TR/REC-CSS2/ */
+
+
+.title {
+    color: steelblue;
+    font-size: 2em;
+    font-family:sans-serif;
+    font-weight: bold;
+}
