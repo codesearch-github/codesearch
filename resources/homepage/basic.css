@@ -1,0 +1,68 @@
+body
+{
+    padding: 0;
+    margin: 0;
+}
+
+#header
+{
+    width: 100%;
+    background-color: #555555;
+}
+
+#logo
+{
+    white-space: nowrap;
+    color: white;
+    font-family: monospace;
+    margin-left: 2em;
+}
+
+#title
+{
+    display: block;
+    font-size: 30pt;
+}
+
+#subtitle
+{
+    display: block;
+    font-size: 16pt;
+}
+
+#left-sidebar
+{
+    float: left;
+    background-color: #555555;
+    height: 100%;
+}
+
+#menu
+{
+    display: block;
+    list-style: none;
+    margin-left: 2em;
+}
+
+#menu li
+{
+    display: block;
+}
+
+#menu a
+{
+    width: 100%;
+    display: block;
+    text-decoration: none;
+}
+
+#menu a:hover
+{
+    background-color: #CCCCCC;
+}
+
+#content
+{
+    background-color: #CCCCCC;
+    padding: 1em 1em 1em 1em;
+}

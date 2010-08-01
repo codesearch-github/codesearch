@@ -40,6 +40,9 @@ public class Scrumbeard implements EntryPoint {
     private Panel header;
     private Label title;
 
+    /**
+     * Constructor.
+     */
     public Scrumbeard() {
     }
 
@@ -58,7 +61,7 @@ public class Scrumbeard implements EntryPoint {
 
         rootPageLayout.addNorth(header, 5);
         rootPageLayout.add(pageLayout);
-
+        
         RootLayoutPanel.get().add(rootPageLayout);
     }
 }

@@ -17,19 +17,21 @@
  * along with Scrumbeard.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* 
-    Document   : scrumbeard
-    Created on : Jul 30, 2010, 5:22:15 PM
-    Author     : Samuel Kogler
-    Description:
-*/
+package org.scrumbeard.shared;
 
-/* Syntax recommendation http://www.w3.org/TR/REC-CSS2/ */
+/**
+ * A project.
+ * @author Samuel Kogler
+ */
+public class Project {
+    /** The name. */
+    private String name;
 
+    public String getName() {
+        return name;
+    }
 
-.title {
-    color: steelblue;
-    font-size: 2em;
-    font-family:sans-serif;
-    font-weight: bold;
+    public void setName(String name) {
+        this.name = name;
+    }
 }
