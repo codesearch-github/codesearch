@@ -1,26 +1,118 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * Copyright 2010 David Froehlich   <david.froehlich@businesssoftware.at>,
+ *                Samuel Kogler     <samuel.kogler@gmail.com>,
+ *                Stephan Stiboller <stistc06@htlkaindorf.at>
+ *
+ * This file is part of Codesearch.
+ *
+ * Codesearch is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Codesearch is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.codesearch.commons.configreader.xml;
 
-import java.io.FileNotFoundException;
-import java.util.HashMap;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-import 
+import java.io.File;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.HierarchicalConfiguration;
+import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.configuration.XMLConfiguration;
+import org.codesearch.commons.configreader.xml.beans.RepositoryBean;
 
 /**
+ * PropertyManager is a class that provides several static methods to access properties.
+ * The properties are stored in a file called config.xml, the path to this file can be
+ * specified in the configpath.properties file which always has to be in the root folder of
+ * the commons project.
  *
- * @author david
+ * @author David Froehlich
  */
 public class PropertyManager {
-    XMLConfiguration config = new XMLConfiguration();
-    public static void readConfig() throws FileNotFoundException{
-        throw new NotImplementedException();
+
+    /** The XMLConfiguration object that is used to read the properties from 
+     * the xml-file, does not have to be instantiated actively hence it will
+     * be checked and instantiated whenever used */
+    private static XMLConfiguration config;
+    /** The path to the config.xml file, will be read from the fielPath.properties file */
+    private static String configpath = "";
+
+    /**
+     * Reads the configpath.properties file which has to be in the root folder of
+     * the commons project and specifies the filepath for the xml.config file
+     * @throws ConfigurationException if the configpath.properties file is not
+     * found or does not contain a valid filepath property
+     */
+    public static void readConfigPath() throws ConfigurationException {
+        Configuration configPathReader = new PropertiesConfiguration("configpath.properties");
+        configpath = configPathReader.getString("filepath");
     }
 
-    public String getSingleLinePropertyValue(String key){
-        return properties.get(key);
+    /**
+     * returns a list of RepositoryBeans containing information about the repositories
+     * specified in the config.xml file. Also checks if the XMLConfiguration is
+     * instantiated and, if not, instantiates it.
+     * @return the list of all repositories
+     * @throws ConfigurationException if either the readConfigPath() method throws
+     * an exception or the config.xml file is either not found or contains invalid data
+     */
+    public static List<RepositoryBean> getRepositories() throws ConfigurationException {
+        if (config == null) {
+            loadConfigReader();
+        }
+        LinkedList<RepositoryBean> repositories = new LinkedList<RepositoryBean>();
+        List fields = config.configurationsAt("repositories.repository");
+        for (Iterator it = fields.iterator(); it.hasNext();) {
+            HierarchicalConfiguration sub = (HierarchicalConfiguration) it.next();
+            // sub contains now all data about a single field
+            String name = sub.getString("name");
+            boolean indexingEnabled = sub.getBoolean("indexingEnabled");
+            boolean codeNavigationEnabled = sub.getBoolean("codeNavigationEnabled");
+            repositories.add(new RepositoryBean(configpath, indexingEnabled, codeNavigationEnabled));
+        }
+        return repositories;
+    }
+
+    /**
+     * loads the config.xml file from the configpath specified in the configpath.properties file
+     * instantiates the XMLConfiguration object through which the config can be read.
+     * @throws ConfigurationException if either the configpath.properties file was not found
+     * or contains invalid data, or if the config.xml file was not found.
+     */
+    public static void loadConfigReader() throws ConfigurationException {
+        if (configpath.equals("")) {
+            readConfigPath();
+        }
+        config = new XMLConfiguration(configpath + File.separator + "config.xml");
+    }
+
+    /**
+     * returns the value of the given single-line-property from the config.xml file
+     * also instantiates the config reader object if it was not instantiated before
+     * @param key the key for the property
+     * @return the value of the property
+     * @throws ConfigurationException if either the configpath.properties file does not
+     * exist or does not contain a valid value or if the config.xml file does not contain
+     * a value for the given key
+     */
+    public static String getSingleLinePropertyValue(String key) throws ConfigurationException {
+        String value = "";
+        if (config == null) {
+            loadConfigReader();
+        }
+        value = config.getString(key);
+        return value;
     }
 }
