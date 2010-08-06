@@ -33,7 +33,7 @@ import org.apache.commons.configuration.XMLConfiguration;
 import org.codesearch.commons.configreader.xml.beans.RepositoryBean;
 
 /**
- * PropertyManager is a class that provides several static methods to access properties.
+ * PropertyManager is a class that provides several methods to access properties.
  * The properties are stored in a file called config.xml, the path to this file can be
  * specified in the configpath.properties file which always has to be in the root folder of
  * the commons project.
@@ -45,19 +45,12 @@ public class PropertyManager {
     /** The XMLConfiguration object that is used to read the properties from 
      * the xml-file, does not have to be instantiated actively hence it will
      * be checked and instantiated whenever used */
-    private static XMLConfiguration config;
+    private XMLConfiguration config;
     /** The path to the config.xml file, will be read from the fielPath.properties file */
-    private static String configpath = "";
+    private String configpath = "";
 
-    /**
-     * Reads the configpath.properties file which has to be in the root folder of
-     * the commons project and specifies the filepath for the xml.config file
-     * @throws ConfigurationException if the configpath.properties file is not
-     * found or does not contain a valid filepath property
-     */
-    public static void readConfigPath() throws ConfigurationException {
-        Configuration configPathReader = new PropertiesConfiguration("configpath.properties");
-        configpath = configPathReader.getString("filepath");
+    private PropertyManager(){
+        
     }
 
     /**
@@ -68,7 +61,7 @@ public class PropertyManager {
      * @throws ConfigurationException if either the readConfigPath() method throws
      * an exception or the config.xml file is either not found or contains invalid data
      */
-    public static List<RepositoryBean> getRepositories() throws ConfigurationException {
+    public List<RepositoryBean> getRepositories() throws ConfigurationException {
         if (config == null) {
             loadConfigReader();
         }
@@ -80,22 +73,9 @@ public class PropertyManager {
             String name = sub.getString("name");
             boolean indexingEnabled = sub.getBoolean("indexingEnabled");
             boolean codeNavigationEnabled = sub.getBoolean("codeNavigationEnabled");
-            repositories.add(new RepositoryBean(configpath, indexingEnabled, codeNavigationEnabled));
+            repositories.add(new RepositoryBean(name, indexingEnabled, codeNavigationEnabled));
         }
         return repositories;
-    }
-
-    /**
-     * loads the config.xml file from the configpath specified in the configpath.properties file
-     * instantiates the XMLConfiguration object through which the config can be read.
-     * @throws ConfigurationException if either the configpath.properties file was not found
-     * or contains invalid data, or if the config.xml file was not found.
-     */
-    public static void loadConfigReader() throws ConfigurationException {
-        if (configpath.equals("")) {
-            readConfigPath();
-        }
-        config = new XMLConfiguration(configpath + File.separator + "config.xml");
     }
 
     /**
@@ -107,12 +87,44 @@ public class PropertyManager {
      * exist or does not contain a valid value or if the config.xml file does not contain
      * a value for the given key
      */
-    public static String getSingleLinePropertyValue(String key) throws ConfigurationException {
+    public String getSingleLinePropertyValue(String key) throws ConfigurationException {
         String value = "";
         if (config == null) {
             loadConfigReader();
         }
         value = config.getString(key);
         return value;
+    }
+
+    /**
+     * Reads the configpath.properties file which has to be in the root folder of
+     * the commons project and specifies the filepath for the xml.config file
+     * @throws ConfigurationException if the configpath.properties file is not
+     * found or does not contain a valid filepath property
+     */
+    private void readConfigPath() throws ConfigurationException {
+        Configuration configPathReader = new PropertiesConfiguration("configpath.properties");
+        configpath = configPathReader.getString("filepath");
+    }
+
+    /**
+     * loads the config.xml file from the configpath specified in the configpath.properties file
+     * instantiates the XMLConfiguration object through which the config can be read.
+     * @throws ConfigurationException if either the configpath.properties file was not found
+     * or contains invalid data, or if the config.xml file was not found.
+     */
+    private void loadConfigReader() throws ConfigurationException {
+        if (configpath.equals("")) {
+            readConfigPath();
+        }
+        config = new XMLConfiguration(configpath + File.separator + "codesearch_config.xml");
+    }
+
+    public String getConfigpath() {
+        return configpath;
+    }
+
+    public void setConfigpath(String configpath) {
+        this.configpath = configpath;
     }
 }

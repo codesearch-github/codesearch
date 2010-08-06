@@ -95,4 +95,13 @@ public class RepositoryBean {
     public void setName(String name) {
         this.name = name;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        RepositoryBean other = (RepositoryBean) o;
+        if(this.getName().equals(other.getName()) && this.isCodeNavigationEnabled() == other.isCodeNavigationEnabled() && this.isIndexingEnabled() == other.isIndexingEnabled()){
+            return true;
+        }
+        return false;
+    }
 }

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+    <testproperty>asdf</testproperty>
+    <repositories>
+        <repository>
+            <name>testRepo1</name>
+            <indexingEnabled>true</indexingEnabled>
+            <codeNavigationEnabled>true</codeNavigationEnabled>
+        </repository>
+        <repository>
+            <name>testRepo2</name>
+            <indexingEnabled>true</indexingEnabled>
+            <codeNavigationEnabled>false</codeNavigationEnabled>
+        </repository>
+        <repository>
+            <name>testRepo3</name>
+            <indexingEnabled>false</indexingEnabled>
+            <codeNavigationEnabled>false</codeNavigationEnabled>
+        </repository>
+    </repositories>
+</root>
