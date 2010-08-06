@@ -34,7 +34,7 @@ import org.codesearch.commons.configreader.xml.beans.RepositoryBean;
 
 /**
  * PropertyManager is a class that provides several methods to access properties.
- * The properties are stored in a file called config.xml, the path to this file can be
+ * The properties are stored in a file called codesearch_config.xml, the path to this file can be
  * specified in the configpath.properties file which always has to be in the root folder of
  * the commons project.
  *
@@ -46,20 +46,25 @@ public class PropertyManager {
      * the xml-file, does not have to be instantiated actively hence it will
      * be checked and instantiated whenever used */
     private XMLConfiguration config;
-    /** The path to the config.xml file, will be read from the fielPath.properties file */
+    /** The path to the codesearch_config.xml file, will be read from the fielPath.properties file
+     * or can be set manually to read a different config-file */
     private String configpath = "";
 
+    /**
+     * creates a new instance of PropertyManager
+     */
     private PropertyManager(){
         
     }
 
     /**
      * returns a list of RepositoryBeans containing information about the repositories
-     * specified in the config.xml file. Also checks if the XMLConfiguration is
-     * instantiated and, if not, instantiates it.
+     * specified in the codesearch_config.xml file. Also checks if the XMLConfiguration is
+     * instantiated and, if not, instantiates it with the configpath declared.
+     * If no configpath is declared, the method will read the configpath from the configpath.properties
      * @return the list of all repositories
      * @throws ConfigurationException if either the readConfigPath() method throws
-     * an exception or the config.xml file is either not found or contains invalid data
+     * an exception or the codesearch_config.xml file is either not found or contains invalid data
      */
     public List<RepositoryBean> getRepositories() throws ConfigurationException {
         if (config == null) {
@@ -69,7 +74,6 @@ public class PropertyManager {
         List fields = config.configurationsAt("repositories.repository");
         for (Iterator it = fields.iterator(); it.hasNext();) {
             HierarchicalConfiguration sub = (HierarchicalConfiguration) it.next();
-            // sub contains now all data about a single field
             String name = sub.getString("name");
             boolean indexingEnabled = sub.getBoolean("indexingEnabled");
             boolean codeNavigationEnabled = sub.getBoolean("codeNavigationEnabled");
@@ -79,8 +83,9 @@ public class PropertyManager {
     }
 
     /**
-     * returns the value of the given single-line-property from the config.xml file
-     * also instantiates the config reader object if it was not instantiated before
+     * returns the value of the given single-line-property from the codesearch_config.xml file
+     * If the config reader object was not instanciated before, it will create it with the
+     * configpath specified, if no configpath is specified it will read it from the configpath.properties file
      * @param key the key for the property
      * @return the value of the property
      * @throws ConfigurationException if either the configpath.properties file does not
@@ -108,7 +113,7 @@ public class PropertyManager {
     }
 
     /**
-     * loads the config.xml file from the configpath specified in the configpath.properties file
+     * loads the codesearch_config.xml file from the filepath specified in the configpath.properties file
      * instantiates the XMLConfiguration object through which the config can be read.
      * @throws ConfigurationException if either the configpath.properties file was not found
      * or contains invalid data, or if the config.xml file was not found.
