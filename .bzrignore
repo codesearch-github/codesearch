@@ -1,9 +1,10 @@
+*gwt*
 *target*
+*lib*
 *.class
 *classes*
 *.classpath
 *.project
 *.buildpath
-*bin*
+bin/*
 *.jar
-resources/example_projects/scrumbeard/war/scrumbeard/
