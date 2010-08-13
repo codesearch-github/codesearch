@@ -23,6 +23,10 @@
 -->
 
 <root>
+<listTest>1</listTest>
+<listTest>2</listTest>
+<listTest>3</listTest>
+
     <testproperty>asdf</testproperty>
     <repositories>
         <repository>

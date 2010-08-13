@@ -36,7 +36,7 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
 import org.codesearch.utils.IndexLogger;
-import org.codesearch.utils.TextExtractor;
+import org.codesearch.utils.FileTool;
 
 /**
  * This class can be used to index a repository
@@ -46,13 +46,14 @@ import org.codesearch.utils.TextExtractor;
  * @author zeheron
  */
 public class IndexerCore {
-
+    
     /** The files to be processed */
     private File[] contentFiles;
     /** The used logger  */
     IndexLogger iLog = new IndexLogger("/tmp/indexerLog.log");   //TODO: Replace test path
     /** The currently active IndexWriter */
     IndexWriter indexWriter;
+
     /** The index directory, contains all index files */
     FSDirectory indexDirectory;
 
@@ -61,16 +62,37 @@ public class IndexerCore {
     }
 
     /**
+     * Deletes the specified index directory physically
+     * @param dir the directory to clean
+     * @return true if directory is cleaned
+     */
+    public boolean cleanIndexDirectory(File dir)
+    {
+        if(FileTool.deleteDirectory(dir))
+        {
+            iLog.append("Index destoyed sucessfully; " + dir.getAbsolutePath());
+            return true;
+        }
+        else
+        {
+            iLog.append("Failed to clear IndexDirectory: " + dir.getAbsolutePath());
+            return false;
+        }
+    }
+
+    /**
      * Initializes a IndexWriter with the given analyzer and for the given directory
      * @param analyzer analyzer for the files.
-     * @param dir   The location for the  lucene index
+     * @param dir The location for the  lucene index
      */
     public void initializeIndexWriter(Analyzer analyzer, File dir) {
         try {
             Analyzer luceneAnalyzer = new StandardAnalyzer(Version.LUCENE_CURRENT);
             indexDirectory = FSDirectory.open(dir);
             indexWriter = new IndexWriter(indexDirectory, luceneAnalyzer, IndexWriter.MaxFieldLength.LIMITED);
+            iLog.append("IndexWriter initilaization succesful: " + dir.getAbsolutePath());
         } catch (IOException ex) {
+            IndexLogger.log.error(ex);
             iLog.append("IndexWriter initialization error: Could not open directory " + dir.getAbsolutePath() );
         }
 
@@ -79,7 +101,7 @@ public class IndexerCore {
     /**
      * Creates an index for the given Directory.
      *
-     * @param dir
+     * @param dir directory to be indexed
      */
     public boolean indexDirectory(File dir) {
         if(indexWriter == null)
@@ -96,18 +118,40 @@ public class IndexerCore {
                 doc = new Document();
                 // Add fields
                 doc.add(new Field("title", currentFile.getName(), Field.Store.YES, Field.Index.NOT_ANALYZED));
-                doc.add(new Field("content", TextExtractor.readTextFile(currentFile), Field.Store.YES, Field.Index.ANALYZED));
+                doc.add(new Field("content", FileTool.readTextFile(currentFile), Field.Store.YES, Field.Index.ANALYZED));
+                iLog.append("Added file: " + doc.get("title") + " to index.");
                 // Add document to the index
                 indexWriter.addDocument(doc);
             }
             indexWriter.optimize();
             indexWriter.close();
+            iLog.append("Index creation sucessful: " + doc.getField("title"));
         } catch (CorruptIndexException ex) {
-            iLog.append("Indexing  of: " + doc.get("title") + " failed!\n");
+            iLog.append("Indexing  of: " + doc.get("title") + " failed! \n");
         } catch (IOException ex) {
-            iLog.append("Reading the content of: " + doc.get("title") + "\n");
+            iLog.append("Adding file to index: " + doc.get("title") + " failed! \n");
+        } catch(NullPointerException ex){
+             iLog.append("NullPointerException: FileContentDirectory is empty!");
         }
         return true;
     }
+
+
+    public File[] getContentFiles() {
+        return contentFiles;
+    }
+
+    public IndexLogger getiLog() {
+        return iLog;
+    }
+
+    public FSDirectory getIndexDirectory() {
+        return indexDirectory;
+    }
+
+    public IndexWriter getIndexWriter() {
+        return indexWriter;
+    }
+
     
 }

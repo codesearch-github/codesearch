@@ -32,8 +32,9 @@ package org.codesearch.indexer.manager;
  */
 public class IndexerJob extends Thread
 {
-    /** Indicates if the thread is suspende or not. */
+    /** Indicates if the thread is suspended or not. */
     private boolean threadIsSuspended = false;
+    /** Indicates if the thread is terminated or not. */
     private boolean threadIsTerminated = false;
 
     /**

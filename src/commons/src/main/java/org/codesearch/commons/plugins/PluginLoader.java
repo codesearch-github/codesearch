@@ -18,42 +18,25 @@
  * You should have received a copy of the GNU General Public License
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
+package org.codesearch.commons.plugins;
 
-package org.codesearch.indexer;
-
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import java.util.Set;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
- * Unit test for simple App.
+ *
+ * @author David Froehlich
  */
-public class AppTest 
-    extends TestCase
-{
-    /**
-     * Create the test case
-     *
-     * @param testName name of the test case
-     */
-    public AppTest( String testName )
-    {
-        super( testName );
+public final class PluginLoader<T extends Plugin> {
+    private Set<T> loadedPlugins;
+
+    public PluginLoader (){
+        ApplicationContext context = new ClassPathXmlApplicationContext("classpath:org/codesearch/commons/");
     }
 
-    /**
-     * @return the suite of tests being tested
-     */
-    public static Test suite()
-    {
-        return new TestSuite( AppTest.class );
-    }
-
-    /**
-     * Rigourous Test :-)
-     */
-    public void testApp()
-    {
-        assertTrue( true );
+    public T getPluginForPurpose(final String type) {
+        
+        return null;
     }
 }
