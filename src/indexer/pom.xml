@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.codesearch</groupId>
     <artifactId>indexer</artifactId>
@@ -8,7 +8,7 @@
 
     <packaging>jar</packaging>
     <version>0.1-SNAPSHOT</version>
-    
+
     <url>http://codesearch.sourceforge.net</url>
 
     <licenses>
@@ -25,6 +25,24 @@
             <version>4.8.1</version>
             <scope>test</scope>
         </dependency>
+        <!-- Log4J -->
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.14</version>
+        </dependency>
+          <!-- apache logging commons -->
+         <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.1.1</version>
+        </dependency>
+         <!--  Lucene API to create/manage index -->
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-core</artifactId>
+            <version>3.0.0</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -36,9 +54,11 @@
                     <header>license_header</header>
                 </configuration>
             </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.0.2</version>
                 <configuration>
                     <source>1.6</source>
                     <target>1.6</target>
@@ -47,3 +67,4 @@
         </plugins>
     </build>
 </project>
+
