@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Document   : module-config.xml.xml
+    Created on : August 13, 2010, 4:27 PM
+    Author     : Samuel Kogler
+    Description:
+        Testing file for the module configuration.
+-->
+
+<module-config>
+    <springConfigLocation>PATH1</springConfigLocation>
+    <springConfigLocation>PATH2</springConfigLocation>
+</module-config>
