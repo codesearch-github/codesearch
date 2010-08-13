@@ -26,6 +26,8 @@
 
 package org.codesearch.commons.configreader.xml;
 
+import java.util.LinkedList;
+import org.apache.commons.configuration.ConfigurationException;
 import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 import org.springframework.test.context.TestExecutionListeners;
@@ -38,16 +40,15 @@ import java.util.List;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.codesearch.commons.configreader.xml.beans.RepositoryBean;
+import org.codesearch.commons.configreader.xml.dto.RepositoryDto;
 import static org.junit.Assert.*;
 
 /**
  *
  * @author David Froehlich
  */
-@TestExecutionListeners({DependencyInjectionTestExecutionListener.class, TransactionalTestExecutionListener.class })
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(loader=GenericXmlContextLoader.class, locations={"classpath:org/codesearch/commons/CodesearchCommonsBeans.xml"})
+//@RunWith(SpringJUnit4ClassRunner.class)
+//@ContextConfiguration(loader=GenericXmlContextLoader.class, locations={"classpath:org/codesearch/commons/CodesearchCommonsBeans.xml"})
 public class PropertyManagerTest {
     @Autowired
     private PropertyManager propertyManager;
@@ -57,6 +58,7 @@ public class PropertyManagerTest {
 
     @Before
     public void setUp() {
+        propertyManager = new PropertyManager();
         propertyManager.setConfigpath("/home/david/codesearch/src/commons/src/test/resources");
     }
 
@@ -70,9 +72,9 @@ public class PropertyManagerTest {
     @Test
     public void testGetRepositories() throws Exception {
         System.out.println("getRepositories");
-        RepositoryBean bean1 = new RepositoryBean("testRepo1", true, true);
-        RepositoryBean bean2 = new RepositoryBean("testRepo2", true, false);
-        RepositoryBean bean3 = new RepositoryBean("testRepo3", false, false);
+        RepositoryDto bean1 = new RepositoryDto("testRepo1", true, true);
+        RepositoryDto bean2 = new RepositoryDto("testRepo2", true, false);
+        RepositoryDto bean3 = new RepositoryDto("testRepo3", false, false);
 
         List result = propertyManager.getRepositories();
         assertTrue(bean1.equals(result.get(0)));
@@ -103,7 +105,20 @@ public class PropertyManagerTest {
         String result = propertyManager.getConfigpath();
         assertEquals(expResult, result);
     }
-    
+
+    @Test
+    public void testGetSingleLinePropertyValueList() throws Exception {
+        System.out.println("getSingleLinePropertyValueList");
+        List<String> expResult = new LinkedList<String>();
+        expResult.add("1");
+        expResult.add("2");
+        expResult.add("3");
+        List<String> result = propertyManager.getSingleLinePropertyValueList("listTest");
+        assertEquals(expResult.get(0), result.get(0));
+        assertEquals(expResult.get(1), result.get(1));
+        assertEquals(expResult.get(2), result.get(2));
+    }
+
     public PropertyManager getPropertyManager() {
         return propertyManager;
     }

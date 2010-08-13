@@ -18,19 +18,20 @@
  * You should have received a copy of the GNU General Public License
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.codesearch.commons.configreader.xml;
 
 import java.io.File;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
-import org.codesearch.commons.configreader.xml.beans.RepositoryBean;
+import org.codesearch.commons.configreader.xml.dto.RepositoryDto;
 
 /**
  * PropertyManager is a class that provides several methods to access properties.
@@ -53,8 +54,7 @@ public class PropertyManager {
     /**
      * creates a new instance of PropertyManager
      */
-    private PropertyManager(){
-        
+    public PropertyManager() {
     }
 
     /**
@@ -66,25 +66,25 @@ public class PropertyManager {
      * @throws ConfigurationException if either the readConfigPath() method throws
      * an exception or the codesearch_config.xml file is either not found or contains invalid data
      */
-    public List<RepositoryBean> getRepositories() throws ConfigurationException {
+    public List<RepositoryDto> getRepositories() throws ConfigurationException {
         if (config == null) {
             loadConfigReader();
         }
-        LinkedList<RepositoryBean> repositories = new LinkedList<RepositoryBean>();
+        List<RepositoryDto> repositories = new LinkedList<RepositoryDto>();
         List fields = config.configurationsAt("repositories.repository");
         for (Iterator it = fields.iterator(); it.hasNext();) {
             HierarchicalConfiguration sub = (HierarchicalConfiguration) it.next();
             String name = sub.getString("name");
             boolean indexingEnabled = sub.getBoolean("indexingEnabled");
             boolean codeNavigationEnabled = sub.getBoolean("codeNavigationEnabled");
-            repositories.add(new RepositoryBean(name, indexingEnabled, codeNavigationEnabled));
+            repositories.add(new RepositoryDto(name, indexingEnabled, codeNavigationEnabled));
         }
         return repositories;
     }
 
     /**
      * returns the value of the given single-line-property from the codesearch_config.xml file
-     * If the config reader object was not instanciated before, it will create it with the
+     * If the config reader object was not instanciated before, it will be created with the
      * configpath specified, if no configpath is specified it will read it from the configpath.properties file
      * @param key the key for the property
      * @return the value of the property
@@ -102,7 +102,26 @@ public class PropertyManager {
     }
 
     /**
-     * Reads the configpath.properties file which has to be in the root folder of
+     * returns the values of all single-line-properties form the codesearch_config.xml file that match the given key.
+     * If the config reader object was not instanciated before, it will be created with the
+     * configpath specified, if no configpath is specified it will read it from the configpath.properties file
+     * @param key the key for the property
+     * @return a list of the values of the properties
+     * @throws ConfigurationException if either the configpath.properties file does not
+     * exist or does not contain a valid value or if the config.xml file does not contain
+     * a value for the given key
+     */
+    public List<String> getSingleLinePropertyValueList(String key) throws ConfigurationException {
+        List<String> values = new LinkedList<String>();
+            if (config == null) {
+            loadConfigReader();
+        }
+        values = config.getList(key);
+        return values;
+    }
+
+    /**
+     * Reads the cListonfigpath.properties file which has to be in the root folder of
      * the commons project and specifies the filepath for the xml.config file
      * @throws ConfigurationException if the configpath.properties file is not
      * found or does not contain a valid filepath property
@@ -125,10 +144,19 @@ public class PropertyManager {
         config = new XMLConfiguration(configpath + File.separator + "codesearch_config.xml");
     }
 
+    /**
+     * returns the set configpath
+     * @return the configpath
+     */
     public String getConfigpath() {
         return configpath;
     }
 
+    /**
+     * sets the configpath to the given parameter
+     * use this method before using any of the property retrieving methods to set a custom config file
+     * @param configpath the path to the properties configuration
+     */
     public void setConfigpath(String configpath) {
         this.configpath = configpath;
     }

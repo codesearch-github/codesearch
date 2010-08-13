@@ -19,13 +19,13 @@
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.codesearch.commons.configreader.xml.beans;
+package org.codesearch.commons.configreader.xml.dto;
 
 /**
- * Bean used to store information about a repository specified in the config.xml file
+ * DTO used to store information about a repository specified in the config.xml file
  * @author David Froehlich
  */
-public class RepositoryBean {
+public class RepositoryDto{
 
     /** The name specified for the repository, stored in the <name> tag in the xml file */
     private String name;
@@ -35,6 +35,8 @@ public class RepositoryBean {
     /** Specifies whether the additional index will be created for the repository. */
     private boolean codeNavigationEnabled;
 
+    
+
     /**
      * Creates a new instance of RepositoryBean setting all attributes to the given parameteres
      * @param name the name of the repository
@@ -42,7 +44,7 @@ public class RepositoryBean {
      * @param codeNavigationEnabled specifies whether the repository should have the additional
      * indexes for the code navigation
      */
-    public RepositoryBean(String name, boolean indexingEnabled, boolean codeNavigationEnabled) {
+    public RepositoryDto(String name, boolean indexingEnabled, boolean codeNavigationEnabled) {
         this.name = name;
         this.indexingEnabled = indexingEnabled;
         this.codeNavigationEnabled = codeNavigationEnabled;
@@ -98,7 +100,7 @@ public class RepositoryBean {
 
     @Override
     public boolean equals(Object o) {
-        RepositoryBean other = (RepositoryBean) o;
+        RepositoryDto other = (RepositoryDto) o;
         if(this.getName().equals(other.getName()) && this.isCodeNavigationEnabled() == other.isCodeNavigationEnabled() && this.isIndexingEnabled() == other.isIndexingEnabled()){
             return true;
         }
