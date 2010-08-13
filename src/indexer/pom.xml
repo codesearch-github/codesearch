@@ -4,25 +4,21 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.codesearch</groupId>
     <artifactId>indexer</artifactId>
-    <name>indexer</name>
+    <name>Codesearch: indexer</name>
 
     <packaging>jar</packaging>
     <version>0.1-SNAPSHOT</version>
-    
-    <url>http://codesearch.sourceforge.net</url>
 
-    <licenses>
-        <license>
-            <name>GNU GENERAL PUBLIC LICENSE</name>
-            <url>http://www.gnu.org/licenses/gpl-3.0.txt</url>
-        </license>
-    </licenses>
+    <parent>
+        <groupId>org.codesearch</groupId>
+        <artifactId>codesearch</artifactId>
+        <version>0.1-SNAPSHOT</version>
+    </parent>  
 
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.8.1</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

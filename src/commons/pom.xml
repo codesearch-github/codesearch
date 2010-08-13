@@ -5,67 +5,52 @@
 
     <groupId>org.codesearch</groupId>
     <artifactId>commons</artifactId>
-    <name>commons</name>
-    <inceptionYear>2010</inceptionYear>
+    <name>Codesearch: commons</name>
   
     <packaging>jar</packaging>
     <version>0.1-SNAPSHOT</version>
-    <url>http://codesearch.sourceforge.net</url>
 
-    <licenses>
-        <license>
-            <name>GNU GENERAL PUBLIC LICENSE</name>
-            <url>http://www.gnu.org/licenses/gpl-3.0.txt</url>
-        </license>
-    </licenses>
-    
+    <parent>
+        <groupId>org.codesearch</groupId>
+        <artifactId>codesearch</artifactId>
+        <version>0.1-SNAPSHOT</version>
+    </parent>
+
     <dependencies>
+        <!-- TEST DEPENDENCIES -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.8.1</version>
             <scope>test</scope>
-        </dependency>
-        
-        <dependency>
-            <groupId>commons-configuration</groupId>
-            <artifactId>commons-configuration</artifactId>
-            <version>1.6</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-core</artifactId>
-            <version>3.0.3.RELEASE</version>
         </dependency>
 
         <dependency>
             <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        
+        <!-- NORMAL DEPENDENCIES -->
+        <dependency>
+            <groupId>commons-configuration</groupId>
+            <artifactId>commons-configuration</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
             <artifactId>spring-beans</artifactId>
-            <version>3.0.3.RELEASE</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
-            <version>3.0.3.RELEASE</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-test</artifactId>
-            <version>3.0.3.RELEASE</version>
-            <scope>test</scope>
-            <type>jar</type>
         </dependency>
     </dependencies>
     <build>
         <plugins>
-            <plugin>
-                <groupId>com.mycila.maven-license-plugin</groupId>
-                <artifactId>maven-license-plugin</artifactId>
-                <version>1.6.1</version>
-                <configuration>
-                    <header>license_header</header>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
