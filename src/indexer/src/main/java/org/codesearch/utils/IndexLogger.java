@@ -43,7 +43,7 @@ public class IndexLogger {
     private File loggingFile;
 
     /** log4j Logger */
-    private static Log log = LogFactory.getLog(IndexLogger.class);
+    public static Log log = LogFactory.getLog(IndexLogger.class);
 
     /** Date formatter. */
     private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
@@ -70,12 +70,21 @@ public class IndexLogger {
     }
 
     /**
+     * Clears the log file content
+     */
+    public boolean clearLog()
+    {
+        return FileTool.clearFileContent(loggingFile);
+    }
+
+    /**
      * Appends a new entry to the logging file.
      * @param entry logged information
      */
     public void append(final String entry) {
          try {
-            fw.write("<b>" + simpleDateFormat.format(new Date()) + "</b>: " + entry + "\n");
+            fw = new FileWriter(loggingFile, true);
+            fw.write(simpleDateFormat.format(new Date()) + ": " + entry + "\n");
             fw.flush();
             fw.close();
         } catch (IOException ioe) {

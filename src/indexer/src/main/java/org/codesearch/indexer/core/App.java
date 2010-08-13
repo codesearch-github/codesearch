@@ -21,6 +21,10 @@
 
 package org.codesearch.indexer.core;
 
+import java.io.File;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.util.Version;
+
 /**
  * Hello world!
  *
@@ -29,6 +33,19 @@ public class App
 {
     public static void main( String[] args )
     {
-        System.out.println( "Hello World!" );
+        System.out.println("Executing Indexing...");
+
+        File pathToTestFiles = new File("/home/zeheron/workspace/testZone/indexer");
+        File pathToIndexDir = new File("/tmp/test/");
+        IndexerCore iCore = new IndexerCore();
+
+
+        iCore.initializeIndexWriter(new StandardAnalyzer(Version.LUCENE_CURRENT),pathToIndexDir );
+        //iCore.cleanIndexDirectory(pathToIndexDir);
+        boolean lol = iCore.indexDirectory(pathToTestFiles);
+
+
+        System.out.println( "Bla.. Bla.. Bla.. ->"  + lol);
+        System.out.println("3 x Bla means: WIN ");
     }
 }
