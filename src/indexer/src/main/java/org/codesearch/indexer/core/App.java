@@ -1,4 +1,4 @@
-package org.codesearch.indexer;
+package org.codesearch.indexer.core;
 
 /**
  * Hello world!
