@@ -23,8 +23,8 @@
 <module rename-to="scrumbeard">
     <inherits name="com.google.gwt.user.User"/>                 -->
     <inherits name="com.google.gwt.user.theme.standard.Standard"/>
-  <!-- <inherits name='com.google.gwt.user.theme.chrome.Chrome'/> -->
-  <!-- <inherits name='com.google.gwt.user.theme.dark.Dark'/>     -->
+    <!-- <inherits name='com.google.gwt.user.theme.chrome.Chrome'/> -->
+    <!-- <inherits name='com.google.gwt.user.theme.dark.Dark'/>     -->
     <entry-point class="org.scrumbeard.client.Scrumbeard"></entry-point>
     <!-- convert this to js too. -->
     <source path='client'/>

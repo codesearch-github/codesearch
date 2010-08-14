@@ -24,6 +24,7 @@ package org.codesearch.commons;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+import org.codesearch.commons.vcs.VersionControlPluginManager;
 
 /**
  * Unit test for simple App.
@@ -54,6 +55,7 @@ public class AppTest
      */
     public void testApp()
     {
-        assertTrue( true );
+        VersionControlPluginManager m = new VersionControlPluginManager();
+        m.loadPlugins();
     }
 }
