@@ -20,23 +20,50 @@
  */
 package org.codesearch.commons.plugins;
 
-import java.util.Set;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.context.support.FileSystemXmlApplicationContext;
 
 /**
  *
  * @author David Froehlich
  */
-public final class PluginLoader<T extends Plugin> {
-    private Set<T> loadedPlugins;
+public final class PluginLoader {
+/** the list of all plugins that have been loaded at the constructor call */
+    private Map<String, Plugin> loadedPlugins;
 
-    public PluginLoader (){
-        ApplicationContext context = new ClassPathXmlApplicationContext("classpath:org/codesearch/commons/");
+    /**
+     * Creates a new instance of plugin loader that loads all classes that implement the given classes type
+     * @param the super class / interface of which the subclasses are loaded
+     */
+    public PluginLoader(Class clazz){
+        ApplicationContext context = new FileSystemXmlApplicationContext("spring-plugin-config.xml"); //move to a better location
+        for(String s : context.getBeanDefinitionNames()){
+            System.out.println(s);
+        }
+        loadedPlugins = context.getBeansOfType(clazz); //replace with generic
     }
 
-    public T getPluginForPurpose(final String type) {
-        
-        return null;
+    public Plugin getPluginForPurpose(final String type) throws Exception {
+        Iterator iter = loadedPlugins.entrySet().iterator();
+        while(iter.hasNext()){
+            Entry<String, Plugin> entry = (Entry<String, Plugin>) iter.next();
+            if(entry.getValue().getPurpose().equals(type)){
+                return entry.getValue();
+            }
+        }
+        throw new Exception("There is no bean in the list with the given purpose");
+    }
+
+    public static void main(String[] args) {
+        try {
+            
+        } catch (Exception ex) {
+            Logger.getLogger(PluginLoader.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }

@@ -12,4 +12,8 @@ Without this configuration present, some functionality in the IDE may be limited
         </config-files>
         <config-file-groups/>
     </spring-data>
+    <spellchecker-wordlist xmlns="http://www.netbeans.org/ns/spellchecker-wordlist/1">
+        <word>plugin</word>
+        <word>plugins</word>
+    </spellchecker-wordlist>
 </project-shared-configuration>
