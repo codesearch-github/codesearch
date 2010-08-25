@@ -51,11 +51,4 @@ public interface VersionControlPlugin {
      * @return The paths of the changed files
      */
     Set<String> getPathsForChangedFilesSinceRevision(String revision);
-
-    /**
-     * Returns the type of repositories that this plugin can handle.
-     * Used to match the plugin to the defined repository type in the configuration.
-     * @return The repository type constant
-     */
-    String getAssociatedRepositoryType();
 }

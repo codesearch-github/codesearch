@@ -23,8 +23,6 @@ package org.codesearch.commons.plugins;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 
@@ -57,13 +55,5 @@ public final class PluginLoader {
             }
         }
         throw new Exception("There is no bean in the list with the given purpose");
-    }
-
-    public static void main(String[] args) {
-        try {
-            
-        } catch (Exception ex) {
-            Logger.getLogger(PluginLoader.class.getName()).log(Level.SEVERE, null, ex);
-        }
     }
 }
