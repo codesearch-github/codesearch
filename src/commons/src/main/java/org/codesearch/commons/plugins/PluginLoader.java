@@ -39,10 +39,7 @@ public final class PluginLoader {
      * @param the super class / interface of which the subclasses are loaded
      */
     public PluginLoader(Class clazz){
-        ApplicationContext context = new FileSystemXmlApplicationContext("spring-plugin-config.xml"); //move to a better location
-        for(String s : context.getBeanDefinitionNames()){
-            System.out.println(s);
-        }
+        ApplicationContext context = new FileSystemXmlApplicationContext("spring-plugin-config.xml"); //move to a better 
         loadedPlugins = context.getBeansOfType(clazz); //replace with generic
     }
 
