@@ -22,6 +22,7 @@ package org.codesearch.commons.util;
 
 import java.util.LinkedList;
 import java.util.List;
+import org.apache.commons.configuration.ConfigurationException;
 import org.codesearch.commons.configreader.xml.PropertyManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -45,10 +46,10 @@ public class ModuleManager {
      * defined in the module configuration.
      * @return The locations of the spring configuration files.
      */
-    public List<String> getSpringConfigLocations() {
+    public List<String> getSpringConfigLocations() throws ConfigurationException {
         List<String> springConfigLocations = new LinkedList<String>();
         propertyManager.setConfigpath(DEFAULT_CONFIG_FILENAME);
-        //springConfigLocations.addAll(propertyManager.getSingleLinePropertyValueList("springConfigLocation"));
+        springConfigLocations.addAll(propertyManager.getSingleLinePropertyValueList("springConfigLocation"));
         return springConfigLocations;
     }
 

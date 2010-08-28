@@ -21,34 +21,37 @@
 
 package org.codesearch.commons.plugins.vcs;
 
+import java.net.URL;
 import java.util.Set;
+import org.codesearch.commons.plugins.Plugin;
 
 /**
  * Base for all version control plugins.
  * @author Samuel Kogler
  */
-
-public interface VersionControlPlugin {
+public interface VersionControlPlugin extends Plugin {
 
     /**
-     * Sets the current repository base URL.
-     * It is required that the URL is set before calling any of the
+     * Sets the current repository.
+     * It is required that the repository is set before calling any of the
      * other Version Control Plugin methods.
-     * @param url The URL
+     * @param url The repository base URL.
+     * @param username The username used to access the repository.
+     * @param password The password used to access the repository.
      */
-    void setRepositoryURL(String url);
+    void setRepository(URL url, String username, String password) throws VersionControlPluginException;
 
     /**
      * Retrieves the file content for the given file path.
      * @param filePath The file path relative to the current repository URL
      * @return The retrieved file content
      */
-    String getFileContentForFilePath(String filePath);
+    String getFileContentForFilePath(String filePath) throws VersionControlPluginException;
 
     /**
      * Returns a list of changed file paths since the given revision.
      * @param revision The given revision
      * @return The paths of the changed files
      */
-    Set<String> getPathsForChangedFilesSinceRevision(String revision);
+    Set<String> getPathsForChangedFilesSinceRevision(String revision) throws VersionControlPluginException;
 }

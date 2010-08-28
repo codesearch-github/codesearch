@@ -21,7 +21,6 @@
 package org.codesearch.commons.configreader.xml;
 
 import java.io.File;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import org.apache.commons.configuration.Configuration;
@@ -69,13 +68,16 @@ public class PropertyManager {
             loadConfigReader();
         }
         List<RepositoryDto> repositories = new LinkedList<RepositoryDto>();
-        List fields = config.configurationsAt("repositories.repository");
-        for (Iterator it = fields.iterator(); it.hasNext();) {
-            HierarchicalConfiguration sub = (HierarchicalConfiguration) it.next();
-            String name = sub.getString("name");
-            boolean indexingEnabled = sub.getBoolean("indexingEnabled");
-            boolean codeNavigationEnabled = sub.getBoolean("codeNavigationEnabled");
-            repositories.add(new RepositoryDto(name, indexingEnabled, codeNavigationEnabled));
+        List<HierarchicalConfiguration> repositoryConfigs = config.configurationsAt("repositories.repository");
+        for (HierarchicalConfiguration repositoryConfig : repositoryConfigs) {
+            RepositoryDto repositoryDto = new RepositoryDto();
+            repositoryDto.setName(repositoryConfig.getString("name"));
+            repositoryDto.setUrl(repositoryConfig.getString("url"));
+            repositoryDto.setUsername(repositoryConfig.getString("username"));
+            repositoryDto.setPassword(repositoryConfig.getString("password"));
+            repositoryDto.setIndexingEnabled(repositoryConfig.getBoolean("indexingEnabled"));
+            repositoryDto.setCodeNavigationEnabled(repositoryConfig.getBoolean("codeNavigationEnabled"));
+            repositories.add(repositoryDto);
         }
         return repositories;
     }
@@ -119,7 +121,7 @@ public class PropertyManager {
     }
 
     /**
-     * Reads the cListonfigpath.properties file which has to be in the root folder of
+     * Reads the configpath.properties file which has to be in the root folder of
      * the commons project and specifies the filepath for the xml.config file
      * @throws ConfigurationException if the configpath.properties file is not
      * found or does not contain a valid filepath property

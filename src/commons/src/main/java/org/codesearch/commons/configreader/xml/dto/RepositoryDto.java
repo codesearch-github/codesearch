@@ -18,90 +18,99 @@
  * You should have received a copy of the GNU General Public License
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.codesearch.commons.configreader.xml.dto;
 
 /**
  * DTO used to store information about a repository specified in the config.xml file
  * @author David Froehlich
  */
-public class RepositoryDto{
+public class RepositoryDto {
 
     /** The name specified for the repository, stored in the <name> tag in the xml file */
     private String name;
+    /** The URL of the repository. */
+    private String url;
+    /** The username for this repository. */
+    private String username;
+    /** The password for this repository. */
+    private String password;
     /** Specifies whether indexing should be enabled for this specific repository. Not recommended for
     repositories that will not be accessed or searched by codesearch*/
     private boolean indexingEnabled;
     /** Specifies whether the additional index will be created for the repository. */
     private boolean codeNavigationEnabled;
 
-    
+    public RepositoryDto() {
+    }
 
     /**
-     * Creates a new instance of RepositoryBean setting all attributes to the given parameteres
+     * Creates a new instance setting all attributes to the given parameters.
      * @param name the name of the repository
      * @param indexingEnabled specifies whether the repository should have indexing enabled
      * @param codeNavigationEnabled specifies whether the repository should have the additional
      * indexes for the code navigation
      */
-    public RepositoryDto(String name, boolean indexingEnabled, boolean codeNavigationEnabled) {
+    public RepositoryDto(String name, String url, String username, String password, boolean indexingEnabled, boolean codeNavigationEnabled) {
         this.name = name;
+        this.url = url;
+        this.username = username;
+        this.password = password;
         this.indexingEnabled = indexingEnabled;
         this.codeNavigationEnabled = codeNavigationEnabled;
     }
 
-    /**
-     * Returns the value of codeNavigationEnabled
-     * @return the value of CodeNavigationEnabled
-     */
     public boolean isCodeNavigationEnabled() {
         return codeNavigationEnabled;
     }
 
-    /**
-     * Sets the value of codeNavigationEnabled to the given parameter
-     * @param the value for codeNavigationEnabled
-     */
     public void setCodeNavigationEnabled(boolean codeNavigationEnabled) {
         this.codeNavigationEnabled = codeNavigationEnabled;
     }
 
-    /**
-     * Returns the value of indexingEnabled
-     * @return the value of indexingEnabled
-     */
     public boolean isIndexingEnabled() {
         return indexingEnabled;
     }
 
-    /**
-     * sets the value of indexingEnabled to the given parameter
-     * @param indexingEnabled the value for indexingEnabled
-     */
     public void setIndexingEnabled(boolean indexingEnabled) {
         this.indexingEnabled = indexingEnabled;
     }
 
-    /**
-     * returns the name of the repository
-     * @return the name of the repository
-     */
     public String getName() {
         return name;
     }
 
-    /**
-     * sets the name of the repository to the given paramter
-     * @param name the name for the repository
-     */
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     @Override
     public boolean equals(Object o) {
         RepositoryDto other = (RepositoryDto) o;
-        if(this.getName().equals(other.getName()) && this.isCodeNavigationEnabled() == other.isCodeNavigationEnabled() && this.isIndexingEnabled() == other.isIndexingEnabled()){
+        if (this.getName().equals(other.getName()) && this.isCodeNavigationEnabled() == other.isCodeNavigationEnabled() && this.isIndexingEnabled() == other.isIndexingEnabled()) {
             return true;
         }
         return false;

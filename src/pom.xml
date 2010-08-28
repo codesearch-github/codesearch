@@ -13,26 +13,18 @@
         <module>commons</module>
         <module>indexer</module>
         <module>searcher</module>
-    <module>SVNSvcPlugin</module>
   </modules>
 
     <!-- LIBRARY VERSIONS -->
     <properties>
         <gwt.version>2.0.4</gwt.version>
         <spring.version>3.0.2.RELEASE</spring.version>
-        <lucene.version>3.0.3</lucene.version>
+        <lucene.version>3.0.2</lucene.version>
     </properties>
 
     <!-- DEFINES VERSIONS OF DEPENDENCIES FOR MODULES -->
     <dependencyManagement>
         <dependencies>
-            <!-- NORMAL DEPENDENCIES -->
-            <dependency>
-                <groupId>log4j</groupId>
-                <artifactId>log4j</artifactId>
-                <version>1.2.14</version>
-                <scope>provided</scope>
-            </dependency>   
             <!-- SPRING FRAMEWORK -->
             <dependency>
                 <groupId>org.springframework</groupId>
