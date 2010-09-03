@@ -31,23 +31,32 @@ import org.springframework.context.support.FileSystemXmlApplicationContext;
  * @author David Froehlich
  */
 public final class PluginLoader {
-/** the list of all plugins that have been loaded at the constructor call */
+
+    /** the list of all plugins that have been loaded at the constructor call */
     private Map<String, Plugin> loadedPlugins;
 
     /**
      * Creates a new instance of plugin loader that loads all classes that implement the given classes type
      * @param the super class / interface of which the subclasses are loaded
      */
-    public PluginLoader(Class clazz){
+    public PluginLoader(Class clazz) {
         ApplicationContext context = new FileSystemXmlApplicationContext("spring-plugin-config.xml"); //move to a better 
         loadedPlugins = context.getBeansOfType(clazz); //replace with generic
     }
 
-    public Plugin getPluginForPurpose(final String type) throws Exception {
+    /**
+     * returns a plugin for the given purpose.
+     * Searches through all plugins originally loaded at the constructor call and compares the purpose of each plugin with the given parameter.
+     * Note that if there are multiple plugins with a fitting purpose it will return the first in the map (which is ordered alphabetically).
+     * @param type the purpose for the plugin
+     * @return the plugin matching the purpose
+     * @throws Exception if no plugin was found with the purpose
+     */
+    public Plugin getPluginForPurpose(final String type) throws Exception { //TODO replace Exception with something less generic
         Iterator iter = loadedPlugins.entrySet().iterator();
-        while(iter.hasNext()){
+        while (iter.hasNext()) {
             Entry<String, Plugin> entry = (Entry<String, Plugin>) iter.next();
-            if(entry.getValue().getPurpose().equals(type)){
+            if (entry.getValue().getPurpose().equals(type)) {
                 return entry.getValue();
             }
         }

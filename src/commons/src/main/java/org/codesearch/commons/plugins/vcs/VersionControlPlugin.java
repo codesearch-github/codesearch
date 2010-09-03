@@ -29,7 +29,9 @@ import org.codesearch.commons.plugins.Plugin;
  * Base for all version control plugins.
  * @author Samuel Kogler
  */
+
 public interface VersionControlPlugin extends Plugin {
+
 
     /**
      * Sets the current repository.
@@ -39,6 +41,7 @@ public interface VersionControlPlugin extends Plugin {
      * @param username The username used to access the repository.
      * @param password The password used to access the repository.
      */
+
     void setRepository(URL url, String username, String password) throws VersionControlPluginException;
 
     /**
@@ -46,12 +49,15 @@ public interface VersionControlPlugin extends Plugin {
      * @param filePath The file path relative to the current repository URL
      * @return The retrieved file content
      */
+
     String getFileContentForFilePath(String filePath) throws VersionControlPluginException;
 
     /**
      * Returns a list of changed file paths since the given revision.
      * @param revision The given revision
      * @return The paths of the changed files
+     * @throws SVNException if the file could not be found in the currently set repository
      */
+
     Set<String> getPathsForChangedFilesSinceRevision(String revision) throws VersionControlPluginException;
 }

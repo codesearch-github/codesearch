@@ -37,6 +37,7 @@ import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
 import org.codesearch.utils.IndexLogger;
 import org.codesearch.utils.FileTool;
+import org.codesearch.utils.constants.IndexerConstants;
 
 /**
  * This class can be used to index a repository
@@ -103,7 +104,7 @@ public class IndexerCore {
      *
      * @param dir directory to be indexed
      */
-    public boolean indexDirectory(File dir) {
+    public boolean indexDirectory(File dir) { //TODO Answer question from David: this method does not index recursively, does it? so only the files that are directly in the specified folder will be indexed and not if they are in a subfolder
         if(indexWriter == null)
         {
             iLog.append("Creation of indexDirectory failed due to missing initialization of IndexWriter!");
