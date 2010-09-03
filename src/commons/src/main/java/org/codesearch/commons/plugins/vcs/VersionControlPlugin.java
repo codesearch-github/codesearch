@@ -21,6 +21,7 @@
 
 package org.codesearch.commons.plugins.vcs;
 
+import java.net.URI;
 import java.net.URL;
 import java.util.Set;
 import org.codesearch.commons.plugins.Plugin;
@@ -42,7 +43,7 @@ public interface VersionControlPlugin extends Plugin {
      * @param password The password used to access the repository.
      */
 
-    void setRepository(URL url, String username, String password) throws VersionControlPluginException;
+    void setRepository(URI url, String username, String password) throws VersionControlPluginException;
 
     /**
      * Retrieves the file content for the given file path.

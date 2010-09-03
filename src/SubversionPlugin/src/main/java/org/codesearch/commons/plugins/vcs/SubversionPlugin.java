@@ -21,6 +21,7 @@
 package org.codesearch.commons.plugins.vcs;
 
 import java.io.ByteArrayOutputStream;
+import java.net.URI;
 import java.net.URL;
 import java.util.Collection;
 import java.util.HashSet;
@@ -70,7 +71,7 @@ public class SubversionPlugin implements VersionControlPlugin {
 
     /** {@inheritDoc} */
     @Override
-    public void setRepository(URL url, String username, String password) throws VersionControlPluginException {
+    public void setRepository(URI url, String username, String password) throws VersionControlPluginException {
         try {
             SVNURL svnurl = SVNURL.parseURIDecoded(url.toString());
             repository = SVNRepositoryFactory.create(svnurl);
@@ -102,10 +103,13 @@ public class SubversionPlugin implements VersionControlPlugin {
     @Override
     public Set<String> getPathsForChangedFilesSinceRevision(String revision) throws VersionControlPluginException {
         Set<String> paths = new HashSet();
-
-        Collection logs;
+        Collection logs = null;
         try {
-            logs = repository.log(new String[]{}, null, Integer.parseInt(revision), -1, true, false);
+            try {
+                logs = repository.log(new String[]{}, null, Integer.parseInt(revision), -1, true, false);
+            } catch (NullPointerException e) {
+                throw new VersionControlPluginException("No repository specified");
+            }
             Iterator iter = logs.iterator();
             while (iter.hasNext()) {
                 SVNLogEntry entry = (SVNLogEntry) iter.next();

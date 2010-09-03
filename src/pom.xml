@@ -13,7 +13,7 @@
         <module>commons</module>
         <module>indexer</module>
         <module>searcher</module>
-  </modules>
+    </modules>
 
     <!-- LIBRARY VERSIONS -->
     <properties>
@@ -25,6 +25,12 @@
     <!-- DEFINES VERSIONS OF DEPENDENCIES FOR MODULES -->
     <dependencyManagement>
         <dependencies>
+            <!-- Log4J -->
+            <dependency>
+                <groupId>log4j</groupId>
+                <artifactId>log4j</artifactId>
+                <version>1.2.14</version>
+            </dependency>
             <!-- SPRING FRAMEWORK -->
             <dependency>
                 <groupId>org.springframework</groupId>
