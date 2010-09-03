@@ -121,11 +121,12 @@ public class IndexerCore {
                 doc.add(new Field("title", currentFile.getName(), Field.Store.YES, Field.Index.NOT_ANALYZED));
                 doc.add(new Field("content", FileTool.readTextFile(currentFile), Field.Store.YES, Field.Index.ANALYZED));
                 doc.add(new Field(IndexConstants.INDEX_FIELD_FILEPATH, currentFile.getAbsolutePath(), Field.Store.YES, Field.Index.NOT_ANALYZED));
-                doc.add(new Field(IndexConstants.INDEX_FIELD_REPOSITORY, currentFile.getAbsolutePath(), Field.Store.YES, Field.Index.NOT_ANALYZED));
+                doc.add(new Field(IndexConstants.INDEX_FIELD_REPOSITORY, "", Field.Store.YES, Field.Index.NOT_ANALYZED)); //TODO test repository name
                 iLog.append("Added file: " + doc.get("title") + " to index.");
                 // Add document to the index
                 indexWriter.addDocument(doc);
             }
+            indexWriter.commit();
             indexWriter.optimize();
             indexWriter.close();
             iLog.append("Index creation sucessful: " + doc.getField("title"));

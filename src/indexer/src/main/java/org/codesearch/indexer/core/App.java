@@ -40,7 +40,7 @@ public class App
         IndexerCore iCore = new IndexerCore();
 
 
-        iCore.initializeIndexWriter(new StandardAnalyzer(Version.LUCENE_CURRENT),pathToIndexDir );
+        iCore.initializeIndexWriter(new StandardAnalyzer(Version.LUCENE_30),pathToIndexDir );
         //iCore.cleanIndexDirectory(pathToIndexDir);
         boolean lol = iCore.indexDirectory(pathToTestFiles);
 

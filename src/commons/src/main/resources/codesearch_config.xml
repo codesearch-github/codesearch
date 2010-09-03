@@ -35,7 +35,7 @@
 	<svn_username>feldruebe</svn_username>
 	<svn_password>dota!123</svn_password>
 	<indexLocation>/tmp/test</indexLocation>
-    <testproperty>asdf</testproperty>
+    <testproperty>fdsa</testproperty>
     <repositories>
         <repository>
             <name>testRepo1</name>
