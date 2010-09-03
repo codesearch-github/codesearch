@@ -35,7 +35,7 @@ public class App
     {
         System.out.println("Executing Indexing...");
 
-        File pathToTestFiles = new File("/home/zeheron/workspace/testZone/indexer");
+        File pathToTestFiles = new File("/home/david/workspace/test");
         File pathToIndexDir = new File("/tmp/test/");
         IndexerCore iCore = new IndexerCore();
 

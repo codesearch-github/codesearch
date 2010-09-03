@@ -1,0 +1,37 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>Codesearch - About the developers</title>
+        <link rel="stylesheet" href="basic.css" type="text/css" media="screen" />
+    </head>
+    <body>
+        <div id="header">
+            <div id="logo">
+                <span id="title">Codesearch</span>
+                <span id="subtitle">A java code search application</span>
+            </div>
+        </div>
+        <div id="left-sidebar">
+            <ul id="menu">
+                <li><a href="#">Home</a></li>
+                <li><a href="#">About codesearch</a></li>
+		<li><a href="#">About the developers</a></li>
+                <li><a href="#">News</a></li>
+            </ul>
+        </div>
+        <div id="content">
+		The developers Froehlich David, Kogler Samuel and Stiboller Stephan are (at time of development) classmates at the HTBLA-Kaindorf in Styria/Austria.<br/>
+		In their third grade they realized that, aside from being a great team in Defense of the Ancient (the Warcraft 3 mod), they also are pretty good in developing programs together. <br/>
+		That realization caused them to work together in a team for their project in project-development. The task here was to get any project (could really be anything, from a software project to the improvement of the school image), and since two of them already worked with Infonova (a software development company near Graz) they managed to get a software development project from them. <br/>
+The project's purpose was to adapt and extend the program SVNSearch, an application written by Infonova to keep an overview about their source code repositories. It provided the user with a search-function with which he could -similar to Google- search through the repositories and display the content of specific files in a browser. <br/>
+Our task was to adapt this progrom and extend it with the functionality of code navigation. So we were supposed to write a java source code parser that recognizes all kinds of java objects like class definitions, attribute usages, method declarations, etc. and use this parsed information to provide the user with an in-browser outline, and the ability to click on for instance attribute usages to jump to their declarations. <br/>
+Even though this was a great side-project for a year we never really were satisfied with the result. There were too many different possibilities for writing java-source code and we were stupid enough not to use some kind of existing AST-parser but write our own. <br/>
+Well, it is 'finished' and was in use at Infonova, (with the advice to not rely a hundred percent on the results) but we discussed it and decided that we had invested way too much time to leave it like that. <br/> That said we talked to our project leaders at Infonova and asked them if they would allow us to rewrite the entire program as our diploma thesis (In our school you have the choice of writing a diploma thesis during your last year). <br/>
+We explained them that most of the features we want to implement are simply not possible with the current version of SVNSearch. (At this place I have to add that SVNSearch was never originally intended for code navigation or similar features, therefore it was really hard to adapt it). During our discussion we realized that it would be stupid to write our diploma thesis only for Infonova and it would be way smarter to make it open source. Infonova agreed to that, because then they wouldn't have to pay us and we were happy because we all really wanted to be a part of the open source community and also a big open source project looks pretty good on the CV of any 17 year old guy. <br/>
+After having decided that we would write an open source project we agreed on making the program as extendable and interchangeable as possible. For once we didn't want that only SVN repositories could be searched, also we wanted that it could be used for other programming languages than Java and if anyone decided to extend our project, he or she should be able to do so without any problems. <br/>
+That being concluded we agreed on the name codesearch for our project (even though we all wanted a cool recursive abbreviation, but we couldn't find one) and got started.
+
+What you see here is the result.
+        </div>
+    </body>
+</html>
