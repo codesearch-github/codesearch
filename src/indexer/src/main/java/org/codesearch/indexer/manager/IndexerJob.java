@@ -23,62 +23,69 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package org.codesearch.indexer.manager;
+
+import java.util.LinkedList;
+import org.apache.log4j.Logger;
+import org.apache.lucene.util.Version;
+
+
 
 /**
  *
  * @author Stiboller Stephan
  */
-public class IndexerJob extends Thread
-{
+public class IndexerJob extends Thread {
+
     /** Indicates if the thread is suspended or not. */
     private boolean threadIsSuspended = false;
     /** Indicates if the thread is terminated or not. */
     private boolean threadIsTerminated = false;
+    /** List of ITask assigned to this IndexingJob */
+    private LinkedList<ITask> taskList = new LinkedList<ITask>();
+    /* Instantiate a logger */
+    private static final Logger log = Logger.getLogger(IndexerJob.class);
 
     /**
      * Suspends the thread in a save way.
      */
-    public void suspendSavely()
-    {
-        threadIsSuspended = true;
+    public void suspendSavely() {
+        try {
+            this.wait();
+            threadIsSuspended = true;
+        } catch (InterruptedException ex) {
+            log.error("Thread has been interrupted during suspend process:" +ex.getMessage());
+        }
     }
 
-   /**
+    /**
      * Resumes the thread.
      * The thread is maybe not instantly killed because the changes of
      * the IndexerJob will be reverted.
      */
-    public void resumeSavely()
-    {
+    public void resumeSavely() {
+        this.notify();
         threadIsSuspended = false;
     }
-    
+
     /**
      * First suspends and then terminates the thread.
      * The thread is maybe not instantly killed because the changes of
      * the IndexerJob will be reverted and cleaned.
      */
-    public void terminateSavely()
-    {
+    public void terminateSavely() {
         threadIsSuspended = true;
         threadIsTerminated = true;
     }
 
     /**
-     * //TODO: impl
+     * Extcuts all Tasks related to this job.
      */
     public void run() {
-        while (!threadIsSuspended)
-        {
-            //TODO: impl
+        for (int i = 0; i < taskList.size(); i++) {
+            taskList.get(i).execute(this);
+            if(threadIsSuspended = true)
+                this.suspendSavely();
         }
-        if(threadIsTerminated)
-        {
-             // TODO: Clean up all changes made by the thread
-        }
-       
     }
-
 }

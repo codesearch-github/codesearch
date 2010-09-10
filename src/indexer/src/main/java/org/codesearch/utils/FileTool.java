@@ -56,6 +56,7 @@ public final class FileTool {
     }
 
     /** Read the contents of the given file. */
+    @Deprecated
     public static String readTextFile(final File file, final String encoding) throws IOException {
 
         StringBuilder text = new StringBuilder();
@@ -72,7 +73,10 @@ public final class FileTool {
 
     }
 
-    /** Read the contents of the given file. */
+    /** 
+     * Read the contents of the given file.
+     */
+    @Deprecated
     public static String readTextFile(final File file) throws IOException {
 
         StringBuilder text = new StringBuilder();
@@ -90,16 +94,40 @@ public final class FileTool {
     }
 
     /**
-     * Clear 
+     * Clears the file content of a the specified file
      * @param file
-     * @return
+     * @return succeess
      */
-    public static boolean clearFileContent(File file)
-    {
+    public static boolean clearFileContent(File file) {
         boolean check = false;
         String path = file.getAbsolutePath();
         check = file.delete();
         file = new File(path);
         return check;
+    }
+
+    /**
+     * Deletes the specified directory physically
+     * @param dir the directory to clean
+     * @return true if directory is cleaned
+     */
+    public static boolean cleanDirectory(final File dir) {
+        if (FileTool.deleteDirectory(dir)) {
+            //iLog.append("Index destoyed sucessfully; " + dir.getAbsolutePath());
+            return true;
+        } else {
+            // iLog.append("Failed to clear IndexDirectory: " + dir.getAbsolutePath());
+            return false;
+        }
+    }
+
+     /**
+     * Extracts the filename
+     * @param path to the file
+     * @return the filename
+     */
+    public static String extractNameFromPath(final String path)
+    {
+        return new File(path).getName();
     }
 }

@@ -26,6 +26,7 @@
 package org.codesearch.indexer.manager;
 
 import java.util.Map;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -37,6 +38,8 @@ public class IndexingManager {
     Map<Long, IndexerJob> activeIndexingThreads;
     /** All predefined/availableIndexingThreads */
     Map<Long, IndexerJob> availableIndexingThreads;
+    /* Instantiate a logger */
+    private static final Logger log = Logger.getLogger(IndexingManager.class);
 
     /**
      * This method takes the proper repo configuration and starts
@@ -72,7 +75,6 @@ public class IndexingManager {
         activeIndexingThreads.get(indentifier).suspendSavely();
         //TODO:
     }
-
 
     /**
      * Terminates the execution of the specified IndexingJob

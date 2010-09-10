@@ -24,15 +24,22 @@
  * and open the template in the editor.
  */
 
-package org.codesearch.utils.constants;
+package org.codesearch.indexer.manager;
 
 /**
  *
  * @author zeheron
  */
-public class IndexerConstants {
+public interface ITask {
 
-    /** type1 description */
-    public static final String type1 = "stuff";
-
+    /**
+     * Executes the Task
+     */
+    public boolean execute(Thread thread);
+    /**
+     * Reverts all changes made by his Task
+     * @return
+     */
+    public boolean revertChanges();
+    
 }

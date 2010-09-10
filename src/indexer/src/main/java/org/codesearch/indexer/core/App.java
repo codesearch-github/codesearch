@@ -22,6 +22,8 @@
 package org.codesearch.indexer.core;
 
 import java.io.File;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.util.Version;
 
@@ -33,6 +35,7 @@ public class App
 {
     public static void main( String[] args )
     {
+
         System.out.println("Executing Indexing...");
 
         File pathToTestFiles = new File("/home/david/workspace/test");
@@ -47,5 +50,6 @@ public class App
 
         System.out.println( "Bla.. Bla.. Bla.. ->"  + lol);
         System.out.println("3 x Bla means: WIN ");
+
     }
 }

@@ -54,7 +54,6 @@ public class IndexerCore {
     IndexLogger iLog = new IndexLogger("/tmp/indexerLog.log");   //TODO: Replace test path
     /** The currently active IndexWriter */
     IndexWriter indexWriter;
-
     /** The index directory, contains all index files */
     FSDirectory indexDirectory;
 
@@ -63,7 +62,7 @@ public class IndexerCore {
     }
 
     /**
-     * Deletes the specified index directory physically
+     * Deletes the specified directory physically
      * @param dir the directory to clean
      * @return true if directory is cleaned
      */
@@ -86,9 +85,9 @@ public class IndexerCore {
      * @param analyzer analyzer for the files.
      * @param dir The location for the  lucene index
      */
-    public void initializeIndexWriter(Analyzer analyzer, File dir) {
+    public void initializeIndexWriter(Analyzer luceneAnalyzer, File dir) {
         try {
-            Analyzer luceneAnalyzer = new StandardAnalyzer(Version.LUCENE_CURRENT);
+            
             indexDirectory = FSDirectory.open(dir);
             indexWriter = new IndexWriter(indexDirectory, luceneAnalyzer, IndexWriter.MaxFieldLength.LIMITED);
             iLog.append("IndexWriter initilaization succesful: " + dir.getAbsolutePath());
