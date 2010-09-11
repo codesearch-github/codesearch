@@ -5,11 +5,8 @@
 package org.codesearch.commons.plugins.vcs;
 
 import java.net.URI;
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Iterator;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
