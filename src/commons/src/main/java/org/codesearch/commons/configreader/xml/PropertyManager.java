@@ -21,6 +21,10 @@
 package org.codesearch.commons.configreader.xml;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.List;
 import org.apache.commons.configuration.Configuration;
@@ -29,6 +33,8 @@ import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.codesearch.commons.configreader.xml.dto.RepositoryDto;
+import org.codesearch.commons.configreader.xml.dto.TaskDto;
+import org.codesearch.commons.configreader.xml.dto.TaskDto.TaskType;
 
 /**
  * PropertyManager is a class that provides several methods to access properties.
@@ -52,6 +58,39 @@ public class PropertyManager {
      * creates a new instance of PropertyManager
      */
     public PropertyManager() {
+    }
+
+    public List<TaskDto> getTasks() throws ConfigurationException {
+        List<TaskDto> tasks = new LinkedList<TaskDto>();
+        if(config == null){
+            loadConfigReader();
+        }
+        List<HierarchicalConfiguration> taskConfig = config.configurationsAt("index_tasks.index_task");
+        for(HierarchicalConfiguration hc : taskConfig){
+            String repositoryString = hc.getString("repositories");
+            List<String> repositories;
+            if(repositoryString == null){
+                repositories = null;
+            } else{
+                repositories = new LinkedList<String>();
+                repositories.addAll(Arrays.asList(repositoryString.split(",")));
+            }
+            TaskType type = null;
+            if(hc.getString("type").equals("index")){ //TODO replace with a more generic method
+                type = TaskType.index;
+            } else if(hc.getString("type").equals("clear")){
+                type = TaskType.clear;
+            }
+            int interval = hc.getInt("interval");
+            String[] timeParts = hc.getString("start").split("-");
+            Calendar calc = new GregorianCalendar(Integer.parseInt(timeParts[0]), Integer.parseInt(timeParts[1]),
+                    Integer.parseInt(timeParts[2]), Integer.parseInt(timeParts[3]), Integer.parseInt(timeParts[4]));
+            if(calc == null){
+                throw new ConfigurationException("String for start date of task configuration is not correct");
+            }
+            tasks.add(new TaskDto(repositories, type, interval, calc));
+        }
+        return tasks;
     }
 
     /**

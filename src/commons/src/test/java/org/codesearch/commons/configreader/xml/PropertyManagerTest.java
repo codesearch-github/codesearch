@@ -26,6 +26,10 @@
 
 package org.codesearch.commons.configreader.xml;
 
+import java.util.GregorianCalendar;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.apache.commons.configuration.ConfigurationException;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -37,6 +41,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.codesearch.commons.configreader.xml.dto.RepositoryDto;
+import org.codesearch.commons.configreader.xml.dto.TaskDto;
 import static org.junit.Assert.*;
 
 /**
@@ -99,6 +104,34 @@ public class PropertyManagerTest {
         String expResult = "/home/david/codesearch/src/commons/src/test/resources";
         String result = propertyManager.getConfigpath();
         assertEquals(expResult, result);
+    }
+
+    /**
+     * Test of getTasks method, of class PropertyManager.
+     */
+    @Test
+    public void testGetTasks() {
+//        System.out.println("getRepositories");
+//        RepositoryDto bean1 = new RepositoryDto("testRepo1", true, true);
+//        RepositoryDto bean2 = new RepositoryDto("testRepo2", true, false);
+//        RepositoryDto bean3 = new RepositoryDto("testRepo3", false, false);
+//
+//        List result = propertyManager.getRepositories();
+//        assertTrue(bean1.equals(result.get(0)));
+//        assertTrue(bean2.equals(result.get(1)));
+//        assertTrue(bean3.equals(result.get(2)));
+        System.out.println("getTasks");
+        TaskDto task1 = new TaskDto(null, TaskDto.TaskType.index, 60, new GregorianCalendar(2010, 9, 11, 18, 0));
+        TaskDto task2 = new TaskDto(null, TaskDto.TaskType.clear, 10080, new GregorianCalendar(2010, 11, 11, 18, 0));
+        try {
+            List<TaskDto> result = propertyManager.getTasks();
+            assert(result.size() == 2);
+            assert(result.get(0).equals(task1));
+            assert(result.get(1).equals(task2));
+        } catch (ConfigurationException ex) {
+            fail("Configuration exception: "+ex.getMessage());
+        }
+
     }
 
     @Test

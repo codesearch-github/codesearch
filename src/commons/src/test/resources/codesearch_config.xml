@@ -26,7 +26,18 @@
 <listTest>1</listTest>
 <listTest>2</listTest>
 <listTest>3</listTest>
-
+<index_tasks>
+		<index_task>
+			<type>index</type>
+			<interval>60</interval>
+			<start>2010-09-11-18-0</start>
+		</index_task>
+		<index_task>
+			<type>clear</type>
+			<interval>10080</interval>
+			<start>2010-11-11-18-0</start>
+		</index_task>
+	</index_tasks>
     <testproperty>asdf</testproperty>
     <repositories>
         <repository>

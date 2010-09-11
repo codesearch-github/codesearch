@@ -35,6 +35,18 @@
 	<svn_username>feldruebe</svn_username>
 	<svn_password>dota!123</svn_password>
 	<indexLocation>/tmp/test</indexLocation>
+	<index_tasks>
+		<index_task>
+			<type>index</type>
+			<interval>60</interval>
+			<start>2010-09-11-18</start>
+		</index_task>
+		<index_task>
+			<type>clear</type>
+			<interval>10080</interval>
+			<start>2010-11-11-18</start>
+		</index_task>
+	</index_tasks>
     <testproperty>fdsa</testproperty>
     <repositories>
         <repository>
