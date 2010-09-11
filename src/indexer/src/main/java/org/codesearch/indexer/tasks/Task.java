@@ -24,22 +24,18 @@
  * and open the template in the editor.
  */
 
-package org.codesearch.indexer.manager;
+package org.codesearch.indexer.tasks;
 
 /**
  *
  * @author zeheron
  */
-public interface ITask {
+public interface Task {
 
     /**
-     * Executes the Task
+     * Executes the Task 
      */
-    public boolean execute(Thread thread);
-    /**
-     * Reverts all changes made by his Task
-     * @return
-     */
-    public boolean revertChanges();
+    public abstract void execute();
+
     
 }

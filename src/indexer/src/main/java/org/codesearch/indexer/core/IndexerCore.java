@@ -28,22 +28,18 @@ package org.codesearch.indexer.core;
 import java.io.File;
 import java.io.IOException;
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.store.FSDirectory;
-import org.apache.lucene.util.Version;
 import org.codesearch.commons.constants.IndexConstants;
-import org.codesearch.utils.IndexLogger;
 import org.codesearch.utils.FileTool;
 
 /**
  * This class can be used to index a repository
  * by specifying the configuration and the
  * directory needed.
- * 
  * @author zeheron
  */
 public class IndexerCore {

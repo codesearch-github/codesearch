@@ -33,7 +33,7 @@ import org.apache.log4j.Logger;
  * @author Stiboller Stephan
  */
 public class IndexingManager {
-
+    
     /** All active running Threads */
     Map<Long, IndexerJob> activeIndexingThreads;
     /** All predefined/availableIndexingThreads */
@@ -48,8 +48,8 @@ public class IndexingManager {
      * @return
      */
     public Long createIndexingJob(final String theconfiguration) {
-        IndexerJob iThread = null;
-        Long indentifier = null;
+        IndexerJob iThread = new IndexerJob();
+        Long indentifier = 1337l;
         //TODO: init
         activeIndexingThreads.put(indentifier, iThread);
         return indentifier;
@@ -72,8 +72,15 @@ public class IndexingManager {
      * @param indentifier
      */
     public void suspendActiveIndexingJob(Long indentifier) {
-        activeIndexingThreads.get(indentifier).suspendSavely();
-        //TODO:
+        activeIndexingThreads.get(indentifier).suspendSafely();
+    }
+
+     /**
+     * Resumes the execution of the specified IndexingJob
+     * @param indentifier
+     */
+    public void resumeSuspendedIndexingJob(Long indentifier) {
+        activeIndexingThreads.get(indentifier).resumeSafely();
     }
 
     /**
@@ -82,6 +89,6 @@ public class IndexingManager {
      * @param indentifier
      */
     public void terminateActiveIndexingJob(Long indentifier) {
-        activeIndexingThreads.remove(indentifier).terminateSavely();
+        activeIndexingThreads.remove(indentifier).terminateSafely();
     }
 }

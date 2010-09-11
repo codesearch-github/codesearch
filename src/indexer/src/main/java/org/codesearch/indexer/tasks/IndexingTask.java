@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.codesearch.indexer.manager;
+package org.codesearch.indexer.tasks;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,46 +19,49 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
 import org.codesearch.commons.constants.IndexConstants;
+import org.codesearch.commons.plugins.Plugin;
 import org.codesearch.commons.plugins.PluginLoader;
 import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
 import org.codesearch.commons.plugins.vcs.VersionControlPluginException;
 import org.codesearch.utils.FileTool;
-import org.codesearch.utils.IndexLogger;
+import org.codesearch.indexer.core.IndexLogger;
 
 /**
+ * This class is the base class used for indexing
  *
  * @author zeheron
  */
-public class ITaskIndexing implements ITask {
+public abstract class IndexingTask implements Task {
 
-    /** The filesNames to be processed */
-    private Set<String> contentFiles;
+    /** The IndexingTask to be processed */
+    protected Set<String> filesNames;
     /* Instantiate a logger  */
-    private static final Logger log = Logger.getLogger(ITaskIndexing.class);
+    protected static final Logger log = Logger.getLogger(IndexingTask.class);
     /** The currently active IndexWriter */
-    private IndexWriter indexWriter;
+    protected IndexWriter indexWriter;
     /** The index directory, contains all index files */
-    private FSDirectory indexDirectory;
+    protected FSDirectory indexDirectory;
     /** The Version controll Plugin */
-    private VersionControlPlugin vcp;
+    protected VersionControlPlugin vcp;
 
     @Override
-    public boolean execute(Thread parentThread) {
-        try {
-            PluginLoader pl = new PluginLoader(VersionControlPlugin.class);
-            vcp = (VersionControlPlugin) pl.getPluginForPurpose("SVN");
-            contentFiles = vcp.getPathsForChangedFilesSinceRevision("0");  // TODO : REVISION EXTRACTING!
-            initializeIndexWriter(new StandardAnalyzer(IndexConstants.LUCENE_VERSION), new File(IndexConstants.INDEX_DIRECTORY));
-        } catch (Exception ex) {
-            log.error("Task execution failed: " + ex.getMessage());
-        }
+    public abstract void execute();
 
-        return true; //TODO REPLACE
-    }
+    /**
+     * Initializes the version control plugin
+     * @throws Exception
+     */
+    public abstract void initializeVersionControlPlugin();
 
-    @Override
-    public boolean revertChanges() {
-        throw new UnsupportedOperationException("Not supported yet.");
+    /**
+     * Adds the Fields to the lucene document.
+     * @param doc the target document
+     * @return document with added lucene fields
+     */
+    public Document addLuceneFields(Document doc, String path) throws VersionControlPluginException {
+        doc.add(new Field("TITLE", extractFilename(path), Field.Store.YES, Field.Index.NOT_ANALYZED));
+        doc.add(new Field("CONTENT", vcp.getFileContentForFilePath(path), Field.Store.YES, Field.Index.ANALYZED));
+        return doc;
     }
 
     /**
@@ -73,32 +76,28 @@ public class ITaskIndexing implements ITask {
             log.debug("IndexWriter initilaization successful: " + dir.getAbsolutePath());
         } catch (IOException ex) {
             IndexLogger.log.error(ex);
-            log.error("IndexWriter initialization error: Could not open directory " + dir.getAbsolutePath() );
+            log.error("IndexWriter initialization error: Could not open directory " + dir.getAbsolutePath());
         }
 
     }
 
     /**
      * Creates an index for the given Directory.
-     *
-     * @param dir directory to be indexed
      */
-    public boolean indexDirectory() {
+    public boolean createIndex() {
         if (indexWriter == null) {
             log.error("Creation of indexDirectory failed due to missing initialization of IndexWriter!");
             return false;
         }
         Document doc = new Document();
         try {
-            Iterator it = contentFiles.iterator();
+            Iterator it = filesNames.iterator();
             while (it.hasNext()) {
-
-                String file = (String) it.next();
+                String path = (String) it.next();
                 // The lucene document containing all relevant indexing information
                 doc = new Document();
                 // Add fields
-                doc.add(new Field("TITLE", vcp.getFileNameForFilePath(file), Field.Store.YES, Field.Index.NOT_ANALYZED));
-                doc.add(new Field("CONTENT", vcp.getFileContentForFilePath(file), Field.Store.YES, Field.Index.ANALYZED));
+                doc = addLuceneFields(doc, path);
                 log.debug("Added file: " + doc.get("title") + " to index.");
                 // Add document to the index
                 indexWriter.addDocument(doc);
@@ -112,10 +111,20 @@ public class ITaskIndexing implements ITask {
         } catch (CorruptIndexException ex) {
             log.error("Indexing  of: " + doc.get("title") + " failed! \n" + ex.getMessage());
         } catch (IOException ex) {
-            log.error("Adding file to index: " + doc.get("title") + " failed! \n"+ ex.getMessage());
+            log.error("Adding file to index: " + doc.get("title") + " failed! \n" + ex.getMessage());
         } catch (NullPointerException ex) {
-            log.error("NullPointerException: FileContentDirectory is empty!"+ ex.getMessage());
+            log.error("NullPointerException: FileContentDirectory is empty!" + ex.getMessage());
         }
         return true;
+    }
+
+    /**
+     * Extracts the filename out of the given path
+     * @param path - a filepath
+     * @return the name of the file
+     */
+    public String extractFilename(final String path) {
+        String[] parts = path.split("/");
+        return parts[parts.length];
     }
 }

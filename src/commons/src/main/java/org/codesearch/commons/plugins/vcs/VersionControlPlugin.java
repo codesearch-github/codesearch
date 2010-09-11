@@ -62,11 +62,4 @@ public interface VersionControlPlugin extends Plugin {
 
     Set<String> getPathsForChangedFilesSinceRevision(String revision) throws VersionControlPluginException;
 
-    /**
-     * Retrieves the filename for the given file path.
-     * @param filePath The file path relative to the current repository URL
-     * @return The retrieved filename
-     */
-
-    String getFileNameForFilePath(String filePath) throws VersionControlPluginException;
 }

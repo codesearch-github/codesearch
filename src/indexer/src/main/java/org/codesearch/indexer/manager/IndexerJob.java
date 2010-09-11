@@ -27,9 +27,7 @@ package org.codesearch.indexer.manager;
 
 import java.util.LinkedList;
 import org.apache.log4j.Logger;
-import org.apache.lucene.util.Version;
-
-
+import org.codesearch.indexer.tasks.Task;
 
 /**
  *
@@ -42,14 +40,14 @@ public class IndexerJob extends Thread {
     /** Indicates if the thread is terminated or not. */
     private boolean threadIsTerminated = false;
     /** List of ITask assigned to this IndexingJob */
-    private LinkedList<ITask> taskList = new LinkedList<ITask>();
+    private LinkedList<Task> taskList = new LinkedList<Task>();
     /* Instantiate a logger */
     private static final Logger log = Logger.getLogger(IndexerJob.class);
 
     /**
      * Suspends the thread in a save way.
      */
-    public void suspendSavely() {
+    public void suspendSafely() {
         try {
             this.wait();
             threadIsSuspended = true;
@@ -63,7 +61,7 @@ public class IndexerJob extends Thread {
      * The thread is maybe not instantly killed because the changes of
      * the IndexerJob will be reverted.
      */
-    public void resumeSavely() {
+    public void resumeSafely() {
         this.notify();
         threadIsSuspended = false;
     }
@@ -73,7 +71,7 @@ public class IndexerJob extends Thread {
      * The thread is maybe not instantly killed because the changes of
      * the IndexerJob will be reverted and cleaned.
      */
-    public void terminateSavely() {
+    public void terminateSafely() {
         threadIsSuspended = true;
         threadIsTerminated = true;
     }
@@ -83,9 +81,9 @@ public class IndexerJob extends Thread {
      */
     public void run() {
         for (int i = 0; i < taskList.size(); i++) {
-            taskList.get(i).execute(this);
+            taskList.get(i).execute();
             if(threadIsSuspended = true)
-                this.suspendSavely();
+                this.suspendSafely();
         }
     }
 }
