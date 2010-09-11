@@ -60,6 +60,6 @@ public final class PluginLoader {
                 return entry.getValue();
             }
         }
-        throw new Exception("There is no bean in the list with the given purpose");
+        throw new Exception("No Plugin found for given purpose");
     }
 }

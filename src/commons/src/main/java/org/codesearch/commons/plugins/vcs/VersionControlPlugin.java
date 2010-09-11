@@ -22,7 +22,6 @@
 package org.codesearch.commons.plugins.vcs;
 
 import java.net.URI;
-import java.net.URL;
 import java.util.Set;
 import org.codesearch.commons.plugins.Plugin;
 
@@ -33,7 +32,6 @@ import org.codesearch.commons.plugins.Plugin;
 
 public interface VersionControlPlugin extends Plugin {
 
-
     /**
      * Sets the current repository.
      * It is required that the repository is set before calling any of the
@@ -42,7 +40,6 @@ public interface VersionControlPlugin extends Plugin {
      * @param username The username used to access the repository.
      * @param password The password used to access the repository.
      */
-
     void setRepository(URI url, String username, String password) throws VersionControlPluginException;
 
     /**
@@ -50,7 +47,6 @@ public interface VersionControlPlugin extends Plugin {
      * @param filePath The file path relative to the current repository URL
      * @return The retrieved file content
      */
-
     String getFileContentForFilePath(String filePath) throws VersionControlPluginException;
 
     /**
@@ -59,7 +55,6 @@ public interface VersionControlPlugin extends Plugin {
      * @return The paths of the changed files
      * @throws SVNException if the file could not be found in the currently set repository
      */
-
     Set<String> getPathsForChangedFilesSinceRevision(String revision) throws VersionControlPluginException;
 
 }

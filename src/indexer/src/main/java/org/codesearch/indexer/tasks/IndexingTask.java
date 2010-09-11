@@ -8,23 +8,15 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Set;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.store.FSDirectory;
-import org.apache.lucene.util.Version;
-import org.codesearch.commons.constants.IndexConstants;
-import org.codesearch.commons.plugins.Plugin;
-import org.codesearch.commons.plugins.PluginLoader;
 import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
 import org.codesearch.commons.plugins.vcs.VersionControlPluginException;
-import org.codesearch.utils.FileTool;
-import org.codesearch.indexer.core.IndexLogger;
 
 /**
  * This class is the base class used for indexing
@@ -41,7 +33,7 @@ public abstract class IndexingTask implements Task {
     protected IndexWriter indexWriter;
     /** The index directory, contains all index files */
     protected FSDirectory indexDirectory;
-    /** The Version controll Plugin */
+    /** The Version control Plugin */
     protected VersionControlPlugin vcp;
 
     @Override
@@ -75,7 +67,7 @@ public abstract class IndexingTask implements Task {
             indexWriter = new IndexWriter(indexDirectory, luceneAnalyzer, IndexWriter.MaxFieldLength.LIMITED);
             log.debug("IndexWriter initilaization successful: " + dir.getAbsolutePath());
         } catch (IOException ex) {
-            IndexLogger.log.error(ex);
+            log.error(ex);
             log.error("IndexWriter initialization error: Could not open directory " + dir.getAbsolutePath());
         }
 

@@ -27,10 +27,8 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.List;
-import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.HierarchicalConfiguration;
-import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.codesearch.commons.configreader.xml.dto.RepositoryDto;
 import org.codesearch.commons.configreader.xml.dto.TaskDto;
@@ -38,21 +36,19 @@ import org.codesearch.commons.configreader.xml.dto.TaskDto.TaskType;
 
 /**
  * PropertyManager is a class that provides several methods to access properties.
- * The properties are stored in a file called codesearch_config.xml, the path to this file can be
- * specified in the configpath.properties file which always has to be in the root folder of
- * the commons project.
+ * By default, the properties are stored in a file in the classpath called codesearch_config.xml.
  *
  * @author David Froehlich
+ * @author Samuel Kogler
  */
 public class PropertyManager {
 
     /** The XMLConfiguration object that is used to read the properties from 
-     * the xml-file, does not have to be instantiated actively hence it will
+     * the XML-file, does not have to be instantiated actively, it will
      * be checked and instantiated whenever used */
     private XMLConfiguration config;
-    /** The path to the codesearch_config.xml file, will be read from the fielPath.properties file
-     * or can be set manually to read a different config-file */
-    private String configpath = "";
+    /** The path to the configuration file. */
+    private String configpath = "codesearch_config.xml";
 
     /**
      * creates a new instance of PropertyManager
@@ -94,13 +90,10 @@ public class PropertyManager {
     }
 
     /**
-     * returns a list of RepositoryBeans containing information about the repositories
-     * specified in the codesearch_config.xml file. Also checks if the XMLConfiguration is
-     * instantiated and, if not, instantiates it with the configpath declared.
-     * If no configpath is declared, the method will read the configpath from the configpath.properties
+     * Returns a list of repositories defined in the configuration.
+     * Checks if the XMLConfiguration is instantiated and, if not, instantiates it.
      * @return the list of all repositories
-     * @throws ConfigurationException if either the readConfigPath() method throws
-     * an exception or the codesearch_config.xml file is either not found or contains invalid data
+     * @throws ConfigurationException If the config file is either not found or contains invalid data.
      */
     public List<RepositoryDto> getRepositories() throws ConfigurationException {
         if (config == null) {
@@ -122,37 +115,27 @@ public class PropertyManager {
     }
 
     /**
-     * returns the value of the given single-line-property from the codesearch_config.xml file
-     * If the config reader object was not instanciated before, it will be created with the
-     * configpath specified, if no configpath is specified it will read it from the configpath.properties file
-     * @param key the key for the property
+     * Returns the value of the given single-line property from the configuration file.
+     * @param key the key of the property
      * @return the value of the property
-     * @throws ConfigurationException if either the configpath.properties file does not
-     * exist or does not contain a valid value or if the config.xml file does not contain
-     * a value for the given key
+     * @throws ConfigurationException If the configuration file does not contain a value for the given key.
      */
-    public String getSingleLinePropertyValue(String key) throws ConfigurationException {
-        String value = "";
+    public String getSingleLinePropertyValue(final String key) throws ConfigurationException {
         if (config == null) {
             loadConfigReader();
         }
-        value = config.getString(key);
-        return value;
+        return config.getString(key);
     }
 
     /**
-     * returns the values of all single-line-properties form the codesearch_config.xml file that match the given key.
-     * If the config reader object was not instanciated before, it will be created with the
-     * configpath specified, if no configpath is specified it will read it from the configpath.properties file
+     * Returns the values of all single-line properties that match the given key from the configuration file.
      * @param key the key for the property
      * @return a list of the values of the properties
-     * @throws ConfigurationException if either the configpath.properties file does not
-     * exist or does not contain a valid value or if the config.xml file does not contain
-     * a value for the given key
+     * @throws ConfigurationException If the configuration file does not contain a value for the given key
      */
-    public List<String> getSingleLinePropertyValueList(String key) throws ConfigurationException {
+    public List<String> getSingleLinePropertyValueList(final String key) throws ConfigurationException {
         List<String> values = new LinkedList<String>();
-            if (config == null) {
+        if (config == null) {
             loadConfigReader();
         }
         values = config.getList(key);
@@ -160,43 +143,18 @@ public class PropertyManager {
     }
 
     /**
-     * Reads the configpath.properties file which has to be in the root folder of
-     * the commons project and specifies the filepath for the xml.config file
-     * @throws ConfigurationException if the configpath.properties file is not
-     * found or does not contain a valid filepath property
-     */
-    private void readConfigPath() throws ConfigurationException {
-        Configuration configPathReader = new PropertiesConfiguration("configpath.properties");
-        configpath = configPathReader.getString("filepath");
-    }
-
-    /**
-     * loads the codesearch_config.xml file from the filepath specified in the configpath.properties file
-     * instantiates the XMLConfiguration object through which the config can be read.
-     * @throws ConfigurationException if either the configpath.properties file was not found
-     * or contains invalid data, or if the config.xml file was not found.
+     * Loads the configuration file from the default or specified path.
+     * @throws ConfigurationException If the configuration file was not found.
      */
     private void loadConfigReader() throws ConfigurationException {
-        if (configpath.equals("")) {
-            readConfigPath();
-        }
-        config = new XMLConfiguration(configpath + File.separator + "codesearch_config.xml");
+        config = new XMLConfiguration(configpath);
     }
 
-    /**
-     * returns the set configpath
-     * @return the configpath
-     */
     public String getConfigpath() {
         return configpath;
     }
 
-    /**
-     * sets the configpath to the given parameter
-     * use this method before using any of the property retrieving methods to set a custom config file
-     * @param configpath the path to the properties configuration
-     */
-    public void setConfigpath(String configpath) {
+    public void setConfigpath(final String configpath) {
         this.configpath = configpath;
     }
 }

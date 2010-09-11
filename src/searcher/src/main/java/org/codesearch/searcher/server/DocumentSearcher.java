@@ -25,8 +25,9 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
+import org.apache.log4j.spi.LoggerFactory;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.queryParser.ParseException;
@@ -47,16 +48,18 @@ import org.codesearch.searcher.shared.ResultItem;
  */
 public class DocumentSearcher {
 //TODO add log messages for class
+
     /** the key with which the location of the index is stored in the configuration file */
     public static final String INDEX_LOCATION_KEY = "indexLocation";
     /** The parser used for parsing search terms to lucene queries */
-    private QueryParser parser;
+    private QueryParser queryParser;
     /** The searcher used for searching the lucene index */
-    private IndexSearcher searcher;
+    private IndexSearcher indexSearcher;
     /** The propertyManager used for retrieving information from the configuration */
-    private PropertyManager propertyM;
+    private PropertyManager propertyManager;
+    /** The logger. */
+    private static final Logger LOG = Logger.getLogger(DocumentSearcher.class);
 
-    private static final Log logger = LogFactory.getLog(DocumentSearcher.class);
     /**
      * Creates a new DocumentSearcher instance
      * @throws ConfigurationException if no value for the key specified in the constant INDEX_LOCATION_KEY could be found in the in the configuration via the PropertyManager
@@ -64,13 +67,13 @@ public class DocumentSearcher {
      */
     public DocumentSearcher() throws ConfigurationException, IOException {
         //Initialize PropertyManager to retrieve indexlocation from the configuraiton
-        propertyM = new PropertyManager(); //TODO replace with spring injection
-        String indexLocation = propertyM.getSingleLinePropertyValue(INDEX_LOCATION_KEY);
-        logger.debug("Index location set to: "+indexLocation);
+        propertyManager = new PropertyManager(); //TODO replace with spring injection
+        String indexLocation = propertyManager.getSingleLinePropertyValue(INDEX_LOCATION_KEY);
+        LOG.debug("Index location set to: " + indexLocation);
         //TODO replace with appropriate Analyzer
-        parser = new QueryParser(Version.LUCENE_30, "", new StandardAnalyzer(Version.LUCENE_30));
-        searcher = new IndexSearcher(FSDirectory.open(new File(indexLocation)), true);
-        logger.debug("DocumentSearcher created");
+        queryParser = new QueryParser(Version.LUCENE_30, "", new StandardAnalyzer(Version.LUCENE_30));
+        indexSearcher = new IndexSearcher(FSDirectory.open(new File(indexLocation)), true);
+        LOG.debug("DocumentSearcher created");
     }
 
     /**
@@ -80,17 +83,17 @@ public class DocumentSearcher {
      * @throws ParseException if the searchString could not be parsed to a query
      * @throws IOException if the Index could not be read
      */
-    public List<ResultItem> getResultsForSearch(String searchString) throws ParseException, IOException {
+    public List<ResultItem> search(String searchString) throws ParseException, IOException {
         LinkedList<ResultItem> results = new LinkedList<ResultItem>();
-        Query query = parser.parse(searchString);
-        logger.info("Search index with query: "+query.toString());
+        Query query = queryParser.parse(searchString);
+        LOG.info("Search index with query: " + query.toString());
         //Retrieve all search results from search
-        TopDocs topDocs = searcher.search(query, 10000);
-        logger.info("Found "+topDocs.scoreDocs.length+" results");
+        TopDocs topDocs = indexSearcher.search(query, 10000);
+        LOG.info("Found " + topDocs.scoreDocs.length + " results");
         Document doc;
         //Add each search result in form of a ResultItem to the results-list
         for (ScoreDoc sd : topDocs.scoreDocs) {
-            doc = searcher.doc(sd.doc);
+            doc = indexSearcher.doc(sd.doc);
             String repo = doc.get(IndexConstants.INDEX_FIELD_REPOSITORY);
             String filePath = doc.get(IndexConstants.INDEX_FIELD_FILEPATH);
             float relevance = sd.score;

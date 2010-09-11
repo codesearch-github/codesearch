@@ -1,0 +1,32 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui">
+    <ui:style>
+        .header
+        {
+            border-style: none none solid none;
+            border-width: 1px;
+        }
+    </ui:style>
+    <g:DockLayoutPanel unit='PX'>
+        <g:north size='94'>
+            <g:HTMLPanel styleName='{style.header}'>
+                <g:Image resource='{res.logo}' />
+            </g:HTMLPanel>
+        </g:north>
+        <g:center>
+            <g:DockLayoutPanel unit='EM'>
+                <g:north size='5'>
+                    <g:HTMLPanel>
+                        <g:Label text='Search for:' />
+                        <g:TextBox ui:field='searchBox' />
+                        <g:Button ui:field='searchButton' text='Search' />
+                    </g:HTMLPanel>
+                </g:north>
+                <g:center>
+                    <g:Label ui:field='resultLabel' text='asdf'/>
+                </g:center>
+            </g:DockLayoutPanel>
+        </g:center>
+    </g:DockLayoutPanel>
+</ui:UiBinder>

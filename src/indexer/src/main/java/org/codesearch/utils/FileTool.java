@@ -25,109 +25,111 @@
  */
 package org.codesearch.utils;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Scanner;
-
 /**
  * This class is used to extract the text
  * out of a text file.
  * @author zeheron
+ * @deprecated Use apache commons FileUtils instead.
  */
+@Deprecated
 public final class FileTool {
 
-    /**
-     * Deletes a directory recursivly
-     * @param path
-     * @return true if sucessful
-     */
-    static public boolean deleteDirectory(final File path) {
-        if (path.exists()) {
-            File[] files = path.listFiles();
-            for (int i = 0; i < files.length; i++) {
-                if (files[i].isDirectory()) {
-                    deleteDirectory(files[i]);
-                } else {
-                    files[i].delete();
-                }
-            }
-        }
-        return (path.delete());
-    }
+   
+//    /**
+//     * Deletes a directory recursivly
+//     * @param path
+//     * @return true if sucessful
+//     */
+//    static public boolean deleteDirectory(final File path) {
+//        if (path.exists()) {
+//            File[] files = path.listFiles();
+//            for (int i = 0; i < files.length; i++) {
+//                if (files[i].isDirectory()) {
+//                    deleteDirectory(files[i]);
+//                } else {
+//                    files[i].delete();
+//                }
+//            }
+//        }
+//        return (path.delete());
+//    }
+//
+//    /**
+//     * Deletes the specified directory physically
+//     * @param dir the directory to clean
+//     * @return true if directory is cleaned
+//     */
+//    public static boolean cleanDirectory(final File dir) {
+//        if (FileTool.deleteDirectory(dir)) {
+//            //iLog.append("Index destoyed sucessfully; " + dir.getAbsolutePath());
+//            return true;
+//        } else {
+//            // iLog.append("Failed to clear IndexDirectory: " + dir.getAbsolutePath());
+//            return false;
+//        }
+//    }
 
-    /** Read the contents of the given file. */
-    @Deprecated
-    public static String readTextFile(final File file, final String encoding) throws IOException {
 
-        StringBuilder text = new StringBuilder();
-        String NL = System.getProperty("line.separator");
-        Scanner scanner = new Scanner(file, encoding);
-        try {
-            while (scanner.hasNextLine()) {
-                text.append(scanner.nextLine() + NL);
-            }
-        } finally {
-            scanner.close();
-        }
-        return text.toString();
+//    /**
+//     * Clears the file content of a the specified file
+//     * @param file
+//     * @return success
+//     */
+//    public static boolean clearFileContent(File file) {
+//        boolean check = false;
+//        String path = file.getAbsolutePath();
+//        check = file.delete();
+//        file = new File(path);
+//        return check;
+//    }
 
-    }
 
-    /** 
-     * Read the contents of the given file.
-     */
-    @Deprecated
-    public static String readTextFile(final File file) throws IOException {
+//     /**
+//     * Extracts the filename
+//     * @param path to the file
+//     * @return the filename
+//     */
+//    public static String extractNameFromPath(final String path)
+//    {
+//        return new File(path).getName();
+//    }
 
-        StringBuilder text = new StringBuilder();
-        String NL = System.getProperty("line.separator");
-        Scanner scanner = new Scanner(file);
-        try {
-            while (scanner.hasNextLine()) {
-                text.append(scanner.nextLine() + NL);
-            }
-        } finally {
-            scanner.close();
-        }
-        return text.toString();
 
-    }
-
-    /**
-     * Clears the file content of a the specified file
-     * @param file
-     * @return succeess
-     */
-    public static boolean clearFileContent(File file) {
-        boolean check = false;
-        String path = file.getAbsolutePath();
-        check = file.delete();
-        file = new File(path);
-        return check;
-    }
-
-    /**
-     * Deletes the specified directory physically
-     * @param dir the directory to clean
-     * @return true if directory is cleaned
-     */
-    public static boolean cleanDirectory(final File dir) {
-        if (FileTool.deleteDirectory(dir)) {
-            //iLog.append("Index destoyed sucessfully; " + dir.getAbsolutePath());
-            return true;
-        } else {
-            // iLog.append("Failed to clear IndexDirectory: " + dir.getAbsolutePath());
-            return false;
-        }
-    }
-
-     /**
-     * Extracts the filename
-     * @param path to the file
-     * @return the filename
-     */
-    public static String extractNameFromPath(final String path)
-    {
-        return new File(path).getName();
-    }
+//    /** Read the contents of the given file. */
+//    @Deprecated
+//    public static String readTextFile(final File file, final String encoding) throws IOException {
+//
+//        StringBuilder text = new StringBuilder();
+//        String NL = System.getProperty("line.separator");
+//        Scanner scanner = new Scanner(file, encoding);
+//        try {
+//            while (scanner.hasNextLine()) {
+//                text.append(scanner.nextLine()).append(NL);
+//            }
+//        } finally {
+//            scanner.close();
+//        }
+//        return text.toString();
+//
+//    }
+//
+//    /**
+//     * Read the contents of the given file.
+//     */
+//    @Deprecated
+//    public static String readTextFile(final File file) throws IOException {
+//
+//        StringBuilder text = new StringBuilder();
+//        String NL = System.getProperty("line.separator");
+//        Scanner scanner = new Scanner(file);
+//        try {
+//            while (scanner.hasNextLine()) {
+//                text.append(scanner.nextLine()).append(NL);
+//            }
+//        } finally {
+//            scanner.close();
+//        }
+//        return text.toString();
+//
+//    }
 }

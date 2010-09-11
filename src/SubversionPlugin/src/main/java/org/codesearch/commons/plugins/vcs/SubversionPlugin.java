@@ -22,7 +22,6 @@ package org.codesearch.commons.plugins.vcs;
 
 import java.io.ByteArrayOutputStream;
 import java.net.URI;
-import java.net.URL;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;

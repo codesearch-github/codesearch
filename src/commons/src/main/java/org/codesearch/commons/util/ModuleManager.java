@@ -26,15 +26,18 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.codesearch.commons.configreader.xml.PropertyManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * Used to parse the configuration for a module.
  * @author Samuel Kogler
  */
+
 public class ModuleManager {
 
-    /** The filename of the default module configuration. */
-    private static final String DEFAULT_CONFIG_FILENAME = "module-config.xml";
+    /** The filename of the module configuration. */
+    private static final String MODULE_CONFIG_PATH = "module-config.xml";
     /** The property manager used to read the configuration. */
     @Autowired
     private PropertyManager propertyManager;
@@ -46,11 +49,22 @@ public class ModuleManager {
      * defined in the module configuration.
      * @return The locations of the spring configuration files.
      */
-    public List<String> getSpringConfigLocations() throws ConfigurationException {
+    private List<String> getSpringConfigLocations() throws ConfigurationException {
         List<String> springConfigLocations = new LinkedList<String>();
-        propertyManager.setConfigpath(DEFAULT_CONFIG_FILENAME);
+        propertyManager.setConfigpath(MODULE_CONFIG_PATH);
         springConfigLocations.addAll(propertyManager.getSingleLinePropertyValueList("springConfigLocation"));
         return springConfigLocations;
     }
 
+    public ApplicationContext getApplicationContext() throws ModuleManagerException {
+        try {
+            if (applicationContext == null) {
+                applicationContext = new ClassPathXmlApplicationContext(getSpringConfigLocations().toArray(new String[0]));
+            }
+
+            return applicationContext;
+        } catch (ConfigurationException ex) {
+            throw new ModuleManagerException(ex.toString());
+        }
+    }
 }

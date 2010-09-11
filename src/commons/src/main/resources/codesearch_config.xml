@@ -22,15 +22,6 @@
 
 -->
 
-
-<!--
-    Document   : config.xml
-    Created on : August 3, 2010, 2:28 PM
-    Author     : david
-    Description:
-        Purpose of the document follows.
--->
-
 <root>
 	<svn_username>feldruebe</svn_username>
 	<svn_password>dota!123</svn_password>
@@ -51,16 +42,19 @@
     <repositories>
         <repository>
             <name>testRepo1</name>
+            <url>http://test.org</url>
             <indexingEnabled>true</indexingEnabled>
             <codeNavigationEnabled>true</codeNavigationEnabled>
         </repository>
         <repository>
             <name>testRepo2</name>
+            <url>http://test.org</url>
             <indexingEnabled>true</indexingEnabled>
             <codeNavigationEnabled>false</codeNavigationEnabled>
         </repository>
         <repository>
             <name>testRepo3</name>
+            <url>http://test.org</url>
             <indexingEnabled>false</indexingEnabled>
             <codeNavigationEnabled>false</codeNavigationEnabled>
         </repository>
