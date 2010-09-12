@@ -25,9 +25,7 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.Logger;
-import org.apache.log4j.spi.LoggerFactory;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.queryParser.ParseException;
@@ -40,7 +38,7 @@ import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
 import org.codesearch.commons.configreader.xml.PropertyManager;
 import org.codesearch.commons.constants.IndexConstants;
-import org.codesearch.searcher.shared.ResultItem;
+import org.codesearch.searcher.shared.SearchResultDto;
 
 /**
  * Provides methods to search the lucene index
@@ -83,8 +81,8 @@ public class DocumentSearcher {
      * @throws ParseException if the searchString could not be parsed to a query
      * @throws IOException if the Index could not be read
      */
-    public List<ResultItem> search(String searchString) throws ParseException, IOException {
-        LinkedList<ResultItem> results = new LinkedList<ResultItem>();
+    public List<SearchResultDto> search(String searchString) throws ParseException, IOException {
+        LinkedList<SearchResultDto> results = new LinkedList<SearchResultDto>();
         Query query = queryParser.parse(searchString);
         LOG.info("Search index with query: " + query.toString());
         //Retrieve all search results from search
@@ -94,10 +92,11 @@ public class DocumentSearcher {
         //Add each search result in form of a ResultItem to the results-list
         for (ScoreDoc sd : topDocs.scoreDocs) {
             doc = indexSearcher.doc(sd.doc);
-            String repo = doc.get(IndexConstants.INDEX_FIELD_REPOSITORY);
-            String filePath = doc.get(IndexConstants.INDEX_FIELD_FILEPATH);
-            float relevance = sd.score;
-            results.add(new ResultItem(filePath, repo, relevance));
+            SearchResultDto searchResult = new SearchResultDto();
+            searchResult.setRepository(doc.get(IndexConstants.INDEX_FIELD_REPOSITORY));
+            searchResult.setFilePath(doc.get(IndexConstants.INDEX_FIELD_FILEPATH));
+            searchResult.setRelevance(sd.score);
+            results.add(searchResult);
         }
         return results;
     }

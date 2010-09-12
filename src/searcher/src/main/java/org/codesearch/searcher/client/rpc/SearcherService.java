@@ -3,7 +3,7 @@ package org.codesearch.searcher.client.rpc;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import java.util.List;
-import org.codesearch.searcher.shared.ResultItem;
+import org.codesearch.searcher.shared.SearchResultDto;
 
 /**
  *
@@ -11,5 +11,5 @@ import org.codesearch.searcher.shared.ResultItem;
  */
 @RemoteServiceRelativePath("searcherservice")
 public interface SearcherService extends RemoteService {
-    public List<ResultItem> doSearch(String query);
+    public SearchResultDto[] doSearch(String query);
 }

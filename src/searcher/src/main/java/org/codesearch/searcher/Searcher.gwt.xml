@@ -4,11 +4,12 @@
   <!-- Inherit the core Web Toolkit stuff.                        -->
     <inherits name="com.google.gwt.user.User"/>
     <inherits name="com.google.gwt.user.theme.standard.Standard"/>
+    <inherits name="com.google.gwt.resources.Resources" />
     <inherits name='com.google.gwt.requestfactory.RequestFactory'/>
   <!-- <inherits name='com.google.gwt.user.theme.chrome.Chrome'/> -->
   <!-- <inherits name='com.google.gwt.user.theme.dark.Dark'/>     -->
   <!-- Specify the app entry point class.                         -->
     <entry-point class="org.codesearch.searcher.client.SearcherEntryPoint"/>
     <source path="client"/>
-    <source path="ui"/>
+    <source path="shared"/>
 </module>

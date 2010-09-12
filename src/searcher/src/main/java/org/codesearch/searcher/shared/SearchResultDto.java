@@ -20,19 +20,21 @@
  */
 package org.codesearch.searcher.shared;
 
+import java.io.Serializable;
+
 /**
- *
+ * Data transfer object holding the data of a single search result.
  * @author David Froehlich
  */
-public class ResultItem {
+public class SearchResultDto implements Serializable {
+    /** The path to the result file. */
     private String filePath;
+    /** The repository. */
     private String repository;
+    /** The result relevance. */
     private float relevance;
 
-    public ResultItem(String filePath, String repository, float relevance) {
-        this.filePath = filePath;
-        this.repository = repository;
-        this.relevance = relevance;
+    public SearchResultDto() {
     }
 
     public String getRepository() {

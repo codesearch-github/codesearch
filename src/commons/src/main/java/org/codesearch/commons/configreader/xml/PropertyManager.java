@@ -20,10 +20,8 @@
  */
 package org.codesearch.commons.configreader.xml;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.List;

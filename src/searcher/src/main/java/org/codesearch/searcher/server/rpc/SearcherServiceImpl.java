@@ -14,7 +14,7 @@ import org.apache.lucene.queryParser.ParseException;
 
 import org.codesearch.searcher.client.rpc.SearcherService;
 import org.codesearch.searcher.server.DocumentSearcher;
-import org.codesearch.searcher.shared.ResultItem;
+import org.codesearch.searcher.shared.SearchResultDto;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -33,8 +33,8 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
 
 
     @Override
-    public List<ResultItem> doSearch(String query) {
-        List<ResultItem> resultItems = new LinkedList<ResultItem>();
+    public SearchResultDto[] doSearch(String query) {
+        List<SearchResultDto> resultItems = new LinkedList<SearchResultDto>();
         try {
             // Do something interesting with 's' here on the server.
             resultItems = documentSearcher.search(query);
@@ -43,6 +43,6 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
         } catch (IOException ex) {
             LOG.error(ex);
         }
-        return resultItems;
+        return resultItems.toArray(new SearchResultDto[0]);
     }
 }

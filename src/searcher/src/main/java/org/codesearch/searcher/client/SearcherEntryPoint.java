@@ -2,7 +2,7 @@ package org.codesearch.searcher.client;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
-import org.codesearch.searcher.ui.SearchInterface;
+import org.codesearch.searcher.client.ui.SearchInterface;
 
 /**
  * The entry point for the searcher.
