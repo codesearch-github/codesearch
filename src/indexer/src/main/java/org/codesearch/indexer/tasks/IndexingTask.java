@@ -18,20 +18,26 @@
  * You should have received a copy of the GNU General Public License
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.codesearch.indexer.tasks;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.logging.Level;
+import org.apache.commons.lang.NotImplementedException;
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.store.FSDirectory;
+import org.codesearch.commons.configreader.xml.dto.RepositoryDto;
+import org.codesearch.commons.constants.IndexConstants;
+import org.codesearch.commons.plugins.PluginLoader;
+import org.codesearch.commons.plugins.PluginLoaderException;
 import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
 import org.codesearch.commons.plugins.vcs.VersionControlPluginException;
 
@@ -39,11 +45,13 @@ import org.codesearch.commons.plugins.vcs.VersionControlPluginException;
  * This class is the base class used for indexing
  *
  * @author Stephan Stiboller
+ * @author David Froehlich
  */
-public abstract class IndexingTask implements Task {
+public class IndexingTask implements Task {
 
+    private RepositoryDto repository;
     /** The IndexingTask to be processed */
-    protected Set<String> filesNames;
+    protected Set<String> fileNames; //TODO probably make private
     /* Instantiate a logger  */
     protected static final Logger log = Logger.getLogger(IndexingTask.class);
     /** The currently active IndexWriter */
@@ -53,21 +61,49 @@ public abstract class IndexingTask implements Task {
     /** The Version control Plugin */
     protected VersionControlPlugin vcp;
 
+    public void setRepository(RepositoryDto repository) {
+        this.repository = repository;
+    }
+
+    public FSDirectory getIndexDirectory() {
+        return indexDirectory;
+    }
+
+    public void setIndexDirectory(FSDirectory indexDirectory) {
+        this.indexDirectory = indexDirectory;
+    }
+
     @Override
-    public abstract void execute();
+    public void execute() throws TaskExecutionException {
+        try {
+            initializeVersionControlPlugin();
+        } catch (PluginLoaderException ex) {
+            throw new TaskExecutionException("VersionControlPlugin could not be loaded: " + ex.getMessage());
+        }
+        initializeIndexWriter(new StandardAnalyzer(IndexConstants.LUCENE_VERSION), new File(IndexConstants.INDEX_DIRECTORY));
+        try {
+            fileNames = vcp.getPathsForChangedFilesSinceRevision("0");//TODO read revision number
+            this.createIndex();
+        } catch (VersionControlPluginException ex) {
+            throw new TaskExecutionException("Error with version control plugin: "+ex.getMessage());
+        }
+    }
 
     /**
      * Initializes the version control plugin
      * @throws Exception
      */
-    public abstract void initializeVersionControlPlugin();
+    public void initializeVersionControlPlugin() throws PluginLoaderException {
+        PluginLoader pl = new PluginLoader(VersionControlPlugin.class);
+        vcp = (VersionControlPlugin) pl.getPluginForPurpose(repository.getVersionControlSystem());
+    }
 
     /**
      * Adds the Fields to the lucene document.
      * @param doc the target document
      * @return document with added lucene fields
      */
-    public Document addLuceneFields(Document doc, String path) throws VersionControlPluginException {
+    public Document addLuceneFields(Document doc, String path) throws VersionControlPluginException { //TODO additional fields required
         doc.add(new Field("TITLE", extractFilename(path), Field.Store.YES, Field.Index.NOT_ANALYZED));
         doc.add(new Field("CONTENT", vcp.getFileContentForFilePath(path), Field.Store.YES, Field.Index.ANALYZED));
         return doc;
@@ -87,7 +123,6 @@ public abstract class IndexingTask implements Task {
             log.error(ex);
             log.error("IndexWriter initialization error: Could not open directory " + dir.getAbsolutePath());
         }
-
     }
 
     /**
@@ -100,7 +135,7 @@ public abstract class IndexingTask implements Task {
         }
         Document doc = new Document();
         try {
-            Iterator it = filesNames.iterator();
+            Iterator it = fileNames.iterator();
             while (it.hasNext()) {
                 String path = (String) it.next();
                 // The lucene document containing all relevant indexing information
@@ -115,7 +150,7 @@ public abstract class IndexingTask implements Task {
             indexWriter.optimize();
             indexWriter.close();
             //iLog.append("Index creation sucessful: " + doc.getField("title"));
-        } catch (VersionControlPluginException ex) {
+        } catch (VersionControlPluginException ex) { //TODO probably replace log messages with throwing of exceptions
             log.error("VersionControl Plugin failed: " + ex.getMessage());
         } catch (CorruptIndexException ex) {
             log.error("Indexing  of: " + doc.get("title") + " failed! \n" + ex.getMessage());

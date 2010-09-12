@@ -91,20 +91,26 @@ public class PropertyManager {
                 } else if (sc.getString("type").equals("clear")) {
                     type = TaskType.clear;
                 }
-                String repositoryString = sc.getString("repositories");
-                List<String> repositories;
-                if (repositoryString == null) {
-                    repositories = null;
-                } else {
-                    repositories = new LinkedList<String>();
-                    repositories.addAll(Arrays.asList(repositoryString.split(",")));
-                }
-                tasks.add(new TaskDto(repositories, type));
+                String repository = sc.getString("repository");
+                tasks.add(new TaskDto(repository, type));
             }
             job.setTasks(tasks);
             jobs.add(job);
         }
         return jobs;
+    }
+
+    public RepositoryDto getRepositoryByName(String name) throws ConfigurationException {
+        if(config == null)
+            loadConfigReader();
+        RepositoryDto repo = null;
+        List<HierarchicalConfiguration> repositories = config.configurationsAt("repositories.repository");
+        for(HierarchicalConfiguration hc : repositories){
+            if(hc.getString("name").equals(name)){
+                repo = new RepositoryDto(name, hc.getString("url"), hc.getString("username"), hc.getString("password"), hc.getBoolean("indexingEnabled"), hc.getBoolean("codeNavigationEnabled"), hc.getString("versionControlSystem"));
+            }
+        }
+        return repo;
     }
 
     /**
@@ -121,6 +127,7 @@ public class PropertyManager {
         List<HierarchicalConfiguration> repositoryConfigs = config.configurationsAt("repositories.repository");
         for (HierarchicalConfiguration repositoryConfig : repositoryConfigs) {
             RepositoryDto repositoryDto = new RepositoryDto();
+            repositoryDto.setVersionControlSystem(repositoryConfig.getString("version_control_system"));
             repositoryDto.setName(repositoryConfig.getString("name"));
             repositoryDto.setUrl(repositoryConfig.getString("url"));
             repositoryDto.setUsername(repositoryConfig.getString("username"));
@@ -174,5 +181,10 @@ public class PropertyManager {
 
     public void setConfigpath(final String configpath) {
         this.configpath = configpath;
+    }
+
+    public void clearPropertyManager(){
+        this.configpath = null;
+        this.config = null;
     }
 }

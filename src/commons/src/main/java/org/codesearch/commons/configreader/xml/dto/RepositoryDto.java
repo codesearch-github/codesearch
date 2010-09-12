@@ -39,6 +39,9 @@ public class RepositoryDto {
     private boolean indexingEnabled;
     /** Specifies whether the additional index will be created for the repository. */
     private boolean codeNavigationEnabled;
+    /** The version control system used for this repository, (for instance SVN or Bazaar),
+     * must match the purpose attribute of the corresponding version control plugin */
+    private String versionControlSystem;
 
     public RepositoryDto() {
     }
@@ -50,13 +53,14 @@ public class RepositoryDto {
      * @param codeNavigationEnabled specifies whether the repository should have the additional
      * indexes for the code navigation
      */
-    public RepositoryDto(String name, String url, String username, String password, boolean indexingEnabled, boolean codeNavigationEnabled) {
+    public RepositoryDto(String name, String url, String username, String password, boolean indexingEnabled, boolean codeNavigationEnabled, String versionControlSystem) {
         this.name = name;
         this.url = url;
         this.username = username;
         this.password = password;
         this.indexingEnabled = indexingEnabled;
         this.codeNavigationEnabled = codeNavigationEnabled;
+        this.versionControlSystem = versionControlSystem;
     }
 
     public boolean isCodeNavigationEnabled() {
@@ -105,6 +109,14 @@ public class RepositoryDto {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getVersionControlSystem(){
+        return versionControlSystem;
+    }
+
+    public void setVersionControlSystem(String versionControlSystem){
+        this.versionControlSystem = versionControlSystem;
     }
 
     @Override

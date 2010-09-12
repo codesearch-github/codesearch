@@ -24,13 +24,8 @@ package org.codesearch.indexer.tasks;
 /**
  *
  * @author Stephan Stiboller
+ * @author David Froehlich
  */
 public interface Task {
-
-    /**
-     * Executes the Task 
-     */
-    public abstract void execute();
-
-    
+    public void execute()throws TaskExecutionException;
 }

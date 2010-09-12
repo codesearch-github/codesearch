@@ -26,64 +26,100 @@
 package org.codesearch.indexer.manager;
 
 import java.util.LinkedList;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.lang.NotImplementedException;
 import org.apache.log4j.Logger;
+import org.codesearch.commons.configreader.xml.PropertyManager;
+import org.codesearch.commons.configreader.xml.dto.TaskDto;
+import org.codesearch.indexer.tasks.IndexingTask;
 import org.codesearch.indexer.tasks.Task;
+import org.codesearch.indexer.tasks.TaskExecutionException;
+import org.quartz.Job;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
 
 /**
  *
  * @author Stiboller Stephan
+ * @author David Froehlich
  */
-public class IndexerJob extends Thread {
+public class IndexerJob implements Job {
 
-    /** Indicates if the thread is suspended or not. */
-    private boolean threadIsSuspended = false;
+//    /** Indicates if the thread is suspended or not. */
+//    private boolean jobIsSuspended = false;
     /** Indicates if the thread is terminated or not. */
-    private boolean threadIsTerminated = false;
+    private boolean terminated = false;
     /** List of ITask assigned to this IndexingJob */
-    private LinkedList<Task> taskList = new LinkedList<Task>();
+    private LinkedList<TaskDto> taskList = new LinkedList<TaskDto>();
     /* Instantiate a logger */
     private static final Logger log = Logger.getLogger(IndexerJob.class);
+    private PropertyManager propertyM;
 
-    /**
-     * Suspends the thread in a save way.
-     */
-    public void suspendSafely() {
-        try {
-            this.wait();
-            threadIsSuspended = true;
-        } catch (InterruptedException ex) {
-            log.error("Thread has been interrupted during suspend process:" +ex.getMessage());
-        }
-    }
-
-    /**
-     * Resumes the thread.
-     * The thread is maybe not instantly killed because the changes of
-     * the IndexerJob will be reverted.
-     */
-    public void resumeSafely() {
-        this.notify();
-        threadIsSuspended = false;
-    }
-
+//    /**
+//     * Suspends the thread in a save way.
+//     */
+//    public void suspendSafely() {
+//        try {
+//            this.wait();
+//            jobIsSuspended = true;
+//        } catch (InterruptedException ex) {
+//            log.error("Thread has been interrupted during suspend process:" +ex.getMessage());
+//        }
+//    }
+//    /**
+//     * Resumes the thread.
+//     * The thread is maybe not instantly killed because the changes of
+//     * the IndexerJob will be reverted.
+//     */
+//    public void resumeSafely() {
+//        this.notify();
+//        jobIsSuspended = false;
+//    }
     /**
      * First suspends and then terminates the thread.
      * The thread is maybe not instantly killed because the changes of
      * the IndexerJob will be reverted and cleaned.
      */
     public void terminateSafely() {
-        threadIsSuspended = true;
-        threadIsTerminated = true;
+        terminated = true;
     }
 
-    /**
-     * Extcuts all Tasks related to this job.
-     */
-    public void run() {
-        for (int i = 0; i < taskList.size(); i++) {
-            taskList.get(i).execute();
-            if(threadIsSuspended = true)
-                this.suspendSafely();
+//    /**
+//     * Extcuts all Tasks related to this job.
+//     */
+//    public void run() {
+//        for (int i = 0; i < taskList.size(); i++) {
+//            taskList.get(i).execute();
+//            if(jobIsSuspended = true)
+//                this.suspendSafely();
+//        }
+//    }
+    @Override
+    public void execute(JobExecutionContext jec) throws JobExecutionException {
+        propertyM = new PropertyManager(); //TODO replace with spring injection
+        taskList = (LinkedList<TaskDto>)jec.get("tasks");
+        for (TaskDto taskDto : taskList) {
+            if (terminated) {
+                return;
+            }
+            Task task;
+            switch (taskDto.getType()) {
+                case index: {
+                    task = new IndexingTask();
+                    try {
+                        ((IndexingTask) task).setRepository(propertyM.getRepositoryByName(taskDto.getRepositoryName()));
+                        task.execute();
+                    } catch (TaskExecutionException ex) {
+                        log.error("Task execution was not completed successfully: "+ex.getMessage());
+                    } catch (ConfigurationException ex) {
+                        log.error("Configuration Error: "+ex.getMessage());
+                    }
+                    break;
+                }
+                case clear:
+                    throw new NotImplementedException();
+            }
+
         }
     }
 }

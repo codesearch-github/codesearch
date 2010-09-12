@@ -51,7 +51,7 @@ public class SvnIndexingTask extends IndexingTask {
         try {
             PluginLoader pl = new PluginLoader(VersionControlPlugin.class);
             vcp = (VersionControlPlugin) pl.getPluginForPurpose("SVN");
-            filesNames = vcp.getPathsForChangedFilesSinceRevision("0"); // TODO : REVISION EXTRACTING!
+            fileNames = vcp.getPathsForChangedFilesSinceRevision("0"); // TODO : REVISION EXTRACTING!
         } catch (Exception ex) {
             log.error("Task execution failed: " + ex.getMessage());
         }

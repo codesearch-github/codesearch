@@ -20,16 +20,13 @@
  */
 package org.codesearch.commons.configreader.xml.dto;
 
-import java.util.LinkedList;
-import java.util.List;
-
 /**
  *
  * @author David Froehlich
  */
 public class TaskDto {
     /** The list of all the repositories this task affects, if it equals null the task will affect all repositories */
-    private List<String> repositoryNames;
+    private String repositoryName;
     /** The type of the task, for instance clear for clearing the entire index, and so on */
     private TaskType type;
 
@@ -38,17 +35,17 @@ public class TaskDto {
      * @param repositoryNames the repositories this task affects
      * @param type the type of task
      */
-    public TaskDto(List<String> repositoryNames, TaskType type) {
-        this.repositoryNames = repositoryNames;
+    public TaskDto(String repositoryName, TaskType type) {
+        this.repositoryName = repositoryName;
         this.type = type;
     }
 
-    public List<String> getRepositoryNames() {
-        return repositoryNames;
+    public String getRepositoryName() {
+        return repositoryName;
     }
 
-    public void setRepositoryNames(LinkedList<String> repositoryNames) {
-        this.repositoryNames = repositoryNames;
+    public void setRepositoryName(String repositoryName) {
+        this.repositoryName = repositoryName;
     }
 
     public TaskType getType() {
@@ -77,13 +74,9 @@ public class TaskDto {
         TaskDto other;
         try {
             other = (TaskDto) o;
-            if (!(this.repositoryNames == null && other.getRepositoryNames() == null)) {
-                for (int i = 0; i < other.getRepositoryNames().size(); i++) {
-                    if (!(other.getRepositoryNames().get(i).equals(this.getRepositoryNames().get(i)))) {
-                        return false;
-                    }
-                }
-                if (this.repositoryNames.size() != other.repositoryNames.size()) {
+            if (!(this.repositoryName == null && other.getRepositoryName() == null)) {
+                
+                if (this.repositoryName.equals(other.getRepositoryName())) {
                     return false;
                 }
             }
@@ -96,3 +89,4 @@ public class TaskDto {
         return false;
     }
 }
+

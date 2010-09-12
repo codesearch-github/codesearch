@@ -50,18 +50,21 @@
     <repositories>
         <repository>
             <name>testRepo1</name>
+	    <version_control_system>SVN</version_control_system>
             <url>http://test.org</url>
             <indexingEnabled>true</indexingEnabled>
             <codeNavigationEnabled>true</codeNavigationEnabled>
         </repository>
         <repository>
             <name>testRepo2</name>
+	    <version_control_system>SVN</version_control_system>
             <url>http://test.org</url>
             <indexingEnabled>true</indexingEnabled>
             <codeNavigationEnabled>false</codeNavigationEnabled>
         </repository>
         <repository>
             <name>testRepo3</name>
+	    <version_control_system>SVN</version_control_system>
             <url>http://test.org</url>
             <indexingEnabled>false</indexingEnabled>
             <codeNavigationEnabled>false</codeNavigationEnabled>

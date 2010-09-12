@@ -18,75 +18,103 @@
  * You should have received a copy of the GNU General Public License
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.codesearch.indexer.manager;
 
+import java.util.Date;
+import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
+import org.codesearch.commons.configreader.xml.PropertyManager;
+import org.codesearch.commons.configreader.xml.dto.JobDto;
+import org.codesearch.indexer.tasks.IndexingTask;
+import org.quartz.JobDetail;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
+import org.quartz.SchedulerFactory;
+import org.quartz.SimpleTrigger;
+import org.quartz.Trigger;
+import org.quartz.impl.StdSchedulerFactory;
 
 /**
  *
  * @author Stiboller Stephan
  * @author David Froehlich
  */
-public class IndexingManager {
-    
-
+public final class IndexingManager {
     /** All active running Threads */
     Map<Long, IndexerJob> activeIndexingThreads;
     /** All predefined/availableIndexingThreads */
     Map<Long, IndexerJob> availableIndexingThreads;
     /* Instantiate a logger */
     private static final Logger log = Logger.getLogger(IndexingManager.class);
+    private Scheduler scheduler;
+    private PropertyManager pm;
 
-    /**
-     * This method takes the proper repo configuration and starts
-     * a new indexing thread.
-     * @param theconfiguration
-     * @return
-     */
-    public Long createIndexingJob(final String theconfiguration) {
-        IndexerJob iThread = new IndexerJob();
-        Long indentifier = 1337l;
-        //TODO: init
-        activeIndexingThreads.put(indentifier, iThread);
-        return indentifier;
-
+    public IndexingManager() throws SchedulerException {
+        pm = new PropertyManager();
+        SchedulerFactory sf = new StdSchedulerFactory();
+        scheduler = sf.getScheduler();   
     }
 
-    /**
-     * Activates the given IndexingJob
-     * @param indentifier
-     */
-    public void startIndexingJob(Long indentifier) {
-        if (!activeIndexingThreads.containsKey(indentifier)) {
-            activeIndexingThreads.put(indentifier, availableIndexingThreads.get(indentifier));
-            availableIndexingThreads.get(indentifier).start();
+    public void startScheduler() throws SchedulerException, ConfigurationException {
+        List<JobDto> jobs = pm.getJobs();
+        for (JobDto job : jobs) {
+
+            JobDetail jobDetail = new JobDetail("Job-" + job.getStartDate(), null, IndexerJob.class);
+            jobDetail.getJobDataMap().put("tasks", job.getTasks());
+            Trigger trigger = new SimpleTrigger("JobTrigger" + job.getStartDate(), null, new Date(job.getStartDate().getTimeInMillis()), null, SimpleTrigger.REPEAT_INDEFINITELY, job.getInterval() * 60000l);
+            scheduler.scheduleJob(jobDetail, trigger);
         }
     }
 
-    /**
-     * Suspends the execution of the specified IndexingJob
-     * @param indentifier
-     */
-    public void suspendActiveIndexingJob(Long indentifier) {
-        activeIndexingThreads.get(indentifier).suspendSafely();
-    }
-
-     /**
-     * Resumes the execution of the specified IndexingJob
-     * @param indentifier
-     */
-    public void resumeSuspendedIndexingJob(Long indentifier) {
-        activeIndexingThreads.get(indentifier).resumeSafely();
-    }
-
+    
+//    /**
+//     * This method takes the proper repo configuration and starts
+//     * a new indexing thread.
+//     * @param theconfiguration
+//     * @return
+//     */
+//    public Long createIndexingJob(final String theconfiguration) {
+//        IndexerJob iThread = new IndexerJob();
+//        Long indentifier = 1337l;
+//        //TODO: init
+//        activeIndexingThreads.put(indentifier, iThread);
+//        return indentifier;
+//
+//    }
+//    /**
+//     * Activates the given IndexingJob
+//     * @param indentifier
+//     */
+//    public void startIndexingJob(Long indentifier) {
+//        if (!activeIndexingThreads.containsKey(indentifier)) {
+//            activeIndexingThreads.put(indentifier, availableIndexingThreads.get(indentifier));
+//            availableIndexingThreads.get(indentifier).start();
+//        }
+//    }
+//    /**
+//     * Suspends the execution of the specified IndexingJob
+//     * @param indentifier
+//     */
+//    public void suspendActiveIndexingJob(Long indentifier) {
+//        activeIndexingThreads.get(indentifier).suspendSafely();
+//    }
+//
+//     /**
+//     * Resumes the execution of the specified IndexingJob
+//     * @param indentifier
+//     */
+//    public void resumeSuspendedIndexingJob(Long indentifier) {
+//        activeIndexingThreads.get(indentifier).resumeSafely();
+//    }
     /**
      * Terminates the execution of the specified IndexingJob
      * and reverts all changes this Jobs has caused.
      * @param indentifier
      */
-    public void terminateActiveIndexingJob(Long indentifier) {
-        activeIndexingThreads.remove(indentifier).terminateSafely();
-    }
+//    public void terminateActiveIndexingJob(Long indentifier) {
+//        activeIndexingThreads.remove(indentifier).terminateSafely();
+//    }
 }

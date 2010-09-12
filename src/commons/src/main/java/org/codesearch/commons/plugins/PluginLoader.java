@@ -52,7 +52,7 @@ public final class PluginLoader {
      * @return the plugin matching the purpose
      * @throws Exception if no plugin was found with the purpose
      */
-    public Plugin getPluginForPurpose(final String type) throws Exception { //TODO replace Exception with something less generic
+    public Plugin getPluginForPurpose(final String type) throws PluginLoaderException { //TODO replace Exception with something less generic
         Iterator iter = loadedPlugins.entrySet().iterator();
         while (iter.hasNext()) {
             Entry<String, Plugin> entry = (Entry<String, Plugin>) iter.next();
@@ -60,6 +60,6 @@ public final class PluginLoader {
                 return entry.getValue();
             }
         }
-        throw new Exception("No Plugin found for given purpose");
+        throw new PluginLoaderException("No Plugin found for given purpose");
     }
 }
