@@ -27,9 +27,11 @@ import org.apache.log4j.Logger;
 /**
  *
  * @author Stiboller Stephan
+ * @author David Froehlich
  */
 public class IndexingManager {
     
+
     /** All active running Threads */
     Map<Long, IndexerJob> activeIndexingThreads;
     /** All predefined/availableIndexingThreads */

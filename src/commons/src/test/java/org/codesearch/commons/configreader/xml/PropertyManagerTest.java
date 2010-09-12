@@ -23,9 +23,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package org.codesearch.commons.configreader.xml;
 
+import org.codesearch.commons.configreader.xml.dto.JobDto;
 import java.util.GregorianCalendar;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -49,8 +49,9 @@ import static org.junit.Assert.*;
  * @author David Froehlich
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(loader=GenericXmlContextLoader.class, locations={"classpath:org/codesearch/commons/CodesearchCommonsBeans.xml"})
+@ContextConfiguration(loader = GenericXmlContextLoader.class, locations = {"classpath:org/codesearch/commons/CodesearchCommonsBeans.xml"})
 public class PropertyManagerTest {
+
     @Autowired
     private PropertyManager propertyManager;
 
@@ -59,7 +60,7 @@ public class PropertyManagerTest {
 
     @Before
     public void setUp() {
-        propertyManager.setConfigpath("/home/david/codesearch/src/commons/src/test/resources");
+        propertyManager.setConfigpath("/home/david/codesearch/src/commons/src/test/resources/codesearch_config.xml");
     }
 
     @After
@@ -96,22 +97,10 @@ public class PropertyManagerTest {
     }
 
     /**
-     * Test of getConfigpath method, of class PropertyManager.
-     */
-    @Test
-    public void testGetConfigpath() {
-        System.out.println("getConfigpath");
-        String expResult = "/home/david/codesearch/src/commons/src/test/resources";
-        String result = propertyManager.getConfigpath();
-        assertEquals(expResult, result);
-    }
-
-    /**
      * Test of getTasks method, of class PropertyManager.
      */
     @Test
-    public void testGetTasks() {
-//        System.out.println("getRepositories");
+    public void testGetJobs() {
 //        RepositoryDto bean1 = new RepositoryDto("testRepo1", true, true);
 //        RepositoryDto bean2 = new RepositoryDto("testRepo2", true, false);
 //        RepositoryDto bean3 = new RepositoryDto("testRepo3", false, false);
@@ -120,16 +109,22 @@ public class PropertyManagerTest {
 //        assertTrue(bean1.equals(result.get(0)));
 //        assertTrue(bean2.equals(result.get(1)));
 //        assertTrue(bean3.equals(result.get(2)));
-        System.out.println("getTasks");
-        TaskDto task1 = new TaskDto(null, TaskDto.TaskType.index, 60, new GregorianCalendar(2010, 9, 11, 18, 0));
-        TaskDto task2 = new TaskDto(null, TaskDto.TaskType.clear, 10080, new GregorianCalendar(2010, 11, 11, 18, 0));
+        System.out.println("getJobs");
+        JobDto job1 = new JobDto();
+        job1.getTasks().add(new TaskDto(null, TaskDto.TaskType.index));
+        job1.setInterval(60);
+        job1.setStartDate(new GregorianCalendar(2010, 9, 11, 18, 0));
+        JobDto job2 = new JobDto();
+        job2.getTasks().add(new TaskDto(null, TaskDto.TaskType.clear));
+        job2.setInterval(10080);
+        job2.setStartDate(new GregorianCalendar(2010, 11, 11, 18, 0));
         try {
-            List<TaskDto> result = propertyManager.getTasks();
-            assert(result.size() == 2);
-            assert(result.get(0).equals(task1));
-            assert(result.get(1).equals(task2));
+            List<JobDto> result = propertyManager.getJobs();
+            assert (result.size() == 2);
+            assert (result.get(0).equals(job1));
+            assert (result.get(1).equals(job2));
         } catch (ConfigurationException ex) {
-            fail("Configuration exception: "+ex.getMessage());
+            fail("Configuration exception: " + ex.getMessage ());
         }
 
     }

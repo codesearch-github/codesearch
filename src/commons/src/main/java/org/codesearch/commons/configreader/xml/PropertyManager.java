@@ -29,7 +29,9 @@ import java.util.LinkedList;
 import java.util.List;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.HierarchicalConfiguration;
+import org.apache.commons.configuration.SubnodeConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
+import org.codesearch.commons.configreader.xml.dto.JobDto;
 import org.codesearch.commons.configreader.xml.dto.RepositoryDto;
 import org.codesearch.commons.configreader.xml.dto.TaskDto;
 import org.codesearch.commons.configreader.xml.dto.TaskDto.TaskType;
@@ -56,37 +58,55 @@ public class PropertyManager {
     public PropertyManager() {
     }
 
-    public List<TaskDto> getTasks() throws ConfigurationException {
-        List<TaskDto> tasks = new LinkedList<TaskDto>();
-        if(config == null){
+    /**
+     * Retrieves a list of all indexer_jobs from the configuration and returns it as a list of JobDto
+     * @return The list of JobDtos
+     * @throws ConfigurationException If the configuration could not be read or the keys were not found
+     */
+    public List<JobDto> getJobs() throws ConfigurationException {
+        List<JobDto> jobs = new LinkedList<JobDto>();
+        if (config == null) {
             loadConfigReader();
         }
-        List<HierarchicalConfiguration> taskConfig = config.configurationsAt("index_tasks.index_task");
-        for(HierarchicalConfiguration hc : taskConfig){
-            String repositoryString = hc.getString("repositories");
-            List<String> repositories;
-            if(repositoryString == null){
-                repositories = null;
-            } else{
-                repositories = new LinkedList<String>();
-                repositories.addAll(Arrays.asList(repositoryString.split(",")));
-            }
-            TaskType type = null;
-            if(hc.getString("type").equals("index")){ //TODO replace with a more generic method
-                type = TaskType.index;
-            } else if(hc.getString("type").equals("clear")){
-                type = TaskType.clear;
-            }
+        //read the configuration for the jobs from the config
+        List<HierarchicalConfiguration> jobConfig = config.configurationsAt("index_jobs.index_job");
+        for (HierarchicalConfiguration hc : jobConfig) {
+            //reads job specific values and adds them to the JobDto
+            JobDto job = new JobDto();
             int interval = hc.getInt("interval");
+            //The start time is stored as a single string seperated by '-' e.g.: YYYY-MM-DD-HH-MM
             String[] timeParts = hc.getString("start").split("-");
             Calendar calc = new GregorianCalendar(Integer.parseInt(timeParts[0]), Integer.parseInt(timeParts[1]),
                     Integer.parseInt(timeParts[2]), Integer.parseInt(timeParts[3]), Integer.parseInt(timeParts[4]));
-            if(calc == null){
+            if (calc == null) {
                 throw new ConfigurationException("String for start date of task configuration is not correct");
             }
-            tasks.add(new TaskDto(repositories, type, interval, calc));
+            job.setInterval(interval);
+            job.setStartDate(calc);
+            //Read the tasks per job from the configuration
+            List<SubnodeConfiguration> subConf = hc.configurationsAt("tasks.task");
+            List<TaskDto> tasks = new LinkedList<TaskDto>();
+            for(SubnodeConfiguration sc : subConf){
+                TaskType type = null;
+                if (sc.getString("type").equals("index")) { //TODO replace with a more generic method
+                    type = TaskType.index;
+                } else if (sc.getString("type").equals("clear")) {
+                    type = TaskType.clear;
+                }
+                String repositoryString = sc.getString("repositories");
+                List<String> repositories;
+                if (repositoryString == null) {
+                    repositories = null;
+                } else {
+                    repositories = new LinkedList<String>();
+                    repositories.addAll(Arrays.asList(repositoryString.split(",")));
+                }
+                tasks.add(new TaskDto(repositories, type));
+            }
+            job.setTasks(tasks);
+            jobs.add(job);
         }
-        return tasks;
+        return jobs;
     }
 
     /**
