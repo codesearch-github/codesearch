@@ -24,8 +24,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.logging.Level;
-import org.apache.commons.lang.NotImplementedException;
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -76,6 +74,7 @@ public class IndexingTask implements Task {
     @Override
     public void execute() throws TaskExecutionException {
         try {
+            log.info("Starting execution of indexing task");
             initializeVersionControlPlugin();
         } catch (PluginLoaderException ex) {
             throw new TaskExecutionException("VersionControlPlugin could not be loaded: " + ex.getMessage());
@@ -84,6 +83,7 @@ public class IndexingTask implements Task {
         try {
             fileNames = vcp.getPathsForChangedFilesSinceRevision("0");//TODO read revision number
             this.createIndex();
+            log.info("finished execution of indexing task");
         } catch (VersionControlPluginException ex) {
             throw new TaskExecutionException("Error with version control plugin: "+ex.getMessage());
         }

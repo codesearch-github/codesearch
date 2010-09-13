@@ -34,7 +34,7 @@
 				</task>
 			</tasks>
 			<interval>60</interval>
-			<start>2010-09-11-18-0</start>
+			<start>2010-08-13-18-46</start>
 		</index_job>
 		<index_job>
 			<tasks>
@@ -43,7 +43,7 @@
 				</task>
 			</tasks>			
 			<interval>10080</interval>
-			<start>2010-11-11-18-0</start>
+			<start>2010-08-11-18-0</start>
 		</index_job>
 	</index_jobs>
     <testproperty>fdsa</testproperty>

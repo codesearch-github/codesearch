@@ -97,7 +97,7 @@ public class IndexerJob implements Job {
     @Override
     public void execute(JobExecutionContext jec) throws JobExecutionException {
         propertyM = new PropertyManager(); //TODO replace with spring injection
-        taskList = (LinkedList<TaskDto>)jec.get("tasks");
+        taskList = (LinkedList<TaskDto>)(jec.getJobDetail().getJobDataMap().get("tasks"));
         for (TaskDto taskDto : taskList) {
             if (terminated) {
                 return;

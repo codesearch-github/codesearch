@@ -5,10 +5,18 @@
     xmlns:web="http://java.sun.com/xml/ns/j2ee/web-app_2_5.xsd"
     xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_5.xsd"
     version="2.5">
+    <listener>
+        <listener-class>
+                org.codesearch.indexer.core.IndexerMain
+        </listener-class>
+    </listener>
     <session-config>
         <session-timeout>
             30
         </session-timeout>
     </session-config>
     <display-name>Codesearch Indexer</display-name>
+    <welcome-file-list>
+        <welcome-file>index.html</welcome-file>
+    </welcome-file-list>
 </web-app>

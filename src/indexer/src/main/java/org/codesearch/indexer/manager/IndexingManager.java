@@ -20,6 +20,7 @@
  */
 package org.codesearch.indexer.manager;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +44,7 @@ import org.quartz.impl.StdSchedulerFactory;
  * @author David Froehlich
  */
 public final class IndexingManager {
+
     /** All active running Threads */
     Map<Long, IndexerJob> activeIndexingThreads;
     /** All predefined/availableIndexingThreads */
@@ -55,21 +57,21 @@ public final class IndexingManager {
     public IndexingManager() throws SchedulerException {
         pm = new PropertyManager();
         SchedulerFactory sf = new StdSchedulerFactory();
-        scheduler = sf.getScheduler();   
+        scheduler = sf.getScheduler();
     }
 
     public void startScheduler() throws SchedulerException, ConfigurationException {
         List<JobDto> jobs = pm.getJobs();
         for (JobDto job : jobs) {
-
-            JobDetail jobDetail = new JobDetail("Job-" + job.getStartDate(), null, IndexerJob.class);
+            JobDetail jobDetail = new JobDetail("Job", "asdf", IndexerJob.class); //TODO write group
             jobDetail.getJobDataMap().put("tasks", job.getTasks());
-            Trigger trigger = new SimpleTrigger("JobTrigger" + job.getStartDate(), null, new Date(job.getStartDate().getTimeInMillis()), null, SimpleTrigger.REPEAT_INDEFINITELY, job.getInterval() * 60000l);
+            Calendar calc = Calendar.getInstance();
+            Calendar calc2 = job.getStartDate();
+            Trigger trigger = new SimpleTrigger("JobTrigger", "triggerGroup", new Date(job.getStartDate().getTimeInMillis()), null, SimpleTrigger.REPEAT_INDEFINITELY, job.getInterval() * 60000l);
             scheduler.scheduleJob(jobDetail, trigger);
+            scheduler.start();
         }
     }
-
-    
 //    /**
 //     * This method takes the proper repo configuration and starts
 //     * a new indexing thread.
