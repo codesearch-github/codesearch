@@ -45,32 +45,34 @@ import org.codesearch.searcher.shared.SearchResultDto;
  * @author David Froehlich
  */
 public class DocumentSearcher {
-//TODO add log messages for class
 
     /** the key with which the location of the index is stored in the configuration file */
     public static final String INDEX_LOCATION_KEY = "indexLocation";
+    /** The logger. */
+    private static final Logger LOG = Logger.getLogger(DocumentSearcher.class);
     /** The parser used for parsing search terms to lucene queries */
     private QueryParser queryParser;
     /** The searcher used for searching the lucene index */
     private IndexSearcher indexSearcher;
-    /** The propertyManager used for retrieving information from the configuration */
-    private PropertyManager propertyManager;
-    /** The logger. */
-    private static final Logger LOG = Logger.getLogger(DocumentSearcher.class);
+    /** Whether the searcher has been initialized. **/
+    private boolean searcherInitialized = false;
+    /** The location of the index. **/
+    private String indexLocation;
 
     /**
      * Creates a new DocumentSearcher instance
      * @throws ConfigurationException if no value for the key specified in the constant INDEX_LOCATION_KEY could be found in the in the configuration via the PropertyManager
      * @throws IOException if the index could not be opened
      */
-    public DocumentSearcher() throws ConfigurationException, IOException {
-        //Initialize PropertyManager to retrieve indexlocation from the configuraiton
-        propertyManager = new PropertyManager(); //TODO replace with spring injection
-        String indexLocation = propertyManager.getSingleLinePropertyValue(INDEX_LOCATION_KEY);
+    public DocumentSearcher(PropertyManager propertyManager) throws ConfigurationException {
+        // Retrieve index location from the configuration
+        indexLocation = propertyManager.getSingleLinePropertyValue(INDEX_LOCATION_KEY);
         LOG.debug("Index location set to: " + indexLocation);
         //TODO replace with appropriate Analyzer
         queryParser = new QueryParser(Version.LUCENE_30, "", new StandardAnalyzer(Version.LUCENE_30));
-        indexSearcher = new IndexSearcher(FSDirectory.open(new File(indexLocation)), true);
+        try {
+            initSearcher();
+        } catch(IOException ex)  {}
         LOG.debug("DocumentSearcher created");
     }
 
@@ -82,6 +84,9 @@ public class DocumentSearcher {
      * @throws IOException if the Index could not be read
      */
     public List<SearchResultDto> search(String searchString) throws ParseException, IOException {
+        if (!searcherInitialized) {
+            initSearcher();
+        }
         LinkedList<SearchResultDto> results = new LinkedList<SearchResultDto>();
         Query query = queryParser.parse(searchString);
         LOG.info("Search index with query: " + query.toString());
@@ -99,5 +104,17 @@ public class DocumentSearcher {
             results.add(searchResult);
         }
         return results;
+    }
+
+    private void initSearcher() throws IOException {
+        try {
+            indexSearcher = new IndexSearcher(FSDirectory.open(new File(indexLocation)), true);
+            searcherInitialized = true;
+        } catch (IOException exc) {
+            searcherInitialized = false;
+            LOG.warn("No valid index found at: " + indexLocation);
+            LOG.warn("Will try to re-initialize at next search operation");
+            throw exc;
+        }
     }
 }

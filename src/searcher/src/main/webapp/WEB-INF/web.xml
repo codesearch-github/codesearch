@@ -26,11 +26,12 @@
     xmlns:web="http://java.sun.com/xml/ns/j2ee/web-app_2_5.xsd"
     xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_5.xsd"
     version="2.5">
-         <session-config>
+    <session-config>
         <session-timeout>
             30
         </session-timeout>
     </session-config>
+    
     <display-name>Codesearch Searcher</display-name>
 	
     <welcome-file-list>
@@ -41,8 +42,18 @@
         <servlet-name>searcherservice</servlet-name>
         <servlet-class>org.codesearch.searcher.server.rpc.SearcherServiceImpl</servlet-class>
     </servlet>
+    
     <servlet-mapping>
         <servlet-name>searcherservice</servlet-name>
         <url-pattern>/searcher/searcherservice</url-pattern>
     </servlet-mapping>
+
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>classpath:org/codesearch/commons/CommonsBeans.xml classpath:org/codesearch/searcher/SearcherBeans.xml</param-value>
+    </context-param>
+
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
 </web-app>

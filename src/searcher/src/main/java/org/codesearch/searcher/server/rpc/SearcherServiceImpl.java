@@ -25,7 +25,6 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
     /**
      * The document searcher used to search tho index.
      */
-    @Autowired
     private DocumentSearcher documentSearcher;
 
      /** The logger. */
@@ -44,5 +43,13 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
             LOG.error(ex);
         }
         return resultItems.toArray(new SearchResultDto[0]);
+    }
+
+    public DocumentSearcher getDocumentSearcher() {
+        return documentSearcher;
+    }
+
+    public void setDocumentSearcher(DocumentSearcher documentSearcher) {
+        this.documentSearcher = documentSearcher;
     }
 }
