@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Set;
+import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -32,6 +33,7 @@ import org.apache.lucene.document.Field;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.store.FSDirectory;
+import org.codesearch.commons.configreader.xml.PropertyManager;
 import org.codesearch.commons.configreader.xml.dto.RepositoryDto;
 import org.codesearch.commons.constants.IndexConstants;
 import org.codesearch.commons.plugins.PluginLoader;
@@ -49,15 +51,16 @@ public class IndexingTask implements Task {
 
     private RepositoryDto repository;
     /** The IndexingTask to be processed */
-    protected Set<String> fileNames; //TODO probably make private
+    private Set<String> fileNames;
     /* Instantiate a logger  */
-    protected static final Logger log = Logger.getLogger(IndexingTask.class);
+    private static final Logger log = Logger.getLogger(IndexingTask.class);
     /** The currently active IndexWriter */
-    protected IndexWriter indexWriter;
+    private IndexWriter indexWriter;
     /** The index directory, contains all index files */
-    protected FSDirectory indexDirectory;
+    private FSDirectory indexDirectory;
     /** The Version control Plugin */
-    protected VersionControlPlugin vcp;
+    private VersionControlPlugin vcp;
+    private PropertyManager pm = new PropertyManager(); //TODO solve this via spring injection
 
     public void setRepository(RepositoryDto repository) {
         this.repository = repository;
@@ -73,19 +76,29 @@ public class IndexingTask implements Task {
 
     @Override
     public void execute() throws TaskExecutionException {
+        String indexLocation = null;
+        try {
+            indexLocation = pm.getSingleLinePropertyValue("index-location");
+        } catch (ConfigurationException ex) {
+            throw new TaskExecutionException("IndexLocation could not be found: " + ex.getMessage());
+        }
         try {
             log.info("Starting execution of indexing task");
             initializeVersionControlPlugin();
         } catch (PluginLoaderException ex) {
             throw new TaskExecutionException("VersionControlPlugin could not be loaded: " + ex.getMessage());
         }
-        initializeIndexWriter(new StandardAnalyzer(IndexConstants.LUCENE_VERSION), new File(IndexConstants.INDEX_DIRECTORY));
+        initializeIndexWriter(new StandardAnalyzer(IndexConstants.LUCENE_VERSION), new File(indexLocation));
         try {
             fileNames = vcp.getPathsForChangedFilesSinceRevision("0");//TODO read revision number
             this.createIndex();
             log.info("finished execution of indexing task");
+        } catch (CorruptIndexException ex) {
+            throw new TaskExecutionException("Index is corrupted: " + ex.getMessage());
+        } catch (IOException ex) {
+            throw new TaskExecutionException("Index could not be opened: " + ex.getMessage());
         } catch (VersionControlPluginException ex) {
-            throw new TaskExecutionException("Error with version control plugin: "+ex.getMessage());
+            throw new TaskExecutionException("Error with version control plugin: " + ex.getMessage());
         }
     }
 
@@ -128,37 +141,28 @@ public class IndexingTask implements Task {
     /**
      * Creates an index for the given Directory.
      */
-    public boolean createIndex() {
+    public boolean createIndex() throws VersionControlPluginException, CorruptIndexException, IOException {
         if (indexWriter == null) {
             log.error("Creation of indexDirectory failed due to missing initialization of IndexWriter!");
             return false;
         }
         Document doc = new Document();
-        try {
-            Iterator it = fileNames.iterator();
-            while (it.hasNext()) {
-                String path = (String) it.next();
-                // The lucene document containing all relevant indexing information
-                doc = new Document();
-                // Add fields
-                doc = addLuceneFields(doc, path);
-                log.debug("Added file: " + doc.get("title") + " to index.");
-                // Add document to the index
-                indexWriter.addDocument(doc);
-            }
-            indexWriter.commit();
-            indexWriter.optimize();
-            indexWriter.close();
-            //iLog.append("Index creation sucessful: " + doc.getField("title"));
-        } catch (VersionControlPluginException ex) { //TODO probably replace log messages with throwing of exceptions
-            log.error("VersionControl Plugin failed: " + ex.getMessage());
-        } catch (CorruptIndexException ex) {
-            log.error("Indexing  of: " + doc.get("title") + " failed! \n" + ex.getMessage());
-        } catch (IOException ex) {
-            log.error("Adding file to index: " + doc.get("title") + " failed! \n" + ex.getMessage());
-        } catch (NullPointerException ex) {
-            log.error("NullPointerException: FileContentDirectory is empty!" + ex.getMessage());
+        Iterator it = fileNames.iterator();
+        while (it.hasNext()) {
+            String path = (String) it.next();
+            // The lucene document containing all relevant indexing information
+            doc = new Document();
+            // Add fields
+            doc = addLuceneFields(doc, path);
+            log.debug("Added file: " + doc.get("title") + " to index.");
+            // Add document to the index
+            indexWriter.addDocument(doc);
         }
+        indexWriter.commit();
+        indexWriter.optimize();
+        indexWriter.close();
+        //iLog.append("Index creation sucessful: " + doc.getField("title"));
+
         return true;
     }
 

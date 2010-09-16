@@ -26,6 +26,8 @@
 package org.codesearch.indexer.manager;
 
 import java.util.LinkedList;
+import java.util.List;
+import java.util.logging.Level;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.log4j.Logger;
@@ -50,7 +52,7 @@ public class IndexerJob implements Job {
     /** Indicates if the thread is terminated or not. */
     private boolean terminated = false;
     /** List of ITask assigned to this IndexingJob */
-    private LinkedList<TaskDto> taskList = new LinkedList<TaskDto>();
+    private List<TaskDto> taskList = new LinkedList<TaskDto>();
     /* Instantiate a logger */
     private static final Logger log = Logger.getLogger(IndexerJob.class);
     private PropertyManager propertyM;
@@ -97,29 +99,30 @@ public class IndexerJob implements Job {
     @Override
     public void execute(JobExecutionContext jec) throws JobExecutionException {
         propertyM = new PropertyManager(); //TODO replace with spring injection
-        taskList = (LinkedList<TaskDto>)(jec.getJobDetail().getJobDataMap().get("tasks"));
+        taskList = (List<TaskDto>) (jec.getJobDetail().getJobDataMap().get("tasks"));
+        Task task = null;
         for (TaskDto taskDto : taskList) {
             if (terminated) {
                 return;
             }
-            Task task;
             switch (taskDto.getType()) {
                 case index: {
                     task = new IndexingTask();
                     try {
                         ((IndexingTask) task).setRepository(propertyM.getRepositoryByName(taskDto.getRepositoryName()));
-                        task.execute();
-                    } catch (TaskExecutionException ex) {
-                        log.error("Task execution was not completed successfully: "+ex.getMessage());
                     } catch (ConfigurationException ex) {
-                        log.error("Configuration Error: "+ex.getMessage());
+                        java.util.logging.Logger.getLogger(IndexerJob.class.getName()).log(Level.SEVERE, null, ex);
                     }
                     break;
                 }
                 case clear:
                     throw new NotImplementedException();
             }
-
+            try {
+                task.execute();
+            } catch (TaskExecutionException ex) {
+                log.error("Task execution was not completed successfully: " + ex.getMessage());
+            }
         }
     }
 }

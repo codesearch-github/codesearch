@@ -45,7 +45,6 @@ import org.codesearch.searcher.shared.SearchResultDto;
  * @author David Froehlich
  */
 public class DocumentSearcher {
-
     /** the key with which the location of the index is stored in the configuration file */
     public static final String INDEX_LOCATION_KEY = "indexLocation";
     /** The logger. */

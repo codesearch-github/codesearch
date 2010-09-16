@@ -26,6 +26,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.springframework.stereotype.Component;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNLogEntry;
@@ -82,6 +84,8 @@ public class SubversionPlugin implements VersionControlPlugin {
         }
     }
 
+
+
     /** {@inheritDoc} */
     @Override
     public String getFileContentForFilePath(String filePath) throws VersionControlPluginException {
@@ -121,5 +125,14 @@ public class SubversionPlugin implements VersionControlPlugin {
             throw new VersionControlPluginException(ex.toString());
         }
         return paths;
+    }
+
+    @Override
+    public String getVersionOfRepository() throws VersionControlPluginException{
+        try {
+            return Float.toString(repository.getLatestRevision());
+        } catch (SVNException ex) {
+            throw new VersionControlPluginException("SVNException: "+ex.getMessage());
+        }
     }
 }

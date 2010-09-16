@@ -65,58 +65,9 @@ public final class IndexingManager {
         for (JobDto job : jobs) {
             JobDetail jobDetail = new JobDetail("Job", "asdf", IndexerJob.class); //TODO write group
             jobDetail.getJobDataMap().put("tasks", job.getTasks());
-            Calendar calc = Calendar.getInstance();
-            Calendar calc2 = job.getStartDate();
             Trigger trigger = new SimpleTrigger("JobTrigger", "triggerGroup", new Date(job.getStartDate().getTimeInMillis()), null, SimpleTrigger.REPEAT_INDEFINITELY, job.getInterval() * 60000l);
             scheduler.scheduleJob(jobDetail, trigger);
-            scheduler.start();
         }
+            scheduler.start();
     }
-//    /**
-//     * This method takes the proper repo configuration and starts
-//     * a new indexing thread.
-//     * @param theconfiguration
-//     * @return
-//     */
-//    public Long createIndexingJob(final String theconfiguration) {
-//        IndexerJob iThread = new IndexerJob();
-//        Long indentifier = 1337l;
-//        //TODO: init
-//        activeIndexingThreads.put(indentifier, iThread);
-//        return indentifier;
-//
-//    }
-//    /**
-//     * Activates the given IndexingJob
-//     * @param indentifier
-//     */
-//    public void startIndexingJob(Long indentifier) {
-//        if (!activeIndexingThreads.containsKey(indentifier)) {
-//            activeIndexingThreads.put(indentifier, availableIndexingThreads.get(indentifier));
-//            availableIndexingThreads.get(indentifier).start();
-//        }
-//    }
-//    /**
-//     * Suspends the execution of the specified IndexingJob
-//     * @param indentifier
-//     */
-//    public void suspendActiveIndexingJob(Long indentifier) {
-//        activeIndexingThreads.get(indentifier).suspendSafely();
-//    }
-//
-//     /**
-//     * Resumes the execution of the specified IndexingJob
-//     * @param indentifier
-//     */
-//    public void resumeSuspendedIndexingJob(Long indentifier) {
-//        activeIndexingThreads.get(indentifier).resumeSafely();
-//    }
-    /**
-     * Terminates the execution of the specified IndexingJob
-     * and reverts all changes this Jobs has caused.
-     * @param indentifier
-     */
-//    public void terminateActiveIndexingJob(Long indentifier) {
-//        activeIndexingThreads.remove(indentifier).terminateSafely();
-//    }
 }
