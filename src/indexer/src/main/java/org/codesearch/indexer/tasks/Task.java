@@ -21,6 +21,8 @@
 
 package org.codesearch.indexer.tasks;
 
+import org.codesearch.indexer.exceptions.TaskExecutionException;
+
 /**
  *
  * @author Stephan Stiboller

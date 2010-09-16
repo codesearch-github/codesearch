@@ -20,11 +20,16 @@
  */
 package org.codesearch.commons.configreader.xml;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Properties;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.SubnodeConfiguration;
@@ -37,7 +42,7 @@ import org.codesearch.commons.configreader.xml.dto.TaskDto.TaskType;
 /**
  * PropertyManager is a class that provides several methods to access properties.
  * By default, the properties are stored in a file in the classpath called codesearch_config.xml.
- *
+ * @author Stephan Stiboller
  * @author David Froehlich
  * @author Samuel Kogler
  */
@@ -49,7 +54,7 @@ public class PropertyManager {
     private XMLConfiguration config;
     /** The path to the configuration file. */
     private String configpath = "codesearch_config.xml";
-
+ 
     /**
      * creates a new instance of PropertyManager
      */
@@ -187,4 +192,6 @@ public class PropertyManager {
         this.configpath = null;
         this.config = null;
     }
+
+
 }

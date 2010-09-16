@@ -24,12 +24,14 @@ package org.codesearch.commons.constants;
 import org.apache.lucene.util.Version;
 
 /**
- *
+ * @author Stephan Stiboller
  * @author David Froehlich
  */
 public final class IndexConstants {
       /** Lucene version used */
     public static final Version LUCENE_VERSION = Version.LUCENE_30;
+    public static final String INDEX_DIRECTORY = "/tmp/test/"; //TODO read this from config
+    public static final String INDEX_REVISION_CONF_DIR = "/tmp/test/";
     public static final String INDEX_FIELD_REPOSITORY="repository";
     public static final String INDEX_FIELD_FILEPATH="filepath";
     

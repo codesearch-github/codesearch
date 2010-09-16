@@ -84,8 +84,6 @@ public class SubversionPlugin implements VersionControlPlugin {
         }
     }
 
-
-
     /** {@inheritDoc} */
     @Override
     public String getFileContentForFilePath(String filePath) throws VersionControlPluginException {
@@ -127,12 +125,9 @@ public class SubversionPlugin implements VersionControlPlugin {
         return paths;
     }
 
+    /** {@inheritDoc} */
     @Override
-    public String getVersionOfRepository() throws VersionControlPluginException{
-        try {
-            return Float.toString(repository.getLatestRevision());
-        } catch (SVNException ex) {
-            throw new VersionControlPluginException("SVNException: "+ex.getMessage());
-        }
+    public long getRepositoryRevision() throws SVNException{
+            return repository.getLatestRevision();
     }
 }

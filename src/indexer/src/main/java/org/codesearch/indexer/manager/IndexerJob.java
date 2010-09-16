@@ -35,7 +35,7 @@ import org.codesearch.commons.configreader.xml.PropertyManager;
 import org.codesearch.commons.configreader.xml.dto.TaskDto;
 import org.codesearch.indexer.tasks.IndexingTask;
 import org.codesearch.indexer.tasks.Task;
-import org.codesearch.indexer.tasks.TaskExecutionException;
+import org.codesearch.indexer.exceptions.TaskExecutionException;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;

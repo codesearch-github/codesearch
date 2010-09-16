@@ -25,6 +25,8 @@ import java.net.URI;
 import java.util.Set;
 import org.codesearch.commons.plugins.Plugin;
 
+
+
 /**
  * Base for all version control plugins.
  * @author Samuel Kogler
@@ -58,5 +60,11 @@ public interface VersionControlPlugin extends Plugin {
      * @throws SVNException if the file could not be found in the currently set repository
      */
     Set<String> getPathsForChangedFilesSinceRevision(String revision) throws VersionControlPluginException;
+
+    /**
+     * Extracts and returns the revision number of the current set revision.
+     * @return The revision number
+     */
+    long getRepositoryRevision() throws Exception;
 
 }
