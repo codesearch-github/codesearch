@@ -77,7 +77,7 @@ public class PropertyManager {
             Calendar calc = new GregorianCalendar(Integer.parseInt(timeParts[0]), Integer.parseInt(timeParts[1]),
                     Integer.parseInt(timeParts[2]), Integer.parseInt(timeParts[3]), Integer.parseInt(timeParts[4]));
             if (calc == null) {
-                throw new ConfigurationException("String for start date of task configuration is not correct");
+                calc = GregorianCalendar.getInstance();
             }
             job.setInterval(interval);
             job.setStartDate(calc);
