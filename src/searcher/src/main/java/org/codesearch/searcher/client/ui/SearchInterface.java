@@ -11,6 +11,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
@@ -34,7 +35,8 @@ public class SearchInterface extends Composite {
     @UiField
     Button searchButton;
     @UiField
-    Label resultLabel;
+    FlexTable resultTable;
+
 
     public SearchInterface() {
         initWidget(uiBinder.createAndBindUi(this));
@@ -54,6 +56,7 @@ public class SearchInterface extends Composite {
 
     private void search() {
         String query = searchBox.getText();
+        resultTable.clear();
         searcherServiceAsync.doSearch(query, new AsyncCallback<SearchResultDto[]>() {
 
             @Override
@@ -62,8 +65,11 @@ public class SearchInterface extends Composite {
             }
 
             @Override
-            public void onSuccess(SearchResultDto[] result) {
-                Window.alert("Successfully called service:\n" + result);
+            public void onSuccess(SearchResultDto[] resultList) {
+                for(SearchResultDto result: resultList) {
+                    int rowIndex = resultTable.getRowCount();
+                    resultTable.setText(rowIndex, 0, result.getFilePath());
+                }
             }
         });
     }

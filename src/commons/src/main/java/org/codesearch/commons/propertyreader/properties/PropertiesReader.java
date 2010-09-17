@@ -25,8 +25,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.XMLConfiguration;
 
 /**
  * PropertyManager is a class that provides several methods to access properties.
@@ -48,27 +46,27 @@ public class PropertiesReader {
     public PropertiesReader(String repositoryPropertyFile) {
         this.repositoryPropertyFile = repositoryPropertyFile;
     }
-   
-   /**
-    * Gets a new value for the specified key
-    * @param key
-    * @param value
-    */
-   public String getPropertyFileValue(final String key) throws FileNotFoundException, IOException {
-            properties.load(new FileInputStream(getRepositoryPropertyFile()));
-            return properties.getProperty(key);
-   }
-   
-   /**
-    * Sets a new value for the specified key
-    * @param key
-    * @param value
-    */
-   public void setPropertyFileValue(final String key, final String value) throws FileNotFoundException, IOException {
-            properties.load(new FileInputStream(getRepositoryPropertyFile()));
-            properties.setProperty(key, value);
-            properties.store(new FileOutputStream(getRepositoryPropertyFile()), null);
-   }
+
+    /**
+     * Gets a new value for the specified key
+     * @param key
+     * @param value
+     */
+    public String getPropertyFileValue(final String key) throws FileNotFoundException, IOException {
+        properties.load(new FileInputStream(getRepositoryPropertyFile()));
+        return properties.getProperty(key);
+    }
+
+    /**
+     * Sets a new value for the specified key
+     * @param key
+     * @param value
+     */
+    public void setPropertyFileValue(final String key, final String value) throws FileNotFoundException, IOException {
+        properties.load(new FileInputStream(getRepositoryPropertyFile()));
+        properties.setProperty(key, value);
+        properties.store(new FileOutputStream(getRepositoryPropertyFile()), null);
+    }
 
     /**
      * @return the repositoryPropertyFile
@@ -83,6 +81,4 @@ public class PropertiesReader {
     public void setRepositoryPropertyFile(String repositoryPropertyFile) {
         this.repositoryPropertyFile = repositoryPropertyFile;
     }
-
-
 }

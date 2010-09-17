@@ -14,32 +14,31 @@ import org.apache.lucene.queryParser.ParseException;
 
 import org.codesearch.searcher.client.rpc.SearcherService;
 import org.codesearch.searcher.server.DocumentSearcher;
+import org.codesearch.searcher.server.InvalidIndexLocationException;
 import org.codesearch.searcher.shared.SearchResultDto;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- *
+ * Service used for search operations.
  * @author Samuel Kogler
  */
 public class SearcherServiceImpl extends RemoteServiceServlet implements SearcherService {
     /**
-     * The document searcher used to search tho index.
+     * The document searcher used to search the index.
      */
     private DocumentSearcher documentSearcher;
-
      /** The logger. */
     private static final Logger LOG = Logger.getLogger(SearcherServiceImpl.class);
-
 
     @Override
     public SearchResultDto[] doSearch(String query) {
         List<SearchResultDto> resultItems = new LinkedList<SearchResultDto>();
         try {
-            // Do something interesting with 's' here on the server.
             resultItems = documentSearcher.search(query);
         } catch (ParseException ex) {
             LOG.error("Could not parse query: " + ex);
         } catch (IOException ex) {
+            LOG.error(ex);
+        } catch (InvalidIndexLocationException ex) {
             LOG.error(ex);
         }
         return resultItems.toArray(new SearchResultDto[0]);

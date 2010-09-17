@@ -44,8 +44,6 @@ public interface VersionControlPlugin extends Plugin {
      */
     void setRepository(URI url, String username, String password) throws VersionControlPluginException;
 
-    String getVersionOfRepository() throws VersionControlPluginException;
-
     /**
      * Retrieves the file content for the given file path.
      * @param filePath The file path relative to the current repository URL
@@ -65,6 +63,5 @@ public interface VersionControlPlugin extends Plugin {
      * Extracts and returns the revision number of the current set revision.
      * @return The revision number
      */
-    long getRepositoryRevision() throws Exception;
-
+    String getRepositoryRevision() throws Exception;
 }

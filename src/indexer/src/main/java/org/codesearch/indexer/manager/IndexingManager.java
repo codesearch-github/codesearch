@@ -20,16 +20,13 @@
  */
 package org.codesearch.indexer.manager;
 
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
 import org.codesearch.commons.configreader.xml.PropertyManager;
 import org.codesearch.commons.configreader.xml.dto.JobDto;
-import org.codesearch.indexer.tasks.IndexingTask;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
@@ -50,7 +47,7 @@ public final class IndexingManager {
     /** All predefined/availableIndexingThreads */
     Map<Long, IndexerJob> availableIndexingThreads;
     /* Instantiate a logger */
-    private static final Logger log = Logger.getLogger(IndexingManager.class);
+    private static final Logger LOG = Logger.getLogger(IndexingManager.class);
     private Scheduler scheduler;
     private PropertyManager pm;
 
@@ -62,12 +59,14 @@ public final class IndexingManager {
 
     public void startScheduler() throws SchedulerException, ConfigurationException {
         List<JobDto> jobs = pm.getJobs();
+        int i = 0;
         for (JobDto job : jobs) {
-            JobDetail jobDetail = new JobDetail("Job", "asdf", IndexerJob.class); //TODO write group
+            JobDetail jobDetail = new JobDetail("Job" + i, "IndexingJobs", IndexerJob.class); //TODO write group
             jobDetail.getJobDataMap().put("tasks", job.getTasks());
-            Trigger trigger = new SimpleTrigger("JobTrigger", "triggerGroup", new Date(job.getStartDate().getTimeInMillis()), null, SimpleTrigger.REPEAT_INDEFINITELY, job.getInterval() * 60000l);
+            Trigger trigger = new SimpleTrigger("JobTrigger" + i, "triggerGroup", new Date(job.getStartDate().getTimeInMillis()), null, SimpleTrigger.REPEAT_INDEFINITELY, job.getInterval() * 60000l);
             scheduler.scheduleJob(jobDetail, trigger);
+            i++;
         }
-            scheduler.start();
+        scheduler.start();
     }
 }

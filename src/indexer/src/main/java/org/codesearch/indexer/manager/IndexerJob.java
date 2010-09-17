@@ -54,8 +54,8 @@ public class IndexerJob implements Job {
     /** List of ITask assigned to this IndexingJob */
     private List<TaskDto> taskList = new LinkedList<TaskDto>();
     /* Instantiate a logger */
-    private static final Logger log = Logger.getLogger(IndexerJob.class);
-    private PropertyManager propertyM;
+    private static final Logger LOG = Logger.getLogger(IndexerJob.class);
+    private PropertyManager propertyManager;
 
 //    /**
 //     * Suspends the thread in a save way.
@@ -65,7 +65,7 @@ public class IndexerJob implements Job {
 //            this.wait();
 //            jobIsSuspended = true;
 //        } catch (InterruptedException ex) {
-//            log.error("Thread has been interrupted during suspend process:" +ex.getMessage());
+//            log.error("Thread has been interrupted during suspend process:" +ex);
 //        }
 //    }
 //    /**
@@ -98,7 +98,7 @@ public class IndexerJob implements Job {
 //    }
     @Override
     public void execute(JobExecutionContext jec) throws JobExecutionException {
-        propertyM = new PropertyManager(); //TODO replace with spring injection
+        propertyManager = new PropertyManager(); //TODO replace with spring injection
         taskList = (List<TaskDto>) (jec.getJobDetail().getJobDataMap().get("tasks"));
         Task task = null;
         for (TaskDto taskDto : taskList) {
@@ -109,7 +109,7 @@ public class IndexerJob implements Job {
                 case index: {
                     task = new IndexingTask();
                     try {
-                        ((IndexingTask) task).setRepository(propertyM.getRepositoryByName(taskDto.getRepositoryName()));
+                        ((IndexingTask) task).setRepository(propertyManager.getRepositoryByName(taskDto.getRepositoryName()));
                     } catch (ConfigurationException ex) {
                         java.util.logging.Logger.getLogger(IndexerJob.class.getName()).log(Level.SEVERE, null, ex);
                     }
@@ -121,7 +121,7 @@ public class IndexerJob implements Job {
             try {
                 task.execute();
             } catch (TaskExecutionException ex) {
-                log.error("Task execution was not completed successfully: " + ex.getMessage());
+                LOG.error("Task execution was not completed successfully: " + ex);
             }
         }
     }

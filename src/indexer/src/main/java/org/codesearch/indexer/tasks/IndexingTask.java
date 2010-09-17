@@ -46,7 +46,7 @@ import org.codesearch.commons.plugins.vcs.VersionControlPluginException;
 import org.codesearch.commons.propertyreader.properties.PropertiesReader;
 
 /**
- * This class is the base class used for indexing
+ * This task performs basic indexing of one repository.
  *
  * @author Stephan Stiboller
  * @author David Froehlich
@@ -57,7 +57,7 @@ public class IndexingTask implements Task {
     /** The IndexingTask to be processed */
     private Set<String> fileNames;
     /* Instantiate a logger  */
-    private static final Logger log = Logger.getLogger(IndexingTask.class);
+    private static final Logger LOG = Logger.getLogger(IndexingTask.class);
     /** The currently active IndexWriter */
     private IndexWriter indexWriter;
     /** The index directory, contains all index files */
@@ -66,20 +66,7 @@ public class IndexingTask implements Task {
     protected VersionControlPlugin vcp;
     /** The used PropertyReader */
     protected PropertiesReader pr = new PropertiesReader("revisions.properties");
-
     private PropertyManager pm = new PropertyManager(); //TODO solve this via spring injection
-
-    public void setRepository(RepositoryDto repository) {
-        this.repository = repository;
-    }
-
-    public FSDirectory getIndexDirectory() {
-        return indexDirectory;
-    }
-
-    public void setIndexDirectory(FSDirectory indexDirectory) {
-        this.indexDirectory = indexDirectory;
-    }
 
     @Override
     public void execute() throws TaskExecutionException {
@@ -87,37 +74,37 @@ public class IndexingTask implements Task {
         try {
             indexLocation = pm.getSingleLinePropertyValue("index-location");
         } catch (ConfigurationException ex) {
-            throw new TaskExecutionException("IndexLocation could not be found: " + ex.getMessage());
+            throw new TaskExecutionException("IndexLocation could not be found: " + ex);
         }
         try {
-            log.info("Starting execution of indexing task");
+            LOG.info("Starting execution of indexing task");
             initializeVersionControlPlugin();
             fileNames = vcp.getPathsForChangedFilesSinceRevision(pr.getPropertyFileValue(repository.getName()));
             initializeIndexWriter(new StandardAnalyzer(IndexConstants.LUCENE_VERSION), new File(IndexConstants.INDEX_DIRECTORY));
             this.createIndex();
-            pr.setPropertyFileValue(repository.getName(), Long.toString(vcp.getRepositoryRevision()));
-        }  catch (FileNotFoundException ex) {
-            java.util.logging.Logger.getLogger(IndexingTask.class.getName()).log(Level.SEVERE, null, ex);
+
+        } catch (FileNotFoundException ex) {
+            LOG.error(ex);
         } catch (IOException ex) {
-            java.util.logging.Logger.getLogger(IndexingTask.class.getName()).log(Level.SEVERE, null, ex);
+            LOG.error(ex);
         } catch (VersionControlPluginException ex) {
-            throw new TaskExecutionException("VersionControlPlugin files could not be retrieved: " + ex.getMessage());
+            throw new TaskExecutionException("VersionControlPlugin files could not be retrieved: " + ex);
         } catch (PluginLoaderException ex) {
-            throw new TaskExecutionException("VersionControlPlugin could not be loaded: " + ex.getMessage());
-        }catch (Exception ex) {
-            java.util.logging.Logger.getLogger(IndexingTask.class.getName()).log(Level.SEVERE, null, ex);
+            throw new TaskExecutionException("VersionControlPlugin could not be loaded: " + ex);
+        } catch (Exception ex) {
+            throw new TaskExecutionException("Unexpected exception: " + ex);
         }
         initializeIndexWriter(new StandardAnalyzer(IndexConstants.LUCENE_VERSION), new File(indexLocation));
         try {
             fileNames = vcp.getPathsForChangedFilesSinceRevision("0");//TODO read revision number
             this.createIndex();
-            log.info("finished execution of indexing task");
+            LOG.info("finished execution of indexing task");
         } catch (CorruptIndexException ex) {
-            throw new TaskExecutionException("Index is corrupted: " + ex.getMessage());
+            throw new TaskExecutionException("Index is corrupted: " + ex);
         } catch (IOException ex) {
-            throw new TaskExecutionException("Index could not be opened: " + ex.getMessage());
+            throw new TaskExecutionException("Index could not be opened: " + ex);
         } catch (VersionControlPluginException ex) {
-            throw new TaskExecutionException("Error with version control plugin: " + ex.getMessage());
+            throw new TaskExecutionException("Error with version control plugin: " + ex);
         }
     }
 
@@ -139,9 +126,9 @@ public class IndexingTask implements Task {
         doc.add(new Field("TITLE", extractFilename(path), Field.Store.YES, Field.Index.NOT_ANALYZED));
         doc.add(new Field("CONTENT", vcp.getFileContentForFilePath(path), Field.Store.YES, Field.Index.ANALYZED));
         try {
-            doc.add(new Field("REVISION", Long.toString(vcp.getRepositoryRevision()), Field.Store.YES, Field.Index.ANALYZED));
+            doc.add(new Field("REVISION", vcp.getRepositoryRevision(), Field.Store.YES, Field.Index.ANALYZED));
         } catch (Exception ex) {
-            log.error("Unexpected Exception occured " + ex.getMessage());
+            LOG.error("Unexpected Exception occured " + ex);
         }
         return doc;
     }
@@ -155,10 +142,10 @@ public class IndexingTask implements Task {
         try {
             indexDirectory = FSDirectory.open(dir);
             indexWriter = new IndexWriter(indexDirectory, luceneAnalyzer, IndexWriter.MaxFieldLength.LIMITED);
-            log.debug("IndexWriter initilaization successful: " + dir.getAbsolutePath());
+            LOG.debug("IndexWriter initilaization successful: " + dir.getAbsolutePath());
         } catch (IOException ex) {
-            log.error(ex);
-            log.error("IndexWriter initialization error: Could not open directory " + dir.getAbsolutePath());
+            LOG.error(ex);
+            LOG.error("IndexWriter initialization error: Could not open directory " + dir.getAbsolutePath());
         }
     }
 
@@ -167,32 +154,32 @@ public class IndexingTask implements Task {
      */
     public boolean createIndex() throws VersionControlPluginException, CorruptIndexException, IOException {
         if (indexWriter == null) {
-            log.error("Creation of indexDirectory failed due to missing initialization of IndexWriter!");
+            LOG.error("Creation of indexDirectory failed due to missing initialization of IndexWriter!");
             return false;
         }
         Document doc = new Document();
         try {
-        Iterator it = fileNames.iterator();
-        while (it.hasNext()) {
-            String path = (String) it.next();
-            // The lucene document containing all relevant indexing information
-            doc = new Document();
-            // Add fields
-            doc = addLuceneFields(doc, path);
-            log.debug("Added file: " + doc.get("title") + " to index.");
-            // Add document to the index
-            indexWriter.addDocument(doc);
-        }
-        indexWriter.commit();
-        indexWriter.optimize();
-        indexWriter.close();
-        //iLog.append("Index creation sucessful: " + doc.getField("title"));
+            Iterator it = fileNames.iterator();
+            while (it.hasNext()) {
+                String path = (String) it.next();
+                // The lucene document containing all relevant indexing information
+                doc = new Document();
+                // Add fields
+                doc = addLuceneFields(doc, path);
+                LOG.debug("Added file: " + doc.get("title") + " to index.");
+                // Add document to the index
+                indexWriter.addDocument(doc);
+            }
+            indexWriter.commit();
+            indexWriter.optimize();
+            indexWriter.close();
+            //iLog.append("Index creation sucessful: " + doc.getField("title"));
         } catch (CorruptIndexException ex) {
-            log.error("Indexing  of: " + doc.get("title") + " failed! \n" + ex.getMessage());
+            LOG.error("Indexing  of: " + doc.get("title") + " failed! \n" + ex);
         } catch (IOException ex) {
-            log.error("Adding file to index: " + doc.get("title") + " failed! \n" + ex.getMessage());
+            LOG.error("Adding file to index: " + doc.get("title") + " failed! \n" + ex);
         } catch (NullPointerException ex) {
-            log.error("NullPointerException: FileContentDirectory is empty!" + ex.getMessage());
+            LOG.error("NullPointerException: FileContentDirectory is empty!" + ex);
         }
         return true;
     }
@@ -205,5 +192,9 @@ public class IndexingTask implements Task {
     public String extractFilename(final String path) {
         String[] parts = path.split("/");
         return parts[parts.length];
+    }
+
+    public void setRepository(RepositoryDto repository) {
+        this.repository = repository;
     }
 }

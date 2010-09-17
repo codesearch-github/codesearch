@@ -18,7 +18,6 @@
  * You should have received a copy of the GNU General Public License
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.codesearch.indexer.core;
 
 import javax.servlet.ServletContextEvent;
@@ -31,25 +30,24 @@ import org.quartz.SchedulerException;
  *
  * @author David Froehlich
  */
-public class IndexerMain implements javax.servlet.ServletContextListener{
-    protected static final Logger log = Logger.getLogger(IndexerMain.class);
+public class IndexerMain implements javax.servlet.ServletContextListener {
+
+    protected static final Logger LOG = Logger.getLogger(IndexerMain.class);
     private IndexingManager indexingManager;
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        System.out.println("blargh");
         try {
             indexingManager = new IndexingManager();
             indexingManager.startScheduler();
         } catch (SchedulerException ex) {
-            log.error("Problem with scheduler at context initialization: "+ex.getMessage());
+            LOG.error("Problem with scheduler at context initialization: " + ex);
         } catch (ConfigurationException ex) {
-            log.error("Problem with configuration at context initialization: "+ex.getMessage());
+            LOG.error("Problem with configuration at context initialization: " + ex);
         }
     }
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
     }
-
 }

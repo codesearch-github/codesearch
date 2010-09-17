@@ -45,6 +45,7 @@ import org.codesearch.searcher.shared.SearchResultDto;
  * @author David Froehlich
  */
 public class DocumentSearcher {
+
     /** the key with which the location of the index is stored in the configuration file */
     public static final String INDEX_LOCATION_KEY = "indexLocation";
     /** The logger. */
@@ -71,7 +72,10 @@ public class DocumentSearcher {
         queryParser = new QueryParser(Version.LUCENE_30, "", new StandardAnalyzer(Version.LUCENE_30));
         try {
             initSearcher();
-        } catch(IOException ex)  {}
+        } catch (InvalidIndexLocationException ex) {
+            LOG.warn(ex);
+            LOG.warn("Will try to re-initialize searcher at the first search operation");
+        }
         LOG.debug("DocumentSearcher created");
     }
 
@@ -82,7 +86,7 @@ public class DocumentSearcher {
      * @throws ParseException if the searchString could not be parsed to a query
      * @throws IOException if the Index could not be read
      */
-    public List<SearchResultDto> search(String searchString) throws ParseException, IOException {
+    public List<SearchResultDto> search(String searchString) throws ParseException, IOException, InvalidIndexLocationException {
         if (!searcherInitialized) {
             initSearcher();
         }
@@ -105,15 +109,13 @@ public class DocumentSearcher {
         return results;
     }
 
-    private void initSearcher() throws IOException {
+    private void initSearcher() throws InvalidIndexLocationException {
         try {
             indexSearcher = new IndexSearcher(FSDirectory.open(new File(indexLocation)), true);
             searcherInitialized = true;
         } catch (IOException exc) {
             searcherInitialized = false;
-            LOG.warn("No valid index found at: " + indexLocation);
-            LOG.warn("Will try to re-initialize at next search operation");
-            throw exc;
+            throw new InvalidIndexLocationException("No valid index found at: " + indexLocation + "\n" + exc);
         }
     }
 }

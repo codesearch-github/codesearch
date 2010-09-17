@@ -124,7 +124,7 @@ public class PropertyManagerTest {
             assert (result.get(0).equals(job1));
             assert (result.get(1).equals(job2));
         } catch (ConfigurationException ex) {
-            fail("Configuration exception: " + ex.getMessage ());
+            fail("Configuration exception: " + ex);
         }
 
     }

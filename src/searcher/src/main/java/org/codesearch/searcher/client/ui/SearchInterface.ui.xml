@@ -28,7 +28,7 @@
                     </g:HTMLPanel>
                 </g:north>
                 <g:center>
-                    <g:Label ui:field='resultLabel' text='asdf'/>
+                    <g:FlexTable ui:field='resultTable' />
                 </g:center>
             </g:DockLayoutPanel>
         </g:center>
