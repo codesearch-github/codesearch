@@ -27,7 +27,7 @@ import java.io.IOException;
 import java.util.Properties;
 
 /**
- * PropertyManager is a class that provides several methods to access properties.
+ * PropertiesReader is a class that provides several methods to access properties.
  * By default, the properties are stored in a file in the classpath called codesearch_config.xml.
  * @author Stephan Stiboller
  * @author David Froehlich
@@ -42,7 +42,7 @@ public class PropertiesReader {
     private String repositoryPropertyFile = "repository.properties";
 
     /**
-     * creates a new instance of PropertyManager
+     * Creates a new instance of PropertyManager
      */
     public PropertiesReader(String repositoryPropertyFile) {
         this.repositoryPropertyFile = repositoryPropertyFile;

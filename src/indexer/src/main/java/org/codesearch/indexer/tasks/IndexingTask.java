@@ -72,40 +72,23 @@ public class IndexingTask implements Task {
     public void execute() throws TaskExecutionException {
         String indexLocation = null;
         try {
-            indexLocation = pm.getSingleLinePropertyValue("index-location");
-        } catch (ConfigurationException ex) {
-            throw new TaskExecutionException("IndexLocation could not be found: " + ex);
-        }
-        try {
             LOG.info("Starting execution of indexing task");
+            indexLocation = pm.getSingleLinePropertyValue("index-location");
             initializeVersionControlPlugin();
             fileNames = vcp.getPathsForChangedFilesSinceRevision(pr.getPropertyFileValue(repository.getName()));
-            initializeIndexWriter(new StandardAnalyzer(IndexConstants.LUCENE_VERSION), new File(IndexConstants.INDEX_DIRECTORY));
+            initializeIndexWriter(new StandardAnalyzer(IndexConstants.LUCENE_VERSION), new File(indexLocation));
             this.createIndex();
-
         } catch (FileNotFoundException ex) {
-            LOG.error(ex);
+            LOG.error(ex.getMessage());
         } catch (IOException ex) {
-            LOG.error(ex);
+            LOG.error(ex.getMessage());
         } catch (VersionControlPluginException ex) {
             throw new TaskExecutionException("VersionControlPlugin files could not be retrieved: " + ex);
         } catch (PluginLoaderException ex) {
             throw new TaskExecutionException("VersionControlPlugin could not be loaded: " + ex);
         } catch (Exception ex) {
             throw new TaskExecutionException("Unexpected exception: " + ex);
-        }
-        initializeIndexWriter(new StandardAnalyzer(IndexConstants.LUCENE_VERSION), new File(indexLocation));
-        try {
-            fileNames = vcp.getPathsForChangedFilesSinceRevision("0");//TODO read revision number
-            this.createIndex();
-            LOG.info("finished execution of indexing task");
-        } catch (CorruptIndexException ex) {
-            throw new TaskExecutionException("Index is corrupted: " + ex);
-        } catch (IOException ex) {
-            throw new TaskExecutionException("Index could not be opened: " + ex);
-        } catch (VersionControlPluginException ex) {
-            throw new TaskExecutionException("Error with version control plugin: " + ex);
-        }
+        } 
     }
 
     /**

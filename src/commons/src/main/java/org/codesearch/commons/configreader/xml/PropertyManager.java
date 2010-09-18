@@ -123,10 +123,6 @@ public class PropertyManager {
         return repos;
     }
 
-    private void addAllRepositoriesToTask(){
-        
-    }
-
     public RepositoryDto getRepositoryByName(String name) throws ConfigurationException {
         if(config == null)
             loadConfigReader();
