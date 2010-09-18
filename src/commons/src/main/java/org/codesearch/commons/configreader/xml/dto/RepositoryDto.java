@@ -34,9 +34,6 @@ public class RepositoryDto {
     private String username;
     /** The password for this repository. */
     private String password;
-    /** Specifies whether indexing should be enabled for this specific repository. Not recommended for
-    repositories that will not be accessed or searched by codesearch*/
-    private boolean indexingEnabled;
     /** Specifies whether the additional index will be created for the repository. */
     private boolean codeNavigationEnabled;
     /** The version control system used for this repository, (for instance SVN or Bazaar),
@@ -53,12 +50,11 @@ public class RepositoryDto {
      * @param codeNavigationEnabled specifies whether the repository should have the additional
      * indexes for the code navigation
      */
-    public RepositoryDto(String name, String url, String username, String password, boolean indexingEnabled, boolean codeNavigationEnabled, String versionControlSystem) {
+    public RepositoryDto(String name, String url, String username, String password, boolean codeNavigationEnabled, String versionControlSystem) {
         this.name = name;
         this.url = url;
         this.username = username;
         this.password = password;
-        this.indexingEnabled = indexingEnabled;
         this.codeNavigationEnabled = codeNavigationEnabled;
         this.versionControlSystem = versionControlSystem;
     }
@@ -69,14 +65,6 @@ public class RepositoryDto {
 
     public void setCodeNavigationEnabled(boolean codeNavigationEnabled) {
         this.codeNavigationEnabled = codeNavigationEnabled;
-    }
-
-    public boolean isIndexingEnabled() {
-        return indexingEnabled;
-    }
-
-    public void setIndexingEnabled(boolean indexingEnabled) {
-        this.indexingEnabled = indexingEnabled;
     }
 
     public String getName() {
@@ -111,20 +99,29 @@ public class RepositoryDto {
         this.username = username;
     }
 
-    public String getVersionControlSystem(){
+    public String getVersionControlSystem() {
         return versionControlSystem;
     }
 
-    public void setVersionControlSystem(String versionControlSystem){
+    public void setVersionControlSystem(String versionControlSystem) {
         this.versionControlSystem = versionControlSystem;
     }
 
+    /**
+     * compares this RepositoryDto with the given one
+     * @param o the RepositoryDto to compare
+     * @return true if all the attributes are equal
+     */
     @Override
     public boolean equals(Object o) {
-        RepositoryDto other = (RepositoryDto) o;
-        if (this.getName().equals(other.getName()) && this.isCodeNavigationEnabled() == other.isCodeNavigationEnabled() && this.isIndexingEnabled() == other.isIndexingEnabled()) {
-            return true;
+        try {
+            RepositoryDto other = (RepositoryDto) o;
+            if (this.getName().equals(other.getName()) && this.isCodeNavigationEnabled() == other.isCodeNavigationEnabled()) {
+                return true;
+            }
+            return false;
+        } catch(ClassCastException ex){
+            return false;
         }
-        return false;
     }
 }

@@ -27,40 +27,38 @@
     <listTest>2</listTest>
     <listTest>3</listTest>
     <index_jobs>
-        <index_job>
-            <tasks>
-                <task>
-                    <type>index</type>
-                </task>
-            </tasks>
-            <interval>60</interval>
-            <start>2010-09-12-18-15</start>
-        </index_job>
-        <index_job>
-            <tasks>
-                <task>
-                    <type>clear</type>
-                </task>
-            </tasks>
-            <interval>10080</interval>
-            <start>2010-11-11-18-0</start>
-        </index_job>
-    </index_jobs>
+		<index_job>
+			<repositories>testRepo1 testRepo2</repositories>
+			<tasks>
+				<task>
+					<type>index</type>			
+				</task>
+			</tasks>
+			<interval>60</interval>
+			<start>2010-08-13-18-0</start>
+		</index_job>
+		<index_job>
+			<tasks>
+				<task>
+					<type>clear</type>
+				</task>
+			</tasks>			
+			<interval>10080</interval>
+			<start>2010-08-11-18-0</start>
+		</index_job>
+	</index_jobs>
     <testproperty>asdf</testproperty>
     <repositories>
         <repository>
             <name>testRepo1</name>
-            <indexingEnabled>true</indexingEnabled>
             <codeNavigationEnabled>true</codeNavigationEnabled>
         </repository>
         <repository>
             <name>testRepo2</name>
-            <indexingEnabled>true</indexingEnabled>
             <codeNavigationEnabled>false</codeNavigationEnabled>
         </repository>
         <repository>
             <name>testRepo3</name>
-            <indexingEnabled>false</indexingEnabled>
             <codeNavigationEnabled>false</codeNavigationEnabled>
         </repository>
     </repositories>

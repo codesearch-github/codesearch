@@ -23,6 +23,7 @@ package org.codesearch.commons.configreader.xml.dto;
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -33,17 +34,27 @@ public class JobDto {
     /** A list of all tasks that will be executed in this job */
     private List<TaskDto> tasks;
     /** The original start date for the job, the job will be executed whenever the start date + an arbitrary count of the interval matches the current time
-     * for instance startDate is 2010-11-11 (a saturday) at 6:00 pm, and the interval is 10080 (minutes per week), then the job will be executed every saturday at 6:00 pm
+     * for instance startDate is 2010-11-11 (a Saturday) at 6:00 pm, and the interval is 10080 (minutes per week), then the job will be executed every saturday at 6:00 pm
      * if the startDate is 2010-10-13 at 8:00 am and the interval is 60, then the job will be executed every full hour*/
     private Calendar startDate;
     /** The interval in which the job will be executed in minutes */
     private int interval;
+    /** The set of all repositories associated with this job, so an indexing task in this job would only create the index for these repositories, a clear task however clears the entire index */
+    private Set<String> repositoryNames;
 
     /**
      * Creates a new instance of JobDto
      */
     public JobDto() {
         tasks = new LinkedList<TaskDto>();
+    }
+
+    public Set<String> getRepositoryNames() {
+        return repositoryNames;
+    }
+
+    public void setRepositoryNames(Set<String> repositoryNames) {
+        this.repositoryNames = repositoryNames;
     }
 
     public int getInterval() {

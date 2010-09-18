@@ -98,6 +98,7 @@ public class IndexerJob implements Job {
 //    }
     @Override
     public void execute(JobExecutionContext jec) throws JobExecutionException {
+        terminated = (Boolean) jec.getJobDetail().getJobDataMap().get("terminated");
         propertyManager = new PropertyManager(); //TODO replace with spring injection
         taskList = (List<TaskDto>) (jec.getJobDetail().getJobDataMap().get("tasks"));
         Task task = null;
@@ -108,11 +109,7 @@ public class IndexerJob implements Job {
             switch (taskDto.getType()) {
                 case index: {
                     task = new IndexingTask();
-                    try {
-                        ((IndexingTask) task).setRepository(propertyManager.getRepositoryByName(taskDto.getRepositoryName()));
-                    } catch (ConfigurationException ex) {
-                        java.util.logging.Logger.getLogger(IndexerJob.class.getName()).log(Level.SEVERE, null, ex);
-                    }
+                    ((IndexingTask) task).setRepository(taskDto.getRepository());
                     break;
                 }
                 case clear:

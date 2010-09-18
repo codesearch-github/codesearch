@@ -86,9 +86,15 @@ public class PropertyManager {
             }
             job.setInterval(interval);
             job.setStartDate(calc);
+            //TODO maybe store repositories differently
+            
+            String repositoryString = hc.getString("repositories");
+            //The list of repositories this job is associated with, each task specified in the configuration is created for each of these repositories
+            List<RepositoryDto> repositoriesForJob = getRepositoryDtosForString(repositoryString);
             //Read the tasks per job from the configuration
             List<SubnodeConfiguration> subConf = hc.configurationsAt("tasks.task");
             List<TaskDto> tasks = new LinkedList<TaskDto>();
+
             for(SubnodeConfiguration sc : subConf){
                 TaskType type = null;
                 if (sc.getString("type").equals("index")) { //TODO replace with a more generic method
@@ -96,13 +102,29 @@ public class PropertyManager {
                 } else if (sc.getString("type").equals("clear")) {
                     type = TaskType.clear;
                 }
-                String repository = sc.getString("repository");
-                tasks.add(new TaskDto(repository, type));
+                for(RepositoryDto repository : repositoriesForJob){
+                    tasks.add(new TaskDto(repository, type));
+                }
             }
             job.setTasks(tasks);
             jobs.add(job);
         }
         return jobs;
+    }
+
+    private List<RepositoryDto> getRepositoryDtosForString(String repositoryString) throws ConfigurationException{
+        if(repositoryString == null){
+            return getRepositories();
+        }
+        List<RepositoryDto> repos = new LinkedList<RepositoryDto>();
+        for(String s : repositoryString.split(" ")){
+            repos.add(getRepositoryByName(s));
+        }
+        return repos;
+    }
+
+    private void addAllRepositoriesToTask(){
+        
     }
 
     public RepositoryDto getRepositoryByName(String name) throws ConfigurationException {
@@ -112,7 +134,7 @@ public class PropertyManager {
         List<HierarchicalConfiguration> repositories = config.configurationsAt("repositories.repository");
         for(HierarchicalConfiguration hc : repositories){
             if(hc.getString("name").equals(name)){
-                repo = new RepositoryDto(name, hc.getString("url"), hc.getString("username"), hc.getString("password"), hc.getBoolean("indexingEnabled"), hc.getBoolean("codeNavigationEnabled"), hc.getString("versionControlSystem"));
+                repo = new RepositoryDto(name, hc.getString("url"), hc.getString("username"), hc.getString("password"), hc.getBoolean("codeNavigationEnabled"), hc.getString("versionControlSystem"));
             }
         }
         return repo;
@@ -137,7 +159,6 @@ public class PropertyManager {
             repositoryDto.setUrl(repositoryConfig.getString("url"));
             repositoryDto.setUsername(repositoryConfig.getString("username"));
             repositoryDto.setPassword(repositoryConfig.getString("password"));
-            repositoryDto.setIndexingEnabled(repositoryConfig.getBoolean("indexingEnabled"));
             repositoryDto.setCodeNavigationEnabled(repositoryConfig.getBoolean("codeNavigationEnabled"));
             repositories.add(repositoryDto);
         }

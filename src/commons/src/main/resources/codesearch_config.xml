@@ -28,6 +28,7 @@
 	<indexLocation>/tmp/test</indexLocation>
 	<index_jobs>
 		<index_job>
+			<repositories>testRepo1, testRepo2</repositories>
 			<tasks>
 				<task>
 					<type>index</type>			

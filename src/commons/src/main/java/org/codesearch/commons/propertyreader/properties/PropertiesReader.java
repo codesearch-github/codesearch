@@ -33,6 +33,7 @@ import java.util.Properties;
  * @author David Froehlich
  * @author Samuel Kogler
  */
+//TODO probably remove class, dude, why don't you just use PropertyManager?
 public class PropertiesReader {
 
     /** The internally used Property file */

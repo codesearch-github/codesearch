@@ -27,7 +27,10 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
 import org.codesearch.commons.configreader.xml.PropertyManager;
 import org.codesearch.commons.configreader.xml.dto.JobDto;
+import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SchedulerFactory;
@@ -43,9 +46,7 @@ import org.quartz.impl.StdSchedulerFactory;
 public final class IndexingManager {
 
     /** All active running Threads */
-    Map<Long, IndexerJob> activeIndexingThreads;
-    /** All predefined/availableIndexingThreads */
-    Map<Long, IndexerJob> availableIndexingThreads;
+    Map<Long, IndexerJob> indexingJobs;
     /* Instantiate a logger */
     private static final Logger LOG = Logger.getLogger(IndexingManager.class);
     private Scheduler scheduler;
@@ -57,12 +58,27 @@ public final class IndexingManager {
         scheduler = sf.getScheduler();
     }
 
+    public void stopThread(int i) throws SchedulerException {
+        List<JobExecutionContext> currentlyExecutedJobs = (List<JobExecutionContext>) scheduler.getCurrentlyExecutingJobs();
+        for(JobExecutionContext jec : currentlyExecutedJobs){
+            JobDataMap dataMap = jec.getJobDetail().getJobDataMap();
+            int currentIndex = Integer.parseInt(dataMap.getString("id"));
+            if(i == currentIndex){
+                dataMap.put("terminated", true);
+                return;
+            }
+        }
+        throw new JobExecutionException("For stopping specified job could not be found");
+    }
+
     public void startScheduler() throws SchedulerException, ConfigurationException {
         List<JobDto> jobs = pm.getJobs();
         int i = 0;
         for (JobDto job : jobs) {
-            JobDetail jobDetail = new JobDetail("Job" + i, "IndexingJobs", IndexerJob.class); //TODO write group
+            JobDetail jobDetail = new JobDetail("Job" + i, "IndexingJobs", IndexerJob.class);
             jobDetail.getJobDataMap().put("tasks", job.getTasks());
+            jobDetail.getJobDataMap().put("id", i);
+            jobDetail.getJobDataMap().put("terminated", false);
             Trigger trigger = new SimpleTrigger("JobTrigger" + i, "triggerGroup", new Date(job.getStartDate().getTimeInMillis()), null, SimpleTrigger.REPEAT_INDEFINITELY, job.getInterval() * 60000l);
             scheduler.scheduleJob(jobDetail, trigger);
             i++;
