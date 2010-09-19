@@ -27,6 +27,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.Pattern;
+import org.apache.commons.lang.NotImplementedException;
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -91,7 +95,7 @@ public class IndexingTask implements Task {
         } catch (PluginLoaderException ex) {
             throw new TaskExecutionException("VersionControlPlugin could not be loaded: " + ex);
         } catch (ConfigurationException ex) {
-            throw new TaskExecutionException("Configuration could not be read "+ex);
+            throw new TaskExecutionException("Configuration could not be read " + ex);
         }
     }
 
@@ -149,16 +153,18 @@ public class IndexingTask implements Task {
             Iterator it = fileNames.iterator();
             while (it.hasNext()) {
                 String path = (String) it.next();
-                // The lucene document containing all relevant indexing information
-                doc = new Document();
-                // Add fields
-                doc = addLuceneFields(doc, path);
-                LOG.debug("Added file: " + doc.get("title") + " to index.");
-                // Add document to the index
-                indexWriter.addDocument(doc);
+                if (!(fileIsOnIgnoreList(path))) {
+                    // The lucene document containing all relevant indexing information
+                    doc = new Document();
+                    // Add fields
+                    doc = addLuceneFields(doc, path);
+                    LOG.debug("Added file: " + doc.get("title") + " to index.");
+                    // Add document to the index
+                    indexWriter.addDocument(doc);
+                }
             }
             indexWriter.commit();
-            indexWriter.optimize();
+            indexWriter.optimize(); //TODO check whether optimize makes removing of documents impossible
             indexWriter.close();
         } catch (CorruptIndexException ex) {
             LOG.error("Indexing  of: " + doc.get("title") + " failed! \n" + ex);
@@ -168,6 +174,23 @@ public class IndexingTask implements Task {
             LOG.error("NullPointerException: FileContentDirectory is empty!" + ex);
         }
         return true;
+    }
+
+    public boolean fileIsOnIgnoreList(String path) {
+        Pattern p;
+        for(String s : repository.getIgnoredFileNames()){
+            p = Pattern.compile(parseRegexString(s)); 
+            Matcher m = p.matcher(path);
+            if(m.find())
+                return true;
+        }
+        return false;
+    }
+
+    //TODO check for different chars the user could specify in configuration
+    private String parseRegexString(String string){
+        String retString = string.replace("*", ".*");
+        return retString;
     }
 
     /**

@@ -23,10 +23,12 @@
 -->
 
 <root>
-    <listTest>1</listTest>
-    <listTest>2</listTest>
-    <listTest>3</listTest>
-    <index_jobs>
+  <globally_ignored_filenames>
+      <filename>*.jpg</filename>
+      <filename>*.txt</filename>
+  </globally_ignored_filenames>
+	<indexLocation>/tmp/test</indexLocation>
+	<index_jobs>
 		<index_job>
 			<repositories>testRepo1 testRepo2</repositories>
 			<tasks>
@@ -34,7 +36,7 @@
 					<type>index</type>			
 				</task>
 			</tasks>
-			<interval>60</interval>
+			<interval>60</interval> 
 			<start>2010-08-13-18-0</start>
 		</index_job>
 		<index_job>
@@ -51,15 +53,25 @@
     <repositories>
         <repository>
             <name>testRepo1</name>
+	          <version_control_system>SVN</version_control_system>
+            <username>testUser</username>
+            <password>testPassword</password>
+            <url>http://test.org</url>
             <codeNavigationEnabled>true</codeNavigationEnabled>
+            <not_indexed_filenames>
+              <filename>*.xml</filename>
+            </not_indexed_filenames>
         </repository>
         <repository>
             <name>testRepo2</name>
-            <codeNavigationEnabled>false</codeNavigationEnabled>
-        </repository>
-        <repository>
-            <name>testRepo3</name>
+            <username>testUser</username>
+            <password>testPassword</password>      
+      	    <version_control_system>SVN</version_control_system>
+            <url>http://test.org</url>
             <codeNavigationEnabled>false</codeNavigationEnabled>
         </repository>
     </repositories>
+<listTest>1</listTest>
+<listTest>2</listTest>
+<listTest>3</listTest>
 </root>

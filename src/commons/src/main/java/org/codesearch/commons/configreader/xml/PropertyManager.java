@@ -24,10 +24,12 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.SubnodeConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
+import org.apache.commons.lang.NotImplementedException;
 import org.codesearch.commons.configreader.xml.dto.JobDto;
 import org.codesearch.commons.configreader.xml.dto.RepositoryDto;
 import org.codesearch.commons.configreader.xml.dto.TaskDto;
@@ -48,7 +50,7 @@ public class PropertyManager {
     private XMLConfiguration config;
     /** The path to the configuration file. */
     private String configpath = "codesearch_config.xml";
- 
+
     /**
      * creates a new instance of PropertyManager
      */
@@ -70,18 +72,23 @@ public class PropertyManager {
         for (HierarchicalConfiguration hc : jobConfig) {
             //reads job specific values and adds them to the JobDto
             JobDto job = new JobDto();
-            int interval = hc.getInt("interval");
+            int interval;
+            try{
+                interval = hc.getInt("interval");
+            } catch (NoSuchElementException ex){
+                //in case no interval was specified the job is set to execute only once
+                interval = -1;
+            }
             //The start time is stored as a single string seperated by '-' e.g.: YYYY-MM-DD-HH-MM
             String[] timeParts = hc.getString("start").split("-");
-            Calendar calc = new GregorianCalendar(Integer.parseInt(timeParts[0]), Integer.parseInt(timeParts[1])-1,
+            Calendar calc = new GregorianCalendar(Integer.parseInt(timeParts[0]), Integer.parseInt(timeParts[1]) - 1,
                     Integer.parseInt(timeParts[2]), Integer.parseInt(timeParts[3]), Integer.parseInt(timeParts[4]));
             if (calc == null) {
                 calc = GregorianCalendar.getInstance();
             }
             job.setInterval(interval);
             job.setStartDate(calc);
-            //TODO maybe store repositories differently
-            
+
             String repositoryString = hc.getString("repositories");
             //The list of repositories this job is associated with, each task specified in the configuration is created for each of these repositories
             List<RepositoryDto> repositoriesForJob = getRepositoryDtosForString(repositoryString);
@@ -89,14 +96,14 @@ public class PropertyManager {
             List<SubnodeConfiguration> subConf = hc.configurationsAt("tasks.task");
             List<TaskDto> tasks = new LinkedList<TaskDto>();
 
-            for(SubnodeConfiguration sc : subConf){
+            for (SubnodeConfiguration sc : subConf) {
                 TaskType type = null;
                 if (sc.getString("type").equals("index")) { //TODO replace with a more generic method
                     type = TaskType.index;
                 } else if (sc.getString("type").equals("clear")) {
                     type = TaskType.clear;
                 }
-                for(RepositoryDto repository : repositoriesForJob){
+                for (RepositoryDto repository : repositoriesForJob) {
                     tasks.add(new TaskDto(repository, type));
                 }
             }
@@ -106,28 +113,43 @@ public class PropertyManager {
         return jobs;
     }
 
-    private List<RepositoryDto> getRepositoryDtosForString(String repositoryString) throws ConfigurationException{
-        if(repositoryString == null){
+    private List<RepositoryDto> getRepositoryDtosForString(String repositoryString) throws ConfigurationException {
+        if (config == null) {
+            loadConfigReader();
+        }
+        if (repositoryString == null) {
             return getRepositories();
         }
         List<RepositoryDto> repos = new LinkedList<RepositoryDto>();
-        for(String s : repositoryString.split(" ")){
+        for (String s : repositoryString.split(" ")) {
             repos.add(getRepositoryByName(s));
         }
         return repos;
     }
 
     public RepositoryDto getRepositoryByName(String name) throws ConfigurationException {
-        if(config == null)
+        if (config == null) {
             loadConfigReader();
+        }
         RepositoryDto repo = null;
         List<HierarchicalConfiguration> repositories = config.configurationsAt("repositories.repository");
-        for(HierarchicalConfiguration hc : repositories){
-            if(hc.getString("name").equals(name)){
-                repo = new RepositoryDto(name, hc.getString("url"), hc.getString("username"), hc.getString("password"), hc.getBoolean("codeNavigationEnabled"), hc.getString("versionControlSystem"));
+        for (HierarchicalConfiguration hc : repositories) {
+            if (hc.getString("name").equals(name)) {
+                List<String> ignoredFileNames = hc.getList("not_indexed_filenames.filename");
+                if(ignoredFileNames == null)
+                    ignoredFileNames = new LinkedList<String>();
+                ignoredFileNames.addAll(getGloballyIgnoredFileNames());
+                repo = new RepositoryDto(name, hc.getString("url"), hc.getString("username"), hc.getString("password"), hc.getBoolean("codeNavigationEnabled"), hc.getString("version_control_system"), ignoredFileNames);
             }
         }
         return repo;
+    }
+
+    private List<String> getGloballyIgnoredFileNames() throws ConfigurationException{
+        if (config == null) {
+            loadConfigReader();
+        }
+        return config.getList("globally_ignored_filenames.filename");
     }
 
     /**
@@ -150,6 +172,11 @@ public class PropertyManager {
             repositoryDto.setUsername(repositoryConfig.getString("username"));
             repositoryDto.setPassword(repositoryConfig.getString("password"));
             repositoryDto.setCodeNavigationEnabled(repositoryConfig.getBoolean("codeNavigationEnabled"));
+            List<String> ignoredFileNames = repositoryConfig.getList("not_indexed_filenames.filename");
+            if(ignoredFileNames == null)
+                ignoredFileNames = new LinkedList<String>();
+            ignoredFileNames.addAll(this.getGloballyIgnoredFileNames());
+            repositoryDto.setIgnoredFileNames(ignoredFileNames);
             repositories.add(repositoryDto);
         }
         return repositories;
@@ -199,10 +226,8 @@ public class PropertyManager {
         this.configpath = configpath;
     }
 
-    public void clearPropertyManager(){
+    public void clearPropertyManager() {
         this.configpath = null;
         this.config = null;
     }
-
-
 }

@@ -42,12 +42,12 @@ import static org.junit.Assert.*;
  *
  * @author David Froehlich
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(loader = GenericXmlContextLoader.class, locations = {"classpath:org/codesearch/commons/CodesearchCommonsBeans.xml"})
+//@RunWith(SpringJUnit4ClassRunner.class)
+//@ContextConfiguration(loader = GenericXmlContextLoader.class, locations = {"classpath:org/codesearch/commons/CodesearchCommonsBeans.xml"})
 public class PropertyManagerTest {
 
-    //TODO use spring injection
-    @Autowired
+ //   TODO use spring injection
+ //   @Autowired
     private PropertyManager propertyManager = new PropertyManager();
 
     public PropertyManagerTest() {
@@ -67,16 +67,22 @@ public class PropertyManagerTest {
      */
     @Test
     public void testGetRepositories() throws Exception {
-        //TODO update unit test
-//        System.out.println("getRepositories");
-//        RepositoryDto bean1 = new RepositoryDto("testRepo1", true, true);
-//        RepositoryDto bean2 = new RepositoryDto("testRepo2", true, false);
-//        RepositoryDto bean3 = new RepositoryDto("testRepo3", false, false);
-//
-//        List result = propertyManager.getRepositories();
-//        assertTrue(bean1.equals(result.get(0)));
-//        assertTrue(bean2.equals(result.get(1)));
-//        assertTrue(bean3.equals(result.get(2)));
+       // TODO update unit test
+        System.out.println("getRepositories");
+        List<String> ignFileNames1 = new LinkedList<String>();
+        ignFileNames1.add("*.xml");
+        ignFileNames1.add("*.jpg");
+        ignFileNames1.add("*.txt");
+        RepositoryDto repo1 = new RepositoryDto("testRepo1", "http://test.org", "testUser", "testPassword", true, "SVN", ignFileNames1);
+
+        List<String> ignFileNames2 = new LinkedList<String>();
+        ignFileNames2.add("*.jpg");
+        ignFileNames2.add("*.txt");
+        RepositoryDto repo2 = new RepositoryDto("testRepo2", "http://test.org", "testUser", "testPassword", false, "SVN", ignFileNames2);
+
+        List result = propertyManager.getRepositories();
+        assertTrue(repo1.equals(result.get(0)));
+        assertTrue(repo2.equals(result.get(1)));
     }
 
     /**
@@ -98,27 +104,49 @@ public class PropertyManagerTest {
     public void testGetJobs() throws ConfigurationException {
         System.out.println("getJobs");
         JobDto job1 = new JobDto();
-        RepositoryDto testRepo1 = propertyManager.getRepositoryByName("testRepo1");
-        RepositoryDto testRepo2 = propertyManager.getRepositoryByName("testRepo2");
-        RepositoryDto testRepo3 = propertyManager.getRepositoryByName("testRepo3");
+
+        RepositoryDto testRepo1;
+        List<String> ignoredFiles1 = new LinkedList<String>();
+        ignoredFiles1.add("*.xml");
+        ignoredFiles1.add("*.jpg");
+        ignoredFiles1.add("*.txt");
+
+        testRepo1 = new RepositoryDto("testRepo1", "http://test.org", "testUser", "testPassword", true, "SVN", ignoredFiles1);
+
+        RepositoryDto testRepo2;
+        List<String> ignoredFiles2 = new LinkedList<String>();
+        ignoredFiles2.add("*.jpg");
+        ignoredFiles2.add("*.txt");
+
+        testRepo2 = new RepositoryDto("testRepo2", "http://test.org", "testUser", "testPassword", false, "SVN", ignoredFiles2);
 
         job1.getTasks().add(new TaskDto(testRepo1, TaskDto.TaskType.index));
         job1.getTasks().add(new TaskDto(testRepo2, TaskDto.TaskType.index));
         job1.setInterval(60);
-        job1.setStartDate(new GregorianCalendar(2010, 8, 13, 18, 0));
+        job1.setStartDate(new GregorianCalendar(2010, 7, 13, 18, 0));
         JobDto job2 = new JobDto();
 
         job2.getTasks().add(new TaskDto(testRepo1, TaskDto.TaskType.clear));
         job2.getTasks().add(new TaskDto(testRepo2, TaskDto.TaskType.clear));
-        job2.getTasks().add(new TaskDto(testRepo3, TaskDto.TaskType.clear));
 
         job2.setInterval(10080);
-        job2.setStartDate(new GregorianCalendar(2010, 8, 11, 18, 0));
+        job2.setStartDate(new GregorianCalendar(2010, 7, 11, 18, 0));
 
         List<JobDto> result = propertyManager.getJobs();
         assert (result.size() == 2);
         assert (result.get(0).equals(job1));
         assert (result.get(1).equals(job2));
+    }
+    
+    @Test
+    public void testGetRepositoryByName() throws Exception {
+        System.out.println("getRepositoryByName");
+        List<String> ignoredFiles = new LinkedList<String>();
+        ignoredFiles.add("*.xml");
+        ignoredFiles.add("*.jpg");
+        ignoredFiles.add("*.txt");
+        RepositoryDto expResult = new RepositoryDto("testRepo1", "http://test.org", "testUser", "testPassword", true, "SVN", ignoredFiles);
+        RepositoryDto result = propertyManager.getRepositoryByName("testRepo1");
     }
 
     @Test

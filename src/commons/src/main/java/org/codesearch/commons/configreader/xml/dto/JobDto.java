@@ -40,7 +40,7 @@ public class JobDto {
     /** The interval in which the job will be executed in minutes */
     private int interval;
     /** The set of all repositories associated with this job, so an indexing task in this job would only create the index for these repositories, a clear task however clears the entire index */
-    private Set<String> repositoryNames;
+ //   private Set<String> repositoryNames;
 
     /**
      * Creates a new instance of JobDto
@@ -49,13 +49,13 @@ public class JobDto {
         tasks = new LinkedList<TaskDto>();
     }
 
-    public Set<String> getRepositoryNames() {
-        return repositoryNames;
-    }
-
-    public void setRepositoryNames(Set<String> repositoryNames) {
-        this.repositoryNames = repositoryNames;
-    }
+//    public Set<String> getRepositoryNames() {
+//        return repositoryNames;
+//    }
+//
+//    public void setRepositoryNames(Set<String> repositoryNames) {
+//        this.repositoryNames = repositoryNames;
+//    }
 
     public int getInterval() {
         return interval;

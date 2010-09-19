@@ -20,6 +20,8 @@
  */
 package org.codesearch.commons.configreader.xml.dto;
 
+import java.util.List;
+
 /**
  * DTO used to store information about a repository specified in the config.xml file
  * @author David Froehlich
@@ -39,6 +41,8 @@ public class RepositoryDto {
     /** The version control system used for this repository, (for instance SVN or Bazaar),
      * must match the purpose attribute of the corresponding version control plugin */
     private String versionControlSystem;
+    /** A list of all file names (in regex) that will not be indexed in this repository */
+    private List<String> ignoredFileNames;
 
     public RepositoryDto() {
     }
@@ -50,13 +54,22 @@ public class RepositoryDto {
      * @param codeNavigationEnabled specifies whether the repository should have the additional
      * indexes for the code navigation
      */
-    public RepositoryDto(String name, String url, String username, String password, boolean codeNavigationEnabled, String versionControlSystem) {
+    public RepositoryDto(String name, String url, String username, String password, boolean codeNavigationEnabled, String versionControlSystem, List<String> ignoredFileNames) {
         this.name = name;
         this.url = url;
         this.username = username;
         this.password = password;
         this.codeNavigationEnabled = codeNavigationEnabled;
         this.versionControlSystem = versionControlSystem;
+        this.ignoredFileNames = ignoredFileNames;
+    }
+
+    public List<String> getIgnoredFileNames() {
+        return ignoredFileNames;
+    }
+
+    public void setIgnoredFileNames(List<String> ignoredFileNames) {
+        this.ignoredFileNames = ignoredFileNames;
     }
 
     public boolean isCodeNavigationEnabled() {
@@ -116,7 +129,12 @@ public class RepositoryDto {
     public boolean equals(Object o) {
         try {
             RepositoryDto other = (RepositoryDto) o;
-            if (this.getName().equals(other.getName()) && this.isCodeNavigationEnabled() == other.isCodeNavigationEnabled()) {
+            if (this.getName().equals(other.getName()) && this.isCodeNavigationEnabled() == other.isCodeNavigationEnabled() && ignoredFileNames.size() == other.getIgnoredFileNames().size()) {
+                for(int i = 0; i < ignoredFileNames.size(); i++){
+                    String s = ignoredFileNames.get(i);
+                    if(!(s.equals(other.getIgnoredFileNames().get(i))))
+                        return false;
+                }
                 return true;
             }
             return false;

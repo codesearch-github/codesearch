@@ -23,8 +23,10 @@
 -->
 
 <root>
-	<svn_username>feldruebe</svn_username>
-	<svn_password>dota!123</svn_password>
+  <globally_ignored_filenames>
+      <filename>*.jpg</filename>
+      <filename>*.txt</filename>
+  </globally_ignored_filenames>
 	<indexLocation>/tmp/test</indexLocation>
 	<index_jobs>
 		<index_job>
@@ -51,23 +53,21 @@
     <repositories>
         <repository>
             <name>testRepo1</name>
-	    <version_control_system>SVN</version_control_system>
+	          <version_control_system>SVN</version_control_system>
+            <username>testUser</username>
+            <password>testPassword</password>
             <url>http://test.org</url>
-            <indexingEnabled>true</indexingEnabled>
             <codeNavigationEnabled>true</codeNavigationEnabled>
+            <not_indexed_filenames>
+              <filename>*.xml</filename>
+            </not_indexed_filenames>
         </repository>
         <repository>
             <name>testRepo2</name>
-	    <version_control_system>SVN</version_control_system>
+            <username>testUser</username>
+            <password>testPassword</password>      
+      	    <version_control_system>SVN</version_control_system>
             <url>http://test.org</url>
-            <indexingEnabled>true</indexingEnabled>
-            <codeNavigationEnabled>false</codeNavigationEnabled>
-        </repository>
-        <repository>
-            <name>testRepo3</name>
-	    <version_control_system>SVN</version_control_system>
-            <url>http://test.org</url>
-            <indexingEnabled>false</indexingEnabled>
             <codeNavigationEnabled>false</codeNavigationEnabled>
         </repository>
     </repositories>
