@@ -22,7 +22,6 @@ package org.codesearch.indexer.manager;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
 import org.codesearch.commons.configreader.xml.PropertyManager;
@@ -39,38 +38,52 @@ import org.quartz.Trigger;
 import org.quartz.impl.StdSchedulerFactory;
 
 /**
- *
+ * IndexingManager controls the scheduler used to execute the indexing jobs
  * @author Stiboller Stephan
  * @author David Froehlich
  */
 public final class IndexingManager {
 
-    /** All active running Threads */
-    Map<Long, IndexerJob> indexingJobs;
-    /* Instantiate a logger */
+    /** Instantiate a logger */
     private static final Logger LOG = Logger.getLogger(IndexingManager.class);
+    /** The scheduler used to schedule the IndexingJobss */
     private Scheduler scheduler;
+    /** The PropertyManager used to retrieve information from the configuration */
     private PropertyManager pm;
 
+    /**
+     * Creates a new instance of IndexingManager
+     * @throws SchedulerException In case the scheduler could not be instantiated
+     */
     public IndexingManager() throws SchedulerException {
         pm = new PropertyManager();
         SchedulerFactory sf = new StdSchedulerFactory();
         scheduler = sf.getScheduler();
     }
 
-    public void stopThread(int i) throws SchedulerException {
+    /**
+     * Flags the job as terminated which causes it to stop after the execution of the current task or throws a JobExecutionException if the task could not be found
+     * @param i the id of the job that is to be terminated
+     * @throws SchedulerException if there is no job found with the id or if the jobs could not be read from the scheduler
+     */
+    public void terminateJob(int i) throws SchedulerException {
         List<JobExecutionContext> currentlyExecutedJobs = (List<JobExecutionContext>) scheduler.getCurrentlyExecutingJobs();
-        for(JobExecutionContext jec : currentlyExecutedJobs){
+        for (JobExecutionContext jec : currentlyExecutedJobs) {
             JobDataMap dataMap = jec.getJobDetail().getJobDataMap();
             int currentIndex = Integer.parseInt(dataMap.getString("id"));
-            if(i == currentIndex){
+            if (i == currentIndex) {
                 dataMap.put("terminated", true);
                 return;
             }
         }
-        throw new JobExecutionException("For stopping specified job could not be found");
+        throw new JobExecutionException("Job specified for termination could not be found");
     }
 
+    /**
+     * Reads the jobs from the configuration and adds them to the scheduler, then starts it
+     * @throws SchedulerException if a job could not be added to the scheduler or if it could not be started
+     * @throws ConfigurationException if the configuration could not be read
+     */
     public void startScheduler() throws SchedulerException, ConfigurationException {
         List<JobDto> jobs = pm.getJobs();
         int i = 0;

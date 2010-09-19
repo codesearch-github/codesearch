@@ -24,7 +24,7 @@ package org.codesearch.indexer.tasks;
 import org.codesearch.indexer.exceptions.TaskExecutionException;
 
 /**
- *
+ * Base class for all IndexingTasks
  * @author Stephan Stiboller
  * @author David Froehlich
  */

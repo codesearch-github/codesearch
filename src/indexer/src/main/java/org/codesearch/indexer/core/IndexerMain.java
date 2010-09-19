@@ -31,10 +31,14 @@ import org.quartz.SchedulerException;
  * @author David Froehlich
  */
 public class IndexerMain implements javax.servlet.ServletContextListener {
-
     protected static final Logger LOG = Logger.getLogger(IndexerMain.class);
+    /** The IndexingManager used to control the execution of the IndexingJobs */
     private IndexingManager indexingManager;
 
+    /**
+     * Instantiates the IndexingManager and calls the startScheduler
+     * @param sce dummy parameter needed by the parent class implementation
+     */
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         try {

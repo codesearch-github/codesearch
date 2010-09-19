@@ -108,7 +108,7 @@ public class DocumentSearcher {
         }
         return results;
     }
-
+    
     private void initSearcher() throws InvalidIndexLocationException {
         try {
             indexSearcher = new IndexSearcher(FSDirectory.open(new File(indexLocation)), true);

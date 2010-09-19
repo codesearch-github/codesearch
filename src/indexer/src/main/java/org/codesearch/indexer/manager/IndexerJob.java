@@ -18,17 +18,10 @@
  * You should have received a copy of the GNU General Public License
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.codesearch.indexer.manager;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Level;
-import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.log4j.Logger;
 import org.codesearch.commons.configreader.xml.PropertyManager;
@@ -41,70 +34,38 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
 /**
- *
+ * An indexerJob stores one or more tasks and controls their execution
  * @author Stiboller Stephan
  * @author David Froehlich
  */
 public class IndexerJob implements Job {
 
-//    /** Indicates if the thread is suspended or not. */
-//    private boolean jobIsSuspended = false;
-    /** Indicates if the thread is terminated or not. */
+    /** Indicates if the thread is terminated or not.
+     * If flagged as terminated the job will not start the execution of the next task
+     */
     private boolean terminated = false;
-    /** List of ITask assigned to this IndexingJob */
+    /** List of TaskDtos assigned to this IndexingJob */
     private List<TaskDto> taskList = new LinkedList<TaskDto>();
-    /* Instantiate a logger */
+    /** Instantiate a logger */
     private static final Logger LOG = Logger.getLogger(IndexerJob.class);
+    /** The PropertyManager used to retrieve configuration */
     private PropertyManager propertyManager;
 
-//    /**
-//     * Suspends the thread in a save way.
-//     */
-//    public void suspendSafely() {
-//        try {
-//            this.wait();
-//            jobIsSuspended = true;
-//        } catch (InterruptedException ex) {
-//            log.error("Thread has been interrupted during suspend process:" +ex);
-//        }
-//    }
-//    /**
-//     * Resumes the thread.
-//     * The thread is maybe not instantly killed because the changes of
-//     * the IndexerJob will be reverted.
-//     */
-//    public void resumeSafely() {
-//        this.notify();
-//        jobIsSuspended = false;
-//    }
     /**
-     * First suspends and then terminates the thread.
-     * The thread is maybe not instantly killed because the changes of
-     * the IndexerJob will be reverted and cleaned.
+     * Executes all tasks from the taskList one after another
+     * @param jec the JobExecutionContext containing the tasks, the id of the job and whether the job is flagged as terminated or not
+     * @throws JobExecutionException if the execution of a task was not successful or if the job was terminated
      */
-    public void terminateSafely() {
-        terminated = true;
-    }
-
-//    /**
-//     * Extcuts all Tasks related to this job.
-//     */
-//    public void run() {
-//        for (int i = 0; i < taskList.size(); i++) {
-//            taskList.get(i).execute();
-//            if(jobIsSuspended = true)
-//                this.suspendSafely();
-//        }
-//    }
     @Override
     public void execute(JobExecutionContext jec) throws JobExecutionException {
         terminated = (Boolean) jec.getJobDetail().getJobDataMap().get("terminated");
         propertyManager = new PropertyManager(); //TODO replace with spring injection
         taskList = (List<TaskDto>) (jec.getJobDetail().getJobDataMap().get("tasks"));
         Task task = null;
-        for (TaskDto taskDto : taskList) {
+        for (int i = 0; i < taskList.size(); i++) {
+            TaskDto taskDto = taskList.get(i);
             if (terminated) {
-                return;
+                throw new JobExecutionException("Job was terminated after successful execution of " + i + " of " + taskList.size() + " jobs");
             }
             switch (taskDto.getType()) {
                 case index: {
@@ -118,7 +79,7 @@ public class IndexerJob implements Job {
             try {
                 task.execute();
             } catch (TaskExecutionException ex) {
-                LOG.error("Task execution was not completed successfully: " + ex);
+                throw new JobExecutionException("Execution of Task number "+i+" threw an exception"+ex);
             }
         }
     }

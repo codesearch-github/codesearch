@@ -19,10 +19,6 @@
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.codesearch.commons.configreader.xml;
 
 import org.codesearch.commons.configreader.xml.dto.RepositoryDto;
@@ -46,11 +42,12 @@ import static org.junit.Assert.*;
  *
  * @author David Froehlich
  */
-//@RunWith(SpringJUnit4ClassRunner.class)
-//@ContextConfiguration(loader = GenericXmlContextLoader.class, locations = {"classpath:org/codesearch/commons/CodesearchCommonsBeans.xml"})
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(loader = GenericXmlContextLoader.class, locations = {"classpath:org/codesearch/commons/CodesearchCommonsBeans.xml"})
 public class PropertyManagerTest {
 
-//    @Autowired
+    //TODO use spring injection
+    @Autowired
     private PropertyManager propertyManager = new PropertyManager();
 
     public PropertyManagerTest() {

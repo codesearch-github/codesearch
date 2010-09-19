@@ -21,13 +21,12 @@
 package org.codesearch.indexer.tasks;
 
 import java.io.FileNotFoundException;
-import java.util.logging.Level;
+import org.apache.commons.configuration.ConfigurationException;
 import org.codesearch.indexer.exceptions.TaskExecutionException;
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Set;
-import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -66,8 +65,13 @@ public class IndexingTask implements Task {
     protected VersionControlPlugin vcp;
     /** The used PropertyReader */
     protected PropertiesReader pr = new PropertiesReader("revisions.properties");
+    /** The PropertyManager used to get the configuration */
     private PropertyManager pm = new PropertyManager(); //TODO solve this via spring injection
 
+    /**
+     * Executes the task
+     * @throws TaskExecutionException
+     */
     @Override
     public void execute() throws TaskExecutionException {
         String indexLocation = null;
@@ -79,23 +83,23 @@ public class IndexingTask implements Task {
             initializeIndexWriter(new StandardAnalyzer(IndexConstants.LUCENE_VERSION), new File(indexLocation));
             this.createIndex();
         } catch (FileNotFoundException ex) {
-            LOG.error(ex.getMessage());
+            throw new TaskExecutionException("Location of index directory could not be found: " + ex);
         } catch (IOException ex) {
-            LOG.error(ex.getMessage());
+            throw new TaskExecutionException("IOException at execution of task: " + ex);
         } catch (VersionControlPluginException ex) {
             throw new TaskExecutionException("VersionControlPlugin files could not be retrieved: " + ex);
         } catch (PluginLoaderException ex) {
             throw new TaskExecutionException("VersionControlPlugin could not be loaded: " + ex);
-        } catch (Exception ex) {
-            throw new TaskExecutionException("Unexpected exception: " + ex);
-        } 
+        } catch (ConfigurationException ex) {
+            throw new TaskExecutionException("Configuration could not be read "+ex);
+        }
     }
 
     /**
-     * Initializes the version control plugin
-     * @throws Exception
+     * Initializes the VersionControlPlugin used to access the repository
+     * @throws PluginLoaderException
      */
-    public void initializeVersionControlPlugin() throws PluginLoaderException {
+    private void initializeVersionControlPlugin() throws PluginLoaderException {
         PluginLoader pl = new PluginLoader(VersionControlPlugin.class);
         vcp = (VersionControlPlugin) pl.getPluginForPurpose(repository.getVersionControlSystem());
     }
@@ -111,7 +115,7 @@ public class IndexingTask implements Task {
         try {
             doc.add(new Field("REVISION", vcp.getRepositoryRevision(), Field.Store.YES, Field.Index.ANALYZED));
         } catch (Exception ex) {
-            LOG.error("Unexpected Exception occured " + ex);
+            LOG.error("Unexpected Exception occured while adding lucene fields to " + ex);
         }
         return doc;
     }
@@ -156,7 +160,6 @@ public class IndexingTask implements Task {
             indexWriter.commit();
             indexWriter.optimize();
             indexWriter.close();
-            //iLog.append("Index creation sucessful: " + doc.getField("title"));
         } catch (CorruptIndexException ex) {
             LOG.error("Indexing  of: " + doc.get("title") + " failed! \n" + ex);
         } catch (IOException ex) {
@@ -172,9 +175,8 @@ public class IndexingTask implements Task {
      * @param path - a filepath
      * @return the name of the file
      */
-    public String extractFilename(final String path) {
-        String[] parts = path.split("/");
-        return parts[parts.length];
+    private String extractFilename(final String path) {
+        return path.substring(path.lastIndexOf(File.separator));
     }
 
     public void setRepository(RepositoryDto repository) {

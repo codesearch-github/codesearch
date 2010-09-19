@@ -20,16 +20,10 @@
  */
 package org.codesearch.commons.configreader.xml;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Properties;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.SubnodeConfiguration;
@@ -79,7 +73,7 @@ public class PropertyManager {
             int interval = hc.getInt("interval");
             //The start time is stored as a single string seperated by '-' e.g.: YYYY-MM-DD-HH-MM
             String[] timeParts = hc.getString("start").split("-");
-            Calendar calc = new GregorianCalendar(Integer.parseInt(timeParts[0]), Integer.parseInt(timeParts[1]),
+            Calendar calc = new GregorianCalendar(Integer.parseInt(timeParts[0]), Integer.parseInt(timeParts[1])-1,
                     Integer.parseInt(timeParts[2]), Integer.parseInt(timeParts[3]), Integer.parseInt(timeParts[4]));
             if (calc == null) {
                 calc = GregorianCalendar.getInstance();
