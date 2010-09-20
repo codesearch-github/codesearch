@@ -164,7 +164,7 @@ public class IndexingTask implements Task {
                 }
             }
             indexWriter.commit();
-            indexWriter.optimize(); //TODO check whether optimize makes removing of documents impossible
+            //indexWriter.optimize(); //TODO check whether optimize makes removing of documents impossible
             indexWriter.close();
         } catch (CorruptIndexException ex) {
             LOG.error("Indexing  of: " + doc.get("title") + " failed! \n" + ex);
@@ -195,11 +195,11 @@ public class IndexingTask implements Task {
 
     /**
      * Extracts the filename out of the given path
-     * @param path - a filepath
+     * @param path - a file path
      * @return the name of the file
      */
-    private String extractFilename(final String path) {
-        return path.substring(path.lastIndexOf(File.separator));
+    public String extractFilename(final String path) {
+       return path.substring(path.lastIndexOf('/'));
     }
 
     public void setRepository(RepositoryDto repository) {

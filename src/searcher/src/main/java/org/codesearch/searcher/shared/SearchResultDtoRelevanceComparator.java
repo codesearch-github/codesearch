@@ -19,26 +19,18 @@
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.codesearch.commons.plugins.vcs;
+package org.codesearch.searcher.shared;
+
+import java.util.Comparator;
 
 /**
- * An Exception that can be thrown by the version control plugins.
+ * Compares search results by relevance.
  * @author Samuel Kogler
  */
-public class VersionControlPluginException extends Exception {
+public class SearchResultDtoRelevanceComparator implements Comparator<SearchResultDto> {
 
-    /**
-     * Creates a new instance of <code>VersionControlPluginException</code> without detail message.
-     */
-    public VersionControlPluginException() {
-    }
-
-
-    /**
-     * Constructs an instance of <code>VersionControlPluginException</code> with the specified detail message.
-     * @param msg the detail message.
-     */
-    public VersionControlPluginException(String msg) {
-        super(msg);
+    @Override
+    public int compare(SearchResultDto t, SearchResultDto t1) {
+        return (int) (t.getRelevance() - t1.getRelevance());
     }
 }

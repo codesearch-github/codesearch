@@ -1,6 +1,30 @@
+<!--
+
+    Copyright 2010 David Froehlich   <david.froehlich@businesssoftware.at>,
+                   Samuel Kogler     <samuel.kogler@gmail.com>,
+                   Stephan Stiboller <stistc06@htlkaindorf.at>
+
+    This file is part of Codesearch.
+
+    Codesearch is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Codesearch is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
+
+-->
+
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui">
+	xmlns:g="urn:import:com.google.gwt.user.client.ui"
+        xmlns:c='urn:import:com.google.gwt.user.cellview.client'>
 
     <ui:with field='res' type='org.codesearch.searcher.client.Resources'/>
 
@@ -14,21 +38,27 @@
     
     <g:DockLayoutPanel unit='PX'>
         <g:north size='94'>
-            <g:HTMLPanel styleName='{style.header}'>
+            <g:FlowPanel styleName='{style.header}'>
                 <g:Image resource='{res.logo}' />
-            </g:HTMLPanel>
+            </g:FlowPanel>
         </g:north>
         <g:center>
             <g:DockLayoutPanel unit='EM'>
-                <g:north size='5'>
+                <g:north size='7'>
                     <g:HTMLPanel>
+                        <g:Label text='Repositories:' />
+
+                        <g:Label text='Repository Groups:' />
                         <g:Label text='Search for:' />
                         <g:TextBox ui:field='searchBox' />
                         <g:Button ui:field='searchButton' text='Search' />
                     </g:HTMLPanel>
                 </g:north>
                 <g:center>
-                    <g:FlexTable ui:field='resultTable' />
+                    <g:FlowPanel>
+                        <c:CellTable ui:field='resultTable' />
+                        <c:SimplePager ui:field='resultTablePager' location='CENTER' />
+                    </g:FlowPanel>
                 </g:center>
             </g:DockLayoutPanel>
         </g:center>
