@@ -30,10 +30,7 @@ import java.util.Properties;
  * PropertiesReader is a class that provides several methods to access properties.
  * By default, the properties are stored in a file in the classpath called codesearch_config.xml.
  * @author Stephan Stiboller
- * @author David Froehlich
- * @author Samuel Kogler
  */
-//TODO probably remove class, dude, why don't you just use PropertyManager?
 public class PropertiesReader {
 
     /** The internally used Property file */
@@ -43,10 +40,18 @@ public class PropertiesReader {
 
     /**
      * Creates a new instance of PropertyManager
+     * @param the location oft he property file
      */
     public PropertiesReader(String repositoryPropertyFile) {
         this.repositoryPropertyFile = repositoryPropertyFile;
     }
+
+    /**
+     * Creates a new instance of PropertyManager
+     */
+    public PropertiesReader() {
+    }
+
 
     /**
      * Gets a new value for the specified key

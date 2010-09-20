@@ -27,7 +27,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 
 /**
- *
+ * @author Stiboller Stephan
  * @author David Froehlich
  */
 public final class PluginLoader {
