@@ -68,7 +68,7 @@ public class IndexingTask implements Task {
     /** The Version control Plugin */
     protected VersionControlPlugin vcp;
     /** The used PropertyReader */
-    protected PropertiesReader pr = new PropertiesReader("revisions.properties");
+    protected PropertiesReader pr;
     /** The PropertyManager used to get the configuration */
     private PropertyManager pm = new PropertyManager(); //TODO solve this via spring injection
 
@@ -79,6 +79,12 @@ public class IndexingTask implements Task {
     @Override
     public void execute() throws TaskExecutionException {
         String indexLocation = null;
+        try{
+            pr = new PropertiesReader("revisions.properties");
+        } catch (IOException ex){
+            LOG.error("Could not open file for PropertiesReader"+ex);
+        }
+
         try {
             LOG.info("Starting execution of indexing task");
             indexLocation = pm.getSingleLinePropertyValue("index-location");
@@ -86,6 +92,7 @@ public class IndexingTask implements Task {
             fileNames = vcp.getPathsForChangedFilesSinceRevision(pr.getPropertyFileValue(repository.getName()));
             initializeIndexWriter(new StandardAnalyzer(IndexConstants.LUCENE_VERSION), new File(indexLocation));
             this.createIndex();
+            pr.setPropertyFileValue(repository.getName(), vcp.getRepositoryRevision());
         } catch (FileNotFoundException ex) {
             throw new TaskExecutionException("Location of index directory could not be found: " + ex);
         } catch (IOException ex) {
@@ -97,6 +104,7 @@ public class IndexingTask implements Task {
         } catch (ConfigurationException ex) {
             throw new TaskExecutionException("Configuration could not be read " + ex);
         }
+        //TODO change throwing of exception to Log errors
     }
 
     /**
@@ -116,10 +124,11 @@ public class IndexingTask implements Task {
     public Document addLuceneFields(Document doc, String path) throws VersionControlPluginException { //TODO additional fields required
         doc.add(new Field("TITLE", extractFilename(path), Field.Store.YES, Field.Index.NOT_ANALYZED));
         doc.add(new Field("CONTENT", vcp.getFileContentForFilePath(path), Field.Store.YES, Field.Index.ANALYZED));
+        doc.add(new Field("REPOSITORY", repository.getName(), Field.Store.YES, Field.Index.NOT_ANALYZED));
         try {
             doc.add(new Field("REVISION", vcp.getRepositoryRevision(), Field.Store.YES, Field.Index.ANALYZED));
-        } catch (Exception ex) {
-            LOG.error("Unexpected Exception occured while adding lucene fields to " + ex);
+        } catch (VersionControlPluginException ex){
+            LOG.error("Failed trying to retrieve the current repository revision: "+ex);
         }
         return doc;
     }
@@ -176,6 +185,9 @@ public class IndexingTask implements Task {
         return true;
     }
 
+    /**
+     * Checks whether the current file is on the list of files that will not be indexed
+     */
     public boolean fileIsOnIgnoreList(String path) {
         Pattern p;
         for(String s : repository.getIgnoredFileNames()){
@@ -188,6 +200,11 @@ public class IndexingTask implements Task {
     }
 
     //TODO check for different chars the user could specify in configuration
+    /**
+     * Parses the string that represents an entry in the ignore list from the configuration to a string that can be read by java regex
+     * @param string the string that is to be parsed
+     * @return the regex pattern string
+     */
     private String parseRegexString(String string){
         String retString = string.replace("*", ".*");
         return retString;

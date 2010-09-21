@@ -63,5 +63,5 @@ public interface VersionControlPlugin extends Plugin {
      * Extracts and returns the revision number of the current set revision.
      * @return The revision number
      */
-    String getRepositoryRevision() throws Exception;
+    String getRepositoryRevision() throws VersionControlPluginException;
 }

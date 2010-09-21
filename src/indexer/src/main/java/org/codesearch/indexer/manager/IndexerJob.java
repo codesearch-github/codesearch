@@ -29,6 +29,7 @@ import org.codesearch.commons.configreader.xml.dto.TaskDto;
 import org.codesearch.indexer.tasks.IndexingTask;
 import org.codesearch.indexer.tasks.Task;
 import org.codesearch.indexer.exceptions.TaskExecutionException;
+import org.codesearch.indexer.tasks.ClearTask;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -74,7 +75,8 @@ public class IndexerJob implements Job {
                     break;
                 }
                 case clear:
-                    throw new NotImplementedException();
+                    task = new ClearTask();
+                    ((ClearTask) task).setRepositoryName(taskDto.getRepository().getName());
             }
             try {
                 task.execute();

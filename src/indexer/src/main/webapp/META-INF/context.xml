@@ -21,5 +21,4 @@
     along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
 
 -->
-
 <Context antiJARLocking="true" path="/indexer-0.1-SNAPSHOT"/>

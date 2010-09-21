@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
 
     Copyright 2010 David Froehlich   <david.froehlich@businesssoftware.at>,
@@ -29,5 +30,5 @@
            http://www.springframework.org/schema/context
            http://www.springframework.org/schema/context/spring-context-3.0.xsd">
                
-    <context:component-scan base-package="org.codesearch.commons.plugins.vcs"/>
+    <context:component-scan base-package="com.mycompany.testprojects"/>
 </beans>

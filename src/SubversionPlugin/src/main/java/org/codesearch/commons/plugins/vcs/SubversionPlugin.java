@@ -127,7 +127,11 @@ public class SubversionPlugin implements VersionControlPlugin {
 
     /** {@inheritDoc} */
     @Override
-    public String getRepositoryRevision() throws SVNException {
-        return Long.toString(repository.getLatestRevision());
+    public String getRepositoryRevision() throws VersionControlPluginException {
+        try {
+            return Long.toString(repository.getLatestRevision());
+        } catch (SVNException ex) {
+            throw new VersionControlPluginException(ex.toString());
+        }
     }
 }

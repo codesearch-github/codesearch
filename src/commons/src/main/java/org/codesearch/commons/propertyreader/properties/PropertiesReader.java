@@ -20,6 +20,7 @@
  */
 package org.codesearch.commons.propertyreader.properties;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -42,8 +43,12 @@ public class PropertiesReader {
      * Creates a new instance of PropertyManager
      * @param the location oft he property file
      */
-    public PropertiesReader(String repositoryPropertyFile) {
+    public PropertiesReader(String repositoryPropertyFile) throws IOException {
         this.repositoryPropertyFile = repositoryPropertyFile;
+        File f = new File(repositoryPropertyFile);
+        if(!f.exists()){
+            f.createNewFile();
+        }
     }
 
     /**
@@ -60,7 +65,11 @@ public class PropertiesReader {
      */
     public String getPropertyFileValue(final String key) throws FileNotFoundException, IOException {
         properties.load(new FileInputStream(getRepositoryPropertyFile()));
-        return properties.getProperty(key);
+        String retString = properties.getProperty(key);
+        if(retString == null){
+            retString = "0"; //TODO add handling for version control systems that don't use numbers for revisions
+        }
+        return retString;
     }
 
     /**

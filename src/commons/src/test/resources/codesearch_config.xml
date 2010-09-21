@@ -52,11 +52,11 @@
     <testproperty>asdf</testproperty>
     <repositories>
         <repository>
-            <name>testRepo1</name>
+            <name>svnsearch_repo</name>
 	          <version_control_system>SVN</version_control_system>
-            <username>testUser</username>
-            <password>testPassword</password>
-            <url>http://test.org</url>
+            <username>feldruebe</username>
+            <password>dota!123</password>
+            <url>http://portal.htl-kaindorf.at/codesearch</url>
             <codeNavigationEnabled>true</codeNavigationEnabled>
             <not_indexed_filenames>
               <filename>*.xml</filename>

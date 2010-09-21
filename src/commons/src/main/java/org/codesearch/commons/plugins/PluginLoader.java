@@ -24,6 +24,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 
 /**
@@ -40,7 +41,7 @@ public final class PluginLoader {
      * @param the super class / interface of which the subclasses are loaded
      */
     public PluginLoader(Class clazz) {
-        ApplicationContext context = new FileSystemXmlApplicationContext("spring-plugin-config.xml"); //move to a better 
+        ApplicationContext context = new ClassPathXmlApplicationContext("spring-plugin-config.xml"); //move to a better
         loadedPlugins = context.getBeansOfType(clazz); //replace with generic
     }
 

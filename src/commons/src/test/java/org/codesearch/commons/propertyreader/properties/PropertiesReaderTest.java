@@ -5,6 +5,7 @@
 
 package org.codesearch.commons.propertyreader.properties;
 
+import java.io.IOException;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -36,7 +37,7 @@ public class PropertiesReaderTest {
     }
 
     @Before
-    public void setUp() {
+    public void setUp() throws IOException {
         pr = new PropertiesReader("/home/zeheron/workspace/codesearch/codesearch/src/indexer/src/test/resources/repository.properties");
     }
 

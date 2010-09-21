@@ -4,6 +4,8 @@
  */
 package org.codesearch.indexer.tasks;
 
+import org.codesearch.commons.propertyreader.properties.PropertiesReader;
+import org.codesearch.commons.configreader.xml.PropertyManager;
 import java.util.List;
 import java.util.LinkedList;
 import java.io.File;
@@ -48,21 +50,29 @@ public class IndexingTaskTest {
         List<String> ignoredFileNames = new LinkedList<String>();
         ignoredFileNames.add("*.xml");
         ignoredFileNames.add("*test*");
+        ignoredFileNames.add("*/test/*");
         task.setRepository(new RepositoryDto(null, null, null, null, false, null, ignoredFileNames));
         assert(task.fileIsOnIgnoreList("asdf.xml"));
         assert(task.fileIsOnIgnoreList("asdftestasdf"));
+        assert(task.fileIsOnIgnoreList("/test/fasdf"));
         assertFalse(task.fileIsOnIgnoreList("asdf.txt"));
     }
+    
     /**
      * Test of execute method, of class IndexingTask.
      */
     @Test
     public void testExecute() throws Exception {
-        System.out.println("execute");
-        IndexingTask instance = new IndexingTask();
-        instance.execute();
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        PropertyManager pm = new PropertyManager();
+        List<RepositoryDto> repos = pm.getRepositories();
+        PropertiesReader pr = new PropertiesReader("revisions.properties");
+        
+        for(RepositoryDto repo : repos){
+            IndexingTask t = new IndexingTask();
+            pr.setPropertyFileValue(repo.getName(), "0");
+            t.setRepository(repo);
+            t.execute();
+        }
     }
 
     /**
