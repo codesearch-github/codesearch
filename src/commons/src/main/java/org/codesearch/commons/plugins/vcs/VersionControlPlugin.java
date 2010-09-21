@@ -25,13 +25,10 @@ import java.net.URI;
 import java.util.Set;
 import org.codesearch.commons.plugins.Plugin;
 
-
-
 /**
  * Base for all version control plugins.
  * @author Samuel Kogler
  */
-
 public interface VersionControlPlugin extends Plugin {
 
     /**

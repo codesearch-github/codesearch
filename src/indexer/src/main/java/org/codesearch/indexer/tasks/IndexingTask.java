@@ -29,8 +29,6 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.regex.Pattern;
-import org.apache.commons.lang.NotImplementedException;
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -47,6 +45,7 @@ import org.codesearch.commons.plugins.PluginLoaderException;
 import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
 import org.codesearch.commons.plugins.vcs.VersionControlPluginException;
 import org.codesearch.commons.propertyreader.properties.PropertiesReader;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * This task performs basic indexing of one repository.
@@ -66,11 +65,14 @@ public class IndexingTask implements Task {
     /** The index directory, contains all index files */
     private FSDirectory indexDirectory;
     /** The Version control Plugin */
-    protected VersionControlPlugin vcp;
+    private VersionControlPlugin versionControlPlugin;
     /** The used PropertyReader */
-    protected PropertiesReader pr;
+    private PropertiesReader propertiesReader;
     /** The PropertyManager used to get the configuration */
-    private PropertyManager pm = new PropertyManager(); //TODO solve this via spring injection
+    @Autowired
+    private PropertyManager propertyManager;
+    @Autowired
+    private PluginLoader pluginLoader;
 
     /**
      * Executes the task
@@ -79,20 +81,18 @@ public class IndexingTask implements Task {
     @Override
     public void execute() throws TaskExecutionException {
         String indexLocation = null;
-        try{
-            pr = new PropertiesReader("revisions.properties");
-        } catch (IOException ex){
-            LOG.error("Could not open file for PropertiesReader"+ex);
-        }
 
         try {
             LOG.info("Starting execution of indexing task");
-            indexLocation = pm.getSingleLinePropertyValue("index-location");
-            initializeVersionControlPlugin();
-            fileNames = vcp.getPathsForChangedFilesSinceRevision(pr.getPropertyFileValue(repository.getName()));
+            indexLocation = propertyManager.getSingleLinePropertyValue("index-location");
+            // Read the index status file
+            propertiesReader = new PropertiesReader(indexLocation + File.separator + "revisions.properties");
+            // Get the version control plugins
+            versionControlPlugin = pluginLoader.getPlugin(VersionControlPlugin.class, repository.getVersionControlSystem());
+            fileNames = versionControlPlugin.getPathsForChangedFilesSinceRevision(propertiesReader.getPropertyFileValue(repository.getName()));
             initializeIndexWriter(new StandardAnalyzer(IndexConstants.LUCENE_VERSION), new File(indexLocation));
-            this.createIndex();
-            pr.setPropertyFileValue(repository.getName(), vcp.getRepositoryRevision());
+            createIndex();
+            propertiesReader.setPropertyFileValue(repository.getName(), versionControlPlugin.getRepositoryRevision());
         } catch (FileNotFoundException ex) {
             throw new TaskExecutionException("Location of index directory could not be found: " + ex);
         } catch (IOException ex) {
@@ -108,27 +108,20 @@ public class IndexingTask implements Task {
     }
 
     /**
-     * Initializes the VersionControlPlugin used to access the repository
-     * @throws PluginLoaderException
-     */
-    private void initializeVersionControlPlugin() throws PluginLoaderException {
-        PluginLoader pl = new PluginLoader(VersionControlPlugin.class);
-        vcp = (VersionControlPlugin) pl.getPluginForPurpose(repository.getVersionControlSystem());
-    }
-
-    /**
      * Adds the Fields to the lucene document.
      * @param doc the target document
      * @return document with added lucene fields
      */
     public Document addLuceneFields(Document doc, String path) throws VersionControlPluginException { //TODO additional fields required
         doc.add(new Field("TITLE", extractFilename(path), Field.Store.YES, Field.Index.NOT_ANALYZED));
-        doc.add(new Field("CONTENT", vcp.getFileContentForFilePath(path), Field.Store.YES, Field.Index.ANALYZED));
+        doc.add(new Field("CONTENT", versionControlPlugin.getFileContentForFilePath(path), Field.Store.YES, Field.Index.ANALYZED));
         doc.add(new Field("REPOSITORY", repository.getName(), Field.Store.YES, Field.Index.NOT_ANALYZED));
         try {
-            doc.add(new Field("REVISION", vcp.getRepositoryRevision(), Field.Store.YES, Field.Index.ANALYZED));
-        } catch (VersionControlPluginException ex){
-            LOG.error("Failed trying to retrieve the current repository revision: "+ex);
+            doc.add(new Field("REVISION", versionControlPlugin.getRepositoryRevision(), Field.Store.YES, Field.Index.ANALYZED));
+        } catch (VersionControlPluginException ex) {
+            LOG.error("Failed trying to retrieve the current repository revision: " + ex);
+        } catch (Exception ex) {
+            LOG.error("Unexpected Exception occured while adding lucene fields to " + ex);
         }
         return doc;
     }
@@ -190,11 +183,12 @@ public class IndexingTask implements Task {
      */
     public boolean fileIsOnIgnoreList(String path) {
         Pattern p;
-        for(String s : repository.getIgnoredFileNames()){
-            p = Pattern.compile(parseRegexString(s)); 
+        for (String s : repository.getIgnoredFileNames()) {
+            p = Pattern.compile(parseRegexString(s));
             Matcher m = p.matcher(path);
-            if(m.find())
+            if (m.find()) {
                 return true;
+            }
         }
         return false;
     }
@@ -205,7 +199,7 @@ public class IndexingTask implements Task {
      * @param string the string that is to be parsed
      * @return the regex pattern string
      */
-    private String parseRegexString(String string){
+    private String parseRegexString(String string) {
         String retString = string.replace("*", ".*");
         return retString;
     }
@@ -216,10 +210,26 @@ public class IndexingTask implements Task {
      * @return the name of the file
      */
     public String extractFilename(final String path) {
-       return path.substring(path.lastIndexOf('/'));
+        return path.substring(path.lastIndexOf('/'));
     }
 
     public void setRepository(RepositoryDto repository) {
         this.repository = repository;
+    }
+
+    public PropertyManager getPropertyManager() {
+        return propertyManager;
+    }
+
+    public void setPropertyManager(PropertyManager propertyManager) {
+        this.propertyManager = propertyManager;
+    }
+
+    public PropertiesReader getPropertiesReader() {
+        return propertiesReader;
+    }
+
+    public void setPropertiesReader(PropertiesReader propertiesReader) {
+        this.propertiesReader = propertiesReader;
     }
 }

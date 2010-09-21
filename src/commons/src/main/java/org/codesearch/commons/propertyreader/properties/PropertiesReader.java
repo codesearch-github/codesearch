@@ -28,27 +28,24 @@ import java.io.IOException;
 import java.util.Properties;
 
 /**
- * PropertiesReader is a class that provides several methods to access properties.
- * By default, the properties are stored in a file in the classpath called codesearch_config.xml.
+ * PropertiesReader is a class that provides several methods to access property files.
+ * It is a simple wrapper to the standard java Properties utility.
  * @author Stephan Stiboller
  */
 public class PropertiesReader {
 
-    /** The internally used Property file */
+    /** The internally used Property file. */
     private Properties properties = new Properties();
-    /** The repository property file */
-    private String repositoryPropertyFile = "repository.properties";
+    /** The property file location. */
+    private String propertyFileLocation;
 
     /**
      * Creates a new instance of PropertyManager
-     * @param the location oft he property file
+     * @param the location of the property file
      */
-    public PropertiesReader(String repositoryPropertyFile) throws IOException {
-        this.repositoryPropertyFile = repositoryPropertyFile;
-        File f = new File(repositoryPropertyFile);
-        if(!f.exists()){
-            f.createNewFile();
-        }
+    public PropertiesReader(final String propertyFileLocation) throws IOException {
+        this.propertyFileLocation = propertyFileLocation;
+        initProperties();
     }
 
     /**
@@ -57,16 +54,16 @@ public class PropertiesReader {
     public PropertiesReader() {
     }
 
-
     /**
      * Gets a new value for the specified key
      * @param key
      * @param value
      */
-    public String getPropertyFileValue(final String key) throws FileNotFoundException, IOException {
-        properties.load(new FileInputStream(getRepositoryPropertyFile()));
+    public String getPropertyFileValue(final String key) {
+//        return properties.getProperty(key);
+//TODO I dont think this belongs here
         String retString = properties.getProperty(key);
-        if(retString == null){
+        if (retString == null) {
             retString = "0"; //TODO add handling for version control systems that don't use numbers for revisions
         }
         return retString;
@@ -78,22 +75,25 @@ public class PropertiesReader {
      * @param value
      */
     public void setPropertyFileValue(final String key, final String value) throws FileNotFoundException, IOException {
-        properties.load(new FileInputStream(getRepositoryPropertyFile()));
         properties.setProperty(key, value);
-        properties.store(new FileOutputStream(getRepositoryPropertyFile()), null);
+        properties.store(new FileOutputStream(propertyFileLocation), null);
     }
 
-    /**
-     * @return the repositoryPropertyFile
-     */
-    public String getRepositoryPropertyFile() {
-        return repositoryPropertyFile;
+    public String getPropertyFileLocation() {
+        return propertyFileLocation;
     }
 
-    /**
-     * @param repositoryPropertyFile the repositoryPropertyFile to set
-     */
-    public void setRepositoryPropertyFile(String repositoryPropertyFile) {
-        this.repositoryPropertyFile = repositoryPropertyFile;
+    public void setPropertyFileLocation(final String propertyFileLocation) throws IOException {
+        this.propertyFileLocation = propertyFileLocation;
+        initProperties();
+    }
+
+    private void initProperties() throws IOException {
+        properties.clear();
+        File f = new File(propertyFileLocation);
+        if (!f.exists()) {
+            f.createNewFile();
+        }
+        properties.load(new FileInputStream(propertyFileLocation));
     }
 }

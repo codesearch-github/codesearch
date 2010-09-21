@@ -19,11 +19,6 @@
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package org.codesearch.searcher.client.rpc;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -31,7 +26,7 @@ import java.util.List;
 import org.codesearch.searcher.shared.SearchResultDto;
 
 /**
- *
+ * Asynchronous Service interface for the searcher.
  * @author Samuel Kogler
  */
 public interface SearcherServiceAsync {

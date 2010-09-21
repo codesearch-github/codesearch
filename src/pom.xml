@@ -20,7 +20,7 @@
         <gwt.version>2.1-SNAPSHOT</gwt.version>
         <spring.version>3.0.2.RELEASE</spring.version>
         <lucene.version>3.0.2</lucene.version>
-        <quartz.version>1.8.3</quartz.version>
+        <quartz.version>1.8.4</quartz.version>
     </properties>
 
     <!-- REPOS -->
@@ -31,14 +31,6 @@
             <name>Google Web Toolkit Repository</name>
         </repository>
     </repositories>
-    <pluginRepositories>
-        <pluginRepository>
-            <id>gwt-plugin-repo</id>
-            <url>http://google-web-toolkit.googlecode.com/svn/2.1.0.M3/gwt/maven</url>
-            <name>Google Web Toolkit Plugin Repository</name>
-        </pluginRepository>
-    </pluginRepositories>
-
 
     <!-- DEFINES VERSIONS OF DEPENDENCIES FOR MODULES -->
     <dependencyManagement>

@@ -20,47 +20,43 @@
  */
 package org.codesearch.commons.plugins;
 
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.context.support.FileSystemXmlApplicationContext;
+import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Stiboller Stephan
  * @author David Froehlich
+ * @author Samuel Kogler
  */
-public final class PluginLoader {
+public class PluginLoader {
 
-    /** the list of all plugins that have been loaded at the constructor call */
-    private Map<String, Plugin> loadedPlugins;
-
-    /**
-     * Creates a new instance of plugin loader that loads all classes that implement the given classes type
-     * @param the super class / interface of which the subclasses are loaded
-     */
-    public PluginLoader(Class clazz) {
-        ApplicationContext context = new ClassPathXmlApplicationContext("spring-plugin-config.xml"); //move to a better
-        loadedPlugins = context.getBeansOfType(clazz); //replace with generic
-    }
+    /** The list of all plugins that have been loaded. */
+    @Autowired
+    private List<Plugin> loadedPlugins;
 
     /**
      * returns a plugin for the given purpose.
-     * Searches through all plugins originally loaded at the constructor call and compares the purpose of each plugin with the given parameter.
-     * Note that if there are multiple plugins with a fitting purpose it will return the first in the map (which is ordered alphabetically).
-     * @param type the purpose for the plugin
+     * Searches through all loaded plugins and finds the one with the given purpose.
+     * @param purpose the purpose of the plugin
      * @return the plugin matching the purpose
      * @throws Exception if no plugin was found with the purpose
      */
-    public Plugin getPluginForPurpose(final String type) throws PluginLoaderException {
-        Iterator iter = loadedPlugins.entrySet().iterator();
-        while (iter.hasNext()) {
-            Entry<String, Plugin> entry = (Entry<String, Plugin>) iter.next();
-            if (entry.getValue().getPurpose().equals(type)) {
-                return entry.getValue();
+    public <T extends Plugin> T getPlugin(final Class clazz, final String purpose) throws PluginLoaderException {
+        for (Plugin plugin : loadedPlugins) {
+            if (plugin.getPurpose().equals(purpose)) {
+                if (clazz.isInstance(plugin)) {
+                    return (T) plugin;
+                }
             }
         }
-        throw new PluginLoaderException("No Plugin found for given purpose");
+        throw new PluginLoaderException("No Plugin found for purpose: " + purpose + " and Class: " + clazz);
+    }
+
+    public List<Plugin> getLoadedPlugins() {
+        return loadedPlugins;
+    }
+
+    public void setLoadedPlugins(List<Plugin> loadedPlugins) {
+        this.loadedPlugins = loadedPlugins;
     }
 }
