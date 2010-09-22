@@ -37,33 +37,7 @@ public class ClearTaskTest {
     public void tearDown() {
     }
 
-    /**
-     * Test of getRepositoryName method, of class ClearTask.
-     */
-    @Test
-    public void testGetRepositoryName() {
-        System.out.println("getRepositoryName");
-        ClearTask instance = new ClearTask();
-        String expResult = "";
-        String result = instance.getRepositoryName();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of setRepositoryName method, of class ClearTask.
-     */
-    @Test
-    public void testSetRepositoryName() {
-        System.out.println("setRepositoryName");
-        String repositoryName = "";
-        ClearTask instance = new ClearTask();
-        instance.setRepositoryName(repositoryName);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
+   
     /**
      * Test of execute method, of class ClearTask.
      */

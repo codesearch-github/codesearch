@@ -55,6 +55,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class IndexingTask implements Task {
 
+    /** The dto holding the repository information */
     private RepositoryDto repository;
     /** The IndexingTask to be processed */
     private Set<String> fileNames;

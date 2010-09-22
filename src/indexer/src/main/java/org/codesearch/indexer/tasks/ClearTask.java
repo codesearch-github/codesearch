@@ -6,11 +6,15 @@ package org.codesearch.indexer.tasks;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
+import java.util.logging.Level;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
 import org.apache.lucene.index.CorruptIndexException;
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.codesearch.commons.configreader.xml.PropertyManager;
 import org.codesearch.indexer.exceptions.TaskExecutionException;
@@ -26,6 +30,7 @@ public class ClearTask implements Task {
     private IndexSearcher searcher;
     private PropertyManager propertyManager;
     private static final Logger LOG = Logger.getLogger(ClearTask.class);
+
 
     public String getRepositoryName() {
         return repositoryName;
@@ -43,6 +48,7 @@ public class ClearTask implements Task {
             }
             searcher = new IndexSearcher(FSDirectory.open(new File(indexLocation)), false);
             Term term = new Term("REPOSITORY", repositoryName);
+            deleteDocumentsFromIndexUsingTerm(term);
             LOG.debug("Deleted " + searcher.getIndexReader().deleteDocuments(term) + " documents with repository " + repositoryName);
         } catch (CorruptIndexException ex) {
             LOG.error("CorruptedIndex: " + ex);
@@ -52,4 +58,16 @@ public class ClearTask implements Task {
             LOG.error("Could not retrieve value for index_location from configuration" + ex);
         }
     }
+
+    /**
+     * Removes all documents related to the used Term
+     * @param term
+     * @throws IOException
+     * @throws ParseException
+     */
+    public void deleteDocumentsFromIndexUsingTerm(Term term) throws IOException {
+		LOG.info("Deleting documents with field '" + term.field() + "' with text '" + term.text() + "'");
+		searcher.getIndexReader().deleteDocuments(term);
+                searcher.close();
+	}
 }

@@ -10,7 +10,10 @@ import java.util.List;
 import java.util.LinkedList;
 import java.io.File;
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
+import org.apache.lucene.document.Field;
+import org.apache.lucene.util.Version;
 import org.codesearch.commons.configreader.xml.dto.RepositoryDto;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -24,6 +27,8 @@ import static org.junit.Assert.*;
  * @author David Froehlich
  */
 public class IndexingTaskTest {
+
+    private IndexingTask task = new IndexingTask();
 
     public IndexingTaskTest() {
     }
@@ -46,7 +51,6 @@ public class IndexingTaskTest {
 
     @Test
     public void testFileIsOnIgnoreList(){
-        IndexingTask task = new IndexingTask();
         List<String> ignoredFileNames = new LinkedList<String>();
         ignoredFileNames.add("*.xml");
         ignoredFileNames.add("*test*");
@@ -76,33 +80,14 @@ public class IndexingTaskTest {
     }
 
     /**
-     * Test of addLuceneFields method, of class IndexingTask.
-     */
-    @Test
-    public void testAddLuceneFields() throws Exception {
-        System.out.println("addLuceneFields");
-        Document doc = null;
-        String path = "";
-        IndexingTask instance = new IndexingTask();
-        Document expResult = null;
-        Document result = instance.addLuceneFields(doc, path);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
      * Test of initializeIndexWriter method, of class IndexingTask.
      */
     @Test
     public void testInitializeIndexWriter() {
         System.out.println("initializeIndexWriter");
-        Analyzer luceneAnalyzer = null;
+        Analyzer luceneAnalyzer = new StandardAnalyzer(Version.LUCENE_30);
         File dir = null;
-        IndexingTask instance = new IndexingTask();
-        instance.initializeIndexWriter(luceneAnalyzer, dir);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        task.initializeIndexWriter(luceneAnalyzer, dir);
     }
 
     /**
