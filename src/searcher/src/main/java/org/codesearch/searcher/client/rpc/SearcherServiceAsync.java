@@ -23,6 +23,7 @@ package org.codesearch.searcher.client.rpc;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import java.util.List;
+import org.codesearch.searcher.server.InvalidIndexLocationException;
 import org.codesearch.searcher.shared.SearchResultDto;
 
 /**
@@ -30,5 +31,5 @@ import org.codesearch.searcher.shared.SearchResultDto;
  * @author Samuel Kogler
  */
 public interface SearcherServiceAsync {
-    public void doSearch(String query, AsyncCallback<List<SearchResultDto>> asyncCallback);
+    public void doSearch(String query, AsyncCallback<List<SearchResultDto>> asyncCallback) throws InvalidIndexLocationException;
 }

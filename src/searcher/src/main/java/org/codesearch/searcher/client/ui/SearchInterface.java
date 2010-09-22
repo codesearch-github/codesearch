@@ -39,13 +39,12 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.SelectionModel;
 import com.google.gwt.view.client.SingleSelectionModel;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import org.codesearch.searcher.client.rpc.SearcherServiceAsync;
 import org.codesearch.searcher.client.rpc.SearcherService;
+import org.codesearch.searcher.server.InvalidIndexLocationException;
 import org.codesearch.searcher.shared.SearchResultDto;
-import org.codesearch.searcher.shared.SearchResultDtoRelevanceComparator;
 
 /**
  * Implements the functionality of the search page.
@@ -74,7 +73,6 @@ public class SearchInterface extends Composite {
     public SearchInterface() {
         resultTable = new CellTable<SearchResultDto>();
         resultTable.addColumn(new TextColumn<SearchResultDto>() {
-
             @Override
             public String getValue(SearchResultDto object) {
                 return String.valueOf(object.getRelevance());
@@ -82,7 +80,6 @@ public class SearchInterface extends Composite {
         }, "Relevance");
 
         resultTable.addColumn(new TextColumn<SearchResultDto>() {
-
             @Override
             public String getValue(SearchResultDto object) {
                 return object.getFilePath();
@@ -90,7 +87,6 @@ public class SearchInterface extends Composite {
         }, "Path");
 
         resultTable.addColumn(new TextColumn<SearchResultDto>() {
-
             @Override
             public String getValue(SearchResultDto object) {
                 return object.getRepository();
@@ -125,25 +121,29 @@ public class SearchInterface extends Composite {
     private void search() {
         searchResults.clear();
         String query = searchBox.getText();
-        searcherServiceAsync.doSearch(query, new AsyncCallback<List<SearchResultDto>>() {
+        try {
+            searcherServiceAsync.doSearch(query, new AsyncCallback<List<SearchResultDto>>() {
 
-            @Override
-            public void onFailure(Throwable caught) {
-                Window.alert("Exception calling the search service on the server:\n" + caught);
-            }
+                @Override
+                public void onFailure(Throwable caught) {
+                    Window.alert("Exception calling the search service on the server:\n" + caught);
+                }
 
-            @Override
-            public void onSuccess(List<SearchResultDto> resultList) {
-                Collections.sort(resultList, new SearchResultDtoRelevanceComparator());
-            }
-        });
-        for (int i = 0; i < 30; i++) {
-            SearchResultDto result = new SearchResultDto();
-            result.setFilePath("/aoeu/oeu/aoeu/aoeu");
-            result.setRelevance(45.55f);
-            result.setRepository("repo1");
-            searchResults.add(result);
+                @Override
+                public void onSuccess(List<SearchResultDto> resultList) {
+                    searchResults.addAll(resultList);
+                }
+            });
+        } catch (InvalidIndexLocationException ex) {
+            Window.alert("Invalid Index Location");
         }
+//        for (int i = 0; i < 30; i++) {
+//            SearchResultDto result = new SearchResultDto();
+//            result.setFilePath("/aoeu/oeu/aoeu/aoeu");
+//            result.setRelevance(45.55f);
+//            result.setRepository("repo1");
+//            searchResults.add(result);
+//        }
         updateResultsView();
     }
 

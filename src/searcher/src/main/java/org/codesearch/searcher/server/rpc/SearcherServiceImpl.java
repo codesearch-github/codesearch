@@ -46,15 +46,13 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
     private static final Logger LOG = Logger.getLogger(SearcherServiceImpl.class);
 
     @Override
-    public List<SearchResultDto> doSearch(String query) {
+    public List<SearchResultDto> doSearch(String query) throws InvalidIndexLocationException {
         List<SearchResultDto> resultItems = new LinkedList<SearchResultDto>();
         try {
             resultItems = documentSearcher.search(query);
         } catch (ParseException ex) {
             LOG.error("Could not parse query: " + ex);
         } catch (IOException ex) {
-            LOG.error(ex);
-        } catch (InvalidIndexLocationException ex) {
             LOG.error(ex);
         }
         return resultItems;

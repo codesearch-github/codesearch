@@ -71,6 +71,7 @@ public class IndexingTask implements Task {
     /** The PropertyManager used to get the configuration */
     @Autowired
     private PropertyManager propertyManager;
+    /** The plugin loader. */
     @Autowired
     private PluginLoader pluginLoader;
 
