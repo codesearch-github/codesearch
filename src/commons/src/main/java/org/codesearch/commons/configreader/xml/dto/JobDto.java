@@ -23,10 +23,9 @@ package org.codesearch.commons.configreader.xml.dto;
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 /**
- *
+ * DTO storing the information about a single IndexingJob
  * @author David Froehlich
  */
 public class JobDto {

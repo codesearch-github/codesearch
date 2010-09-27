@@ -24,6 +24,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
+ * A class that provides access to dynamically loaded plugins defined in the spring configuration of the corresponding module
  * @author Stiboller Stephan
  * @author David Froehlich
  * @author Samuel Kogler
@@ -33,7 +34,11 @@ public class PluginLoader {
     /** The list of all plugins that have been loaded. */
     @Autowired
     private List<Plugin> loadedPlugins;
+    
+    public PluginLoader(){
 
+    }
+    
     /**
      * returns a plugin for the given purpose.
      * Searches through all loaded plugins and finds the one with the given purpose.
@@ -42,6 +47,7 @@ public class PluginLoader {
      * @throws Exception if no plugin was found with the purpose
      */
     public <T extends Plugin> T getPlugin(final Class clazz, final String purpose) throws PluginLoaderException {
+        
         for (Plugin plugin : loadedPlugins) {
             if (plugin.getPurpose().equals(purpose)) {
                 if (clazz.isInstance(plugin)) {
@@ -52,11 +58,7 @@ public class PluginLoader {
         throw new PluginLoaderException("No Plugin found for purpose: " + purpose + " and Class: " + clazz);
     }
 
-    public List<Plugin> getLoadedPlugins() {
-        return loadedPlugins;
-    }
-
-    public void setLoadedPlugins(List<Plugin> loadedPlugins) {
+    public void setLoadedPlugins(List<Plugin> loadedPlugins){
         this.loadedPlugins = loadedPlugins;
     }
 }

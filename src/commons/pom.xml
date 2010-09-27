@@ -47,6 +47,12 @@
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-core</artifactId>
         </dependency>
+        <!-- Remove as fast as possible -->
+        <dependency>
+            <groupId>org.codesearch</groupId>
+            <artifactId>SubversionPlugin</artifactId>
+            <version>0.1-SNAPSHOT</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

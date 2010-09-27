@@ -36,6 +36,8 @@ import org.quartz.SchedulerFactory;
 import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
 import org.quartz.impl.StdSchedulerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 
 /**
  * IndexingManager controls the scheduler used to execute the indexing jobs
@@ -85,14 +87,25 @@ public final class IndexingManager {
      * @throws ConfigurationException if the configuration could not be read
      */
     public void startScheduler() throws SchedulerException, ConfigurationException {
+        LOG.debug("Starting scheduler");
         List<JobDto> jobs = pm.getJobs();
         int i = 0;
+        LOG.info("Starting scheduler with " + jobs.size() + " jobs");
+
         for (JobDto job : jobs) {
             JobDetail jobDetail = new JobDetail("Job" + i, "IndexingJobs", IndexerJob.class);
             jobDetail.getJobDataMap().put("tasks", job.getTasks());
             jobDetail.getJobDataMap().put("id", i);
+
             jobDetail.getJobDataMap().put("terminated", false);
-            Trigger trigger = new SimpleTrigger("JobTrigger" + i, "triggerGroup", new Date(job.getStartDate().getTimeInMillis()), null, SimpleTrigger.REPEAT_INDEFINITELY, job.getInterval() * 60000l);
+
+            Trigger trigger;
+            if (job.getInterval() == 0) {
+                LOG.info("setting job for single execution");
+                trigger = new SimpleTrigger("JobTrigger" + i, new Date(job.getStartDate().getTimeInMillis()), null, 0, 0);
+            } else {
+                trigger = new SimpleTrigger("JobTrigger" + i, new Date(job.getStartDate().getTimeInMillis()), null, SimpleTrigger.REPEAT_INDEFINITELY, job.getInterval() * 60000l);
+            }
             scheduler.scheduleJob(jobDetail, trigger);
             i++;
         }

@@ -19,15 +19,10 @@
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package org.codesearch.commons.plugins;
 
 /**
- *
+ * An exception that can be thrown by the PluginLoader
  * @author David Froehlich
  */
 public class PluginLoaderException extends Exception {

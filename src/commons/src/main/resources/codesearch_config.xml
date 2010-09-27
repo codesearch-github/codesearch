@@ -23,52 +23,40 @@
 -->
 
 <root>
-  <globally_ignored_filenames>
-      <filename>*.jpg</filename>
-      <filename>*.txt</filename>
-  </globally_ignored_filenames>
-	<indexLocation>/tmp/test</indexLocation>
-	<index_jobs>
-		<index_job>
-			<repositories>testRepo1, testRepo2</repositories>
-			<tasks>
-				<task>
-					<type>index</type>			
-				</task>
-			</tasks>
-			<interval>60</interval>
-			<start>2010-08-13-18-46</start>
-		</index_job>
-		<index_job>
-			<tasks>
-				<task>
-					<type>clear</type>
-				</task>
-			</tasks>			
-			<interval>10080</interval>
-			<start>2010-08-11-18-0</start>
-		</index_job>
-	</index_jobs>
+    <globally_ignored_filenames>
+        <filename>*.jpg</filename>
+        <filename>*.txt</filename>
+    </globally_ignored_filenames>
+    <index-location>/tmp/test</index-location>
+    <index_jobs>
+    <!--    <index_job>
+            <tasks>
+                <task>
+                    <type>clear</type>
+                </task>
+            </tasks>			
+        </index_job> -->
+        <index_job>
+            <repositories>svnsearch_repo</repositories>
+            <tasks>
+                <task>
+                    <type>index</type>
+                </task>
+            </tasks>
+        </index_job> 
+    </index_jobs>
     <testproperty>fdsa</testproperty>
     <repositories>
         <repository>
-            <name>testRepo1</name>
-	          <version_control_system>SVN</version_control_system>
-            <username>testUser</username>
-            <password>testPassword</password>
-            <url>http://test.org</url>
+            <name>svnsearch_repo</name>
+            <version_control_system>SVN</version_control_system>
+            <username>feldruebe</username>
+            <password>dota!123</password>
+            <url>svn://portal.htl-kaindorf.at/svnsearch</url>
             <codeNavigationEnabled>true</codeNavigationEnabled>
             <not_indexed_filenames>
-              <filename>*.xml</filename>
+                <filename>*.xml</filename>
             </not_indexed_filenames>
-        </repository>
-        <repository>
-            <name>testRepo2</name>
-            <username>testUser</username>
-            <password>testPassword</password>      
-      	    <version_control_system>SVN</version_control_system>
-            <url>http://test.org</url>
-            <codeNavigationEnabled>false</codeNavigationEnabled>
         </repository>
     </repositories>
 </root>

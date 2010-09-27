@@ -47,6 +47,10 @@
         </dependency>
 
         <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.codesearch</groupId>
             <artifactId>commons</artifactId>
             <version>0.1-SNAPSHOT</version>

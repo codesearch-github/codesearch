@@ -4,6 +4,9 @@
  */
 package org.codesearch.indexer.tasks;
 
+import org.junit.runner.RunWith;
+import org.springframework.context.ApplicationContext;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.codesearch.commons.propertyreader.properties.PropertiesReader;
 import org.codesearch.commons.configreader.xml.PropertyManager;
 import java.util.List;
@@ -21,15 +24,22 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.support.GenericXmlContextLoader;
 
 /**
  *
  * @author David Froehlich
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(loader = GenericXmlContextLoader.class, locations = {"classpath:org/codesearch/indexer/IndexerBeans.xml"})
 public class IndexingTaskTest {
 
     private IndexingTask task = new IndexingTask();
-
+    @Autowired
+    private ApplicationContext applicationContext;
     public IndexingTaskTest() {
     }
 
@@ -69,10 +79,10 @@ public class IndexingTaskTest {
     public void testExecute() throws Exception {
         PropertyManager pm = new PropertyManager();
         List<RepositoryDto> repos = pm.getRepositories();
-        PropertiesReader pr = new PropertiesReader("revisions.properties");
+        PropertiesReader pr = new PropertiesReader("/tmp/test/revisions.properties");
         
         for(RepositoryDto repo : repos){
-            IndexingTask t = new IndexingTask();
+            IndexingTask t = (IndexingTask) applicationContext.getBean("indexingTask");
             pr.setPropertyFileValue(repo.getName(), "0");
             t.setRepository(repo);
             t.execute();

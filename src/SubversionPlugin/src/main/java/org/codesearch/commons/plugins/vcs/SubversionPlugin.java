@@ -25,9 +25,8 @@ import java.net.URI;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.springframework.stereotype.Component;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNLogEntry;
@@ -106,21 +105,22 @@ public class SubversionPlugin implements VersionControlPlugin {
         Set<String> paths = new HashSet();
         Collection logs = null;
         try {
-            try {
-                logs = repository.log(new String[]{}, null, Integer.parseInt(revision), -1, true, false);
-            } catch (NullPointerException e) {
-                throw new VersionControlPluginException("No repository specified");
-            }
-            Iterator iter = logs.iterator();
-            while (iter.hasNext()) {
-                SVNLogEntry entry = (SVNLogEntry) iter.next();
-                Iterator iter2 = entry.getChangedPaths().keySet().iterator();
-                while (iter2.hasNext()) {
-                    paths.add((String) iter2.next());
+            logs = repository.log(new String[]{}, null, Long.parseLong(revision) + 1, -1, true, false);
+        } catch (NullPointerException e) {
+            throw new VersionControlPluginException("No repository specified");
+        } catch (SVNException ex) {
+            logs = new LinkedList();
+        }
+        Iterator iter = logs.iterator();
+        while (iter.hasNext()) {
+            SVNLogEntry entry = (SVNLogEntry) iter.next();
+            Iterator iter2 = entry.getChangedPaths().keySet().iterator();
+            while (iter2.hasNext()) {
+                String path = (String) iter2.next();
+                if (path.lastIndexOf(".") > path.lastIndexOf("/")) {
+                    paths.add(path);
                 }
             }
-        } catch (SVNException ex) {
-            throw new VersionControlPluginException(ex.toString());
         }
         return paths;
     }

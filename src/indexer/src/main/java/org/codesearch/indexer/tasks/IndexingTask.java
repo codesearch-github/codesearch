@@ -21,10 +21,12 @@
 package org.codesearch.indexer.tasks;
 
 import java.io.FileNotFoundException;
+import java.net.URISyntaxException;
 import org.apache.commons.configuration.ConfigurationException;
 import org.codesearch.indexer.exceptions.TaskExecutionException;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -83,30 +85,38 @@ public class IndexingTask implements Task {
     @Override
     public void execute() throws TaskExecutionException {
         String indexLocation = null;
-
         try {
             LOG.info("Starting execution of indexing task");
             indexLocation = propertyManager.getSingleLinePropertyValue("index-location");
             // Read the index status file
-            propertiesReader = new PropertiesReader(indexLocation + File.separator + "revisions.properties");
+            propertiesReader = new PropertiesReader(indexLocation + File.separator + "revisions.properties"); //TODO add propertiesReader path
             // Get the version control plugins
             versionControlPlugin = pluginLoader.getPlugin(VersionControlPlugin.class, repository.getVersionControlSystem());
+            versionControlPlugin.setRepository(new URI(repository.getUrl()), repository.getUsername(), repository.getPassword());
             fileNames = versionControlPlugin.getPathsForChangedFilesSinceRevision(propertiesReader.getPropertyFileValue(repository.getName()));
+            for(String s : fileNames){
+                LOG.info(s);
+            }
+            if (fileNames.isEmpty()) {
+                LOG.info("Index of repository " + repository.getName() + " is up to date");
+                return;
+            }
             initializeIndexWriter(new StandardAnalyzer(IndexConstants.LUCENE_VERSION), new File(indexLocation));
             createIndex();
             propertiesReader.setPropertyFileValue(repository.getName(), versionControlPlugin.getRepositoryRevision());
+        } catch (URISyntaxException ex) {
+            LOG.error("Repository url could not be parsed to URI" + ex);
         } catch (FileNotFoundException ex) {
-            throw new TaskExecutionException("Location of index directory could not be found: " + ex);
+            LOG.error("Index not found at task execution" + ex);
         } catch (IOException ex) {
-            throw new TaskExecutionException("IOException at execution of task: " + ex);
+            LOG.error("IOException at execution of task: " + ex);
         } catch (VersionControlPluginException ex) {
-            throw new TaskExecutionException("VersionControlPlugin files could not be retrieved: " + ex);
+            LOG.error("VersionControlPlugin files could not be retrieved: " + ex);
         } catch (PluginLoaderException ex) {
-            throw new TaskExecutionException("VersionControlPlugin could not be loaded: " + ex);
+            LOG.error("VersionControlPlugin could not be loaded: " + ex);
         } catch (ConfigurationException ex) {
-            throw new TaskExecutionException("Configuration could not be read " + ex);
+            LOG.error("Configuration could not be read " + ex);
         }
-        //TODO change throwing of exception to Log errors
     }
 
     /**
@@ -114,7 +124,7 @@ public class IndexingTask implements Task {
      * @param doc the target document
      * @return document with added lucene fields
      */
-    public Document addLuceneFields(Document doc, String path) throws VersionControlPluginException { //TODO additional fields required
+    public Document addLuceneFields(Document doc, String path) throws VersionControlPluginException {
         doc.add(new Field("TITLE", extractFilename(path), Field.Store.YES, Field.Index.NOT_ANALYZED));
         doc.add(new Field("CONTENT", versionControlPlugin.getFileContentForFilePath(path), Field.Store.YES, Field.Index.ANALYZED));
         doc.add(new Field("REPOSITORY", repository.getName(), Field.Store.YES, Field.Index.NOT_ANALYZED));
@@ -155,6 +165,7 @@ public class IndexingTask implements Task {
         Document doc = new Document();
         try {
             Iterator it = fileNames.iterator();
+            int i = 0;
             while (it.hasNext()) {
                 String path = (String) it.next();
                 if (!(fileIsOnIgnoreList(path))) {
@@ -162,9 +173,10 @@ public class IndexingTask implements Task {
                     doc = new Document();
                     // Add fields
                     doc = addLuceneFields(doc, path);
-                    LOG.debug("Added file: " + doc.get("title") + " to index.");
+                    LOG.debug("Added file: " + doc.get("TITLE") + " to index.");
                     // Add document to the index
                     indexWriter.addDocument(doc);
+                    i++;
                 }
             }
             indexWriter.commit();
@@ -212,7 +224,7 @@ public class IndexingTask implements Task {
      * @return the name of the file
      */
     public String extractFilename(final String path) {
-        return path.substring(path.lastIndexOf('/'));
+        return path.substring(path.lastIndexOf('/') + 1);
     }
 
     public void setRepository(RepositoryDto repository) {
@@ -225,6 +237,10 @@ public class IndexingTask implements Task {
 
     public void setPropertyManager(PropertyManager propertyManager) {
         this.propertyManager = propertyManager;
+    }
+
+    public void setPluginLoader(PluginLoader pluginLoader) {
+        this.pluginLoader = pluginLoader;
     }
 
     public PropertiesReader getPropertiesReader() {

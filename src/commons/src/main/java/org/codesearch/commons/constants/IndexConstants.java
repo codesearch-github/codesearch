@@ -33,7 +33,6 @@ public final class IndexConstants {
     public static final String INDEX_REVISION_CONF_DIR = "/tmp/test/";
     public static final String INDEX_FIELD_REPOSITORY="repository";
     public static final String INDEX_FIELD_FILEPATH="filepath";
-    public static final String BLACKLIST_LOCATION = "/tmp/test/blacklist/blacklist.txt";
     
     private IndexConstants(){
         

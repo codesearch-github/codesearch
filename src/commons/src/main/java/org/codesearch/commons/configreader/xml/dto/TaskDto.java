@@ -21,12 +21,12 @@
 package org.codesearch.commons.configreader.xml.dto;
 
 /**
- *
+ * DTO class storing information about a single task
  * @author David Froehlich
  */
 public class TaskDto {
 
-    /** The list of all the repositories this task affects, if it equals null the task will affect all repositories */ //TODO rewrite
+    /** The repository this task is assigned to */
     private RepositoryDto repository;
     /** The type of the task, for instance clear for clearing the entire index, and so on */
     private TaskType type;
@@ -76,10 +76,14 @@ public class TaskDto {
         TaskDto other;
         try {
             other = (TaskDto) o;
-            //TODO rewrite
             if (!(repository == null && other.getRepository() == null)) {
-                if(!(repository.equals(other.getRepository())))
+                try {
+                    if (!(repository.equals(other.getRepository()))) {
+                        return false;
+                    }
+                } catch (NullPointerException ex) {
                     return false;
+                }
             }
             if (this.type == other.getType()) {
                 return true;

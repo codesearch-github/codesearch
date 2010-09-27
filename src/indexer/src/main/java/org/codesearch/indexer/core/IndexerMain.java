@@ -25,22 +25,28 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
 import org.codesearch.indexer.manager.IndexingManager;
 import org.quartz.SchedulerException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.context.support.FileSystemXmlApplicationContext;
+import org.springframework.web.context.support.XmlWebApplicationContext;
 
 /**
- *
+ * Listener class that calls required methods at startup and destruction of the program
  * @author David Froehlich
  */
 public class IndexerMain implements javax.servlet.ServletContextListener {
     protected static final Logger LOG = Logger.getLogger(IndexerMain.class);
+    private static ApplicationContext applicationContext;
     /** The IndexingManager used to control the execution of the IndexingJobs */
     private IndexingManager indexingManager;
 
     /**
-     * Instantiates the IndexingManager and calls the startScheduler
+     * Instantiates the IndexingManager and starts its scheduler
      * @param sce dummy parameter needed by the parent class implementation
      */
     @Override
     public void contextInitialized(ServletContextEvent sce) {
+        applicationContext = new ClassPathXmlApplicationContext("classpath:org/codesearch/indexer/IndexerBeans.xml");
         try {
             indexingManager = new IndexingManager();
             indexingManager.startScheduler();
@@ -53,5 +59,9 @@ public class IndexerMain implements javax.servlet.ServletContextListener {
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
+    }
+
+    public static ApplicationContext getApplicationContext() {
+        return applicationContext;
     }
 }
