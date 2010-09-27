@@ -30,7 +30,7 @@ import org.apache.lucene.queryParser.ParseException;
 
 import org.codesearch.searcher.client.rpc.SearcherService;
 import org.codesearch.searcher.server.DocumentSearcher;
-import org.codesearch.searcher.server.InvalidIndexLocationException;
+import org.codesearch.searcher.shared.InvalidIndexLocationException;
 import org.codesearch.searcher.shared.SearchResultDto;
 
 /**

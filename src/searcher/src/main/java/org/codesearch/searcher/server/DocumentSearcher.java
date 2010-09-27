@@ -20,6 +20,7 @@
  */
 package org.codesearch.searcher.server;
 
+import org.codesearch.searcher.shared.InvalidIndexLocationException;
 import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;

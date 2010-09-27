@@ -19,7 +19,7 @@
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.codesearch.searcher.server;
+package org.codesearch.searcher.shared;
 
 /**
  * Thrown when no valid index was found.

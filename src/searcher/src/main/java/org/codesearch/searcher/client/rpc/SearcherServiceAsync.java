@@ -23,7 +23,7 @@ package org.codesearch.searcher.client.rpc;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import java.util.List;
-import org.codesearch.searcher.server.InvalidIndexLocationException;
+import org.codesearch.searcher.shared.InvalidIndexLocationException;
 import org.codesearch.searcher.shared.SearchResultDto;
 
 /**

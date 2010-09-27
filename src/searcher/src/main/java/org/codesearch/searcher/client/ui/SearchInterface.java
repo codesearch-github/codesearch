@@ -37,13 +37,15 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.view.client.SelectionChangeEvent;
+import com.google.gwt.view.client.SelectionChangeEvent.Handler;
 import com.google.gwt.view.client.SelectionModel;
 import com.google.gwt.view.client.SingleSelectionModel;
 import java.util.LinkedList;
 import java.util.List;
 import org.codesearch.searcher.client.rpc.SearcherServiceAsync;
 import org.codesearch.searcher.client.rpc.SearcherService;
-import org.codesearch.searcher.server.InvalidIndexLocationException;
+import org.codesearch.searcher.shared.InvalidIndexLocationException;
 import org.codesearch.searcher.shared.SearchResultDto;
 
 /**
@@ -64,15 +66,15 @@ public class SearchInterface extends Composite {
     Button searchButton;
     //TODO workaround, refactor after GWT2.1 release
     @UiField(provided = true)
-    final CellTable<SearchResultDto> resultTable;
+    CellTable<SearchResultDto> resultTable = new CellTable<SearchResultDto>();
     @UiField
     SimplePager resultTablePager;
     /** Saves the current search results **/
     List<SearchResultDto> searchResults = new LinkedList<SearchResultDto>();
 
     public SearchInterface() {
-        resultTable = new CellTable<SearchResultDto>();
         resultTable.addColumn(new TextColumn<SearchResultDto>() {
+
             @Override
             public String getValue(SearchResultDto object) {
                 return String.valueOf(object.getRelevance());
@@ -80,6 +82,7 @@ public class SearchInterface extends Composite {
         }, "Relevance");
 
         resultTable.addColumn(new TextColumn<SearchResultDto>() {
+
             @Override
             public String getValue(SearchResultDto object) {
                 return object.getFilePath();
@@ -87,6 +90,7 @@ public class SearchInterface extends Composite {
         }, "Path");
 
         resultTable.addColumn(new TextColumn<SearchResultDto>() {
+
             @Override
             public String getValue(SearchResultDto object) {
                 return object.getRepository();
@@ -101,10 +105,10 @@ public class SearchInterface extends Composite {
         initWidget(uiBinder.createAndBindUi(this));
     }
 
-    @UiHandler("resultTable")
-    void onResultList(SelectionEvent<SearchResultDto> e) {
-        Window.alert(e.getSelectedItem().getFilePath());
-    }
+//    @UiHandler("resultTable")
+//    void onResultList(SelectionEvent<SearchResultDto> e) {
+//        Window.alert(e.getSelectedItem().getFilePath());
+//    }
 
     @UiHandler("searchButton")
     void onSearchButton(ClickEvent e) {
@@ -137,19 +141,19 @@ public class SearchInterface extends Composite {
         } catch (InvalidIndexLocationException ex) {
             Window.alert("Invalid Index Location");
         }
-//        for (int i = 0; i < 30; i++) {
-//            SearchResultDto result = new SearchResultDto();
-//            result.setFilePath("/aoeu/oeu/aoeu/aoeu");
-//            result.setRelevance(45.55f);
-//            result.setRepository("repo1");
-//            searchResults.add(result);
-//        }
+        for (int i = 0; i < 30; i++) {
+            SearchResultDto result = new SearchResultDto();
+            result.setFilePath("/aoeu/oeu/aoeu/aoeu");
+            result.setRelevance(45.55f);
+            result.setRepository("repo1");
+            searchResults.add(result);
+        }
         updateResultsView();
     }
 
     private void updateResultsView() {
         resultTable.setRowData(0, searchResults);
-        resultTablePager.setDisplay(resultTable);
+//        resultTablePager.setDisplay(resultTable);
         resultTable.redraw();
     }
 }
