@@ -51,6 +51,14 @@
     <testproperty>asdf</testproperty>
     <repositories>
         <repository>
+            <name>svn_local</name>
+            <version_control_system>FILESYSTEM</version_control_system>
+            <username>null</username>
+            <password>null</password>
+            <url>$home/workspace/svnsearch</url>
+            <codeNavigationEnabled>true</codeNavigationEnabled>
+        </repository>
+        <repository>
             <name>svnsearch_repo</name>
             <version_control_system>SVN</version_control_system>
             <username>feldruebe</username>

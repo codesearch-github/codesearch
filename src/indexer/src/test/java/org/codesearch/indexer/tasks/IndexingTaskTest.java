@@ -37,6 +37,7 @@ public class IndexingTaskTest {
     private IndexingTask task = new IndexingTask();
     @Autowired
     private ApplicationContext applicationContext;
+
     public IndexingTaskTest() {
     }
 
@@ -57,18 +58,18 @@ public class IndexingTaskTest {
     }
 
     @Test
-    public void testFileIsOnIgnoreList(){
+    public void testFileIsOnIgnoreList() {
         List<String> ignoredFileNames = new LinkedList<String>();
         ignoredFileNames.add("*.xml");
         ignoredFileNames.add("*test*");
         ignoredFileNames.add("*/test/*");
         task.setRepository(new RepositoryDto(null, null, null, null, false, null, ignoredFileNames));
-        assert(task.fileIsOnIgnoreList("asdf.xml"));
-        assert(task.fileIsOnIgnoreList("asdftestasdf"));
-        assert(task.fileIsOnIgnoreList("/test/fasdf"));
+        assert (task.fileIsOnIgnoreList("asdf.xml"));
+        assert (task.fileIsOnIgnoreList("asdftestasdf"));
+        assert (task.fileIsOnIgnoreList("/test/fasdf"));
         assertFalse(task.fileIsOnIgnoreList("asdf.txt"));
     }
-    
+
     /**
      * Test of execute method, of class IndexingTask.
      */
@@ -77,12 +78,34 @@ public class IndexingTaskTest {
         XmlConfigurationReader pm = new XmlConfigurationReader();
         List<RepositoryDto> repos = pm.getRepositories();
         PropertiesManager pr = new PropertiesManager("/tmp/test/revisions.properties");
-        
-        for(RepositoryDto repo : repos){
-            IndexingTask t = (IndexingTask) applicationContext.getBean("indexingTask");
-            pr.setPropertyFileValue(repo.getName(), "0");
-            t.setRepository(repo);
-            t.execute();
+
+        for (RepositoryDto repo : repos) {
+            if (!repo.getVersionControlSystem().equals("FILESYTEM")) {
+                IndexingTask t = (IndexingTask) applicationContext.getBean("indexingTask");
+                pr.setPropertyFileValue(repo.getName(), "0");
+                t.setRepository(repo);
+                t.execute();
+            }
+        }
+    }
+
+    @Test
+    public void testExecuteLocal() throws Exception {
+        XmlConfigurationReader pm = new XmlConfigurationReader();
+        List<RepositoryDto> repos = pm.getRepositories();
+        PropertiesManager pr = new PropertiesManager("/tmp/test/revisions.properties");
+
+        ClearTask clear = new ClearTask();
+        clear.setRepositoryName(null);
+        clear.execute();
+        for (RepositoryDto repo : repos) {
+            if (repo.getVersionControlSystem().equals("FILESYSTEM")) {
+                repo.setUrl(repo.getUrl().replace("$home", System.getProperty("user.home")));
+                IndexingTask t = (IndexingTask) applicationContext.getBean("indexingTask");
+                pr.setPropertyFileValue(repo.getName(), "0");
+                t.setRepository(repo);
+                t.execute();
+            }
         }
     }
 
@@ -123,5 +146,4 @@ public class IndexingTaskTest {
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
-
 }
