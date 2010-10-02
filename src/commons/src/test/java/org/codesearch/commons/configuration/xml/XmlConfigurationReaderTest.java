@@ -19,23 +19,18 @@
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.codesearch.commons.configreader.xml;
+package org.codesearch.commons.configuration.xml;
 
-import org.codesearch.commons.configreader.xml.dto.RepositoryDto;
-import org.codesearch.commons.configreader.xml.dto.JobDto;
+import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
+import org.codesearch.commons.configuration.xml.dto.JobDto;
 import java.util.GregorianCalendar;
 import org.apache.commons.configuration.ConfigurationException;
-import org.junit.runner.RunWith;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.support.GenericXmlContextLoader;
 import java.util.LinkedList;
-import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.codesearch.commons.configreader.xml.dto.TaskDto;
+import org.codesearch.commons.configuration.xml.dto.TaskDto;
 import static org.junit.Assert.*;
 
 /**
@@ -44,13 +39,13 @@ import static org.junit.Assert.*;
  */
 //@RunWith(SpringJUnit4ClassRunner.class)
 //@ContextConfiguration(loader = GenericXmlContextLoader.class, locations = {"classpath:org/codesearch/commons/CodesearchCommonsBeans.xml"})
-public class PropertyManagerTest {
+public class XmlConfigurationReaderTest {
 
  //   TODO use spring injection
  //   @Autowired
-    private PropertyManager propertyManager = new PropertyManager();
+    private XmlConfigurationReader propertyManager = new XmlConfigurationReader();
 
-    public PropertyManagerTest() {
+    public XmlConfigurationReaderTest() {
     }
 
     @Before
@@ -73,7 +68,7 @@ public class PropertyManagerTest {
         ignFileNames1.add("*.xml");
         ignFileNames1.add("*.jpg");
         ignFileNames1.add("*.txt");
-        RepositoryDto repo1 = new RepositoryDto("testRepo1", "http://test.org", "testUser", "testPassword", true, "SVN", ignFileNames1);
+        RepositoryDto repo1 = new RepositoryDto("svnsearch_repo", "svn://portal.htl-kaindorf.at/svnsearch", "feldruebe", "dota!123", true, "SVN", ignFileNames1);
 
         List<String> ignFileNames2 = new LinkedList<String>();
         ignFileNames2.add("*.jpg");
@@ -111,8 +106,8 @@ public class PropertyManagerTest {
         ignoredFiles1.add("*.jpg");
         ignoredFiles1.add("*.txt");
 
-        testRepo1 = new RepositoryDto("testRepo1", "http://test.org", "testUser", "testPassword", true, "SVN", ignoredFiles1);
-
+        
+        testRepo1 = new RepositoryDto("svnsearch_repo", "svn://portal.htl-kaindorf.at/svnsearch", "feldruebe", "dota!123", true, "SVN", ignoredFiles1);
         RepositoryDto testRepo2;
         List<String> ignoredFiles2 = new LinkedList<String>();
         ignoredFiles2.add("*.jpg");
@@ -126,8 +121,7 @@ public class PropertyManagerTest {
         job1.setStartDate(new GregorianCalendar(2010, 7, 13, 18, 0));
         JobDto job2 = new JobDto();
 
-        job2.getTasks().add(new TaskDto(testRepo1, TaskDto.TaskType.clear));
-        job2.getTasks().add(new TaskDto(testRepo2, TaskDto.TaskType.clear));
+        job2.getTasks().add(new TaskDto(null, TaskDto.TaskType.clear));
 
         job2.setInterval(10080);
         job2.setStartDate(new GregorianCalendar(2010, 7, 11, 18, 0));

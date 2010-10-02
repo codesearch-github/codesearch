@@ -47,7 +47,6 @@ public class PluginLoader {
      * @throws Exception if no plugin was found with the purpose
      */
     public <T extends Plugin> T getPlugin(final Class clazz, final String purpose) throws PluginLoaderException {
-        
         for (Plugin plugin : loadedPlugins) {
             if (plugin.getPurpose().equals(purpose)) {
                 if (clazz.isInstance(plugin)) {

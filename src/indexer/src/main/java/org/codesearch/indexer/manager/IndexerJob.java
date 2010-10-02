@@ -23,10 +23,9 @@ package org.codesearch.indexer.manager;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import org.apache.commons.lang.NotImplementedException;
 import org.apache.log4j.Logger;
-import org.codesearch.commons.configreader.xml.PropertyManager;
-import org.codesearch.commons.configreader.xml.dto.TaskDto;
+import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
+import org.codesearch.commons.configuration.xml.dto.TaskDto;
 import org.codesearch.indexer.core.IndexerMain;
 import org.codesearch.indexer.tasks.IndexingTask;
 import org.codesearch.indexer.tasks.Task;
@@ -35,7 +34,6 @@ import org.codesearch.indexer.tasks.ClearTask;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 
 /**
@@ -53,9 +51,7 @@ public class IndexerJob implements Job {
     /** Instantiate a logger */
     private static final Logger LOG = Logger.getLogger(IndexerJob.class);
     /** The PropertyManager used to retrieve configuration */
-    private PropertyManager propertyManager;
-//    @Autowired
-//    private ApplicationContext applicationContext;
+    private XmlConfigurationReader configReader;
 
     /**
      * Executes all tasks from the taskList one after another
@@ -65,11 +61,11 @@ public class IndexerJob implements Job {
     @Override
     public void execute(JobExecutionContext jec) throws JobExecutionException {
         LOG.info("Executing IndexerJob");
+        ApplicationContext applicationContext = IndexerMain.getApplicationContext();
         terminated = (Boolean) jec.getJobDetail().getJobDataMap().get("terminated");
-        propertyManager = new PropertyManager(); //TODO replace with spring injection
+        configReader = new XmlConfigurationReader(); //TODO replace with spring injection
         taskList = (List<TaskDto>) (jec.getJobDetail().getJobDataMap().get("tasks"));
         Task task = null;
-        ApplicationContext applicationContext = IndexerMain.getApplicationContext();
         Date startDate = new Date();
         for (int i = 0; i < taskList.size(); i++) {
             TaskDto taskDto = taskList.get(i);
@@ -89,9 +85,9 @@ public class IndexerJob implements Job {
             try {
                 task.execute();
             } catch (TaskExecutionException ex) {
-                throw new JobExecutionException("Execution of Task number "+i+" threw an exception"+ex);
+                throw new JobExecutionException("Execution of Task number " + i + " threw an exception" + ex);
             }
         }
-        LOG.info("Finished execution of job in "+(new Date().getTime() - startDate.getTime())/1000f +" seconds");
+        LOG.info("Finished execution of job in " + (new Date().getTime() - startDate.getTime()) / 1000f + " seconds");
     }
 }

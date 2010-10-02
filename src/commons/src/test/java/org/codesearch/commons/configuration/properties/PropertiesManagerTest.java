@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package org.codesearch.commons.propertyreader.properties;
+package org.codesearch.commons.configuration.properties;
 
 import java.io.IOException;
 import org.junit.After;
@@ -19,14 +19,14 @@ import static org.junit.Assert.*;
  * @author zeheron
  */
 //TODO spring
-public class PropertiesReaderTest {
+public class PropertiesManagerTest {
 
     /**
      * The used PropertiesReader instance
      */
-    private PropertiesReader pr;
+    private PropertiesManager pr;
 
-    public PropertiesReaderTest() {
+    public PropertiesManagerTest() {
     }
 
     @BeforeClass
@@ -39,7 +39,7 @@ public class PropertiesReaderTest {
 
     @Before
     public void setUp() throws IOException {
-        pr = new PropertiesReader("/home/zeheron/workspace/codesearch/codesearch/src/indexer/src/test/resources/repository.properties");
+        pr = new PropertiesManager("/tmp/test/repository.properties");
     }
 
     @After
@@ -66,7 +66,7 @@ public class PropertiesReaderTest {
         System.out.println("setPropertyFileValue");
         String key = "testrepo2";
         String value = "1";
-        PropertiesReader instance = null;
+        PropertiesManager instance = null;
         pr.setPropertyFileValue(key, value);
         assertEquals(value, pr.getPropertyFileValue(key));
     }

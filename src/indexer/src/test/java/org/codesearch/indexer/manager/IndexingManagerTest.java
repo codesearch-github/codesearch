@@ -26,6 +26,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.quartz.SchedulerException;
 
+//TODO implement test and add javadoc
 /**
  *
  * @author David Froehlich

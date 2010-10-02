@@ -30,10 +30,20 @@
     <index-location>/tmp/test</index-location>
     <index_jobs>
         <index_job>
-            <repositories>svnsearch_repo</repositories>
+            <interval>60</interval>
+            <start>2010-8-13-18-0</start>
             <tasks>
                 <task>
                     <type>index</type>
+                </task>
+            </tasks>
+        </index_job>
+        <index_job>
+            <interval>10080</interval>
+            <start>2010-8-11-18-0</start>
+            <tasks>
+                <task>
+                    <type>clear</type>
                 </task>
             </tasks>
         </index_job>
@@ -45,7 +55,7 @@
             <version_control_system>SVN</version_control_system>
             <username>feldruebe</username>
             <password>dota!123</password>
-            <url>http://portal.htl-kaindorf.at/svnsearch</url>
+            <url>svn://portal.htl-kaindorf.at/svnsearch</url>
             <codeNavigationEnabled>true</codeNavigationEnabled>
             <not_indexed_filenames>
                 <filename>*.xml</filename>

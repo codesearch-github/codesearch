@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.codesearch.commons.configreader.xml;
+package org.codesearch.commons.configuration.xml;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -29,24 +29,22 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.SubnodeConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
-import org.apache.commons.lang.NotImplementedException;
-import org.codesearch.commons.configreader.xml.dto.JobDto;
-import org.codesearch.commons.configreader.xml.dto.RepositoryDto;
-import org.codesearch.commons.configreader.xml.dto.TaskDto;
-import org.codesearch.commons.configreader.xml.dto.TaskDto.TaskType;
+import org.codesearch.commons.configreader.xml.ConfigReaderConstants;
+import org.codesearch.commons.configuration.xml.dto.JobDto;
+import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
+import org.codesearch.commons.configuration.xml.dto.TaskDto;
+import org.codesearch.commons.configuration.xml.dto.TaskDto.TaskType;
 
 /**
- * PropertyManager is a class that provides several methods to access properties.
+ * XmlConfigurationReader is a class that provides several methods to access properties.
  * By default, the properties are stored in a file in the classpath called codesearch_config.xml.
  * @author Stephan Stiboller
  * @author David Froehlich
  * @author Samuel Kogler
  */
-public class PropertyManager {
+public class XmlConfigurationReader {
 
-    /** The XMLConfiguration object that is used to read the properties from 
-     * the XML-file, does not have to be instantiated actively, it will
-     * be checked and instantiated whenever used */
+    /** The XMLConfiguration object that is used to read the properties from the XML-file*/
     private XMLConfiguration config;
     /** The path to the configuration file. */
     private String configpath = "codesearch_config.xml";
@@ -54,7 +52,7 @@ public class PropertyManager {
     /**
      * creates a new instance of PropertyManager
      */
-    public PropertyManager() {
+    public XmlConfigurationReader() {
     }
 
     /**
@@ -108,8 +106,12 @@ public class PropertyManager {
                     } else if (sc.getString(ConfigReaderConstants.TASK_TYPE).equals("clear")) {
                         type = TaskType.clear;
                     }
-                    for (RepositoryDto repository : repositoriesForJob) {
-                        tasks.add(new TaskDto(repository, type));
+                    if (type == TaskType.clear && repositoryString == null) {
+                        tasks.add(new TaskDto(null, type));
+                    } else {
+                        for (RepositoryDto repository : repositoriesForJob) {
+                            tasks.add(new TaskDto(repository, type));
+                        }
                     }
                 }
                 job.setTasks(tasks);
@@ -121,6 +123,12 @@ public class PropertyManager {
         return jobs;
     }
 
+    /**
+     * returns all repositories which have names that are contained in the parameter
+     * @param repositoryString the list of repositories, split by spaces
+     * @return the list of repositories as dtos
+     * @throws ConfigurationException if the configuration could not be loaded
+     */
     private List<RepositoryDto> getRepositoryDtosForString(String repositoryString) throws ConfigurationException {
         if (config == null) {
             loadConfigReader();
@@ -135,7 +143,12 @@ public class PropertyManager {
         return repos;
     }
 
-    //TODO add javadoc
+    /**
+     * Returns the repository dto with the given name
+     * @param name the name of the repository
+     * @return the dto of the repository or null if none was found
+     * @throws ConfigurationException if the configuration could not be loaded
+     */
     public RepositoryDto getRepositoryByName(String name) throws ConfigurationException {
         if (config == null) {
             loadConfigReader();

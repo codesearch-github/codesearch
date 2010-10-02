@@ -7,30 +7,30 @@ package org.codesearch.indexer.tasks;
 import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.logging.Level;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
 import org.apache.lucene.index.CorruptIndexException;
-import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
-import org.codesearch.commons.configreader.xml.PropertyManager;
+import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
 import org.codesearch.indexer.exceptions.TaskExecutionException;
 
 /**
- *
+ * clears either the lucene index of all fields of a single repository or deletes the entire index
  * @author David Froehlich
  */
 public class ClearTask implements Task {
 
+    /** the location of the index */
     private String indexLocation;
+    /** the name of the repository whichs fields should be cleared or null if the entire index is to be deleted */
     private String repositoryName;
+    /** the searcher used to find the fields of the repository in the index */
     private IndexSearcher searcher;
-    private PropertyManager propertyManager;
+    /** the config reader used to retrieve the index location */
+    private XmlConfigurationReader configReader;
     private static final Logger LOG = Logger.getLogger(ClearTask.class);
-
 
     public String getRepositoryName() {
         return repositoryName;
@@ -44,18 +44,30 @@ public class ClearTask implements Task {
     public void execute() throws TaskExecutionException {
         try {
             if (indexLocation.equals("")) {
-                indexLocation = propertyManager.getSingleLinePropertyValue("index_location");
+                indexLocation = configReader.getSingleLinePropertyValue("index_location");
             }
-            searcher = new IndexSearcher(FSDirectory.open(new File(indexLocation)), false);
-            Term term = new Term("REPOSITORY", repositoryName);
-            deleteDocumentsFromIndexUsingTerm(term);
-            LOG.debug("Deleted " + searcher.getIndexReader().deleteDocuments(term) + " documents with repository " + repositoryName);
-        } catch (CorruptIndexException ex) {
-            LOG.error("CorruptedIndex: " + ex);
-        } catch (IOException ex) {
-            LOG.error("IOException while trying to open the index" + ex);
         } catch (ConfigurationException ex) {
             LOG.error("Could not retrieve value for index_location from configuration" + ex);
+        }
+        if (repositoryName == null) {
+            File indexDir = new File(indexLocation);
+            for(File f : indexDir.listFiles()){
+                if(!f.delete()){
+                    LOG.error("Could not delete file in index-directory: "+f.getName());
+                }
+            }
+        } else {
+            try {
+
+                searcher = new IndexSearcher(FSDirectory.open(new File(indexLocation)), false);
+                Term term = new Term("REPOSITORY", repositoryName);
+                deleteDocumentsFromIndexUsingTerm(term);
+                LOG.debug("Deleted " + searcher.getIndexReader().deleteDocuments(term) + " documents with repository " + repositoryName);
+            } catch (CorruptIndexException ex) {
+                LOG.error("CorruptedIndex: " + ex);
+            } catch (IOException ex) {
+                LOG.error("IOException while trying to open the index" + ex);
+            }
         }
     }
 
@@ -66,8 +78,8 @@ public class ClearTask implements Task {
      * @throws ParseException
      */
     public void deleteDocumentsFromIndexUsingTerm(Term term) throws IOException {
-		LOG.info("Deleting documents with field '" + term.field() + "' with text '" + term.text() + "'");
-		searcher.getIndexReader().deleteDocuments(term);
-                searcher.close();
-	}
+        LOG.info("Deleting documents with field '" + term.field() + "' with text '" + term.text() + "'");
+        searcher.getIndexReader().deleteDocuments(term);
+        searcher.close();
+    }
 }

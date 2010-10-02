@@ -13,7 +13,8 @@
         <module>commons</module>
         <module>indexer</module>
         <module>searcher</module>
-    </modules>
+    <module>FilesystemPlugin</module>
+  </modules>
 
     <!-- LIBRARY VERSIONS -->
     <properties>

@@ -24,8 +24,8 @@ import java.util.Date;
 import java.util.List;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
-import org.codesearch.commons.configreader.xml.PropertyManager;
-import org.codesearch.commons.configreader.xml.dto.JobDto;
+import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
+import org.codesearch.commons.configuration.xml.dto.JobDto;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
@@ -36,11 +36,9 @@ import org.quartz.SchedulerFactory;
 import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
 import org.quartz.impl.StdSchedulerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 
 /**
- * IndexingManager controls the scheduler used to execute the indexing jobs
+ * controls the scheduler used to execute the indexing jobs
  * @author Stiboller Stephan
  * @author David Froehlich
  */
@@ -51,14 +49,14 @@ public final class IndexingManager {
     /** The scheduler used to schedule the IndexingJobss */
     private Scheduler scheduler;
     /** The PropertyManager used to retrieve information from the configuration */
-    private PropertyManager pm;
+    private XmlConfigurationReader configReader;
 
     /**
      * Creates a new instance of IndexingManager
      * @throws SchedulerException In case the scheduler could not be instantiated
      */
     public IndexingManager() throws SchedulerException {
-        pm = new PropertyManager();
+        configReader = new XmlConfigurationReader();
         SchedulerFactory sf = new StdSchedulerFactory();
         scheduler = sf.getScheduler();
     }
@@ -88,7 +86,7 @@ public final class IndexingManager {
      */
     public void startScheduler() throws SchedulerException, ConfigurationException {
         LOG.debug("Starting scheduler");
-        List<JobDto> jobs = pm.getJobs();
+        List<JobDto> jobs = configReader.getJobs();
         int i = 0;
         LOG.info("Starting scheduler with " + jobs.size() + " jobs");
 

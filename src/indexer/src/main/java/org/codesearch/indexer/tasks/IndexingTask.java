@@ -37,16 +37,19 @@ import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.CorruptIndexException;
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.store.FSDirectory;
-import org.codesearch.commons.configreader.xml.PropertyManager;
-import org.codesearch.commons.configreader.xml.dto.RepositoryDto;
+import org.codesearch.commons.configuration.properties.PropertiesManager;
+import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
+import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 import org.codesearch.commons.constants.IndexConstants;
 import org.codesearch.commons.plugins.PluginLoader;
 import org.codesearch.commons.plugins.PluginLoaderException;
 import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
 import org.codesearch.commons.plugins.vcs.VersionControlPluginException;
-import org.codesearch.commons.propertyreader.properties.PropertiesReader;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -65,21 +68,24 @@ public class IndexingTask implements Task {
     private static final Logger LOG = Logger.getLogger(IndexingTask.class);
     /** The currently active IndexWriter */
     private IndexWriter indexWriter;
+    /** The indexReader used to delete documents */
+    private IndexReader indexReader;
     /** The index directory, contains all index files */
     private FSDirectory indexDirectory;
     /** The Version control Plugin */
     private VersionControlPlugin versionControlPlugin;
     /** The used PropertyReader */
-    private PropertiesReader propertiesReader;
+    private PropertiesManager propertiesReader;
     /** The PropertyManager used to get the configuration */
     @Autowired
-    private PropertyManager propertyManager;
+    private XmlConfigurationReader propertyManager;
     /** The plugin loader. */
     @Autowired
     private PluginLoader pluginLoader;
 
     /**
-     * Executes the task
+     * executes the task,
+     * updates the index fields of the set repository
      * @throws TaskExecutionException
      */
     @Override
@@ -89,12 +95,12 @@ public class IndexingTask implements Task {
             LOG.info("Starting execution of indexing task");
             indexLocation = propertyManager.getSingleLinePropertyValue("index-location");
             // Read the index status file
-            propertiesReader = new PropertiesReader(indexLocation + File.separator + "revisions.properties"); //TODO add propertiesReader path
+            propertiesReader = new PropertiesManager(indexLocation + File.separator + "revisions.properties"); //TODO add propertiesReader path
             // Get the version control plugins
             versionControlPlugin = pluginLoader.getPlugin(VersionControlPlugin.class, repository.getVersionControlSystem());
             versionControlPlugin.setRepository(new URI(repository.getUrl()), repository.getUsername(), repository.getPassword());
             fileNames = versionControlPlugin.getPathsForChangedFilesSinceRevision(propertiesReader.getPropertyFileValue(repository.getName()));
-            for(String s : fileNames){
+            for (String s : fileNames) {
                 LOG.info(s);
             }
             if (fileNames.isEmpty()) {
@@ -104,16 +110,16 @@ public class IndexingTask implements Task {
             initializeIndexWriter(new StandardAnalyzer(IndexConstants.LUCENE_VERSION), new File(indexLocation));
             createIndex();
             propertiesReader.setPropertyFileValue(repository.getName(), versionControlPlugin.getRepositoryRevision());
+        } catch (VersionControlPluginException ex) {
+            LOG.error("VersionControlPlugin files could not be retrieved: " + ex);
+        } catch (PluginLoaderException ex) {
+            LOG.error("VersionControlPlugin could not be loaded: " + ex);
         } catch (URISyntaxException ex) {
             LOG.error("Repository url could not be parsed to URI" + ex);
         } catch (FileNotFoundException ex) {
             LOG.error("Index not found at task execution" + ex);
         } catch (IOException ex) {
             LOG.error("IOException at execution of task: " + ex);
-        } catch (VersionControlPluginException ex) {
-            LOG.error("VersionControlPlugin files could not be retrieved: " + ex);
-        } catch (PluginLoaderException ex) {
-            LOG.error("VersionControlPlugin could not be loaded: " + ex);
         } catch (ConfigurationException ex) {
             LOG.error("Configuration could not be read " + ex);
         }
@@ -147,6 +153,8 @@ public class IndexingTask implements Task {
         try {
             indexDirectory = FSDirectory.open(dir);
             indexWriter = new IndexWriter(indexDirectory, luceneAnalyzer, IndexWriter.MaxFieldLength.LIMITED);
+            IndexSearcher searcher = new IndexSearcher(indexDirectory);
+            indexReader = searcher.getIndexReader();
             LOG.debug("IndexWriter initilaization successful: " + dir.getAbsolutePath());
         } catch (IOException ex) {
             LOG.error(ex);
@@ -174,6 +182,9 @@ public class IndexingTask implements Task {
                     // Add fields
                     doc = addLuceneFields(doc, path);
                     LOG.debug("Added file: " + doc.get("TITLE") + " to index.");
+                    Term term = new Term("TITLE", extractFilename(path));
+                    indexReader.deleteDocuments(term);
+
                     // Add document to the index
                     indexWriter.addDocument(doc);
                     i++;
@@ -231,11 +242,11 @@ public class IndexingTask implements Task {
         this.repository = repository;
     }
 
-    public PropertyManager getPropertyManager() {
+    public XmlConfigurationReader getPropertyManager() {
         return propertyManager;
     }
 
-    public void setPropertyManager(PropertyManager propertyManager) {
+    public void setPropertyManager(XmlConfigurationReader propertyManager) {
         this.propertyManager = propertyManager;
     }
 
@@ -243,11 +254,11 @@ public class IndexingTask implements Task {
         this.pluginLoader = pluginLoader;
     }
 
-    public PropertiesReader getPropertiesReader() {
+    public PropertiesManager getPropertiesReader() {
         return propertiesReader;
     }
 
-    public void setPropertiesReader(PropertiesReader propertiesReader) {
+    public void setPropertiesReader(PropertiesManager propertiesReader) {
         this.propertiesReader = propertiesReader;
     }
 }

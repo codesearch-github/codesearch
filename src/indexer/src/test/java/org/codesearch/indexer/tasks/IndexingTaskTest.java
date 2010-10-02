@@ -4,20 +4,17 @@
  */
 package org.codesearch.indexer.tasks;
 
-import org.junit.runner.RunWith;
 import org.springframework.context.ApplicationContext;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.codesearch.commons.propertyreader.properties.PropertiesReader;
-import org.codesearch.commons.configreader.xml.PropertyManager;
 import java.util.List;
 import java.util.LinkedList;
 import java.io.File;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
 import org.apache.lucene.util.Version;
-import org.codesearch.commons.configreader.xml.dto.RepositoryDto;
+import org.codesearch.commons.configuration.properties.PropertiesManager;
+import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
+import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -77,9 +74,9 @@ public class IndexingTaskTest {
      */
     @Test
     public void testExecute() throws Exception {
-        PropertyManager pm = new PropertyManager();
+        XmlConfigurationReader pm = new XmlConfigurationReader();
         List<RepositoryDto> repos = pm.getRepositories();
-        PropertiesReader pr = new PropertiesReader("/tmp/test/revisions.properties");
+        PropertiesManager pr = new PropertiesManager("/tmp/test/revisions.properties");
         
         for(RepositoryDto repo : repos){
             IndexingTask t = (IndexingTask) applicationContext.getBean("indexingTask");

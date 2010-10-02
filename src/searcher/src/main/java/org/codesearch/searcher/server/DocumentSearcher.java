@@ -37,7 +37,7 @@ import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
-import org.codesearch.commons.configreader.xml.PropertyManager;
+import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
 import org.codesearch.commons.constants.IndexConstants;
 import org.codesearch.searcher.shared.SearchResultDto;
 
@@ -65,9 +65,9 @@ public class DocumentSearcher {
      * @throws ConfigurationException if no value for the key specified in the constant INDEX_LOCATION_KEY could be found in the in the configuration via the PropertyManager
      * @throws IOException if the index could not be opened
      */
-    public DocumentSearcher(PropertyManager propertyManager) throws ConfigurationException {
+    public DocumentSearcher(XmlConfigurationReader configReader) throws ConfigurationException {
         // Retrieve index location from the configuration
-        indexLocation = propertyManager.getSingleLinePropertyValue(INDEX_LOCATION_KEY);
+        indexLocation = configReader.getSingleLinePropertyValue(INDEX_LOCATION_KEY);
         LOG.debug("Index location set to: " + indexLocation);
         //TODO replace with appropriate Analyzer
         queryParser = new QueryParser(Version.LUCENE_30, "", new StandardAnalyzer(Version.LUCENE_30));

@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.codesearch.commons.configreader.xml.dto;
+package org.codesearch.commons.configuration.xml.dto;
 
 import java.util.List;
 

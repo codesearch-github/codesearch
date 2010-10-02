@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.codesearch.commons.propertyreader.properties;
+package org.codesearch.commons.configuration.properties;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -28,30 +28,24 @@ import java.io.IOException;
 import java.util.Properties;
 
 /**
- * PropertiesReader is a class that provides several methods to access property files.
+ * PropertiesManager is a class that provides several methods to access property files.
  * It is a simple wrapper to the standard java Properties utility.
  * @author Stephan Stiboller
  */
-public class PropertiesReader {
+public class PropertiesManager {
 
-    /** The internally used Property file. */
+    /** The used Property file. */
     private Properties properties = new Properties();
     /** The property file location. */
     private String propertyFileLocation;
 
     /**
-     * Creates a new instance of PropertyManager
+     * Creates a new instance of PropertiesManager
      * @param the location of the property file
      */
-    public PropertiesReader(final String propertyFileLocation) throws IOException {
+    public PropertiesManager(final String propertyFileLocation) throws IOException {
         this.propertyFileLocation = propertyFileLocation;
         initProperties();
-    }
-
-    /**
-     * Creates a new instance of PropertyManager
-     */
-    public PropertiesReader() {
     }
 
     /**
@@ -60,11 +54,9 @@ public class PropertiesReader {
      * @param value
      */
     public String getPropertyFileValue(final String key) {
-//        return properties.getProperty(key);
-//TODO I dont think this belongs here
         String retString = properties.getProperty(key);
         if (retString == null) {
-            retString = "0"; //TODO add handling for version control systems that don't use numbers for revisions
+            retString = "0";
         }
         return retString;
     }

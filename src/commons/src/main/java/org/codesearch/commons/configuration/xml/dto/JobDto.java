@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.codesearch.commons.configreader.xml.dto;
+package org.codesearch.commons.configuration.xml.dto;
 
 import java.util.Calendar;
 import java.util.LinkedList;
@@ -38,23 +38,12 @@ public class JobDto {
     private Calendar startDate;
     /** The interval in which the job will be executed in minutes */
     private int interval;
-    /** The set of all repositories associated with this job, so an indexing task in this job would only create the index for these repositories, a clear task however clears the entire index */
- //   private Set<String> repositoryNames;
-
     /**
      * Creates a new instance of JobDto
      */
     public JobDto() {
         tasks = new LinkedList<TaskDto>();
     }
-
-//    public Set<String> getRepositoryNames() {
-//        return repositoryNames;
-//    }
-//
-//    public void setRepositoryNames(Set<String> repositoryNames) {
-//        this.repositoryNames = repositoryNames;
-//    }
 
     public int getInterval() {
         return interval;
