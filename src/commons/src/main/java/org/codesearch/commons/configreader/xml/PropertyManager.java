@@ -68,44 +68,44 @@ public class PropertyManager {
             loadConfigReader();
         }
         //read the configuration for the jobs from the config
-        List<HierarchicalConfiguration> jobConfig = config.configurationsAt("index_jobs.index_job");
+        List<HierarchicalConfiguration> jobConfig = config.configurationsAt(ConfigReaderConstants.INDEX_JOB);
         for (HierarchicalConfiguration hc : jobConfig) {
             //reads job specific values and adds them to the JobDto
             try {
                 JobDto job = new JobDto();
                 int interval;
                 try {
-                    interval = hc.getInt("interval");
+                    interval = hc.getInt(ConfigReaderConstants.JOB_INTERVAL);
                 } catch (NoSuchElementException ex) {
                     //in case no interval was specified the job is set to execute only once
                     interval = 0;
                 }
                 //The start time is stored as a single string seperated by '-' e.g.: YYYY-MM-DD-HH-MM
-                String timeString = hc.getString("start");
+                String timeString = hc.getString(ConfigReaderConstants.JOB_START_DATE);
                 Calendar calc;
                 if (timeString == null) {
                     calc = GregorianCalendar.getInstance();
                 } else {
 
-                    String[] timeParts = hc.getString("start").split("-");
+                    String[] timeParts = timeString.split("-");
                     calc = new GregorianCalendar(Integer.parseInt(timeParts[0]), Integer.parseInt(timeParts[1]) - 1,
                             Integer.parseInt(timeParts[2]), Integer.parseInt(timeParts[3]), Integer.parseInt(timeParts[4]));
                 }
                 job.setInterval(interval);
                 job.setStartDate(calc);
 
-                String repositoryString = hc.getString("repositories");
+                String repositoryString = hc.getString(ConfigReaderConstants.JOB_REPOSITORY);
                 //The list of repositories this job is associated with, each task specified in the configuration is created for each of these repositories
                 List<RepositoryDto> repositoriesForJob = getRepositoryDtosForString(repositoryString);
                 //Read the tasks per job from the configuration
-                List<SubnodeConfiguration> subConf = hc.configurationsAt("tasks.task");
+                List<SubnodeConfiguration> subConf = hc.configurationsAt(ConfigReaderConstants.TASK_LIST);
                 List<TaskDto> tasks = new LinkedList<TaskDto>();
 
                 for (SubnodeConfiguration sc : subConf) {
                     TaskType type = null;
-                    if (sc.getString("type").equals("index")) { //TODO replace with a more generic method
+                    if (sc.getString(ConfigReaderConstants.TASK_TYPE).equals("index")) { //TODO replace with a more generic method
                         type = TaskType.index;
-                    } else if (sc.getString("type").equals("clear")) {
+                    } else if (sc.getString(ConfigReaderConstants.TASK_TYPE).equals("clear")) {
                         type = TaskType.clear;
                     }
                     for (RepositoryDto repository : repositoriesForJob) {
@@ -141,15 +141,20 @@ public class PropertyManager {
             loadConfigReader();
         }
         RepositoryDto repo = null;
-        List<HierarchicalConfiguration> repositories = config.configurationsAt("repositories.repository");
+        List<HierarchicalConfiguration> repositories = config.configurationsAt(ConfigReaderConstants.REPOSITORY_LIST);
         for (HierarchicalConfiguration hc : repositories) {
-            if (hc.getString("name").equals(name)) {
-                List<String> ignoredFileNames = hc.getList("not_indexed_filenames.filename");
+            if (hc.getString(ConfigReaderConstants.REPOSITORY_NAME).equals(name)) {
+                List<String> ignoredFileNames = hc.getList(ConfigReaderConstants.REPOSITORY_BLACKLIST);
                 if (ignoredFileNames == null) {
                     ignoredFileNames = new LinkedList<String>();
                 }
                 ignoredFileNames.addAll(getGloballyIgnoredFileNames());
-                repo = new RepositoryDto(name, hc.getString("url"), hc.getString("username"), hc.getString("password"), hc.getBoolean("codeNavigationEnabled"), hc.getString("version_control_system"), ignoredFileNames);
+                repo = new RepositoryDto(name, hc.getString(ConfigReaderConstants.REPOSITORY_URL), 
+                        hc.getString(ConfigReaderConstants.REPOSITORY_USERNAME),
+                        hc.getString(ConfigReaderConstants.REPOSITORY_PASSWORD),
+                        hc.getBoolean(ConfigReaderConstants.REPOSITORY_CODE_NAVIGATION_ENABLED),
+                        hc.getString(ConfigReaderConstants.REPOSITORY_VCS),
+                        ignoredFileNames);
             }
         }
         return repo;
@@ -159,7 +164,7 @@ public class PropertyManager {
         if (config == null) {
             loadConfigReader();
         }
-        return config.getList("globally_ignored_filenames.filename");
+        return config.getList(ConfigReaderConstants.GLOBAL_BLACKLIST);
     }
 
     /**
@@ -173,16 +178,16 @@ public class PropertyManager {
             loadConfigReader();
         }
         List<RepositoryDto> repositories = new LinkedList<RepositoryDto>();
-        List<HierarchicalConfiguration> repositoryConfigs = config.configurationsAt("repositories.repository");
+        List<HierarchicalConfiguration> repositoryConfigs = config.configurationsAt(ConfigReaderConstants.REPOSITORY_LIST);
         for (HierarchicalConfiguration repositoryConfig : repositoryConfigs) {
             RepositoryDto repositoryDto = new RepositoryDto();
-            repositoryDto.setVersionControlSystem(repositoryConfig.getString("version_control_system"));
-            repositoryDto.setName(repositoryConfig.getString("name"));
-            repositoryDto.setUrl(repositoryConfig.getString("url"));
-            repositoryDto.setUsername(repositoryConfig.getString("username"));
-            repositoryDto.setPassword(repositoryConfig.getString("password"));
-            repositoryDto.setCodeNavigationEnabled(repositoryConfig.getBoolean("codeNavigationEnabled"));
-            List<String> ignoredFileNames = repositoryConfig.getList("not_indexed_filenames.filename");
+            repositoryDto.setVersionControlSystem(repositoryConfig.getString(ConfigReaderConstants.REPOSITORY_VCS));
+            repositoryDto.setName(repositoryConfig.getString(ConfigReaderConstants.REPOSITORY_NAME));
+            repositoryDto.setUrl(repositoryConfig.getString(ConfigReaderConstants.REPOSITORY_URL));
+            repositoryDto.setUsername(repositoryConfig.getString(ConfigReaderConstants.REPOSITORY_USERNAME));
+            repositoryDto.setPassword(repositoryConfig.getString(ConfigReaderConstants.REPOSITORY_PASSWORD));
+            repositoryDto.setCodeNavigationEnabled(repositoryConfig.getBoolean(ConfigReaderConstants.REPOSITORY_CODE_NAVIGATION_ENABLED));
+            List<String> ignoredFileNames = repositoryConfig.getList(ConfigReaderConstants.REPOSITORY_BLACKLIST);
             if (ignoredFileNames == null) {
                 ignoredFileNames = new LinkedList<String>();
             }
