@@ -131,16 +131,11 @@ public class IndexingTask implements Task {
      * @return document with added lucene fields
      */
     public Document addLuceneFields(Document doc, String path) throws VersionControlPluginException {
-        doc.add(new Field("TITLE", extractFilename(path), Field.Store.YES, Field.Index.NOT_ANALYZED));
-        doc.add(new Field("CONTENT", versionControlPlugin.getFileContentForFilePath(path), Field.Store.YES, Field.Index.ANALYZED));
-        doc.add(new Field("REPOSITORY", repository.getName(), Field.Store.YES, Field.Index.NOT_ANALYZED));
-        try {
-            doc.add(new Field("REVISION", versionControlPlugin.getRepositoryRevision(), Field.Store.YES, Field.Index.ANALYZED));
-        } catch (VersionControlPluginException ex) {
-            LOG.error("Failed trying to retrieve the current repository revision: " + ex);
-        } catch (Exception ex) {
-            LOG.error("Unexpected Exception occured while adding lucene fields to " + ex);
-        }
+        doc.add(new Field(IndexConstants.INDEX_FIELD_TITLE, extractFilename(path), Field.Store.YES, Field.Index.NOT_ANALYZED));
+        doc.add(new Field(IndexConstants.INDEX_FIELD_FILEPATH, path, Field.Store.YES, Field.Index.NOT_ANALYZED));
+        doc.add(new Field(IndexConstants.INDEX_FIELD_CONTENT, versionControlPlugin.getFileContentForFilePath(path), Field.Store.YES, Field.Index.ANALYZED));
+        doc.add(new Field(IndexConstants.INDEX_FIELD_REPOSITORY, repository.getName(), Field.Store.YES, Field.Index.NOT_ANALYZED));
+        doc.add(new Field(IndexConstants.INDEX_FIELD_REVISION, versionControlPlugin.getRepositoryRevision(), Field.Store.YES, Field.Index.NOT_ANALYZED));
         return doc;
     }
 

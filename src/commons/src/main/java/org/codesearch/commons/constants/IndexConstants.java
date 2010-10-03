@@ -18,20 +18,25 @@
  * You should have received a copy of the GNU General Public License
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.codesearch.commons.constants;
 
 import org.apache.lucene.util.Version;
 
 /**
- * Holds the values for constants associated with the indexer
  * @author Stephan Stiboller
  * @author David Froehlich
  */
 public final class IndexConstants {
-
-    /** Lucene version used */
+      /** Lucene version used */
     public static final Version LUCENE_VERSION = Version.LUCENE_30;
-
-    private IndexConstants() {
+    public static final String INDEX_FIELD_REPOSITORY="repository";
+    public static final String INDEX_FIELD_FILEPATH="filepath";
+    public static final String INDEX_FIELD_CONTENT="content";
+    public static final String INDEX_FIELD_TITLE="title";
+    public static final String INDEX_FIELD_REVISION="revision";
+    
+    private IndexConstants(){
+        
     }
 }
