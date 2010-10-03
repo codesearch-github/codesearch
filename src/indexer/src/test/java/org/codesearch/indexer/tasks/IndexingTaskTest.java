@@ -63,7 +63,7 @@ public class IndexingTaskTest {
         ignoredFileNames.add("*.xml");
         ignoredFileNames.add("*test*");
         ignoredFileNames.add("*/test/*");
-        task.setRepository(new RepositoryDto(null, null, null, null, false, null, ignoredFileNames));
+        task.setRepository(new RepositoryDto(null, null, null, null, false, null, ignoredFileNames,null));
         assert (task.fileIsOnIgnoreList("asdf.xml"));
         assert (task.fileIsOnIgnoreList("asdftestasdf"));
         assert (task.fileIsOnIgnoreList("/test/fasdf"));

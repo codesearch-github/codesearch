@@ -20,6 +20,7 @@
  */
 package org.codesearch.commons.configuration.xml;
 
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.LinkedList;
@@ -160,13 +161,18 @@ public class XmlConfigurationReader {
                 if (ignoredFileNames == null) {
                     ignoredFileNames = new LinkedList<String>();
                 }
+                List<String> repositoryGroups = hc.getList(ConfigReaderConstants.REPOSITORY_BLACKLIST);
+                if (repositoryGroups == null) {
+                    repositoryGroups = new LinkedList<String>();
+                }
                 ignoredFileNames.addAll(getGloballyIgnoredFileNames());
                 repo = new RepositoryDto(name, hc.getString(ConfigReaderConstants.REPOSITORY_URL), 
                         hc.getString(ConfigReaderConstants.REPOSITORY_USERNAME),
                         hc.getString(ConfigReaderConstants.REPOSITORY_PASSWORD),
                         hc.getBoolean(ConfigReaderConstants.REPOSITORY_CODE_NAVIGATION_ENABLED),
                         hc.getString(ConfigReaderConstants.REPOSITORY_VCS),
-                        ignoredFileNames);
+                        ignoredFileNames,
+                        repositoryGroups);
             }
         }
         return repo;
@@ -205,9 +211,28 @@ public class XmlConfigurationReader {
             }
             ignoredFileNames.addAll(this.getGloballyIgnoredFileNames());
             repositoryDto.setIgnoredFileNames(ignoredFileNames);
+            List<String> repositoryGroups = repositoryConfig.getList(ConfigReaderConstants.REPOSITORY_GROUPS);
+            if(repositoryGroups == null){
+                repositoryGroups = new LinkedList<String>();
+            }
+            repositoryDto.setRepositoryGroups(repositoryGroups);
             repositories.add(repositoryDto);
         }
         return repositories;
+    }
+
+    /**
+     * Retrieves all existing Repository groups 
+     * @return list of all repo groups
+     * @throws ConfigurationException
+     */
+    public List<String> getRepositoryGroups() throws ConfigurationException {
+        if (config == null) {
+            loadConfigReader();
+        }
+        List<String> groups = new LinkedList<String>();
+        groups = Arrays.asList(config.getString(ConfigReaderConstants.REPOSITORY_GROUP_LIST).split(","));
+        return groups;
     }
 
     /**

@@ -43,6 +43,8 @@ public class RepositoryDto {
     private String versionControlSystem;
     /** A list of all file names (in regex) that will not be indexed in this repository */
     private List<String> ignoredFileNames;
+    /** A list of repository groups this repositorie belongs to */
+    private List<String> repositoryGroups;
 
     public RepositoryDto() {
     }
@@ -54,7 +56,7 @@ public class RepositoryDto {
      * @param codeNavigationEnabled specifies whether the repository should have the additional
      * indexes for the code navigation
      */
-    public RepositoryDto(String name, String url, String username, String password, boolean codeNavigationEnabled, String versionControlSystem, List<String> ignoredFileNames) {
+    public RepositoryDto(String name, String url, String username, String password, boolean codeNavigationEnabled, String versionControlSystem, List<String> ignoredFileNames, List<String> repositoryGroups) {
         this.name = name;
         this.url = url;
         this.username = username;
@@ -62,6 +64,7 @@ public class RepositoryDto {
         this.codeNavigationEnabled = codeNavigationEnabled;
         this.versionControlSystem = versionControlSystem;
         this.ignoredFileNames = ignoredFileNames;
+        this.repositoryGroups = repositoryGroups;
     }
 
     public List<String> getIgnoredFileNames() {
@@ -120,6 +123,35 @@ public class RepositoryDto {
         this.versionControlSystem = versionControlSystem;
     }
 
+     /**
+     * @return the repositoryGroups
+     */
+    public List<String> getRepositoryGroups() {
+        return repositoryGroups;
+    }
+
+    /**
+     * Return the repository list as a single string
+     * the groups are spearated with a whitespace
+     * @return repository list as a single string separated by whitspaces
+     */
+    public String getRepositoryGroupsAsString()
+    {
+        String repoString = "";
+        for(String repo : repositoryGroups)
+        {
+            repoString += repo + " ";
+        }
+        return repoString;
+    }
+
+    /**
+     * @param repositoryGroups the repositoryGroups to set
+     */
+    public void setRepositoryGroups(List<String> repositoryGroups) {
+        this.repositoryGroups = repositoryGroups;
+    }
+    
     /**
      * compares this RepositoryDto with the given one
      * @param o the RepositoryDto to compare
@@ -142,4 +174,6 @@ public class RepositoryDto {
             return false;
         }
     }
+
+   
 }

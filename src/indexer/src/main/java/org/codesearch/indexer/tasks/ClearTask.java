@@ -13,6 +13,7 @@ import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.store.FSDirectory;
+import org.codesearch.commons.configuration.xml.ConfigReaderConstants;
 import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
 import org.codesearch.indexer.exceptions.TaskExecutionException;
 
@@ -44,7 +45,7 @@ public class ClearTask implements Task {
     public void execute() throws TaskExecutionException {
         try {
             if (indexLocation.equals("")) {
-                indexLocation = configReader.getSingleLinePropertyValue("index_location");
+                indexLocation = configReader.getSingleLinePropertyValue(ConfigReaderConstants.INDEX_LOCATION);
             }
         } catch (ConfigurationException ex) {
             LOG.error("Could not retrieve value for index_location from configuration" + ex);

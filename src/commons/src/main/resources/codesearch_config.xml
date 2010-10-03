@@ -46,7 +46,7 @@
         </index-job> 
     </index-jobs>
     <testproperty>fdsa</testproperty>
-    <repository-groups>group1,group2</repository-groups>
+    <repository-groups>group1 group2 group3 group4</repository-groups>
     <repositories>
         <repository>
             <repo-group>group1</repo-group>
@@ -59,6 +59,12 @@
             <blacklist-filenames>
                 <filename>*.xml</filename>
             </blacklist-filenames>
+            <repository-groups>
+                <repo-group>group1</repo-group>
+                <repo-group>group2</repo-group>
+                <repo-group>group3</repo-group>
+                <repo-group>group4</repo-group>
+            </repository-groups>
         </repository>
     </repositories>
 </root>

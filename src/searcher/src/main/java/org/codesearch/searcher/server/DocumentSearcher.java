@@ -37,6 +37,7 @@ import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
+import org.codesearch.commons.configuration.xml.ConfigReaderConstants;
 import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
 import org.codesearch.commons.constants.IndexConstants;
 import org.codesearch.searcher.shared.SearchResultDto;
@@ -47,8 +48,6 @@ import org.codesearch.searcher.shared.SearchResultDto;
  */
 public class DocumentSearcher {
 
-    /** the key with which the location of the index is stored in the configuration file */
-    public static final String INDEX_LOCATION_KEY = "indexLocation";
     /** The logger. */
     private static final Logger LOG = Logger.getLogger(DocumentSearcher.class);
     /** The parser used for parsing search terms to lucene queries */
@@ -67,7 +66,7 @@ public class DocumentSearcher {
      */
     public DocumentSearcher(XmlConfigurationReader configReader) throws ConfigurationException {
         // Retrieve index location from the configuration
-        indexLocation = configReader.getSingleLinePropertyValue(INDEX_LOCATION_KEY);
+        indexLocation = configReader.getSingleLinePropertyValue(ConfigReaderConstants.INDEX_LOCATION);
         LOG.debug("Index location set to: " + indexLocation);
         //TODO replace with appropriate Analyzer
         queryParser = new QueryParser(Version.LUCENE_30, "", new StandardAnalyzer(Version.LUCENE_30));

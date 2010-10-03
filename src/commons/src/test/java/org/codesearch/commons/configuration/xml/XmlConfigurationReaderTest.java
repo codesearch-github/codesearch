@@ -18,7 +18,6 @@
  * You should have received a copy of the GNU General Public License
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.codesearch.commons.configuration.xml;
 
 import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
@@ -41,8 +40,8 @@ import static org.junit.Assert.*;
 //@ContextConfiguration(loader = GenericXmlContextLoader.class, locations = {"classpath:org/codesearch/commons/CodesearchCommonsBeans.xml"})
 public class XmlConfigurationReaderTest {
 
- //   TODO use spring injection
- //   @Autowired
+    //   TODO use spring injection
+    //   @Autowired
     private XmlConfigurationReader configReader = new XmlConfigurationReader();
 
     public XmlConfigurationReaderTest() {
@@ -50,7 +49,6 @@ public class XmlConfigurationReaderTest {
 
     @Before
     public void setUp() {
-        configReader.setConfigpath("/home/david/codesearch/src/commons/src/test/resources/codesearch_config.xml");
     }
 
     @After
@@ -62,18 +60,23 @@ public class XmlConfigurationReaderTest {
      */
     @Test
     public void testGetRepositories() throws Exception {
-       // TODO update unit test
+        // TODO update unit test
         System.out.println("getRepositories");
         List<String> ignFileNames1 = new LinkedList<String>();
+        List<String> repoGroups1 = new LinkedList<String>();
+        repoGroups1.add("group1");
         ignFileNames1.add("*.xml");
         ignFileNames1.add("*.jpg");
         ignFileNames1.add("*.txt");
-        RepositoryDto repo1 = new RepositoryDto("svnsearch_repo", "svn://portal.htl-kaindorf.at/svnsearch", "feldruebe", "dota!123", true, "SVN", ignFileNames1);
+        RepositoryDto repo1 = new RepositoryDto("svnsearch_repo", "svn://portal.htl-kaindorf.at/svnsearch", "feldruebe", "dota!123", true, "SVN", ignFileNames1, repoGroups1);
 
         List<String> ignFileNames2 = new LinkedList<String>();
+        List<String> repoGroups2 = new LinkedList<String>();
+        repoGroups2.add("group2");
+        repoGroups2.add("group2.2");
         ignFileNames2.add("*.jpg");
         ignFileNames2.add("*.txt");
-        RepositoryDto repo2 = new RepositoryDto("testRepo2", "http://test.org", "testUser", "testPassword", false, "SVN", ignFileNames2);
+        RepositoryDto repo2 = new RepositoryDto("testRepo2", "http://test.org", "testUser", "testPassword", false, "SVN", ignFileNames2, repoGroups2);
 
         List result = configReader.getRepositories();
         assertTrue(repo1.equals(result.get(0)));
@@ -101,19 +104,24 @@ public class XmlConfigurationReaderTest {
         JobDto job1 = new JobDto();
 
         RepositoryDto testRepo1;
+        List<String> repoGroups1 = new LinkedList<String>();
         List<String> ignoredFiles1 = new LinkedList<String>();
+        repoGroups1.add("group1");
+        repoGroups1.add("group1.1");
         ignoredFiles1.add("*.xml");
         ignoredFiles1.add("*.jpg");
         ignoredFiles1.add("*.txt");
 
-        
-        testRepo1 = new RepositoryDto("svnsearch_repo", "svn://portal.htl-kaindorf.at/svnsearch", "feldruebe", "dota!123", true, "SVN", ignoredFiles1);
+
+        testRepo1 = new RepositoryDto("svnsearch_repo", "svn://portal.htl-kaindorf.at/svnsearch", "feldruebe", "dota!123", true, "SVN", ignoredFiles1, repoGroups1);
         RepositoryDto testRepo2;
         List<String> ignoredFiles2 = new LinkedList<String>();
+        List<String> repoGroups2 = new LinkedList<String>();
+        repoGroups2.add("group2");
         ignoredFiles2.add("*.jpg");
         ignoredFiles2.add("*.txt");
 
-        testRepo2 = new RepositoryDto("testRepo2", "http://test.org", "testUser", "testPassword", false, "SVN", ignoredFiles2);
+        testRepo2 = new RepositoryDto("testRepo2", "http://test.org", "testUser", "testPassword", false, "SVN", ignoredFiles2, repoGroups2);
 
         job1.getTasks().add(new TaskDto(testRepo1, TaskDto.TaskType.index));
         job1.getTasks().add(new TaskDto(testRepo2, TaskDto.TaskType.index));
@@ -131,15 +139,16 @@ public class XmlConfigurationReaderTest {
         assert (result.get(0).equals(job1));
         assert (result.get(1).equals(job2));
     }
-    
+
     @Test
     public void testGetRepositoryByName() throws Exception {
         System.out.println("getRepositoryByName");
         List<String> ignoredFiles = new LinkedList<String>();
+        List<String> repoGroups = new LinkedList<String>();
         ignoredFiles.add("*.xml");
         ignoredFiles.add("*.jpg");
         ignoredFiles.add("*.txt");
-        RepositoryDto expResult = new RepositoryDto("testRepo1", "http://test.org", "testUser", "testPassword", true, "SVN", ignoredFiles);
+        RepositoryDto expResult = new RepositoryDto("testRepo1", "http://test.org", "testUser", "testPassword", true, "SVN", ignoredFiles, repoGroups);
         RepositoryDto result = configReader.getRepositoryByName("testRepo1");
     }
 

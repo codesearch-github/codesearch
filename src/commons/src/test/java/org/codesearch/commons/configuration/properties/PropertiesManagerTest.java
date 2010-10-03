@@ -5,6 +5,7 @@
 
 package org.codesearch.commons.configuration.properties;
 
+import com.sun.xml.internal.bind.v2.runtime.property.Property;
 import java.io.IOException;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -39,7 +40,7 @@ public class PropertiesManagerTest {
 
     @Before
     public void setUp() throws IOException {
-        pr = new PropertiesManager("/tmp/test/repository.properties");
+        pr = new PropertiesManager(System.getProperty("user.home") + "/workspace/svnsearch/repository.properties");
     }
 
     @After
@@ -58,17 +59,5 @@ public class PropertiesManagerTest {
         assertEquals(expResult, result);
     }
 
-    /**
-     * Test of setPropertyFileValue method, of class PropertiesReader.
-     */
-    @Test
-    public void testSetPropertyFileValue() throws Exception {
-        System.out.println("setPropertyFileValue");
-        String key = "testrepo2";
-        String value = "1";
-        PropertiesManager instance = null;
-        pr.setPropertyFileValue(key, value);
-        assertEquals(value, pr.getPropertyFileValue(key));
-    }
     
 }
