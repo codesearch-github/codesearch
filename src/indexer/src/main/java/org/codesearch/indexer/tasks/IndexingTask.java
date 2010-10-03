@@ -22,6 +22,7 @@ package org.codesearch.indexer.tasks;
 
 import java.io.FileNotFoundException;
 import java.net.URISyntaxException;
+import java.util.logging.Level;
 import org.apache.commons.configuration.ConfigurationException;
 import org.codesearch.indexer.exceptions.TaskExecutionException;
 import java.io.File;
@@ -100,14 +101,16 @@ public class IndexingTask implements Task {
             versionControlPlugin = pluginLoader.getPlugin(VersionControlPlugin.class, repository.getVersionControlSystem());
             versionControlPlugin.setRepository(new URI(repository.getUrl()), repository.getUsername(), repository.getPassword());
             fileNames = versionControlPlugin.getPathsForChangedFilesSinceRevision(propertiesReader.getPropertyFileValue(repository.getName()));
-            for (String s : fileNames) {
-                LOG.info(s);
-            }
+
             if (fileNames.isEmpty()) {
                 LOG.info("Index of repository " + repository.getName() + " is up to date");
                 return;
             }
-            initializeIndexWriter(new StandardAnalyzer(IndexConstants.LUCENE_VERSION), new File(indexLocation));
+            File dir = new File(indexLocation);
+            indexDirectory = FSDirectory.open(dir);
+
+            clearPreviousDocuments();
+            initializeIndexWriter(new StandardAnalyzer(IndexConstants.LUCENE_VERSION), dir);
             createIndex();
             propertiesReader.setPropertyFileValue(repository.getName(), versionControlPlugin.getRepositoryRevision());
         } catch (VersionControlPluginException ex) {
@@ -147,10 +150,7 @@ public class IndexingTask implements Task {
      */
     public void initializeIndexWriter(Analyzer luceneAnalyzer, File dir) {
         try {
-            indexDirectory = FSDirectory.open(dir);
             indexWriter = new IndexWriter(indexDirectory, luceneAnalyzer, IndexWriter.MaxFieldLength.LIMITED);
-            IndexSearcher searcher = new IndexSearcher(indexDirectory);
-            indexReader = searcher.getIndexReader();
             LOG.debug("IndexWriter initilaization successful: " + dir.getAbsolutePath());
         } catch (IOException ex) {
             LOG.error(ex);
@@ -161,7 +161,7 @@ public class IndexingTask implements Task {
     /**
      * Creates an index for the given Directory.
      */
-    public boolean createIndex() throws VersionControlPluginException, CorruptIndexException, IOException {
+    private boolean createIndex() throws VersionControlPluginException, CorruptIndexException, IOException {
         if (indexWriter == null) {
             LOG.error("Creation of indexDirectory failed due to missing initialization of IndexWriter!");
             return false;
@@ -177,10 +177,7 @@ public class IndexingTask implements Task {
                     doc = new Document();
                     // Add fields
                     doc = addLuceneFields(doc, path);
-                    LOG.debug("Added file: " + doc.get("TITLE") + " to index.");
-                    Term term = new Term("TITLE", extractFilename(path));
-                    indexReader.deleteDocuments(term);
-
+                    LOG.debug("Added file: " + doc.get(IndexConstants.INDEX_FIELD_TITLE) + " to index.");
                     // Add document to the index
                     indexWriter.addDocument(doc);
                     i++;
@@ -197,6 +194,25 @@ public class IndexingTask implements Task {
             LOG.error("NullPointerException: FileContentDirectory is empty!" + ex);
         }
         return true;
+    }
+
+    /**
+     * removes all documents from the index that will be replaced by updated documents
+     */
+    private void clearPreviousDocuments() throws CorruptIndexException, IOException {
+        IndexSearcher searcher = null;
+        try {
+            searcher = new IndexSearcher(indexDirectory, false);
+        } catch (IOException ex) {
+            //In case no index was found no documents have to be deleted
+            return;
+        }
+        indexReader = searcher.getIndexReader();
+        for (String path : fileNames) {
+            Term term = new Term(IndexConstants.INDEX_FIELD_FILEPATH, path);
+            indexReader.deleteDocuments(term);
+        }
+        indexReader.close();
     }
 
     /**
@@ -221,7 +237,7 @@ public class IndexingTask implements Task {
      * @return the regex pattern string
      */
     private String parseRegexString(String string) {
-        String retString = string.replace("*", ".*");
+        String retString = string.replace(".", "\\.").replace("*", ".*");
         return retString;
     }
 
@@ -237,7 +253,7 @@ public class IndexingTask implements Task {
     public void setRepository(RepositoryDto repository) {
         this.repository = repository;
     }
-    
+
     public void setPluginLoader(PluginLoader pluginLoader) {
         this.pluginLoader = pluginLoader;
     }

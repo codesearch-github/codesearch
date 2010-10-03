@@ -26,6 +26,11 @@
     <global-blacklist-filenames>
         <filename>*.jpg</filename>
         <filename>*.txt</filename>
+        <filename>*.PNG</filename>
+        <filename>*.png</filename>
+        <filename>*img*</filename>
+        <filename>*.svn*</filename>
+
     </global-blacklist-filenames>
     <index-location>/tmp/test</index-location>
     <index-jobs>
@@ -65,6 +70,15 @@
                 <repo-group>group3</repo-group>
                 <repo-group>group4</repo-group>
             </repository-groups>
+        </repository>
+        <repository>
+            <repo-group>group1</repo-group>
+            <name>svn_local</name>
+            <version-control-system>FILESYSTEM</version-control-system>
+            <username>null</username>
+            <password>null</password>
+            <url>$home/workspace/svnsearch</url>
+            <code-navigation-enabled>true</code-navigation-enabled>
         </repository>
     </repositories>
 </root>

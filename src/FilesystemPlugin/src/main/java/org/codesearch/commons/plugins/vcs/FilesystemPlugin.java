@@ -6,19 +6,18 @@ package org.codesearch.commons.plugins.vcs;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.springframework.stereotype.Component;
 
 /**
  * A VersionControlPlugin used to access files from the file system
  * @author David Froehlich
  */
+@Component
 public class FilesystemPlugin implements VersionControlPlugin {
 
     /** the folder where all code files are located */

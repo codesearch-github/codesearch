@@ -24,13 +24,13 @@ import org.codesearch.indexer.exceptions.TaskExecutionException;
 public class ClearTask implements Task {
 
     /** the location of the index */
-    private String indexLocation;
+    private String indexLocation = "";
     /** the name of the repository whichs fields should be cleared or null if the entire index is to be deleted */
     private String repositoryName;
     /** the searcher used to find the fields of the repository in the index */
     private IndexSearcher searcher;
     /** the config reader used to retrieve the index location */
-    private XmlConfigurationReader configReader;
+    private XmlConfigurationReader configReader = new XmlConfigurationReader();
     private static final Logger LOG = Logger.getLogger(ClearTask.class);
 
     public String getRepositoryName() {

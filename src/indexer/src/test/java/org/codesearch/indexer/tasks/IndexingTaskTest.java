@@ -82,7 +82,6 @@ public class IndexingTaskTest {
         for (RepositoryDto repo : repos) {
             if (!repo.getVersionControlSystem().equals("FILESYTEM")) {
                 IndexingTask t = (IndexingTask) applicationContext.getBean("indexingTask");
-                pr.setPropertyFileValue(repo.getName(), "0");
                 t.setRepository(repo);
                 t.execute();
             }
@@ -97,6 +96,7 @@ public class IndexingTaskTest {
 
         ClearTask clear = new ClearTask();
         clear.setRepositoryName(null);
+
         clear.execute();
         for (RepositoryDto repo : repos) {
             if (repo.getVersionControlSystem().equals("FILESYSTEM")) {
@@ -107,17 +107,6 @@ public class IndexingTaskTest {
                 t.execute();
             }
         }
-    }
-
-    /**
-     * Test of initializeIndexWriter method, of class IndexingTask.
-     */
-    @Test
-    public void testInitializeIndexWriter() {
-        System.out.println("initializeIndexWriter");
-        Analyzer luceneAnalyzer = new StandardAnalyzer(Version.LUCENE_30);
-        File dir = null;
-        task.initializeIndexWriter(luceneAnalyzer, dir);
     }
 
     /**

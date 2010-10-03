@@ -34,7 +34,7 @@ public class ConfigReaderConstants {
     /** Used to access globally blacklisted filenames in the xml-config file */
     public static final String GLOBAL_BLACKLIST = "global-blacklist-filenames.filename";
     /** Used to retrieve all repositories in the xml-config file */
-    public static final String REPOSITORY_LIST = "repositories..repository";
+    public static final String REPOSITORY_LIST = "repositories.repository";
     /** Used to retrieve all tasks in the xml-config file */
     public static final String TASK_LIST = "tasks.task";
 

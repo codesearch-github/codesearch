@@ -88,6 +88,6 @@ public class IndexerJob implements Job {
                 throw new JobExecutionException("Execution of Task number " + i + " threw an exception" + ex);
             }
         }
-        LOG.info("Finished execution of job in " + (new Date().getTime() - startDate.getTime()) / 1000f + " seconds");
+        LOG.debug("Finished execution of job in " + (new Date().getTime() - startDate.getTime()) / 1000f + " seconds");
     }
 }

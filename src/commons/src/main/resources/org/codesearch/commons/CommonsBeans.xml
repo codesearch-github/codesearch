@@ -30,7 +30,6 @@
         
     <context:annotation-config/>
     <context:component-scan base-package="org.codesearch.commons.plugins"/>
-    <context:annotation-config/>
     <bean name="xmlConfigReader" class="org.codesearch.commons.configuration.xml.XmlConfigurationReader" />
     <bean name="pluginLoader" class="org.codesearch.commons.plugins.PluginLoader" />
 
