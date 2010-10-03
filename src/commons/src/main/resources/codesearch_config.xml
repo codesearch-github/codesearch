@@ -23,12 +23,12 @@
 -->
 
 <root>
-    <globally_ignored_filenames>
+    <global-blacklist-filenames>
         <filename>*.jpg</filename>
         <filename>*.txt</filename>
-    </globally_ignored_filenames>
+    </global-blacklist-filenames>
     <index-location>/tmp/test</index-location>
-    <index_jobs>
+    <index-jobs>
     <!--    <index_job>
             <tasks>
                 <task>
@@ -36,27 +36,29 @@
                 </task>
             </tasks>			
         </index_job> -->
-        <index_job>
+        <index-job>
             <repositories>svnsearch_repo</repositories>
             <tasks>
                 <task>
                     <type>index</type>
                 </task>
             </tasks>
-        </index_job> 
-    </index_jobs>
+        </index-job> 
+    </index-jobs>
     <testproperty>fdsa</testproperty>
+    <repository-groups>group1,group2</repository-groups>
     <repositories>
         <repository>
+            <repo-group>group1</repo-group>
             <name>svnsearch_repo</name>
-            <version_control_system>SVN</version_control_system>
+            <version-control-system>SVN</version-control-system>
             <username>feldruebe</username>
             <password>dota!123</password>
             <url>svn://portal.htl-kaindorf.at/svnsearch</url>
-            <codeNavigationEnabled>true</codeNavigationEnabled>
-            <not_indexed_filenames>
+            <code-navigation-enabled>true</code-navigation-enabled>
+            <blacklist-filenames>
                 <filename>*.xml</filename>
-            </not_indexed_filenames>
+            </blacklist-filenames>
         </repository>
     </repositories>
 </root>

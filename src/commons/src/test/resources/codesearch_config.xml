@@ -23,11 +23,14 @@
 -->
 
 <root>
-    <globally_ignored_filenames>
+    <global-blacklist-filenames>
         <filename>*.jpg</filename>
         <filename>*.txt</filename>
-    </globally_ignored_filenames>
+    </global-blacklist-filenames>
     <index-location>/tmp/test</index-location>
+    <index-jobs>
+        <index-job>
+            <repositories>svnsearch_repo</repositories>
     <index_jobs>
         <index_job>
             <interval>60</interval>
@@ -37,6 +40,9 @@
                     <type>index</type>
                 </task>
             </tasks>
+
+        </index-job>
+    </index-jobs>
         </index_job>
         <index_job>
             <interval>10080</interval>
@@ -50,6 +56,27 @@
     </index_jobs>
     <testproperty>asdf</testproperty>
     <repositories>
+		<repository>
+		    <repo-group>group1</repo-group>
+		    <name>svnsearch_repo</name>
+		    <version-control-system>SVN</version-control-system>
+		    <username>feldruebe</username>
+		    <password>dota!123</password>
+		    <url>http://portal.htl-kaindorf.at/svnsearch</url>
+		    <code-navigation-enabled>true</code-navigation-enabled>
+		    <blacklist-filenames>
+		        <filename>*.xml</filename>
+		    </blacklist-filenames>
+		</repository>
+		<repository>
+                    <repo-group>group1</repo-group>
+		    <name>testRepo2</name>
+		    <username>testUser</username>
+		    <password>testPassword</password>
+		    <version-control-system>SVN</version-control-system>
+		    <url>http://test.org</url>
+		    <code-navigation-enabled>false</code-navigation-enabled>
+		</repository>
         <repository>
             <name>svn_local</name>
             <version_control_system>FILESYSTEM</version_control_system>
@@ -78,6 +105,7 @@
             <codeNavigationEnabled>false</codeNavigationEnabled>
         </repository>
     </repositories>
+	<repository-groups>group1,group2,group3</repository-groups>
     <listTest>1</listTest>
     <listTest>2</listTest>
     <listTest>3</listTest>

@@ -29,7 +29,6 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.SubnodeConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
-import org.codesearch.commons.configreader.xml.ConfigReaderConstants;
 import org.codesearch.commons.configuration.xml.dto.JobDto;
 import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 import org.codesearch.commons.configuration.xml.dto.TaskDto;
