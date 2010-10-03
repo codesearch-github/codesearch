@@ -76,9 +76,9 @@ public class IndexingTask implements Task {
     private VersionControlPlugin versionControlPlugin;
     /** The used PropertyReader */
     private PropertiesManager propertiesReader;
-    /** The PropertyManager used to get the configuration */
+    /** The XmlConfigurationReader used to get the configuration */
     @Autowired
-    private XmlConfigurationReader propertyManager;
+    private XmlConfigurationReader configReader;
     /** The plugin loader. */
     @Autowired
     private PluginLoader pluginLoader;
@@ -93,7 +93,7 @@ public class IndexingTask implements Task {
         String indexLocation = null;
         try {
             LOG.info("Starting execution of indexing task");
-            indexLocation = propertyManager.getSingleLinePropertyValue("index-location");
+            indexLocation = configReader.getSingleLinePropertyValue("index-location");
             // Read the index status file
             propertiesReader = new PropertiesManager(indexLocation + File.separator + "revisions.properties"); //TODO add propertiesReader path
             // Get the version control plugins
@@ -236,24 +236,8 @@ public class IndexingTask implements Task {
     public void setRepository(RepositoryDto repository) {
         this.repository = repository;
     }
-
-    public XmlConfigurationReader getPropertyManager() {
-        return propertyManager;
-    }
-
-    public void setPropertyManager(XmlConfigurationReader propertyManager) {
-        this.propertyManager = propertyManager;
-    }
-
+    
     public void setPluginLoader(PluginLoader pluginLoader) {
         this.pluginLoader = pluginLoader;
-    }
-
-    public PropertiesManager getPropertiesReader() {
-        return propertiesReader;
-    }
-
-    public void setPropertiesReader(PropertiesManager propertiesReader) {
-        this.propertiesReader = propertiesReader;
     }
 }

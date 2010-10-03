@@ -62,7 +62,7 @@ public class DocumentSearcher {
 
     /**
      * Creates a new DocumentSearcher instance
-     * @throws ConfigurationException if no value for the key specified in the constant INDEX_LOCATION_KEY could be found in the in the configuration via the PropertyManager
+     * @throws ConfigurationException if no value for the key specified in the constant INDEX_LOCATION_KEY could be found in the in the configuration via the XmlConfigurationReader
      * @throws IOException if the index could not be opened
      */
     public DocumentSearcher(XmlConfigurationReader configReader) throws ConfigurationException {

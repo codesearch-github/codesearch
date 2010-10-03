@@ -48,7 +48,7 @@ public final class IndexingManager {
     private static final Logger LOG = Logger.getLogger(IndexingManager.class);
     /** The scheduler used to schedule the IndexingJobss */
     private Scheduler scheduler;
-    /** The PropertyManager used to retrieve information from the configuration */
+    /** The XmlConfigReader used to retrieve information from the configuration */
     private XmlConfigurationReader configReader;
 
     /**

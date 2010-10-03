@@ -32,6 +32,6 @@
     <context:component-scan base-package="org.codesearch.commons.plugins"/>
     <context:annotation-config/>
     <bean name="indexingTask" class="org.codesearch.indexer.tasks.IndexingTask" autowire="byName" scope="prototype" />
-    <bean name="propertyManager" class="org.codesearch.commons.configreader.xml.PropertyManager" />
+    <bean name="xmlConfigReader" class="org.codesearch.commons.configuration.xml.XmlConfigurationReader" />
     <bean name="pluginLoader" class="org.codesearch.commons.plugins.PluginLoader" />  
 </beans>

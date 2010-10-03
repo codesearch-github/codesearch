@@ -43,14 +43,14 @@ public class XmlConfigurationReaderTest {
 
  //   TODO use spring injection
  //   @Autowired
-    private XmlConfigurationReader propertyManager = new XmlConfigurationReader();
+    private XmlConfigurationReader configReader = new XmlConfigurationReader();
 
     public XmlConfigurationReaderTest() {
     }
 
     @Before
     public void setUp() {
-        propertyManager.setConfigpath("/home/david/codesearch/src/commons/src/test/resources/codesearch_config.xml");
+        configReader.setConfigpath("/home/david/codesearch/src/commons/src/test/resources/codesearch_config.xml");
     }
 
     @After
@@ -58,7 +58,7 @@ public class XmlConfigurationReaderTest {
     }
 
     /**
-     * Test of getRepositories method, of class PropertyManager.
+     * Test of getRepositories method, of class XmlConfigurationReader.
      */
     @Test
     public void testGetRepositories() throws Exception {
@@ -75,25 +75,25 @@ public class XmlConfigurationReaderTest {
         ignFileNames2.add("*.txt");
         RepositoryDto repo2 = new RepositoryDto("testRepo2", "http://test.org", "testUser", "testPassword", false, "SVN", ignFileNames2);
 
-        List result = propertyManager.getRepositories();
+        List result = configReader.getRepositories();
         assertTrue(repo1.equals(result.get(0)));
         assertTrue(repo2.equals(result.get(1)));
     }
 
     /**
-     * Test of getSingleLinePropertyValue method, of class PropertyManager.
+     * Test of getSingleLinePropertyValue method, of class XmlConfigurationReader.
      */
     @Test
     public void testGetSingleLinePropertyValue() throws Exception {
         System.out.println("getSingleLinePropertyValue");
         String key = "testproperty";
         String expResult = "asdf";
-        String result = propertyManager.getSingleLinePropertyValue(key);
+        String result = configReader.getSingleLinePropertyValue(key);
         assertEquals(expResult, result);
     }
 
     /**
-     * Test of getTasks method, of class PropertyManager.
+     * Test of getTasks method, of class XmlConfigurationReader.
      */
     @Test
     public void testGetJobs() throws ConfigurationException {
@@ -126,7 +126,7 @@ public class XmlConfigurationReaderTest {
         job2.setInterval(10080);
         job2.setStartDate(new GregorianCalendar(2010, 7, 11, 18, 0));
 
-        List<JobDto> result = propertyManager.getJobs();
+        List<JobDto> result = configReader.getJobs();
         assert (result.size() == 2);
         assert (result.get(0).equals(job1));
         assert (result.get(1).equals(job2));
@@ -140,7 +140,7 @@ public class XmlConfigurationReaderTest {
         ignoredFiles.add("*.jpg");
         ignoredFiles.add("*.txt");
         RepositoryDto expResult = new RepositoryDto("testRepo1", "http://test.org", "testUser", "testPassword", true, "SVN", ignoredFiles);
-        RepositoryDto result = propertyManager.getRepositoryByName("testRepo1");
+        RepositoryDto result = configReader.getRepositoryByName("testRepo1");
     }
 
     @Test
@@ -150,7 +150,7 @@ public class XmlConfigurationReaderTest {
         expResult.add("1");
         expResult.add("2");
         expResult.add("3");
-        List<String> result = propertyManager.getSingleLinePropertyValueList("listTest");
+        List<String> result = configReader.getSingleLinePropertyValueList("listTest");
         assertEquals(expResult.get(0), result.get(0));
         assertEquals(expResult.get(1), result.get(1));
         assertEquals(expResult.get(2), result.get(2));

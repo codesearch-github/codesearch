@@ -27,7 +27,7 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
     <bean id="documentSearcher" class="org.codesearch.searcher.server.DocumentSearcher">
-        <constructor-arg ref="propertyManager" />
+        <constructor-arg ref="xmlConfigReader" />
     </bean>
     
     <bean id="searcherServiceImpl" class="org.codesearch.searcher.server.rpc.SearcherServiceImpl">

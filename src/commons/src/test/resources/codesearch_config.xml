@@ -83,7 +83,7 @@
             <username>null</username>
             <password>null</password>
             <url>$home/workspace/svnsearch</url>
-            <codeNavigationEnabled>true</codeNavigationEnabled>
+            <code-navigation-enabled>true</code-navigation-enabled>
         </repository>
         <repository>
             <name>svnsearch_repo</name>
@@ -91,7 +91,7 @@
             <username>feldruebe</username>
             <password>dota!123</password>
             <url>svn://portal.htl-kaindorf.at/svnsearch</url>
-            <codeNavigationEnabled>true</codeNavigationEnabled>
+            <code-navigation-enabled>true</code-navigation-enabled>
             <not_indexed_filenames>
                 <filename>*.xml</filename>
             </not_indexed_filenames>
@@ -102,7 +102,7 @@
             <password>testPassword</password>
             <version_control_system>SVN</version_control_system>
             <url>http://test.org</url>
-            <codeNavigationEnabled>false</codeNavigationEnabled>
+            <code-navigation-enabled>false</code-navigation-enabled>
         </repository>
     </repositories>
 	<repository-groups>group1,group2,group3</repository-groups>

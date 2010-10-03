@@ -49,7 +49,7 @@ public class XmlConfigurationReader {
     private String configpath = "codesearch_config.xml";
 
     /**
-     * creates a new instance of PropertyManager
+     * creates a new instance of XmlConfigurationReader
      */
     public XmlConfigurationReader() {
     }
@@ -254,7 +254,7 @@ public class XmlConfigurationReader {
         this.configpath = configpath;
     }
 
-    public void clearPropertyManager() {
+    public void clearConfigurationReader() {
         this.configpath = null;
         this.config = null;
     }

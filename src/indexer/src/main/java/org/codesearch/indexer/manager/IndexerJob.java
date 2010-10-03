@@ -50,7 +50,7 @@ public class IndexerJob implements Job {
     private List<TaskDto> taskList = new LinkedList<TaskDto>();
     /** Instantiate a logger */
     private static final Logger LOG = Logger.getLogger(IndexerJob.class);
-    /** The PropertyManager used to retrieve configuration */
+    /** The XmlConfigReader used to retrieve configuration */
     private XmlConfigurationReader configReader;
 
     /**
