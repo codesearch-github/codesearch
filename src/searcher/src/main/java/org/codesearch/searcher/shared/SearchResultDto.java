@@ -33,8 +33,18 @@ public class SearchResultDto implements Serializable {
     private String repository;
     /** The result relevance. */
     private float relevance;
+    /** The revision of this result. */
+    private String revision;
 
     public SearchResultDto() {
+    }
+
+    public String getRevision() {
+        return revision;
+    }
+
+    public void setRevision(String revision) {
+        this.revision = revision;
     }
 
     public String getRepository() {

@@ -18,7 +18,6 @@
  * You should have received a copy of the GNU General Public License
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.codesearch.searcher.server.rpc;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
@@ -38,12 +37,11 @@ import org.codesearch.searcher.shared.SearchResultDto;
  * @author Samuel Kogler
  */
 public class SearcherServiceImpl extends RemoteServiceServlet implements SearcherService {
-    /**
-     * The document searcher used to search the index.
-     */
-    private DocumentSearcher documentSearcher;
-     /** The logger. */
+
+    /** The logger. */
     private static final Logger LOG = Logger.getLogger(SearcherServiceImpl.class);
+    /** The document searcher used to search the index. */
+    private DocumentSearcher documentSearcher;
 
     @Override
     public List<SearchResultDto> doSearch(String query) throws InvalidIndexLocationException {

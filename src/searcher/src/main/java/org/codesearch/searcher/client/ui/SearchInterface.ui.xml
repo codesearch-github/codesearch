@@ -34,6 +34,11 @@
             border-style: none none solid none;
             border-width: 1px;
         }
+        .searchForm
+        {
+            border-style: none none solid none;
+            border-width: 1px;
+        }
     </ui:style>
     
     <g:DockLayoutPanel unit='PX'>
@@ -44,18 +49,34 @@
         </g:north>
         <g:center>
             <g:DockLayoutPanel unit='EM'>
-                <g:north size='7'>
-                    <g:HTMLPanel>
-                        <g:Label text='Repositories:' />
-
-                        <g:Label text='Repository Groups:' />
+                <g:north size='15'>
+                    <g:FlowPanel styleName='{style.searchForm}'>
+                        <g:TabLayoutPanel ui:field='repositoryTabPanel' barUnit='EM' barHeight='1.7' height='10em'>
+                            <g:tab>
+                                <g:header>Repositories</g:header>
+                                <g:ListBox ui:field='repositoryList' visibleItemCount='6'>
+                                    <g:item>
+                                        No valid repositories found. Check configuration.
+                                    </g:item>
+                                </g:ListBox>
+                            </g:tab>
+                            <g:tab>
+                                <g:header>Repository Groups</g:header>
+                                <g:ListBox ui:field='repositoryGroupList' visibleItemCount='6'>
+                                    <g:item>
+                                        No valid repository groups found. Check configuration.
+                                    </g:item>
+                                </g:ListBox>
+                            </g:tab>
+                        </g:TabLayoutPanel>
                         <g:Label text='Search for:' />
                         <g:TextBox ui:field='searchBox' />
                         <g:Button ui:field='searchButton' text='Search' />
-                    </g:HTMLPanel>
+                        <g:CheckBox ui:field='caseSensitive' text='Case Sensitive' />
+                    </g:FlowPanel>
                 </g:north>
                 <g:center>
-                    <g:FlowPanel>
+                    <g:FlowPanel ui:field='resultView'>
                         <c:CellTable ui:field='resultTable' />
                         <c:SimplePager ui:field='resultTablePager' location='CENTER' />
                     </g:FlowPanel>

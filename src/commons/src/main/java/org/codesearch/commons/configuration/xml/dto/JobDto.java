@@ -77,6 +77,9 @@ public class JobDto {
      */
     @Override
     public boolean equals(Object o) {
+        if(!(o instanceof JobDto)) {
+            return false;
+        }
         JobDto other = null;
         try {
             other = (JobDto) o;

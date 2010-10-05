@@ -43,7 +43,7 @@ import org.codesearch.commons.constants.IndexConstants;
 import org.codesearch.searcher.shared.SearchResultDto;
 
 /**
- * Provides methods to search the lucene index
+ * Provides methods to search the index.
  * @author David Froehlich
  */
 public class DocumentSearcher {
@@ -90,9 +90,9 @@ public class DocumentSearcher {
         if (!searcherInitialized) {
             initSearcher();
         }
-        LinkedList<SearchResultDto> results = new LinkedList<SearchResultDto>();
+        List<SearchResultDto> results = new LinkedList<SearchResultDto>();
         Query query = queryParser.parse(searchString);
-        LOG.info("Search index with query: " + query.toString());
+        LOG.info("Searching index with query: " + query.toString());
         //Retrieve all search results from search
         TopDocs topDocs = indexSearcher.search(query, 10000);
         LOG.info("Found " + topDocs.scoreDocs.length + " results");
@@ -103,6 +103,7 @@ public class DocumentSearcher {
             SearchResultDto searchResult = new SearchResultDto();
             searchResult.setRepository(doc.get(IndexConstants.INDEX_FIELD_REPOSITORY));
             searchResult.setFilePath(doc.get(IndexConstants.INDEX_FIELD_FILEPATH));
+            searchResult.setRevision(doc.get(IndexConstants.INDEX_FIELD_REVISION));
             searchResult.setRelevance(sd.score);
             results.add(searchResult);
         }

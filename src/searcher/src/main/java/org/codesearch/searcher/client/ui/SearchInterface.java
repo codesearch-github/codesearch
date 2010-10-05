@@ -24,21 +24,22 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyUpEvent;
-import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.cellview.client.CellTable;
+import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.TabLayoutPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.SelectionChangeEvent;
-import com.google.gwt.view.client.SelectionChangeEvent.Handler;
 import com.google.gwt.view.client.SelectionModel;
 import com.google.gwt.view.client.SingleSelectionModel;
 import java.util.LinkedList;
@@ -60,15 +61,23 @@ public class SearchInterface extends Composite {
     }
     private static SearchInterfaceUiBinder uiBinder = GWT.create(SearchInterfaceUiBinder.class);
     private SearcherServiceAsync searcherServiceAsync = GWT.create(SearcherService.class);
+    //TODO workaround, refactor after GWT2.1 release
+    @UiField(provided = true)
+    CellTable<SearchResultDto> resultTable = new CellTable<SearchResultDto>(15);
+    @UiField
+    SimplePager resultTablePager;
     @UiField
     TextBox searchBox;
     @UiField
     Button searchButton;
-    //TODO workaround, refactor after GWT2.1 release
-    @UiField(provided = true)
-    CellTable<SearchResultDto> resultTable = new CellTable<SearchResultDto>();
     @UiField
-    SimplePager resultTablePager;
+    TabLayoutPanel repositoryTabPanel;
+    @UiField
+    ListBox repositoryList;
+    @UiField
+    ListBox repositoryGroupList;
+    @UiField
+    FlowPanel resultView;
     /** Saves the current search results **/
     List<SearchResultDto> searchResults = new LinkedList<SearchResultDto>();
 
@@ -76,39 +85,34 @@ public class SearchInterface extends Composite {
         resultTable.addColumn(new TextColumn<SearchResultDto>() {
 
             @Override
-            public String getValue(SearchResultDto object) {
-                return String.valueOf(object.getRelevance());
+            public String getValue(SearchResultDto dto) {
+                return String.valueOf(dto.getRelevance());
             }
         }, "Relevance");
 
         resultTable.addColumn(new TextColumn<SearchResultDto>() {
 
             @Override
-            public String getValue(SearchResultDto object) {
-                return object.getFilePath();
+            public String getValue(SearchResultDto dto) {
+                return dto.getFilePath();
             }
         }, "Path");
 
         resultTable.addColumn(new TextColumn<SearchResultDto>() {
 
             @Override
-            public String getValue(SearchResultDto object) {
-                return object.getRepository();
+            public String getValue(SearchResultDto dto) {
+                return dto.getRepository();
             }
         }, "Repository");
 
-        resultTable.setRowData(0, searchResults);
-        SelectionModel resultSelectionModel = new SingleSelectionModel<SearchResultDto>();
-        resultTable.setSelectionModel(resultSelectionModel);
-        resultTablePager.setDisplay(resultTable);
-
         initWidget(uiBinder.createAndBindUi(this));
+        repositoryTabPanel.selectTab(0);
+        resultTablePager.setDisplay(resultTable);
+        setResultViewVisible(false);
     }
 
-//    @UiHandler("resultTable")
-//    void onResultList(SelectionEvent<SearchResultDto> e) {
-//        Window.alert(e.getSelectedItem().getFilePath());
-//    }
+   
 
     @UiHandler("searchButton")
     void onSearchButton(ClickEvent e) {
@@ -127,7 +131,6 @@ public class SearchInterface extends Composite {
         String query = searchBox.getText();
         try {
             searcherServiceAsync.doSearch(query, new AsyncCallback<List<SearchResultDto>>() {
-
                 @Override
                 public void onFailure(Throwable caught) {
                     Window.alert("Exception calling the search service on the server:\n" + caught);
@@ -143,17 +146,21 @@ public class SearchInterface extends Composite {
         }
         for (int i = 0; i < 30; i++) {
             SearchResultDto result = new SearchResultDto();
-            result.setFilePath("/aoeu/oeu/aoeu/aoeu");
+            result.setFilePath("/aoeu/test");
             result.setRelevance(45.55f);
             result.setRepository("repo1");
             searchResults.add(result);
         }
+        setResultViewVisible(true);
         updateResultsView();
     }
 
     private void updateResultsView() {
         resultTable.setRowData(0, searchResults);
-//        resultTablePager.setDisplay(resultTable);
         resultTable.redraw();
+    }
+
+     private void setResultViewVisible(boolean visible) {
+        resultView.setVisible(visible);
     }
 }

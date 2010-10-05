@@ -73,6 +73,9 @@ public class TaskDto {
      */
     @Override
     public boolean equals(Object o) {
+        if (!(o instanceof TaskDto)) {
+            return false;
+        }
         TaskDto other;
         try {
             other = (TaskDto) o;

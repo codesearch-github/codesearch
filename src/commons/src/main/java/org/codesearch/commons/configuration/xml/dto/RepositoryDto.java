@@ -159,18 +159,22 @@ public class RepositoryDto {
      */
     @Override
     public boolean equals(Object o) {
+        if (!(o instanceof RepositoryDto)) {
+            return false;
+        }
         try {
             RepositoryDto other = (RepositoryDto) o;
             if (this.getName().equals(other.getName()) && this.isCodeNavigationEnabled() == other.isCodeNavigationEnabled() && ignoredFileNames.size() == other.getIgnoredFileNames().size()) {
-                for(int i = 0; i < ignoredFileNames.size(); i++){
+                for (int i = 0; i < ignoredFileNames.size(); i++) {
                     String s = ignoredFileNames.get(i);
-                    if(!(s.equals(other.getIgnoredFileNames().get(i))))
+                    if (!(s.equals(other.getIgnoredFileNames().get(i)))) {
                         return false;
+                    }
                 }
                 return true;
             }
             return false;
-        } catch(ClassCastException ex){
+        } catch (ClassCastException ex) {
             return false;
         }
     }
