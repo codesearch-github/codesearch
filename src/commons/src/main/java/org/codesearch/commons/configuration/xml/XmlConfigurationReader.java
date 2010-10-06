@@ -166,7 +166,7 @@ public class XmlConfigurationReader {
                     repositoryGroups = new LinkedList<String>();
                 }
                 ignoredFileNames.addAll(getGloballyIgnoredFileNames());
-                repo = new RepositoryDto(name, hc.getString(ConfigReaderConstants.REPOSITORY_URL), 
+                repo = new RepositoryDto(name, hc.getString(ConfigReaderConstants.REPOSITORY_URL),
                         hc.getString(ConfigReaderConstants.REPOSITORY_USERNAME),
                         hc.getString(ConfigReaderConstants.REPOSITORY_PASSWORD),
                         hc.getBoolean(ConfigReaderConstants.REPOSITORY_CODE_NAVIGATION_ENABLED),
@@ -212,7 +212,7 @@ public class XmlConfigurationReader {
             ignoredFileNames.addAll(this.getGloballyIgnoredFileNames());
             repositoryDto.setIgnoredFileNames(ignoredFileNames);
             List<String> repositoryGroups = repositoryConfig.getList(ConfigReaderConstants.REPOSITORY_GROUPS);
-            if(repositoryGroups == null){
+            if (repositoryGroups == null) {
                 repositoryGroups = new LinkedList<String>();
             }
             repositoryDto.setRepositoryGroups(repositoryGroups);
@@ -261,6 +261,16 @@ public class XmlConfigurationReader {
         }
         values = config.getList(key);
         return values;
+    }
+
+    public List<String> getRepositoriesForGroup(String groupName) throws ConfigurationException {
+        List<String> repos = new LinkedList<String>();
+        for(RepositoryDto repo : getRepositories()){
+            if(repo.getRepositoryGroups().contains(groupName)){
+                repos.add(repo.getName());
+            }
+        }
+        return repos;
     }
 
     /**

@@ -23,11 +23,13 @@ public class FilesystemPlugin implements VersionControlPlugin {
     /** the folder where all code files are located */
     private String codeLocation;
 
+    /** {@inheritDoc} */
     @Override
     public void setRepository(URI url, String username, String password) throws VersionControlPluginException {
         this.codeLocation = url.getPath();
     }
 
+    /** {@inheritDoc} */
     @Override
     public String getFileContentForFilePath(String filePath) throws VersionControlPluginException {
         File f = new File(filePath);
@@ -43,6 +45,7 @@ public class FilesystemPlugin implements VersionControlPlugin {
         return content;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Set<String> getPathsForChangedFilesSinceRevision(String revision) throws VersionControlPluginException {
         Set<String> paths = new HashSet<String>();
@@ -50,6 +53,12 @@ public class FilesystemPlugin implements VersionControlPlugin {
         return paths;
     }
 
+    /**
+     * recursively adds all changed files from the directory into the set
+     * @param paths the set
+     * @param directory the current directory
+     * @param lastModified the time of last indexing
+     */
     private void addChangedFilesFromDirectoryToSet(Set<String> paths, File directory, long lastModified) {
         for (File f : directory.listFiles()) {
             if (f.isDirectory()) {
@@ -62,11 +71,17 @@ public class FilesystemPlugin implements VersionControlPlugin {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public String getRepositoryRevision() throws VersionControlPluginException {
         return Long.toString(getHighestLastModifiedDateFromDirectory(new File(codeLocation)));
     }
 
+    /**
+     * recursively finds the highest last modified date from the directory
+     * @param dir the current directory
+     * @return the highest modification date in the directory
+     */
     private long getHighestLastModifiedDateFromDirectory(File dir) {
         long lastModified = 0;
         for (File f : dir.listFiles()) {
@@ -83,11 +98,13 @@ public class FilesystemPlugin implements VersionControlPlugin {
         return lastModified;
     }
 
+    /** {@inheritDoc} */
     @Override
     public String getPurpose() {
         return "FILESYSTEM";
     }
 
+    /** {@inheritDoc} */
     @Override
     public String getVersion() {
         return "0.1";

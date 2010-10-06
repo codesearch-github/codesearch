@@ -34,6 +34,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.KeywordAnalyzer;
+import org.apache.lucene.analysis.WhitespaceAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -110,7 +112,7 @@ public class IndexingTask implements Task {
             indexDirectory = FSDirectory.open(dir);
 
             clearPreviousDocuments();
-            initializeIndexWriter(new StandardAnalyzer(IndexConstants.LUCENE_VERSION), dir);
+            initializeIndexWriter(new WhitespaceAnalyzer(), dir); //IndexConstants.LUCENE_VERSION
             createIndex();
             propertiesReader.setPropertyFileValue(repository.getName(), versionControlPlugin.getRepositoryRevision());
         } catch (VersionControlPluginException ex) {
@@ -140,6 +142,10 @@ public class IndexingTask implements Task {
         doc.add(new Field(IndexConstants.INDEX_FIELD_REPOSITORY, repository.getName(), Field.Store.YES, Field.Index.NOT_ANALYZED));
         doc.add(new Field(IndexConstants.INDEX_FIELD_REVISION, versionControlPlugin.getRepositoryRevision(), Field.Store.YES, Field.Index.ANALYZED));
         doc.add(new Field(IndexConstants.INDEX_FILED_REPOSITORY_GROUP, repository.getRepositoryGroupsAsString(), Field.Store.YES, Field.Index.ANALYZED));
+        //doc.add(new Field(IndexConstants.INDEX_FIELD_TITLE_LC, extractFilename(path).toLowerCase(), Field.Store.YES, Field.Index.NOT_ANALYZED));
+        doc.add(new Field(IndexConstants.INDEX_FIELD_FILEPATH_LC, path.toLowerCase(), Field.Store.YES, Field.Index.NOT_ANALYZED));
+        doc.add(new Field(IndexConstants.INDEX_FIELD_CONTENT_LC, versionControlPlugin.getFileContentForFilePath(path).toLowerCase(), Field.Store.YES, Field.Index.ANALYZED));
+
         return doc;
     }
 

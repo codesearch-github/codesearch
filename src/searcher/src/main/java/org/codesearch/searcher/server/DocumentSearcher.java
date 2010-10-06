@@ -20,13 +20,17 @@
  */
 package org.codesearch.searcher.server;
 
+import java.util.logging.Level;
 import org.codesearch.searcher.shared.InvalidIndexLocationException;
 import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.lang.NotImplementedException;
 import org.apache.log4j.Logger;
+import org.apache.lucene.analysis.KeywordAnalyzer;
+import org.apache.lucene.analysis.WhitespaceAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.queryParser.ParseException;
@@ -58,7 +62,16 @@ public class DocumentSearcher {
     private boolean searcherInitialized = false;
     /** The location of the index. **/
     private String indexLocation;
+    /** whether the current search is case sensitive or not */
+    private boolean caseSensitive;
+    /** the repositories used for the search */
+    private List<String> repositoryNames = new LinkedList<String>();
+    /** the repository groups used for the search*/
+    private List<String> repositoryGroupNames = new LinkedList<String>();
 
+    private XmlConfigurationReader configReader = new XmlConfigurationReader();
+
+    
     /**
      * Creates a new DocumentSearcher instance
      * @throws ConfigurationException if no value for the key specified in the constant INDEX_LOCATION_KEY could be found in the in the configuration via the XmlConfigurationReader
@@ -69,7 +82,7 @@ public class DocumentSearcher {
         indexLocation = configReader.getSingleLinePropertyValue(ConfigReaderConstants.INDEX_LOCATION);
         LOG.debug("Index location set to: " + indexLocation);
         //TODO replace with appropriate Analyzer
-        queryParser = new QueryParser(Version.LUCENE_30, "", new StandardAnalyzer(Version.LUCENE_30));
+        queryParser = new QueryParser(Version.LUCENE_30, "", new WhitespaceAnalyzer());
         try {
             initSearcher();
         } catch (InvalidIndexLocationException ex) {
@@ -86,12 +99,18 @@ public class DocumentSearcher {
      * @throws ParseException if the searchString could not be parsed to a query
      * @throws IOException if the Index could not be read
      */
-    public List<SearchResultDto> search(String searchString) throws ParseException, IOException, InvalidIndexLocationException {
+    public List<SearchResultDto> search(String searchString) throws ParseException, IOException, InvalidIndexLocationException{
         if (!searcherInitialized) {
             initSearcher();
         }
         List<SearchResultDto> results = new LinkedList<SearchResultDto>();
-        Query query = queryParser.parse(searchString);
+        Query query;
+        try {
+            query = queryParser.parse(this.parseQuery(searchString));
+        } catch (ConfigurationException ex) {
+            //TODO add handling for exception
+            throw new NotImplementedException();
+        }
         LOG.info("Searching index with query: " + query.toString());
         //Retrieve all search results from search
         TopDocs topDocs = indexSearcher.search(query, 10000);
@@ -109,7 +128,47 @@ public class DocumentSearcher {
         }
         return results;
     }
-    
+
+    /**
+     * parses the search term to a lucene conform query keeping in mind the several options
+     * @param term the search term
+     * @return the lucene conform query
+     */
+    public String parseQuery(String term) throws ConfigurationException { //TODO rename, same name as lucene and make private after finished testing
+        String query = "";
+
+        if (term.contains(":")) {
+            throw new NotImplementedException();
+        }
+
+        if (caseSensitive) {
+            query = IndexConstants.INDEX_FIELD_CONTENT+":\"" + term + "\"";
+        } else {
+            query = IndexConstants.INDEX_FIELD_CONTENT_LC+":\"" + term + "\"";
+        }
+        query = appendRepositoriesToQuery(query);
+        return query;
+    }
+
+    private String appendRepositoriesToQuery(String query) throws ConfigurationException{
+        if(repositoryGroupNames.isEmpty() && repositoryNames.isEmpty()){
+            return query;
+        }
+        
+        query += " AND (";
+        for(String repoGroup : repositoryGroupNames){
+            for(String repo : configReader.getRepositoriesForGroup(repoGroup)){
+                repositoryNames.add(repo);
+            }
+        }
+        for(String repo : repositoryNames){
+            query += IndexConstants.INDEX_FIELD_REPOSITORY + ":" + repo + " OR ";
+        }
+               
+        query = query.substring(0, query.length()-4)+")";
+        return query;
+    }
+
     private void initSearcher() throws InvalidIndexLocationException {
         try {
             indexSearcher = new IndexSearcher(FSDirectory.open(new File(indexLocation)), true);
@@ -118,5 +177,13 @@ public class DocumentSearcher {
             searcherInitialized = false;
             throw new InvalidIndexLocationException("No valid index found at: " + indexLocation + "\n" + exc);
         }
+    }
+
+    public void setCaseSensitive(boolean caseSensitive) {
+        this.caseSensitive = caseSensitive;
+    }
+
+    public void setRepositoryNames(List<String> repositoryNames) {
+        this.repositoryNames = repositoryNames;
     }
 }

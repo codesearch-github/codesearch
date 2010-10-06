@@ -40,7 +40,7 @@ public class PropertiesManagerTest {
 
     @Before
     public void setUp() throws IOException {
-        pr = new PropertiesManager(System.getProperty("user.home") + "/workspace/svnsearch/repository.properties");
+        pr = new PropertiesManager(System.getProperty("user.home") + "/workspace/svnsearch/revisions.properties");
     }
 
     @After

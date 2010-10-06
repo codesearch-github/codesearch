@@ -30,6 +30,8 @@
         <filename>*.png</filename>
         <filename>*img*</filename>
         <filename>*.svn*</filename>
+        <filename>*.class*</filename>
+
     </global-blacklist-filenames>
     <index-location>/tmp/test</index-location>
     <index-jobs>

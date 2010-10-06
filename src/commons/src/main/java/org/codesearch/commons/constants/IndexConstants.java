@@ -36,6 +36,9 @@ public final class IndexConstants {
     public static final String INDEX_FIELD_TITLE="title";
     public static final String INDEX_FIELD_REVISION="revision";
     public static final String INDEX_FILED_REPOSITORY_GROUP = "repository-groups";
+    public static final String INDEX_FIELD_FILEPATH_LC="filepath_lc";
+    public static final String INDEX_FIELD_CONTENT_LC="content_lc";
+    public static final String INDEX_FIELD_TITLE_LC="title_lc";
     
     private IndexConstants(){
         

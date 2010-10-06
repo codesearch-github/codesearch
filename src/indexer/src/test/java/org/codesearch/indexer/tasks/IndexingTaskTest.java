@@ -75,17 +75,17 @@ public class IndexingTaskTest {
      */
     @Test
     public void testExecute() throws Exception {
-        XmlConfigurationReader pm = new XmlConfigurationReader();
-        List<RepositoryDto> repos = pm.getRepositories();
-        PropertiesManager pr = new PropertiesManager("/tmp/test/revisions.properties");
-
-        for (RepositoryDto repo : repos) {
-            if (!repo.getVersionControlSystem().equals("FILESYTEM")) {
-                IndexingTask t = (IndexingTask) applicationContext.getBean("indexingTask");
-                t.setRepository(repo);
-                t.execute();
-            }
-        }
+//        XmlConfigurationReader pm = new XmlConfigurationReader();
+//        List<RepositoryDto> repos = pm.getRepositories();
+//        PropertiesManager pr = new PropertiesManager("/tmp/test/revisions.properties");
+//
+//        for (RepositoryDto repo : repos) {
+//            if (!repo.getVersionControlSystem().equals("FILESYTEM")) {
+//                IndexingTask t = (IndexingTask) applicationContext.getBean("indexingTask");
+//                t.setRepository(repo);
+//                t.execute();
+//            }
+//        }
     }
 
     @Test
