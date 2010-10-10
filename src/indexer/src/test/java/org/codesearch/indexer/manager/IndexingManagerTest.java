@@ -21,6 +21,7 @@
 
 package org.codesearch.indexer.manager;
 
+import org.codesearch.indexer.IndexingManager;
 import org.apache.commons.configuration.ConfigurationException;
 import org.junit.Before;
 import org.junit.Test;

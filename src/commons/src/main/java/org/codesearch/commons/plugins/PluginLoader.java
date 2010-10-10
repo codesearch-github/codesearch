@@ -24,7 +24,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * A class that provides access to dynamically loaded plugins defined in the spring configuration of the corresponding module
+ * A class that provides access to dynamically loaded plugins.
  * @author Stiboller Stephan
  * @author David Froehlich
  * @author Samuel Kogler

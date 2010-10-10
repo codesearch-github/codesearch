@@ -24,6 +24,7 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import javax.servlet.ServletContext;
 import org.apache.log4j.Logger;
 import org.apache.lucene.queryParser.ParseException;
 
@@ -31,20 +32,32 @@ import org.codesearch.searcher.client.rpc.SearcherService;
 import org.codesearch.searcher.server.DocumentSearcher;
 import org.codesearch.searcher.shared.InvalidIndexLocationException;
 import org.codesearch.searcher.shared.SearchResultDto;
+import org.springframework.context.ApplicationContext;
+import org.springframework.web.context.ServletContextAware;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * Service used for search operations.
  * @author Samuel Kogler
  */
-public class SearcherServiceImpl extends RemoteServiceServlet implements SearcherService {
+public class SearcherServiceImpl extends RemoteServiceServlet implements SearcherService, ServletContextAware {
 
     /** The logger. */
     private static final Logger LOG = Logger.getLogger(SearcherServiceImpl.class);
     /** The document searcher used to search the index. */
     private DocumentSearcher documentSearcher;
+    /** The servlet context **/
+    private ServletContext servletContext;
+
+    public SearcherServiceImpl() {
+    }
 
     @Override
     public List<SearchResultDto> doSearch(String query) throws InvalidIndexLocationException {
+        if (documentSearcher == null) {
+            ApplicationContext applicationContext = WebApplicationContextUtils.getWebApplicationContext(servletContext);
+            documentSearcher = (DocumentSearcher) applicationContext.getBean("documentSearcher");
+        }
         List<SearchResultDto> resultItems = new LinkedList<SearchResultDto>();
         try {
             resultItems = documentSearcher.search(query);
@@ -56,11 +69,23 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
         return resultItems;
     }
 
-    public DocumentSearcher getDocumentSearcher() {
-        return documentSearcher;
+    @Override
+    public void setServletContext(ServletContext sc) {
+        this.servletContext = sc;
     }
 
-    public void setDocumentSearcher(DocumentSearcher documentSearcher) {
-        this.documentSearcher = documentSearcher;
+    @Override
+    public void setCaseSensitive(boolean caseSensitive) {
+        documentSearcher.setCaseSensitive(caseSensitive);
+    }
+
+    @Override
+    public List<String> getAvailableRepositoryGroups() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public List<String> getAvailableRepositories() {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

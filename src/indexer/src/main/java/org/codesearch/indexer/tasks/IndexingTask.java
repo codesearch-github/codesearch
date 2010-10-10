@@ -22,8 +22,8 @@ package org.codesearch.indexer.tasks;
 
 import java.io.FileNotFoundException;
 import java.net.URISyntaxException;
-import java.util.logging.Level;
 import org.apache.commons.configuration.ConfigurationException;
+import org.apache.lucene.store.LockObtainFailedException;
 import org.codesearch.indexer.exceptions.TaskExecutionException;
 import java.io.File;
 import java.io.IOException;
@@ -34,9 +34,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.KeywordAnalyzer;
 import org.apache.lucene.analysis.WhitespaceAnalyzer;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.CorruptIndexException;
@@ -47,7 +45,7 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.store.FSDirectory;
 import org.codesearch.commons.configuration.properties.PropertiesManager;
 import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
-import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
+import org.codesearch.commons.configuration.xml.XmlConfigurationReaderConstants;
 import org.codesearch.commons.constants.IndexConstants;
 import org.codesearch.commons.plugins.PluginLoader;
 import org.codesearch.commons.plugins.PluginLoaderException;
@@ -55,20 +53,21 @@ import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
 import org.codesearch.commons.plugins.vcs.VersionControlPluginException;
 import org.springframework.beans.factory.annotation.Autowired;
 
+//FIXME index is opened and closed for !!every single!! repository
+//TODO Research on IndexWriter.updateDocument
 /**
  * This task performs basic indexing of one repository.
+ * The indexLocation and the repository must be set before executing this task.
  *
  * @author Stephan Stiboller
  * @author David Froehlich
  */
-public class IndexingTask implements Task {
+public class IndexingTask extends Task {
 
-    /** The dto holding the repository information */
-    private RepositoryDto repository;
-    /** The IndexingTask to be processed */
-    private Set<String> fileNames;
     /* Instantiate a logger  */
     private static final Logger LOG = Logger.getLogger(IndexingTask.class);
+    /** The IndexingTask to be processed */
+    private Set<String> fileNames;
     /** The currently active IndexWriter */
     private IndexWriter indexWriter;
     /** The indexReader used to delete documents */
@@ -79,11 +78,7 @@ public class IndexingTask implements Task {
     private VersionControlPlugin versionControlPlugin;
     /** The used PropertyReader */
     private PropertiesManager propertiesReader;
-    /** The XmlConfigurationReader used to get the configuration */
-    @Autowired
-    private XmlConfigurationReader configReader;
     /** The plugin loader. */
-    @Autowired
     private PluginLoader pluginLoader;
 
     /**
@@ -93,12 +88,16 @@ public class IndexingTask implements Task {
      */
     @Override
     public void execute() throws TaskExecutionException {
-        String indexLocation = null;
+        if (indexLocation == null) {
+            throw new TaskExecutionException("Index location not set before executing task!");
+        }
+        if (repository == null) {
+            throw new TaskExecutionException("Repository not set before executing indexing task!");
+        }
         try {
             LOG.info("Starting execution of indexing task");
-            indexLocation = configReader.getSingleLinePropertyValue("index-location");
             // Read the index status file
-            propertiesReader = new PropertiesManager(indexLocation + File.separator + "revisions.properties"); //TODO add propertiesReader path
+            propertiesReader = new PropertiesManager(indexLocation + File.separator + "revisions.properties");
             // Get the version control plugins
             versionControlPlugin = pluginLoader.getPlugin(VersionControlPlugin.class, repository.getVersionControlSystem());
             versionControlPlugin.setRepository(new URI(repository.getUrl()), repository.getUsername(), repository.getPassword());
@@ -108,25 +107,25 @@ public class IndexingTask implements Task {
                 LOG.info("Index of repository " + repository.getName() + " is up to date");
                 return;
             }
-            File dir = new File(indexLocation);
-            indexDirectory = FSDirectory.open(dir);
 
             clearPreviousDocuments();
-            initializeIndexWriter(new WhitespaceAnalyzer(), dir); //IndexConstants.LUCENE_VERSION
+            initializeIndexWriter();
             createIndex();
             propertiesReader.setPropertyFileValue(repository.getName(), versionControlPlugin.getRepositoryRevision());
-        } catch (VersionControlPluginException ex) {
-            LOG.error("VersionControlPlugin files could not be retrieved: " + ex);
+        } catch (CorruptIndexException ex) {
+            throw new TaskExecutionException("Index is currupt, indexing of repository failed: " + ex);
+        } catch (LockObtainFailedException ex) {
+            throw new TaskExecutionException("Could not write to index because it is locked: " + ex);
         } catch (PluginLoaderException ex) {
-            LOG.error("VersionControlPlugin could not be loaded: " + ex);
+            throw new TaskExecutionException("Task execution failed because PluginLoader threw an exception: " + ex);
+        } catch (VersionControlPluginException ex) {
+            throw new TaskExecutionException("VersionControlPlugin files could not be retrieved: " + ex);
         } catch (URISyntaxException ex) {
-            LOG.error("Repository url could not be parsed to URI" + ex);
+            throw new TaskExecutionException("Repository url could not be parsed to URI: " + ex);
         } catch (FileNotFoundException ex) {
-            LOG.error("Index not found at task execution" + ex);
+            throw new TaskExecutionException("Index not found at task execution: " + ex);
         } catch (IOException ex) {
-            LOG.error("IOException at execution of task: " + ex);
-        } catch (ConfigurationException ex) {
-            LOG.error("Configuration could not be read " + ex);
+            throw new TaskExecutionException("IOException at execution of task: " + ex);
         }
     }
 
@@ -142,7 +141,7 @@ public class IndexingTask implements Task {
         doc.add(new Field(IndexConstants.INDEX_FIELD_REPOSITORY, repository.getName(), Field.Store.YES, Field.Index.NOT_ANALYZED));
         doc.add(new Field(IndexConstants.INDEX_FIELD_REVISION, versionControlPlugin.getRepositoryRevision(), Field.Store.YES, Field.Index.ANALYZED));
         doc.add(new Field(IndexConstants.INDEX_FILED_REPOSITORY_GROUP, repository.getRepositoryGroupsAsString(), Field.Store.YES, Field.Index.ANALYZED));
-        //doc.add(new Field(IndexConstants.INDEX_FIELD_TITLE_LC, extractFilename(path).toLowerCase(), Field.Store.YES, Field.Index.NOT_ANALYZED));
+        doc.add(new Field(IndexConstants.INDEX_FIELD_TITLE_LC, extractFilename(path).toLowerCase(), Field.Store.YES, Field.Index.NOT_ANALYZED));
         doc.add(new Field(IndexConstants.INDEX_FIELD_FILEPATH_LC, path.toLowerCase(), Field.Store.YES, Field.Index.NOT_ANALYZED));
         doc.add(new Field(IndexConstants.INDEX_FIELD_CONTENT_LC, versionControlPlugin.getFileContentForFilePath(path).toLowerCase(), Field.Store.YES, Field.Index.ANALYZED));
 
@@ -150,62 +149,48 @@ public class IndexingTask implements Task {
     }
 
     /**
-     * Initializes a IndexWriter with the given analyzer and for the given directory
-     * @param analyzer analyzer for the files.
-     * @param dir The location for the  lucene index
+     * Initializes the IndexWriter
      */
-    public void initializeIndexWriter(Analyzer luceneAnalyzer, File dir) {
-        try {
-            indexWriter = new IndexWriter(indexDirectory, luceneAnalyzer, IndexWriter.MaxFieldLength.LIMITED);
-            LOG.debug("IndexWriter initilaization successful: " + dir.getAbsolutePath());
-        } catch (IOException ex) {
-            LOG.error(ex);
-            LOG.error("IndexWriter initialization error: Could not open directory " + dir.getAbsolutePath());
-        }
+    private void initializeIndexWriter() throws CorruptIndexException, LockObtainFailedException, IOException {
+        indexDirectory = FSDirectory.open(new File(indexLocation));
+        indexWriter = new IndexWriter(indexDirectory, new WhitespaceAnalyzer(), IndexWriter.MaxFieldLength.LIMITED);
+        LOG.debug("IndexWriter initialization successful for directory: " + indexDirectory.getFile().getAbsolutePath());
     }
 
     /**
-     * Creates an index for the given Directory.
+     * Creates an index for the current repository.
      */
     private boolean createIndex() throws VersionControlPluginException, CorruptIndexException, IOException {
         if (indexWriter == null) {
             LOG.error("Creation of indexDirectory failed due to missing initialization of IndexWriter!");
             return false;
         }
-        Document doc = new Document();
-        try {
-            Iterator it = fileNames.iterator();
-            int i = 0;
-            while (it.hasNext()) {
-                String path = (String) it.next();
-                if (!(fileIsOnIgnoreList(path))) {
-                    // The lucene document containing all relevant indexing information
-                    doc = new Document();
-                    // Add fields
-                    doc = addLuceneFields(doc, path);
-                    LOG.debug("Added file: " + doc.get(IndexConstants.INDEX_FIELD_TITLE) + " to index.");
-                    // Add document to the index
-                    indexWriter.addDocument(doc);
-                    i++;
-                }
+        Document doc = null;
+        for (String path : fileNames) {
+            if (!(fileIsOnIgnoreList(path))) {
+                // The lucene document containing all relevant indexing information
+                doc = new Document();
+                // Add fields
+                doc = addLuceneFields(doc, path);
+                // Add document to the index
+                indexWriter.addDocument(doc);
+                LOG.debug("Added file: " + doc.get(IndexConstants.INDEX_FIELD_TITLE) + " to index.");
             }
-            indexWriter.commit();
-            //indexWriter.optimize(); //TODO check whether optimize makes removing of documents impossible
-            indexWriter.close();
-        } catch (CorruptIndexException ex) {
-            LOG.error("Indexing  of: " + doc.get("title") + " failed! \n" + ex);
-        } catch (IOException ex) {
-            LOG.error("Adding file to index: " + doc.get("title") + " failed! \n" + ex);
-        } catch (NullPointerException ex) {
-            LOG.error("NullPointerException: FileContentDirectory is empty!" + ex);
         }
+        indexWriter.commit();
+        //FIXME do not always optimize index, configure a max amount of indexing operations before optimizing
+        //indexWriter.optimize();
+        indexWriter.close();
         return true;
     }
 
     /**
-     * removes all documents from the index that will be replaced by updated documents
+     * Removes all documents from the index that will be replaced by updated documents.
      */
     private void clearPreviousDocuments() throws CorruptIndexException, IOException {
+        if (indexWriter == null) {
+            LOG.error("Clearing of Documents failed due to missing initialization of IndexWriter!");
+        }
         IndexSearcher searcher = null;
         try {
             searcher = new IndexSearcher(indexDirectory, false);
@@ -222,7 +207,7 @@ public class IndexingTask implements Task {
     }
 
     /**
-     * Checks whether the current file is on the list of files that will not be indexed
+     * Checks whether the given file is on the list of files that will not be indexed
      */
     public boolean fileIsOnIgnoreList(String path) {
         Pattern p;
@@ -237,6 +222,7 @@ public class IndexingTask implements Task {
     }
 
     //TODO check for different chars the user could specify in configuration
+    //TODO research whether there is a library for wildcard stuff
     /**
      * Parses the string that represents an entry in the ignore list from the configuration to a string that can be read by java regex
      * @param string the string that is to be parsed
@@ -254,10 +240,6 @@ public class IndexingTask implements Task {
      */
     public String extractFilename(final String path) {
         return path.substring(path.lastIndexOf('/') + 1);
-    }
-
-    public void setRepository(RepositoryDto repository) {
-        this.repository = repository;
     }
 
     public void setPluginLoader(PluginLoader pluginLoader) {

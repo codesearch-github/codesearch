@@ -28,10 +28,13 @@ import org.codesearch.searcher.shared.InvalidIndexLocationException;
 import org.codesearch.searcher.shared.SearchResultDto;
 
 /**
- *
+ * The service used for communication between the GWT javascript client and the server.
  * @author Samuel Kogler
  */
 @RemoteServiceRelativePath("searcherservice")
 public interface SearcherService extends RemoteService {
     public List<SearchResultDto> doSearch(String query) throws InvalidIndexLocationException;
+    public void setCaseSensitive(boolean caseSensitive);
+    public List<String> getAvailableRepositories();
+    public List<String> getAvailableRepositoryGroups();
 }

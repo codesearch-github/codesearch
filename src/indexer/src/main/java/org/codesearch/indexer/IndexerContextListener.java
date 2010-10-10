@@ -18,41 +18,37 @@
  * You should have received a copy of the GNU General Public License
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.codesearch.indexer.core;
+package org.codesearch.indexer;
 
 import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
-import org.codesearch.indexer.manager.IndexingManager;
 import org.quartz.SchedulerException;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * Listener class that calls required methods at startup and destruction of the program
  * @author David Froehlich
  */
-public class IndexerMain implements javax.servlet.ServletContextListener {
+public class IndexerContextListener implements ServletContextListener {
 
-    protected static final Logger LOG = Logger.getLogger(IndexerMain.class);
-    /** The IndexingManager used to control the execution of the IndexingJobs */
-    private IndexingManager indexingManager;
-    /** the application context used to retrieve spring-beans in the indexer */
-    private static ApplicationContext applicationContext;
+    /** Logger. */
+    protected static final Logger LOG = Logger.getLogger(IndexerContextListener.class);
     
-
     /**
      * Instantiates the IndexingManager and starts its scheduler
      * @param sce dummy parameter needed by the parent class implementation
      */
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        applicationContext = new ClassPathXmlApplicationContext("classpath:org/codesearch/indexer/IndexerBeans.xml");
+        ApplicationContext applicationContext = WebApplicationContextUtils.getWebApplicationContext(sce.getServletContext());
         try {
-            indexingManager = new IndexingManager();
+            IndexingManager indexingManager = applicationContext.getBean("indexingManager", IndexingManager.class);
             indexingManager.startScheduler();
         } catch (SchedulerException ex) {
-            LOG.error("Problem with scheduler at context initialization: " + ex);
+            LOG.error("Problem starting scheduler at context initialization: " + ex);
         } catch (ConfigurationException ex) {
             LOG.error("Problem with configuration at context initialization: " + ex);
         }
@@ -60,9 +56,5 @@ public class IndexerMain implements javax.servlet.ServletContextListener {
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
-    }
-
-    public static ApplicationContext getApplicationContext() {
-        return applicationContext;
     }
 }

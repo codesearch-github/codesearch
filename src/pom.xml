@@ -20,7 +20,6 @@
         <gwt.version>2.1-SNAPSHOT</gwt.version>
         <spring.version>3.0.2.RELEASE</spring.version>
         <lucene.version>3.0.2</lucene.version>
-        <quartz.version>1.8.4</quartz.version>
     </properties>
 
     <!-- REPOS -->
@@ -134,9 +133,9 @@
             </dependency>
             <!-- QUARTZ SCHEDULING -->
             <dependency>
-                <groupId>org.quartz-scheduler</groupId>
+                <groupId>org.opensymphony.quartz</groupId>
                 <artifactId>quartz</artifactId>
-                <version>${quartz.version}</version>
+                <version>1.6.1</version>
             </dependency>
             <!-- SERVLET -->
             <dependency>

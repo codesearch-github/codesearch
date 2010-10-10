@@ -38,6 +38,33 @@
         <welcome-file>index.html</welcome-file>
     </welcome-file-list>
 
+    <!-- PARAMS -->
+    <context-param>
+        <param-name>log4jConfigLocation</param-name>
+        <param-value>/WEB-INF/log4j.xml</param-value>
+    </context-param>
+
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>classpath:org/codesearch/commons/CommonsBeans.xml classpath:org/codesearch/searcher/SearcherBeans.xml</param-value>
+    </context-param>
+
+    <!-- LISTENERS -->
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+
+    <listener>
+        <listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>
+    </listener>
+
+    <servlet>
+        <servlet-name>spring-dispatcher</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <!-- SERVLETS -->
     <servlet>
         <servlet-name>searcherservice</servlet-name>
         <servlet-class>org.codesearch.searcher.server.rpc.SearcherServiceImpl</servlet-class>
@@ -48,12 +75,10 @@
         <url-pattern>/searcher/searcherservice</url-pattern>
     </servlet-mapping>
 
-    <context-param>
-        <param-name>contextConfigLocation</param-name>
-        <param-value>classpath:org/codesearch/commons/CommonsBeans.xml classpath:org/codesearch/searcher/SearcherBeans.xml</param-value>
-    </context-param>
+    <!-- Map the DispatcherServlet to only intercept RPC requests -->
+    <servlet-mapping>
+        <servlet-name>spring-dispatcher</servlet-name>
+        <url-pattern>*.rpc</url-pattern>
+    </servlet-mapping>
 
-    <listener>
-        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
-    </listener>
 </web-app>

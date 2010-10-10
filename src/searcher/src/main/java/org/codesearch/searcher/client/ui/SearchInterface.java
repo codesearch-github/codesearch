@@ -144,13 +144,13 @@ public class SearchInterface extends Composite {
         } catch (InvalidIndexLocationException ex) {
             Window.alert("Invalid Index Location");
         }
-        for (int i = 0; i < 30; i++) {
-            SearchResultDto result = new SearchResultDto();
-            result.setFilePath("/aoeu/test");
-            result.setRelevance(45.55f);
-            result.setRepository("repo1");
-            searchResults.add(result);
-        }
+//        for (int i = 0; i < 30; i++) {
+//            SearchResultDto result = new SearchResultDto();
+//            result.setFilePath("/aoeu/test");
+//            result.setRelevance(45.55f);
+//            result.setRepository("repo1");
+//            searchResults.add(result);
+//        }
         setResultViewVisible(true);
         updateResultsView();
     }

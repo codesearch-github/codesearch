@@ -30,7 +30,4 @@
         <constructor-arg ref="xmlConfigReader" />
     </bean>
     
-    <bean name="searcherServiceImpl" class="org.codesearch.searcher.server.rpc.SearcherServiceImpl">
-        <property name="documentSearcher" ref="documentSearcher" />
-    </bean>
 </beans>

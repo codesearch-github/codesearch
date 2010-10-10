@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package org.codesearch.commons.configuration.properties;
 
 import com.sun.xml.internal.bind.v2.runtime.property.Property;
@@ -17,7 +12,7 @@ import static org.junit.Assert.*;
 
 /**
  *
- * @author zeheron
+ * @author Stephan Stiboller
  */
 //TODO spring
 public class PropertiesManagerTest {
