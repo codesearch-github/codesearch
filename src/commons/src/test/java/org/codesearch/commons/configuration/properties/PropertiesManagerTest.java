@@ -5,7 +5,6 @@
 
 package org.codesearch.commons.configuration.properties;
 
-import com.sun.xml.internal.bind.v2.runtime.property.Property;
 import java.io.IOException;
 import org.junit.After;
 import org.junit.AfterClass;

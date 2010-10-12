@@ -164,7 +164,13 @@ public class RepositoryDto {
         }
         try {
             RepositoryDto other = (RepositoryDto) o;
-            if (this.getName().equals(other.getName()) && this.isCodeNavigationEnabled() == other.isCodeNavigationEnabled() && ignoredFileNames.size() == other.getIgnoredFileNames().size()) {
+            if (this.getName().equals(other.getName()) && this.isCodeNavigationEnabled() == other.isCodeNavigationEnabled() && ignoredFileNames.size() == other.getIgnoredFileNames().size() && repositoryGroups.size() == other.getRepositoryGroups().size()) {
+                for(int i = 0; i < repositoryGroups.size(); i++){
+                    if(!repositoryGroups.get(i).equals(other.getRepositoryGroups().get(i))){
+                        return false;
+                    }
+                }
+
                 for (int i = 0; i < ignoredFileNames.size(); i++) {
                     String s = ignoredFileNames.get(i);
                     if (!(s.equals(other.getIgnoredFileNames().get(i)))) {

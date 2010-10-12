@@ -47,7 +47,7 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
     public List<SearchResultDto> doSearch(String query) throws InvalidIndexLocationException {
         List<SearchResultDto> resultItems = new LinkedList<SearchResultDto>();
         try {
-            resultItems = documentSearcher.search(query);
+            resultItems = documentSearcher.search(query, true, null, null); //TODO implement
         } catch (ParseException ex) {
             LOG.error("Could not parse query: " + ex);
         } catch (IOException ex) {

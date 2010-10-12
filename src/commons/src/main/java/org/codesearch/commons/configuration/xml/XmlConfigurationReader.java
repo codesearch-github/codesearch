@@ -161,7 +161,7 @@ public class XmlConfigurationReader {
                 if (ignoredFileNames == null) {
                     ignoredFileNames = new LinkedList<String>();
                 }
-                List<String> repositoryGroups = hc.getList(ConfigReaderConstants.REPOSITORY_BLACKLIST);
+                List<String> repositoryGroups = hc.getList(ConfigReaderConstants.REPOSITORY_GROUPS);
                 if (repositoryGroups == null) {
                     repositoryGroups = new LinkedList<String>();
                 }

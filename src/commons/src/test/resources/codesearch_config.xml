@@ -31,7 +31,6 @@
         <filename>*img*</filename>
         <filename>*.svn*</filename>
         <filename>*.class*</filename>
-
     </global-blacklist-filenames>
     <index-location>/tmp/test</index-location>
     <index-jobs>
@@ -58,7 +57,6 @@
     <testproperty>asdf</testproperty>
     <repositories>
         <repository>
-            <repo-group>group1</repo-group>
             <name>svnsearch_repo</name>
             <version-control-system>SVN</version-control-system>
             <username>feldruebe</username>
@@ -68,15 +66,10 @@
             <blacklist-filenames>
                 <filename>*.xml</filename>
             </blacklist-filenames>
-        </repository>
-        <repository>
-            <repo-group>group1</repo-group>
-            <name>testRepo2</name>
-            <username>testUser</username>
-            <password>testPassword</password>
-            <version-control-system>SVN</version-control-system>
-            <url>http://test.org</url>
-            <code-navigation-enabled>false</code-navigation-enabled>
+            <repository-groups>
+                <repo-group>group1</repo-group>
+                <repo-group>group2</repo-group>
+            </repository-groups>
         </repository>
         <repository>
             <name>svn_local</name>
@@ -84,26 +77,10 @@
             <username>null</username>
             <password>null</password>
             <url>$home/workspace/svnsearch</url>
+            <repository-groups>
+                <repo-group>group1</repo-group>
+            </repository-groups>
             <code-navigation-enabled>true</code-navigation-enabled>
-        </repository>
-        <repository>
-            <name>svnsearch_repo</name>
-            <version_control_system>SVN</version_control_system>
-            <username>feldruebe</username>
-            <password>dota!123</password>
-            <url>svn://portal.htl-kaindorf.at/svnsearch</url>
-            <code-navigation-enabled>true</code-navigation-enabled>
-            <not_indexed_filenames>
-                <filename>*.xml</filename>
-            </not_indexed_filenames>
-        </repository>
-        <repository>
-            <name>testRepo2</name>
-            <username>testUser</username>
-            <password>testPassword</password>
-            <version_control_system>SVN</version_control_system>
-            <url>http://test.org</url>
-            <code-navigation-enabled>false</code-navigation-enabled>
         </repository>
     </repositories>
     <repository-groups>group1,group2,group3</repository-groups>

@@ -65,18 +65,31 @@ public class XmlConfigurationReaderTest {
         List<String> ignFileNames1 = new LinkedList<String>();
         List<String> repoGroups1 = new LinkedList<String>();
         repoGroups1.add("group1");
+        repoGroups1.add("group2");
+
         ignFileNames1.add("*.xml");
         ignFileNames1.add("*.jpg");
         ignFileNames1.add("*.txt");
+        ignFileNames1.add("*.PNG");
+        ignFileNames1.add("*.png");
+        ignFileNames1.add("*img*");
+        ignFileNames1.add("*.svn*");
+        ignFileNames1.add("*.class*");
+        
+
         RepositoryDto repo1 = new RepositoryDto("svnsearch_repo", "svn://portal.htl-kaindorf.at/svnsearch", "feldruebe", "dota!123", true, "SVN", ignFileNames1, repoGroups1);
 
         List<String> ignFileNames2 = new LinkedList<String>();
         List<String> repoGroups2 = new LinkedList<String>();
-        repoGroups2.add("group2");
-        repoGroups2.add("group2.2");
+        repoGroups2.add("group1");
         ignFileNames2.add("*.jpg");
         ignFileNames2.add("*.txt");
-        RepositoryDto repo2 = new RepositoryDto("testRepo2", "http://test.org", "testUser", "testPassword", false, "SVN", ignFileNames2, repoGroups2);
+        ignFileNames2.add("*.PNG");
+        ignFileNames2.add("*.png");
+        ignFileNames2.add("*img*");
+        ignFileNames2.add("*.svn*");
+        ignFileNames2.add("*.class*");
+        RepositoryDto repo2 = new RepositoryDto("svn_local", System.getProperty("user.home")+"/workspace/svnsearch", "null", "null", true, "FILESYSTEM", ignFileNames2, repoGroups2);
 
         List result = configReader.getRepositories();
         assertTrue(repo1.equals(result.get(0)));
@@ -103,28 +116,34 @@ public class XmlConfigurationReaderTest {
         System.out.println("getJobs");
         JobDto job1 = new JobDto();
 
-        RepositoryDto testRepo1;
+        List<String> ignFileNames1 = new LinkedList<String>();
         List<String> repoGroups1 = new LinkedList<String>();
-        List<String> ignoredFiles1 = new LinkedList<String>();
         repoGroups1.add("group1");
-        repoGroups1.add("group1.1");
-        ignoredFiles1.add("*.xml");
-        ignoredFiles1.add("*.jpg");
-        ignoredFiles1.add("*.txt");
+        repoGroups1.add("group2");
 
+        ignFileNames1.add("*.xml");
+        ignFileNames1.add("*.jpg");
+        ignFileNames1.add("*.txt");
+        ignFileNames1.add("*.PNG");
+        ignFileNames1.add("*.png");
+        ignFileNames1.add("*img*");
+        ignFileNames1.add("*.svn*");
+        ignFileNames1.add("*.class*");
+        RepositoryDto repo1 = new RepositoryDto("svnsearch_repo", "svn://portal.htl-kaindorf.at/svnsearch", "feldruebe", "dota!123", true, "SVN", ignFileNames1, repoGroups1);
 
-        testRepo1 = new RepositoryDto("svnsearch_repo", "svn://portal.htl-kaindorf.at/svnsearch", "feldruebe", "dota!123", true, "SVN", ignoredFiles1, repoGroups1);
-        RepositoryDto testRepo2;
-        List<String> ignoredFiles2 = new LinkedList<String>();
+        List<String> ignFileNames2 = new LinkedList<String>();
         List<String> repoGroups2 = new LinkedList<String>();
-        repoGroups2.add("group2");
-        ignoredFiles2.add("*.jpg");
-        ignoredFiles2.add("*.txt");
+        repoGroups2.add("group1");
+        ignFileNames2.add("*.jpg");
+        ignFileNames2.add("*.txt");
+        ignFileNames2.add("*.PNG");
+        ignFileNames2.add("*.png");
+        ignFileNames2.add("*img*");
+        ignFileNames2.add("*.svn*");
+        ignFileNames2.add("*.class*");
+        RepositoryDto repo2 = new RepositoryDto("svn_local", System.getProperty("user.home")+"/workspace/svnsearch", "null", "null", true, "FILESYSTEM", ignFileNames2, repoGroups2);
 
-        testRepo2 = new RepositoryDto("testRepo2", "http://test.org", "testUser", "testPassword", false, "SVN", ignoredFiles2, repoGroups2);
-
-        job1.getTasks().add(new TaskDto(testRepo1, TaskDto.TaskType.index));
-        job1.getTasks().add(new TaskDto(testRepo2, TaskDto.TaskType.index));
+        job1.getTasks().add(new TaskDto(repo1, TaskDto.TaskType.index));
         job1.setInterval(60);
         job1.setStartDate(new GregorianCalendar(2010, 7, 13, 18, 0));
         JobDto job2 = new JobDto();

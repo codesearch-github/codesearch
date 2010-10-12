@@ -53,10 +53,9 @@
         </index-job> 
     </index-jobs>
     <testproperty>fdsa</testproperty>
-    <repository-groups>group1 group2 group3 group4</repository-groups>
+    <repository-groups>group1 group2</repository-groups>
     <repositories>
         <repository>
-            <repo-group>group1</repo-group>
             <name>svnsearch_repo</name>
             <version-control-system>SVN</version-control-system>
             <username>feldruebe</username>
@@ -69,16 +68,16 @@
             <repository-groups>
                 <repo-group>group1</repo-group>
                 <repo-group>group2</repo-group>
-                <repo-group>group3</repo-group>
-                <repo-group>group4</repo-group>
             </repository-groups>
         </repository>
         <repository>
-            <repo-group>group1</repo-group>
             <name>svn_local</name>
             <version-control-system>FILESYSTEM</version-control-system>
             <username>null</username>
             <password>null</password>
+            <repository-groups>
+                <repo-group>group1</repo-group>
+            </repository-groups>
             <url>$home/workspace/svnsearch</url>
             <code-navigation-enabled>true</code-navigation-enabled>
         </repository>
