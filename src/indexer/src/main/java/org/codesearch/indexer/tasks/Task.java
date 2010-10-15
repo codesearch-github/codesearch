@@ -18,9 +18,9 @@
  * You should have received a copy of the GNU General Public License
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.codesearch.indexer.tasks;
 
+import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 import org.codesearch.indexer.exceptions.TaskExecutionException;
 
 /**
@@ -28,6 +28,20 @@ import org.codesearch.indexer.exceptions.TaskExecutionException;
  * @author Stephan Stiboller
  * @author David Froehlich
  */
-public interface Task {
-    public void execute()throws TaskExecutionException;
+public abstract class Task {
+
+    /** The repository to process. */
+    protected RepositoryDto repository;
+    /** The index location. **/
+    protected String indexLocation;
+
+    public void setRepository(RepositoryDto repository) {
+        this.repository = repository;
+    }
+
+    public void setIndexLocation(String indexLocation) {
+        this.indexLocation = indexLocation;
+    }
+
+    public abstract void execute() throws TaskExecutionException;
 }

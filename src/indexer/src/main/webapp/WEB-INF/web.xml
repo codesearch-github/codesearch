@@ -21,32 +21,21 @@
     along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
 
 -->
-
-
-<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns="http://java.sun.com/xml/ns/javaee"
-    xmlns:web="http://java.sun.com/xml/ns/j2ee/web-app_2_5.xsd"
-    xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_5.xsd"
-    version="2.5">
+<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/j2ee/web-app_2_5.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_5.xsd">
     <session-config>
         <session-timeout>
             30
         </session-timeout>
     </session-config>
-
     <display-name>Codesearch Indexer</display-name>
-
     <context-param>
         <param-name>contextConfigLocation</param-name>
         <param-value>classpath:org/codesearch/commons/CommonsBeans.xml classpath:org/codesearch/indexer/IndexerBeans.xml</param-value>
     </context-param>
-
     <listener>
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
     </listener>
-
     <listener>
-        <listener-class>org.codesearch.indexer.core.IndexerMain</listener-class>
+        <listener-class>org.codesearch.indexer.IndexerContextListener</listener-class>
     </listener>
-
 </web-app>

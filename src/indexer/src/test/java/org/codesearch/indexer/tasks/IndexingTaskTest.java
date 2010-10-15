@@ -1,42 +1,30 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.codesearch.indexer.tasks;
 
-import org.springframework.context.ApplicationContext;
-import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 import java.util.LinkedList;
-import java.io.File;
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.util.Version;
 import org.codesearch.commons.configuration.properties.PropertiesManager;
-import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
 import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.*;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.support.GenericXmlContextLoader;
+
+import static org.junit.Assert.*;
 
 /**
  *
  * @author David Froehlich
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(loader = GenericXmlContextLoader.class, locations = {"classpath:org/codesearch/indexer/IndexerBeans.xml"})
+@ContextConfiguration(locations = {"classpath:org/codesearch/indexer/IndexerBeans.xml", "classpath:org/codesearch/commons/CommonsBeans.xml"})
 public class IndexingTaskTest {
 
     private IndexingTask task = new IndexingTask();
-    @Autowired
-    private ApplicationContext applicationContext;
+    private String indexLocation = "/tmp/test/";
 
     public IndexingTaskTest() {
     }
@@ -63,18 +51,18 @@ public class IndexingTaskTest {
         ignoredFileNames.add("*.xml");
         ignoredFileNames.add("*test*");
         ignoredFileNames.add("*/test/*");
-        task.setRepository(new RepositoryDto(null, null, null, null, false, null, ignoredFileNames,null));
+        task.setRepository(new RepositoryDto(null, null, null, null, false, null, ignoredFileNames, null));
         assert (task.fileIsOnIgnoreList("asdf.xml"));
         assert (task.fileIsOnIgnoreList("asdftestasdf"));
         assert (task.fileIsOnIgnoreList("/test/fasdf"));
         assertFalse(task.fileIsOnIgnoreList("asdf.txt"));
     }
 
-    /**
-     * Test of execute method, of class IndexingTask.
-     */
-    @Test
-    public void testExecute() throws Exception {
+//    /**
+//     * Test of execute method, of class IndexingTask.
+//     */
+//    @Test
+//    public void testExecute() throws Exception {
 //        XmlConfigurationReader pm = new XmlConfigurationReader();
 //        List<RepositoryDto> repos = pm.getRepositories();
 //        PropertiesManager pr = new PropertiesManager("/tmp/test/revisions.properties");
@@ -86,27 +74,26 @@ public class IndexingTaskTest {
 //                t.execute();
 //            }
 //        }
-    }
-
+//    }
     @Test
     public void testExecuteLocal() throws Exception {
-        XmlConfigurationReader pm = new XmlConfigurationReader();
-        List<RepositoryDto> repos = pm.getRepositories();
-        PropertiesManager pr = new PropertiesManager("/tmp/test/revisions.properties");
+        RepositoryDto repo = new RepositoryDto();
+        repo.setName("svn_local");
+        repo.setVersionControlSystem("FILESYSTEM");
+        repo.setUrl(System.getProperty("user.home") + "/workspace/svnsearch");
+        PropertiesManager pr = new PropertiesManager(indexLocation + "revisions.properties");
 
         ClearTask clear = new ClearTask();
-        clear.setRepositoryName(null);
-
+        clear.setIndexLocation(indexLocation);
         clear.execute();
-        for (RepositoryDto repo : repos) {
-            if (repo.getVersionControlSystem().equals("FILESYSTEM")) {
-                repo.setUrl(repo.getUrl().replace("$home", System.getProperty("user.home")));
-                IndexingTask t = (IndexingTask) applicationContext.getBean("indexingTask");
-                pr.setPropertyFileValue(repo.getName(), "0");
-                t.setRepository(repo);
-                t.execute();
-            }
-        }
+
+
+        pr.setPropertyFileValue(repo.getName(), "0");
+        
+        IndexingTask t = new IndexingTask();
+        t.setIndexLocation(indexLocation);
+        t.setRepository(repo);
+        t.execute();
     }
 
     /**

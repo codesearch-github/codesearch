@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package org.codesearch.commons.configuration.properties;
 
 import java.io.IOException;
@@ -16,7 +11,7 @@ import static org.junit.Assert.*;
 
 /**
  *
- * @author zeheron
+ * @author Stephan Stiboller
  */
 //TODO spring
 public class PropertiesManagerTest {

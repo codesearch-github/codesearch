@@ -18,24 +18,28 @@
  * You should have received a copy of the GNU General Public License
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.codesearch.indexer.manager;
+package org.codesearch.indexer;
 
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
 import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
 import org.codesearch.commons.configuration.xml.dto.JobDto;
+import org.codesearch.commons.plugins.PluginLoader;
+import org.codesearch.indexer.jobs.IndexingJob;
 import org.quartz.JobDataMap;
-import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
-import org.quartz.SchedulerFactory;
-import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
-import org.quartz.impl.StdSchedulerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.quartz.JobDetailBean;
+import org.springframework.scheduling.quartz.SchedulerFactoryBean;
+import org.springframework.scheduling.quartz.SimpleTriggerBean;
 
 /**
  * controls the scheduler used to execute the indexing jobs
@@ -49,16 +53,17 @@ public final class IndexingManager {
     /** The scheduler used to schedule the IndexingJobss */
     private Scheduler scheduler;
     /** The XmlConfigReader used to retrieve information from the configuration */
-    private XmlConfigurationReader configReader;
+    @Autowired
+    private XmlConfigurationReader xmlConfigurationReader;
+    @Autowired
+    private SchedulerFactoryBean schedulerFactoryBean;
+    @Autowired
+    private PluginLoader pluginLoader;
 
     /**
      * Creates a new instance of IndexingManager
-     * @throws SchedulerException In case the scheduler could not be instantiated
      */
-    public IndexingManager() throws SchedulerException {
-        configReader = new XmlConfigurationReader();
-        SchedulerFactory sf = new StdSchedulerFactory();
-        scheduler = sf.getScheduler();
+    public IndexingManager() {
     }
 
     /**
@@ -86,27 +91,55 @@ public final class IndexingManager {
      */
     public void startScheduler() throws SchedulerException, ConfigurationException {
         LOG.debug("Starting scheduler");
-        List<JobDto> jobs = configReader.getJobs();
-        int i = 0;
+        List<JobDto> jobs = xmlConfigurationReader.getJobs();
         LOG.info("Starting scheduler with " + jobs.size() + " jobs");
 
+        List<Trigger> triggers = new LinkedList<Trigger>();
+
+        SimpleTriggerBean trigger = null;
+        JobDetailBean jobDetail = null;
+        int i = 0;
         for (JobDto job : jobs) {
-            JobDetail jobDetail = new JobDetail("Job" + i, "IndexingJobs", IndexerJob.class);
-            jobDetail.getJobDataMap().put("tasks", job.getTasks());
-            jobDetail.getJobDataMap().put("id", i);
-
+            jobDetail = new JobDetailBean();
+            jobDetail.setBeanName("indexingJob" + i);
+            jobDetail.setJobClass(IndexingJob.class);
+            jobDetail.getJobDataMap().put("taskList", job.getTasks());
             jobDetail.getJobDataMap().put("terminated", false);
+            jobDetail.getJobDataMap().put("xmlConfigurationReader", xmlConfigurationReader);
+            jobDetail.getJobDataMap().put("pluginLoader", pluginLoader);
 
-            Trigger trigger;
+            trigger = new SimpleTriggerBean();
+            trigger.setName("JobTrigger" + i);
+            trigger.setStartTime(new Date(job.getStartDate().getTimeInMillis()));
             if (job.getInterval() == 0) {
                 LOG.info("setting job for single execution");
-                trigger = new SimpleTrigger("JobTrigger" + i, new Date(job.getStartDate().getTimeInMillis()), null, 0, 0);
             } else {
-                trigger = new SimpleTrigger("JobTrigger" + i, new Date(job.getStartDate().getTimeInMillis()), null, SimpleTrigger.REPEAT_INDEFINITELY, job.getInterval() * 60000l);
+                trigger.setRepeatInterval(job.getInterval() * 60000l);
+                trigger.setRepeatCount(SimpleTriggerBean.REPEAT_INDEFINITELY);
             }
-            scheduler.scheduleJob(jobDetail, trigger);
+            trigger.setJobDetail(jobDetail);
+            triggers.add(trigger);
             i++;
         }
-        scheduler.start();
+        schedulerFactoryBean.setTriggers(triggers.toArray(new Trigger[0]));
+        schedulerFactoryBean.stop();
+        try {
+            schedulerFactoryBean.afterPropertiesSet();
+        } catch (Exception ex) {
+            LOG.error(ex);
+        }
+        schedulerFactoryBean.start();
+    }
+
+    public void setXmlConfigurationReader(XmlConfigurationReader xmlConfigurationReader) {
+        this.xmlConfigurationReader = xmlConfigurationReader;
+    }
+
+    public void setSchedulerFactoryBean(SchedulerFactoryBean schedulerFactoryBean) {
+        this.schedulerFactoryBean = schedulerFactoryBean;
+    }
+
+    public void setPluginLoader(PluginLoader pluginLoader) {
+        this.pluginLoader = pluginLoader;
     }
 }

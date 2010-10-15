@@ -30,8 +30,7 @@
          http://www.springframework.org/schema/context
          http://www.springframework.org/schema/context/spring-context-3.0.xsd">
     <context:annotation-config/>
-    <context:component-scan base-package="org.codesearch.commons.plugins"/>
-    <bean name="indexingTask" class="org.codesearch.indexer.tasks.IndexingTask" autowire="byName" scope="prototype" />
-    <bean name="xmlConfigReader" class="org.codesearch.commons.configuration.xml.XmlConfigurationReader" />
-    <bean name="pluginLoader" class="org.codesearch.commons.plugins.PluginLoader" />
+
+    <bean name="schedulerFactoryBean" class="org.springframework.scheduling.quartz.SchedulerFactoryBean" />
+    <bean name="indexingManager" class="org.codesearch.indexer.IndexingManager" />
 </beans>

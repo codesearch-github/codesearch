@@ -22,7 +22,7 @@
 package org.codesearch.searcher;
 
 /**
- *
+ * Exception thrown when something goes wrong in the searcher.
  * @author Samuel Kogler
  */
 public class SearcherException extends Exception {

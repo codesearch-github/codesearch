@@ -21,11 +21,13 @@
 package org.codesearch.commons.configuration.xml;
 
 /**
- * This class includes all constants needed to access the global xml-configuration file with the config reader.
+ * This class includes all constants needed to access the global xml-configuration with the config reader.
  * @author Stephan Stiboller
  */
-public class ConfigReaderConstants {
+public final class XmlConfigurationReaderConstants {
 
+    /** Private constructor so its  not instantiable. */
+    private XmlConfigurationReaderConstants () {}
     //GLOBAL CONSTANTS
     /** Used to find out the index location */
     public static final String INDEX_LOCATION = "index-location";
