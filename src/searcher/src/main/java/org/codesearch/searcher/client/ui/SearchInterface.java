@@ -28,8 +28,8 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.cellview.client.CellTable;
-import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.SimplePager;
+import com.google.gwt.user.cellview.client.SimplePager.TextLocation;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -40,8 +40,6 @@ import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TabLayoutPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.SelectionModel;
-import com.google.gwt.view.client.SingleSelectionModel;
 import java.util.LinkedList;
 import java.util.List;
 import org.codesearch.searcher.client.rpc.SearcherServiceAsync;
@@ -64,7 +62,7 @@ public class SearchInterface extends Composite {
     //TODO workaround, refactor after GWT2.1 release
     @UiField(provided = true)
     CellTable<SearchResultDto> resultTable = new CellTable<SearchResultDto>(15);
-    @UiField
+    @UiField(provided = true)
     SimplePager resultTablePager;
     @UiField
     TextBox searchBox;
@@ -83,7 +81,6 @@ public class SearchInterface extends Composite {
 
     public SearchInterface() {
         resultTable.addColumn(new TextColumn<SearchResultDto>() {
-
             @Override
             public String getValue(SearchResultDto dto) {
                 return String.valueOf(dto.getRelevance());
@@ -105,14 +102,15 @@ public class SearchInterface extends Composite {
                 return dto.getRepository();
             }
         }, "Repository");
-
+        // Create a Pager to control the table.
+        SimplePager.Resources pagerResources = GWT.create(SimplePager.Resources.class);
+        resultTablePager = new SimplePager(TextLocation.CENTER, pagerResources, false, 0, true);
+        resultTablePager.setDisplay(resultTable);
         initWidget(uiBinder.createAndBindUi(this));
         repositoryTabPanel.selectTab(0);
         resultTablePager.setDisplay(resultTable);
         setResultViewVisible(false);
     }
-
-   
 
     @UiHandler("searchButton")
     void onSearchButton(ClickEvent e) {
@@ -131,28 +129,23 @@ public class SearchInterface extends Composite {
         String query = searchBox.getText();
         try {
             searcherServiceAsync.doSearch(query, new AsyncCallback<List<SearchResultDto>>() {
+
                 @Override
                 public void onFailure(Throwable caught) {
                     Window.alert("Exception calling the search service on the server:\n" + caught);
+                    setResultViewVisible(false);
                 }
 
                 @Override
                 public void onSuccess(List<SearchResultDto> resultList) {
                     searchResults.addAll(resultList);
+                    updateResultsView();
+                    setResultViewVisible(true);
                 }
             });
         } catch (InvalidIndexLocationException ex) {
             Window.alert("Invalid Index Location");
         }
-        for (int i = 0; i < 30; i++) {
-            SearchResultDto result = new SearchResultDto();
-            result.setFilePath("/aoeu/test");
-            result.setRelevance(45.55f);
-            result.setRepository("repo1");
-            searchResults.add(result);
-        }
-        setResultViewVisible(true);
-        updateResultsView();
     }
 
     private void updateResultsView() {
@@ -160,7 +153,7 @@ public class SearchInterface extends Composite {
         resultTable.redraw();
     }
 
-     private void setResultViewVisible(boolean visible) {
+    private void setResultViewVisible(boolean visible) {
         resultView.setVisible(visible);
     }
 }

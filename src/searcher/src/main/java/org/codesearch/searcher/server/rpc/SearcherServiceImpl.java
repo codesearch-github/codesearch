@@ -20,7 +20,6 @@
  */
 package org.codesearch.searcher.server.rpc;
 
-import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
@@ -31,23 +30,28 @@ import org.codesearch.searcher.client.rpc.SearcherService;
 import org.codesearch.searcher.server.DocumentSearcher;
 import org.codesearch.searcher.shared.InvalidIndexLocationException;
 import org.codesearch.searcher.shared.SearchResultDto;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Service used for search operations.
  * @author Samuel Kogler
  */
-public class SearcherServiceImpl extends RemoteServiceServlet implements SearcherService {
+public class SearcherServiceImpl extends AutowiringRemoteServiceServlet implements SearcherService {
 
     /** The logger. */
     private static final Logger LOG = Logger.getLogger(SearcherServiceImpl.class);
     /** The document searcher used to search the index. */
+    @Autowired
     private DocumentSearcher documentSearcher;
+
+    public SearcherServiceImpl() {
+    }
 
     @Override
     public List<SearchResultDto> doSearch(String query) throws InvalidIndexLocationException {
         List<SearchResultDto> resultItems = new LinkedList<SearchResultDto>();
         try {
-            resultItems = documentSearcher.search(query, true, null, null); //TODO implement
+            resultItems = documentSearcher.search(query, true, new LinkedList<String>(), new LinkedList<String>()); //TODO implement
         } catch (ParseException ex) {
             LOG.error("Could not parse query: " + ex);
         } catch (IOException ex) {
@@ -56,11 +60,17 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
         return resultItems;
     }
 
-    public DocumentSearcher getDocumentSearcher() {
-        return documentSearcher;
-    }
-
     public void setDocumentSearcher(DocumentSearcher documentSearcher) {
         this.documentSearcher = documentSearcher;
+    }
+
+    @Override
+    public List<String> getAvailableRepositoryGroups() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public List<String> getAvailableRepositories() {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

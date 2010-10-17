@@ -66,20 +66,20 @@ public class XmlConfigurationReader {
             loadConfigReader();
         }
         //read the configuration for the jobs from the config
-        List<HierarchicalConfiguration> jobConfig = config.configurationsAt(ConfigReaderConstants.INDEX_JOB);
+        List<HierarchicalConfiguration> jobConfig = config.configurationsAt(XmlConfigurationReaderConstants.INDEX_JOB);
         for (HierarchicalConfiguration hc : jobConfig) {
             //reads job specific values and adds them to the JobDto
             try {
                 JobDto job = new JobDto();
                 int interval;
                 try {
-                    interval = hc.getInt(ConfigReaderConstants.JOB_INTERVAL);
+                    interval = hc.getInt(XmlConfigurationReaderConstants.JOB_INTERVAL);
                 } catch (NoSuchElementException ex) {
                     //in case no interval was specified the job is set to execute only once
                     interval = 0;
                 }
                 //The start time is stored as a single string seperated by '-' e.g.: YYYY-MM-DD-HH-MM
-                String timeString = hc.getString(ConfigReaderConstants.JOB_START_DATE);
+                String timeString = hc.getString(XmlConfigurationReaderConstants.JOB_START_DATE);
                 Calendar calc;
                 if (timeString == null) {
                     calc = GregorianCalendar.getInstance();
@@ -92,18 +92,18 @@ public class XmlConfigurationReader {
                 job.setInterval(interval);
                 job.setStartDate(calc);
 
-                String repositoryString = hc.getString(ConfigReaderConstants.JOB_REPOSITORY);
+                String repositoryString = hc.getString(XmlConfigurationReaderConstants.JOB_REPOSITORY);
                 //The list of repositories this job is associated with, each task specified in the configuration is created for each of these repositories
                 List<RepositoryDto> repositoriesForJob = getRepositoryDtosForString(repositoryString);
                 //Read the tasks per job from the configuration
-                List<SubnodeConfiguration> subConf = hc.configurationsAt(ConfigReaderConstants.TASK_LIST);
+                List<SubnodeConfiguration> subConf = hc.configurationsAt(XmlConfigurationReaderConstants.TASK_LIST);
                 List<TaskDto> tasks = new LinkedList<TaskDto>();
 
                 for (SubnodeConfiguration sc : subConf) {
                     TaskType type = null;
-                    if (sc.getString(ConfigReaderConstants.TASK_TYPE).equals("index")) { //TODO replace with a more generic method
+                    if (sc.getString(XmlConfigurationReaderConstants.TASK_TYPE).equals("index")) { //TODO replace with a more generic method
                         type = TaskType.index;
-                    } else if (sc.getString(ConfigReaderConstants.TASK_TYPE).equals("clear")) {
+                    } else if (sc.getString(XmlConfigurationReaderConstants.TASK_TYPE).equals("clear")) {
                         type = TaskType.clear;
                     }
                     if (type == TaskType.clear && repositoryString == null) {
@@ -154,23 +154,23 @@ public class XmlConfigurationReader {
             loadConfigReader();
         }
         RepositoryDto repo = null;
-        List<HierarchicalConfiguration> repositories = config.configurationsAt(ConfigReaderConstants.REPOSITORY_LIST);
+        List<HierarchicalConfiguration> repositories = config.configurationsAt(XmlConfigurationReaderConstants.REPOSITORY_LIST);
         for (HierarchicalConfiguration hc : repositories) {
-            if (hc.getString(ConfigReaderConstants.REPOSITORY_NAME).equals(name)) {
-                List<String> ignoredFileNames = hc.getList(ConfigReaderConstants.REPOSITORY_BLACKLIST);
+            if (hc.getString(XmlConfigurationReaderConstants.REPOSITORY_NAME).equals(name)) {
+                List<String> ignoredFileNames = hc.getList(XmlConfigurationReaderConstants.REPOSITORY_BLACKLIST);
                 if (ignoredFileNames == null) {
                     ignoredFileNames = new LinkedList<String>();
                 }
-                List<String> repositoryGroups = hc.getList(ConfigReaderConstants.REPOSITORY_GROUPS);
+                List<String> repositoryGroups = hc.getList(XmlConfigurationReaderConstants.REPOSITORY_BLACKLIST);
                 if (repositoryGroups == null) {
                     repositoryGroups = new LinkedList<String>();
                 }
                 ignoredFileNames.addAll(getGloballyIgnoredFileNames());
-                repo = new RepositoryDto(name, hc.getString(ConfigReaderConstants.REPOSITORY_URL),
-                        hc.getString(ConfigReaderConstants.REPOSITORY_USERNAME),
-                        hc.getString(ConfigReaderConstants.REPOSITORY_PASSWORD),
-                        hc.getBoolean(ConfigReaderConstants.REPOSITORY_CODE_NAVIGATION_ENABLED),
-                        hc.getString(ConfigReaderConstants.REPOSITORY_VCS),
+                repo = new RepositoryDto(name, hc.getString(XmlConfigurationReaderConstants.REPOSITORY_URL),
+                        hc.getString(XmlConfigurationReaderConstants.REPOSITORY_USERNAME),
+                        hc.getString(XmlConfigurationReaderConstants.REPOSITORY_PASSWORD),
+                        hc.getBoolean(XmlConfigurationReaderConstants.REPOSITORY_CODE_NAVIGATION_ENABLED),
+                        hc.getString(XmlConfigurationReaderConstants.REPOSITORY_VCS),
                         ignoredFileNames,
                         repositoryGroups);
             }
@@ -182,7 +182,7 @@ public class XmlConfigurationReader {
         if (config == null) {
             loadConfigReader();
         }
-        return config.getList(ConfigReaderConstants.GLOBAL_BLACKLIST);
+        return config.getList(XmlConfigurationReaderConstants.GLOBAL_BLACKLIST);
     }
 
     /**
@@ -196,22 +196,22 @@ public class XmlConfigurationReader {
             loadConfigReader();
         }
         List<RepositoryDto> repositories = new LinkedList<RepositoryDto>();
-        List<HierarchicalConfiguration> repositoryConfigs = config.configurationsAt(ConfigReaderConstants.REPOSITORY_LIST);
+        List<HierarchicalConfiguration> repositoryConfigs = config.configurationsAt(XmlConfigurationReaderConstants.REPOSITORY_LIST);
         for (HierarchicalConfiguration repositoryConfig : repositoryConfigs) {
             RepositoryDto repositoryDto = new RepositoryDto();
-            repositoryDto.setVersionControlSystem(repositoryConfig.getString(ConfigReaderConstants.REPOSITORY_VCS));
-            repositoryDto.setName(repositoryConfig.getString(ConfigReaderConstants.REPOSITORY_NAME));
-            repositoryDto.setUrl(repositoryConfig.getString(ConfigReaderConstants.REPOSITORY_URL));
-            repositoryDto.setUsername(repositoryConfig.getString(ConfigReaderConstants.REPOSITORY_USERNAME));
-            repositoryDto.setPassword(repositoryConfig.getString(ConfigReaderConstants.REPOSITORY_PASSWORD));
-            repositoryDto.setCodeNavigationEnabled(repositoryConfig.getBoolean(ConfigReaderConstants.REPOSITORY_CODE_NAVIGATION_ENABLED));
-            List<String> ignoredFileNames = repositoryConfig.getList(ConfigReaderConstants.REPOSITORY_BLACKLIST);
+            repositoryDto.setVersionControlSystem(repositoryConfig.getString(XmlConfigurationReaderConstants.REPOSITORY_VCS));
+            repositoryDto.setName(repositoryConfig.getString(XmlConfigurationReaderConstants.REPOSITORY_NAME));
+            repositoryDto.setUrl(repositoryConfig.getString(XmlConfigurationReaderConstants.REPOSITORY_URL));
+            repositoryDto.setUsername(repositoryConfig.getString(XmlConfigurationReaderConstants.REPOSITORY_USERNAME));
+            repositoryDto.setPassword(repositoryConfig.getString(XmlConfigurationReaderConstants.REPOSITORY_PASSWORD));
+            repositoryDto.setCodeNavigationEnabled(repositoryConfig.getBoolean(XmlConfigurationReaderConstants.REPOSITORY_CODE_NAVIGATION_ENABLED));
+            List<String> ignoredFileNames = repositoryConfig.getList(XmlConfigurationReaderConstants.REPOSITORY_BLACKLIST);
             if (ignoredFileNames == null) {
                 ignoredFileNames = new LinkedList<String>();
             }
             ignoredFileNames.addAll(this.getGloballyIgnoredFileNames());
             repositoryDto.setIgnoredFileNames(ignoredFileNames);
-            List<String> repositoryGroups = repositoryConfig.getList(ConfigReaderConstants.REPOSITORY_GROUPS);
+            List<String> repositoryGroups = repositoryConfig.getList(XmlConfigurationReaderConstants.REPOSITORY_GROUPS);
             if (repositoryGroups == null) {
                 repositoryGroups = new LinkedList<String>();
             }
@@ -231,7 +231,7 @@ public class XmlConfigurationReader {
             loadConfigReader();
         }
         List<String> groups = new LinkedList<String>();
-        groups = Arrays.asList(config.getString(ConfigReaderConstants.REPOSITORY_GROUP_LIST).split(","));
+        groups = Arrays.asList(config.getString(XmlConfigurationReaderConstants.REPOSITORY_GROUP_LIST).split(","));
         return groups;
     }
 

@@ -32,4 +32,8 @@ import org.codesearch.searcher.shared.SearchResultDto;
  */
 public interface SearcherServiceAsync {
     public void doSearch(String query, AsyncCallback<List<SearchResultDto>> asyncCallback) throws InvalidIndexLocationException;
+
+    public void getAvailableRepositories(AsyncCallback<List<String>> asyncCallback);
+
+    public void getAvailableRepositoryGroups(AsyncCallback<List<String>> asyncCallback);
 }

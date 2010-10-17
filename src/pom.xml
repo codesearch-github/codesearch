@@ -13,21 +13,20 @@
         <module>commons</module>
         <module>indexer</module>
         <module>searcher</module>
-  </modules>
+    </modules>
 
     <!-- LIBRARY VERSIONS -->
     <properties>
-        <gwt.version>2.1-SNAPSHOT</gwt.version>
+        <gwt.version>2.1.0.RC1</gwt.version>
         <spring.version>3.0.2.RELEASE</spring.version>
         <lucene.version>3.0.2</lucene.version>
-        <quartz.version>1.8.4</quartz.version>
     </properties>
 
     <!-- REPOS -->
     <repositories>
         <repository>
             <id>gwt-repo</id>
-            <url>http://google-web-toolkit.googlecode.com/svn/2.1.0.M3/gwt/maven</url>
+            <url>http://google-web-toolkit.googlecode.com/svn/2.1.0/gwt/maven/</url>
             <name>Google Web Toolkit Repository</name>
         </repository>
     </repositories>
@@ -35,12 +34,6 @@
     <!-- DEFINES VERSIONS OF DEPENDENCIES FOR MODULES -->
     <dependencyManagement>
         <dependencies>
-            <!-- Log4J -->
-            <dependency>
-                <groupId>log4j</groupId>
-                <artifactId>log4j</artifactId>
-                <version>1.2.14</version>
-            </dependency>
             <!-- SPRING FRAMEWORK -->
             <dependency>
                 <groupId>org.springframework</groupId>
@@ -136,7 +129,7 @@
             <dependency>
                 <groupId>org.quartz-scheduler</groupId>
                 <artifactId>quartz</artifactId>
-                <version>${quartz.version}</version>
+                <version>1.8.4</version>
             </dependency>
             <!-- SERVLET -->
             <dependency>
@@ -171,10 +164,16 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
                 <configuration>
                     <source>1.6</source>
                     <target>1.6</target>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>2.1</version>
             </plugin>
             <plugin>
                 <groupId>com.mycila.maven-license-plugin</groupId>

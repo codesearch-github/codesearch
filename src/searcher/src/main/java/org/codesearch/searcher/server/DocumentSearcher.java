@@ -38,10 +38,11 @@ import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
-import org.codesearch.commons.configuration.xml.ConfigReaderConstants;
+import org.codesearch.commons.configuration.xml.XmlConfigurationReaderConstants;
 import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
 import org.codesearch.commons.constants.IndexConstants;
 import org.codesearch.searcher.shared.SearchResultDto;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Provides methods to search the index.
@@ -59,9 +60,14 @@ public class DocumentSearcher {
     private boolean searcherInitialized = false;
     /** The location of the index. **/
     private String indexLocation;
-    
-    private XmlConfigurationReader configReader = new XmlConfigurationReader();
-
+    /** whether the current search is case sensitive or not */
+    private boolean caseSensitive;
+    /** the repositories used for the search */
+    private List<String> repositoryNames = new LinkedList<String>();
+    /** the repository groups used for the search*/
+    private List<String> repositoryGroupNames = new LinkedList<String>();
+    @Autowired
+    private XmlConfigurationReader xmlConfigurationReader;
     
     /**
      * Creates a new DocumentSearcher instance
@@ -70,7 +76,7 @@ public class DocumentSearcher {
      */
     public DocumentSearcher(XmlConfigurationReader configReader) throws ConfigurationException {
         // Retrieve index location from the configuration
-        indexLocation = configReader.getSingleLinePropertyValue(ConfigReaderConstants.INDEX_LOCATION);
+        indexLocation = configReader.getSingleLinePropertyValue(XmlConfigurationReaderConstants.INDEX_LOCATION);
         LOG.debug("Index location set to: " + indexLocation);
         //TODO replace with appropriate Analyzer
         queryParser = new QueryParser(Version.LUCENE_30, "", new WhitespaceAnalyzer());
@@ -148,7 +154,7 @@ public class DocumentSearcher {
         
         query += " AND (";
         for(String repoGroup : repositoryGroupNames){
-            for(String repo : configReader.getRepositoriesForGroup(repoGroup)){
+            for(String repo : xmlConfigurationReader.getRepositoriesForGroup(repoGroup)){
                 repositoryNames.add(repo);
             }
         }
