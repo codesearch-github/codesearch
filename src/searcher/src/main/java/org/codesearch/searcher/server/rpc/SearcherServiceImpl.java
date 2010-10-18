@@ -23,8 +23,13 @@ package org.codesearch.searcher.server.rpc;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
+import javax.annotation.PostConstruct;
+import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
 import org.apache.lucene.queryParser.ParseException;
+import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
+import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 
 import org.codesearch.searcher.client.rpc.SearcherService;
 import org.codesearch.searcher.server.DocumentSearcher;
@@ -43,18 +48,36 @@ public class SearcherServiceImpl extends AutowiringRemoteServiceServlet implemen
     /** The document searcher used to search the index. */
     @Autowired
     private DocumentSearcher documentSearcher;
+    @Autowired
+    private XmlConfigurationReader xmlConfigurationReader;
+    private List<String> repositories;
+    private List<String> repositoryGroups;
 
-    public SearcherServiceImpl() {
+    @Override
+    protected void postConstruct() {
+        try {
+            repositoryGroups = xmlConfigurationReader.getRepositoryGroups();
+            repositories = new LinkedList<String>();
+            for (RepositoryDto dto : xmlConfigurationReader.getRepositories()) {
+                if (dto != null) {
+                    repositories.add(dto.getName());
+                }
+            }
+        } catch (ConfigurationException ex) {
+            LOG.error(ex);
+        }
     }
 
     @Override
-    public List<SearchResultDto> doSearch(String query) throws InvalidIndexLocationException {
+    public List<SearchResultDto> doSearch(String query, boolean caseSensitive, List<String> selectedRepositories, List<String> selectedRepositoryGroups) throws InvalidIndexLocationException {
         List<SearchResultDto> resultItems = new LinkedList<SearchResultDto>();
         try {
-            resultItems = documentSearcher.search(query, true, new LinkedList<String>(), new LinkedList<String>()); //TODO implement
+            resultItems = documentSearcher.search(query, caseSensitive, selectedRepositories, selectedRepositoryGroups);
         } catch (ParseException ex) {
             LOG.error("Could not parse query: " + ex);
         } catch (IOException ex) {
+            LOG.error(ex);
+        } catch (ConfigurationException ex) {
             LOG.error(ex);
         }
         return resultItems;
@@ -64,13 +87,17 @@ public class SearcherServiceImpl extends AutowiringRemoteServiceServlet implemen
         this.documentSearcher = documentSearcher;
     }
 
+    public void setXmlConfigurationReader(XmlConfigurationReader xmlConfigurationReader) {
+        this.xmlConfigurationReader = xmlConfigurationReader;
+    }
+
     @Override
     public List<String> getAvailableRepositoryGroups() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return repositoryGroups;
     }
 
     @Override
     public List<String> getAvailableRepositories() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return repositories;
     }
 }

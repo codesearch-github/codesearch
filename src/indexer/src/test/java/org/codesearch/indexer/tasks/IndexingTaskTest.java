@@ -8,10 +8,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 import java.util.LinkedList;
-import java.io.File;
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.util.Version;
 import org.codesearch.commons.configuration.properties.PropertiesManager;
 import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
 import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
@@ -31,7 +27,7 @@ import org.springframework.test.context.support.GenericXmlContextLoader;
  * @author David Froehlich
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(loader = GenericXmlContextLoader.class, locations = {"classpath:org/codesearch/indexer/IndexerBeans.xml"})
+@ContextConfiguration(loader = GenericXmlContextLoader.class, locations = {"classpath:org/codesearch/commons/CommonsBeans.xml", "classpath:org/codesearch/indexer/IndexerBeans.xml"})
 public class IndexingTaskTest {
 
     private IndexingTask task = new IndexingTask();

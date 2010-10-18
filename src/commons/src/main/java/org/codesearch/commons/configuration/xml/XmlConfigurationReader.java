@@ -231,7 +231,7 @@ public class XmlConfigurationReader {
             loadConfigReader();
         }
         List<String> groups = new LinkedList<String>();
-        groups = Arrays.asList(config.getString(XmlConfigurationReaderConstants.REPOSITORY_GROUP_LIST).split(","));
+        groups = Arrays.asList(config.getString(XmlConfigurationReaderConstants.REPOSITORY_GROUP_LIST).split(" "));
         return groups;
     }
 

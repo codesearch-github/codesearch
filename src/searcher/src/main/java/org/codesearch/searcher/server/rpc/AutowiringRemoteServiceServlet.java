@@ -11,7 +11,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * Convenience class that enables spring autowiring for a gwt service servlet.
  * @author Samuel Kogler
  */
-public class AutowiringRemoteServiceServlet extends RemoteServiceServlet {
+public abstract class AutowiringRemoteServiceServlet extends RemoteServiceServlet {
 
     @Override
     public void init(ServletConfig config) throws ServletException {
@@ -19,5 +19,8 @@ public class AutowiringRemoteServiceServlet extends RemoteServiceServlet {
         WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(config.getServletContext());
         AutowireCapableBeanFactory beanFactory = ctx.getAutowireCapableBeanFactory();
         beanFactory.autowireBean(this);
+        postConstruct();
     }
+
+    protected abstract void postConstruct();
 }

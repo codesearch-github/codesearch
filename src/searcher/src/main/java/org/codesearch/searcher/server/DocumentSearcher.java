@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.lang.NotImplementedException;
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.WhitespaceAnalyzer;
 import org.apache.lucene.document.Document;
@@ -68,7 +67,7 @@ public class DocumentSearcher {
     private List<String> repositoryGroupNames = new LinkedList<String>();
     @Autowired
     private XmlConfigurationReader xmlConfigurationReader;
-    
+
     /**
      * Creates a new DocumentSearcher instance
      * @throws ConfigurationException if no value for the key specified in the constant INDEX_LOCATION_KEY could be found in the in the configuration via the XmlConfigurationReader
@@ -96,21 +95,15 @@ public class DocumentSearcher {
      * @throws ParseException if the searchString could not be parsed to a query
      * @throws IOException if the Index could not be read
      */
-    public List<SearchResultDto> search(String searchString, boolean caseSensitive, List<String> repositoryNames, List<String> repositoryGroupNames) throws ParseException, IOException, InvalidIndexLocationException{
+    public List<SearchResultDto> search(String searchString, boolean caseSensitive, List<String> repositoryNames, List<String> repositoryGroupNames) throws ParseException, IOException, InvalidIndexLocationException, ConfigurationException {
         if (!searcherInitialized) {
             initSearcher();
         }
         List<SearchResultDto> results = new LinkedList<SearchResultDto>();
-        Query query;
-        try {
-            query = queryParser.parse(this.parseQuery(searchString, caseSensitive, repositoryNames, repositoryGroupNames));
-        } catch (ConfigurationException ex) {
-            //TODO add handling for exception
-            throw new NotImplementedException();
-        }
+        Query query = queryParser.parse(parseQuery(searchString, caseSensitive, repositoryNames, repositoryGroupNames));
         LOG.info("Searching index with query: " + query.toString());
         //Retrieve all search results from search
-        TopDocs topDocs = indexSearcher.search(query, 10000);
+        TopDocs topDocs = indexSearcher.search(query, 1000);
         LOG.info("Found " + topDocs.scoreDocs.length + " results");
         Document doc;
         //Add each search result in form of a ResultItem to the results-list
@@ -134,36 +127,39 @@ public class DocumentSearcher {
     public String parseQuery(String term, boolean caseSensitive, List<String> repositoryNames, List<String> repositoryGroupNames) throws ConfigurationException { //TODO rename, same name as lucene and make private after finished testing
         String query = "";
 
-        if (term.contains(":")) {
-            throw new NotImplementedException();
-        }
-
         if (caseSensitive) {
-            query = IndexConstants.INDEX_FIELD_CONTENT+":\"" + term + "\"";
+            query = IndexConstants.INDEX_FIELD_CONTENT + ":\"" + term + "\"";
         } else {
-            query = IndexConstants.INDEX_FIELD_CONTENT_LC+":\"" + term + "\"";
+            query = IndexConstants.INDEX_FIELD_CONTENT_LC + ":\"" + term.toLowerCase() + "\"";
         }
         query = appendRepositoriesToQuery(query, repositoryNames, repositoryGroupNames);
         return query;
     }
 
-    private String appendRepositoriesToQuery(String query, List<String> repositoryNames, List<String> repositoryGroupNames) throws ConfigurationException{
-        if(repositoryGroupNames.isEmpty() && repositoryNames.isEmpty()){
-            return query;
-        }
-        
-        query += " AND (";
-        for(String repoGroup : repositoryGroupNames){
-            for(String repo : xmlConfigurationReader.getRepositoriesForGroup(repoGroup)){
+    private String appendRepositoriesToQuery(String query, List<String> repositoryNames, List<String> repositoryGroupNames) throws ConfigurationException {
+        for (String repoGroup : repositoryGroupNames) {
+            for (String repo : xmlConfigurationReader.getRepositoriesForGroup(repoGroup)) {
                 repositoryNames.add(repo);
             }
         }
-        for(String repo : repositoryNames){
-            query += IndexConstants.INDEX_FIELD_REPOSITORY + ":" + repo + " OR ";
+
+        if (repositoryNames.isEmpty()) {
+            return query;
         }
-               
-        query = query.substring(0, query.length()-4)+")";
-        return query;
+
+        StringBuilder repoQuery = new StringBuilder();
+        repoQuery.append(" +");
+        repoQuery.append(IndexConstants.INDEX_FIELD_REPOSITORY);
+        repoQuery.append(":(");
+
+        for (String repo : repositoryNames) {
+            repoQuery.append(repo);
+            repoQuery.append(" OR ");
+        }
+        repoQuery = new StringBuilder(repoQuery.substring(0, repoQuery.length()- 4));
+        repoQuery.append(")");
+
+        return query + repoQuery.toString();
     }
 
     private void initSearcher() throws InvalidIndexLocationException {

@@ -54,7 +54,7 @@
                         <g:TabLayoutPanel ui:field='repositoryTabPanel' barUnit='EM' barHeight='1.7' height='10em'>
                             <g:tab>
                                 <g:header>Repositories</g:header>
-                                <g:ListBox ui:field='repositoryList' visibleItemCount='6'>
+                                <g:ListBox ui:field='repositoryList' visibleItemCount='6' multipleSelect='true'>
                                     <g:item>
                                         No valid repositories found. Check configuration.
                                     </g:item>
@@ -62,7 +62,7 @@
                             </g:tab>
                             <g:tab>
                                 <g:header>Repository Groups</g:header>
-                                <g:ListBox ui:field='repositoryGroupList' visibleItemCount='6'>
+                                <g:ListBox ui:field='repositoryGroupList' visibleItemCount='6' multipleSelect='true'>
                                     <g:item>
                                         No valid repository groups found. Check configuration.
                                     </g:item>
@@ -78,7 +78,7 @@
                 <g:center>
                     <g:FlowPanel ui:field='resultView'>
                         <c:CellTable ui:field='resultTable' />
-                        <c:SimplePager ui:field='resultTablePager' location='CENTER' />
+                        <c:SimplePager ui:field='resultTablePager' />
                     </g:FlowPanel>
                 </g:center>
             </g:DockLayoutPanel>

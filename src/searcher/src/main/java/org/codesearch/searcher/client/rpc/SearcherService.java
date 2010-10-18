@@ -33,7 +33,7 @@ import org.codesearch.searcher.shared.SearchResultDto;
  */
 @RemoteServiceRelativePath("searcherservice")
 public interface SearcherService extends RemoteService {
-    public List<SearchResultDto> doSearch(String query) throws InvalidIndexLocationException;
+    public List<SearchResultDto> doSearch(String query, boolean caseSensitive, List<String> selectedRepositories, List<String> selectedRepositoryGroups) throws InvalidIndexLocationException;
     public List<String> getAvailableRepositories();
     public List<String> getAvailableRepositoryGroups();
 }

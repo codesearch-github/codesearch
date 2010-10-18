@@ -36,6 +36,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TabLayoutPanel;
 import com.google.gwt.user.client.ui.TextBox;
@@ -61,7 +62,7 @@ public class SearchInterface extends Composite {
     private SearcherServiceAsync searcherServiceAsync = GWT.create(SearcherService.class);
     //TODO workaround, refactor after GWT2.1 release
     @UiField(provided = true)
-    CellTable<SearchResultDto> resultTable = new CellTable<SearchResultDto>(15);
+    CellTable<SearchResultDto> resultTable;
     @UiField(provided = true)
     SimplePager resultTablePager;
     @UiField
@@ -76,11 +77,118 @@ public class SearchInterface extends Composite {
     ListBox repositoryGroupList;
     @UiField
     FlowPanel resultView;
+    @UiField
+    HasValue<Boolean> caseSensitive;
     /** Saves the current search results **/
     List<SearchResultDto> searchResults = new LinkedList<SearchResultDto>();
 
     public SearchInterface() {
+        initResultTable();
+        initWidget(uiBinder.createAndBindUi(this));
+        repositoryTabPanel.selectTab(0);
+        updateRepositoryDisplay();
+        setResultViewVisible(false);
+    }
+
+    @UiHandler("searchButton")
+    void onSearchButton(ClickEvent e) {
+        search();
+    }
+
+    @UiHandler("searchBox")
+    void onSearchBoxKeyUp(KeyUpEvent event) {
+        if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+            searchButton.click();
+        }
+    }
+
+    private void search() {
+        searchResults.clear();
+        String query = searchBox.getText();
+        List<String> selectedRepositories = new LinkedList<String>();
+        List<String> selectedRepositoryGroups = new LinkedList<String>();
+        if (repositoryTabPanel.getSelectedIndex() == 0) {
+            for (int i = 0; i < repositoryList.getItemCount(); i++) {
+                if (repositoryList.isItemSelected(i)) {
+                    selectedRepositories.add(repositoryList.getValue(i));
+                }
+            }
+        } else {
+            for (int i = 0; i < repositoryGroupList.getItemCount(); i++) {
+                if (repositoryGroupList.isItemSelected(i)) {
+                    selectedRepositoryGroups.add(repositoryGroupList.getValue(i));
+                }
+            }
+        }
+        try {
+            searcherServiceAsync.doSearch(query, caseSensitive.getValue(), selectedRepositories, selectedRepositoryGroups, new AsyncCallback<List<SearchResultDto>>() {
+
+                @Override
+                public void onFailure(Throwable caught) {
+                    Window.alert("Exception calling the search service on the server:\n" + caught);
+                    setResultViewVisible(false);
+                }
+
+                @Override
+                public void onSuccess(List<SearchResultDto> resultList) {
+                    searchResults.addAll(resultList);
+                    updateResultsView();
+                    if (resultList.size() > 0) {
+                        setResultViewVisible(true);
+                    } else {
+                        setResultViewVisible(false);
+                    }
+                }
+            });
+        } catch (InvalidIndexLocationException ex) {
+            Window.alert("Invalid Index Location");
+        }
+    }
+
+    private void updateResultsView() {
+        resultTable.setRowData(0, searchResults);
+        resultTable.redraw();
+    }
+
+    private void setResultViewVisible(boolean visible) {
+        resultView.setVisible(visible);
+    }
+
+    private void updateRepositoryDisplay() {
+        repositoryList.clear();
+        repositoryGroupList.clear();
+        searcherServiceAsync.getAvailableRepositories(new AsyncCallback<List<String>>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                throw new UnsupportedOperationException("Not supported yet.");
+            }
+
+            @Override
+            public void onSuccess(List<String> result) {
+                for (String repo : result) {
+                    repositoryList.addItem(repo);
+                }
+            }
+        });
+        searcherServiceAsync.getAvailableRepositoryGroups(new AsyncCallback<List<String>>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                throw new UnsupportedOperationException("Not supported yet.");
+            }
+
+            @Override
+            public void onSuccess(List<String> result) {
+                for (String repo : result) {
+                    repositoryGroupList.addItem(repo);
+                }
+            }
+        });
+    }
+
+    private void initResultTable() {
+        resultTable = new CellTable<SearchResultDto>(15);
         resultTable.addColumn(new TextColumn<SearchResultDto>() {
+
             @Override
             public String getValue(SearchResultDto dto) {
                 return String.valueOf(dto.getRelevance());
@@ -106,54 +214,5 @@ public class SearchInterface extends Composite {
         SimplePager.Resources pagerResources = GWT.create(SimplePager.Resources.class);
         resultTablePager = new SimplePager(TextLocation.CENTER, pagerResources, false, 0, true);
         resultTablePager.setDisplay(resultTable);
-        initWidget(uiBinder.createAndBindUi(this));
-        repositoryTabPanel.selectTab(0);
-        resultTablePager.setDisplay(resultTable);
-        setResultViewVisible(false);
-    }
-
-    @UiHandler("searchButton")
-    void onSearchButton(ClickEvent e) {
-        search();
-    }
-
-    @UiHandler("searchBox")
-    void onSearchBoxKeyUp(KeyUpEvent event) {
-        if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
-            searchButton.click();
-        }
-    }
-
-    private void search() {
-        searchResults.clear();
-        String query = searchBox.getText();
-        try {
-            searcherServiceAsync.doSearch(query, new AsyncCallback<List<SearchResultDto>>() {
-
-                @Override
-                public void onFailure(Throwable caught) {
-                    Window.alert("Exception calling the search service on the server:\n" + caught);
-                    setResultViewVisible(false);
-                }
-
-                @Override
-                public void onSuccess(List<SearchResultDto> resultList) {
-                    searchResults.addAll(resultList);
-                    updateResultsView();
-                    setResultViewVisible(true);
-                }
-            });
-        } catch (InvalidIndexLocationException ex) {
-            Window.alert("Invalid Index Location");
-        }
-    }
-
-    private void updateResultsView() {
-        resultTable.setRowData(0, searchResults);
-        resultTable.redraw();
-    }
-
-    private void setResultViewVisible(boolean visible) {
-        resultView.setVisible(visible);
     }
 }
