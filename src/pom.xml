@@ -13,6 +13,7 @@
         <module>commons</module>
         <module>indexer</module>
         <module>searcher</module>
+        <module>BazaarPlugin</module>
     </modules>
 
     <!-- LIBRARY VERSIONS -->
@@ -155,6 +156,11 @@
                 <groupId>log4j</groupId>
                 <artifactId>log4j</artifactId>
                 <version>1.2.14</version>
+            </dependency>
+            <dependency>
+                <groupId>jmimemagic</groupId>
+                <artifactId>jmimemagic</artifactId>
+                <version>0.1.2</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

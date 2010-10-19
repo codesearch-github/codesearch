@@ -21,6 +21,7 @@
 
 package org.codesearch.commons.plugins.vcs;
 
+import java.io.ByteArrayOutputStream;
 import java.net.URI;
 import java.util.Set;
 import org.codesearch.commons.plugins.Plugin;
@@ -46,7 +47,7 @@ public interface VersionControlPlugin extends Plugin {
      * @param filePath The file path relative to the current repository URL
      * @return The retrieved file content
      */
-    String getFileContentForFilePath(String filePath) throws VersionControlPluginException;
+    ByteArrayOutputStream getFileContentForFilePath(String filePath) throws VersionControlPluginException;
 
     /**
      * Returns a list of changed file paths since the given revision.

@@ -58,6 +58,7 @@ public class IndexerMain implements javax.servlet.ServletContextListener {
         }
     }
 
+   
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
     }

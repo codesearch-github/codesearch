@@ -60,7 +60,6 @@ public class XmlConfigurationReaderTest {
      */
     @Test
     public void testGetRepositories() throws Exception {
-        // TODO update unit test
         System.out.println("getRepositories");
         List<String> ignFileNames1 = new LinkedList<String>();
         List<String> repoGroups1 = new LinkedList<String>();
@@ -92,8 +91,8 @@ public class XmlConfigurationReaderTest {
         RepositoryDto repo2 = new RepositoryDto("svn_local", System.getProperty("user.home")+"/workspace/svnsearch", "null", "null", true, "FILESYSTEM", ignFileNames2, repoGroups2);
 
         List result = configReader.getRepositories();
-        assertTrue(repo1.equals(result.get(0)));
-        assertTrue(repo2.equals(result.get(1)));
+        assertTrue(repo1.equals(result.get(1)));
+        assertTrue(repo2.equals(result.get(2)));
     }
 
     /**

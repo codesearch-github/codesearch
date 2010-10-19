@@ -36,13 +36,13 @@
     </global-blacklist-filenames>
     <index-location>/tmp/test</index-location>
     <index-jobs>
-    <!--    <index_job>
+       <index-job>
             <tasks>
                 <task>
                     <type>clear</type>
                 </task>
             </tasks>			
-        </index_job> -->
+        </index-job>
         <index-job>
             <repositories>svnsearch_repo</repositories>
             <tasks>

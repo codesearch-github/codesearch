@@ -21,16 +21,26 @@
 package org.codesearch.commons.plugins.vcs;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.net.URI;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import net.sf.jmimemagic.Magic;
+import net.sf.jmimemagic.MagicException;
+import net.sf.jmimemagic.MagicMatch;
+import net.sf.jmimemagic.MagicMatchNotFoundException;
+import net.sf.jmimemagic.MagicParseException;
 import org.springframework.stereotype.Component;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNLogEntry;
 import org.tmatesoft.svn.core.SVNNodeKind;
+import org.tmatesoft.svn.core.SVNProperties;
+import org.tmatesoft.svn.core.SVNProperty;
 import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.auth.BasicAuthenticationManager;
 import org.tmatesoft.svn.core.auth.ISVNAuthenticationManager;
@@ -75,7 +85,6 @@ public class SubversionPlugin implements VersionControlPlugin {
         try {
             SVNURL svnurl = SVNURL.parseURIDecoded(url.toString());
             repository = SVNRepositoryFactory.create(svnurl);
-
             ISVNAuthenticationManager authManager = new BasicAuthenticationManager(username, password);
             repository.setAuthenticationManager(authManager);
         } catch (SVNException ex) {
@@ -85,15 +94,15 @@ public class SubversionPlugin implements VersionControlPlugin {
 
     /** {@inheritDoc} */
     @Override
-    public String getFileContentForFilePath(String filePath) throws VersionControlPluginException {
+    public ByteArrayOutputStream getFileContentForFilePath(String filePath) throws VersionControlPluginException {
         try {
             SVNNodeKind nodeKind = repository.checkPath(filePath, -1);
             if (nodeKind != SVNNodeKind.FILE) {
-                return "";
+                return null;
             }
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             repository.getFile(filePath, -1, null, baos);
-            return baos.toString();
+            return baos;
         } catch (SVNException ex) {
             throw new VersionControlPluginException(ex.toString());
         }
@@ -134,4 +143,5 @@ public class SubversionPlugin implements VersionControlPlugin {
             throw new VersionControlPluginException(ex.toString());
         }
     }
+
 }

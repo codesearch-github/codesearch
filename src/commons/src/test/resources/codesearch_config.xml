@@ -52,9 +52,10 @@
                     <type>clear</type>
                 </task>
             </tasks>
-        </index-job>
-    </index-jobs>
+            </index-job>
+        </index-jobs>
     <testproperty>asdf</testproperty>
+    <repository-groups>group1 group2 group3 group4</repository-groups>
     <repositories>
         <repository>
             <name>svnsearch_repo</name>
@@ -77,13 +78,40 @@
             <username>null</username>
             <password>null</password>
             <url>$home/workspace/svnsearch</url>
+            <code-navigation-enabled>true</code-navigation-enabled>
+        </repository>
+        <repository>
+            <name>svnsearch_repo</name>
+            <version_control_system>SVN</version_control_system>
+            <username>feldruebe</username>
+            <password>dota!123</password>
+            <url>svn://portal.htl-kaindorf.at/svnsearch</url>
+            <code-navigation-enabled>true</code-navigation-enabled>
+            <not_indexed_filenames>
+                <filename>*.xml</filename>
+            </not_indexed_filenames>
+             <repository-groups>
+                <repo-group>group1</repo-group>
+            </repository-groups>
+        </repository>
+        <repository>
+            <name>testRepo2</name>
+            <username>testUser</username>
+            <password>testPassword</password>
+            <version_control_system>SVN</version_control_system>
+            <url>http://test.org</url>
+            <code-navigation-enabled>false</code-navigation-enabled>
+            <repository-groups>
+                <repo-group>group2</repo-group>
+                <repo-group>group2.2</repo-group>
+            </repository-groups>
             <repository-groups>
                 <repo-group>group1</repo-group>
             </repository-groups>
             <code-navigation-enabled>true</code-navigation-enabled>
         </repository>
     </repositories>
-    <repository-groups>group1,group2,group3</repository-groups>
+	<repository-groups>group1,group2,group3</repository-groups>
     <listTest>1</listTest>
     <listTest>2</listTest>
     <listTest>3</listTest>
