@@ -20,6 +20,8 @@
  */
 package org.codesearch.searcher.client.ui;
 
+import com.google.gwt.cell.client.ClickableTextCell;
+import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -28,6 +30,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.cellview.client.CellTable;
+import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.SimplePager.TextLocation;
 import com.google.gwt.user.cellview.client.TextColumn;
@@ -41,6 +44,8 @@ import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TabLayoutPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.view.client.ListDataProvider;
+import com.google.gwt.view.client.ProvidesKey;
 import java.util.LinkedList;
 import java.util.List;
 import org.codesearch.searcher.client.rpc.SearcherServiceAsync;
@@ -62,48 +67,47 @@ public class SearchInterface extends Composite {
     private SearcherServiceAsync searcherServiceAsync = GWT.create(SearcherService.class);
     //TODO workaround, refactor after GWT2.1 release
     @UiField(provided = true)
-    CellTable<SearchResultDto> resultTable;
+        CellTable<SearchResultDto> resultTable;
     @UiField(provided = true)
-    SimplePager resultTablePager;
+        SimplePager resultTablePager;
     @UiField
-    TextBox searchBox;
+        TextBox searchBox;
     @UiField
-    Button searchButton;
+        Button searchButton;
     @UiField
-    TabLayoutPanel repositoryTabPanel;
+        TabLayoutPanel repositoryTabPanel;
     @UiField
-    ListBox repositoryList;
+        ListBox repositoryList;
     @UiField
-    ListBox repositoryGroupList;
+        ListBox repositoryGroupList;
     @UiField
-    FlowPanel resultView;
+        FlowPanel resultView;
     @UiField
-    HasValue<Boolean> caseSensitive;
-    /** Saves the current search results **/
-    List<SearchResultDto> searchResults = new LinkedList<SearchResultDto>();
+        HasValue<Boolean> caseSensitive;
+    ListDataProvider<SearchResultDto> searchResultDataProvider = new ListDataProvider<SearchResultDto>();
 
     public SearchInterface() {
         initResultTable();
         initWidget(uiBinder.createAndBindUi(this));
+        searchResultDataProvider.addDataDisplay(resultTable);
         repositoryTabPanel.selectTab(0);
         updateRepositoryDisplay();
         setResultViewVisible(false);
     }
 
     @UiHandler("searchButton")
-    void onSearchButton(ClickEvent e) {
-        search();
-    }
+        void onSearchButton(ClickEvent e) {
+            search();
+        }
 
     @UiHandler("searchBox")
-    void onSearchBoxKeyUp(KeyUpEvent event) {
-        if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
-            searchButton.click();
+        void onSearchBoxKeyUp(KeyUpEvent event) {
+            if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+                searchButton.click();
+            }
         }
-    }
 
     private void search() {
-        searchResults.clear();
         String query = searchBox.getText();
         List<String> selectedRepositories = new LinkedList<String>();
         List<String> selectedRepositoryGroups = new LinkedList<String>();
@@ -129,15 +133,10 @@ public class SearchInterface extends Composite {
                     setResultViewVisible(false);
                 }
 
-                @Override
+            @Override
                 public void onSuccess(List<SearchResultDto> resultList) {
-                    searchResults.addAll(resultList);
-                    updateResultsView();
-                    if (resultList.size() > 0) {
-                        setResultViewVisible(true);
-                    } else {
-                        setResultViewVisible(false);
-                    }
+                    searchResultDataProvider.setList(resultList);
+                    setResultViewVisible(true);
                 }
             });
         } catch (InvalidIndexLocationException ex) {
@@ -145,13 +144,12 @@ public class SearchInterface extends Composite {
         }
     }
 
-    private void updateResultsView() {
-        resultTable.setRowData(0, searchResults);
-        resultTable.redraw();
-    }
-
     private void setResultViewVisible(boolean visible) {
         resultView.setVisible(visible);
+    }
+
+    private void viewFile(SearchResultDto resultDto) {
+        Window.alert(resultDto.getFilePath());
     }
 
     private void updateRepositoryDisplay() {
@@ -163,7 +161,7 @@ public class SearchInterface extends Composite {
                 throw new UnsupportedOperationException("Not supported yet.");
             }
 
-            @Override
+        @Override
             public void onSuccess(List<String> result) {
                 for (String repo : result) {
                     repositoryList.addItem(repo);
@@ -176,7 +174,7 @@ public class SearchInterface extends Composite {
                 throw new UnsupportedOperationException("Not supported yet.");
             }
 
-            @Override
+        @Override
             public void onSuccess(List<String> result) {
                 for (String repo : result) {
                     repositoryGroupList.addItem(repo);
@@ -195,21 +193,32 @@ public class SearchInterface extends Composite {
             }
         }, "Relevance");
 
-        resultTable.addColumn(new TextColumn<SearchResultDto>() {
+        ClickableTextCell clickCell = new ClickableTextCell();
+
+        Column clickColumn = new Column<SearchResultDto, String>(clickCell) {
 
             @Override
-            public String getValue(SearchResultDto dto) {
-                return dto.getFilePath();
-            }
-        }, "Path");
+                public String getValue(SearchResultDto object) {
+                    return object.getFilePath();
+                }
+        };
 
+        clickColumn.setFieldUpdater(new FieldUpdater<SearchResultDto, String>() {
+
+            @Override
+            public void update(int index, SearchResultDto object, String value) {
+                viewFile(object);
+            }
+        });
+
+        resultTable.addColumn(clickColumn, "Path");
         resultTable.addColumn(new TextColumn<SearchResultDto>() {
 
             @Override
             public String getValue(SearchResultDto dto) {
                 return dto.getRepository();
             }
-        }, "Repository");
+        }, "Repository");   
         // Create a Pager to control the table.
         SimplePager.Resources pagerResources = GWT.create(SimplePager.Resources.class);
         resultTablePager = new SimplePager(TextLocation.CENTER, pagerResources, false, 0, true);

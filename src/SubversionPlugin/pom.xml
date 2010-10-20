@@ -71,11 +71,7 @@
             <artifactId>svnkit</artifactId>
             <version>1.3.4</version>
         </dependency>
-        <dependency>
-                <groupId>jmimemagic</groupId>
-                <artifactId>jmimemagic</artifactId>
-                <version>0.1.2</version>
-            </dependency>
+
         <dependency>
             <groupId>org.codesearch</groupId>
             <artifactId>commons</artifactId>

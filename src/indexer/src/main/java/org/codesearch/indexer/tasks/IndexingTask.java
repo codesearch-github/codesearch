@@ -20,7 +20,6 @@
  */
 package org.codesearch.indexer.tasks;
 
-import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.net.URISyntaxException;
 import org.apache.commons.configuration.ConfigurationException;
@@ -51,7 +50,6 @@ import org.codesearch.commons.plugins.PluginLoader;
 import org.codesearch.commons.plugins.PluginLoaderException;
 import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
 import org.codesearch.commons.plugins.vcs.VersionControlPluginException;
-import org.codesearch.indexer.core.IndexerUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -135,17 +133,19 @@ public class IndexingTask implements Task {
      * @return document with added lucene fields
      */
     public Document addLuceneFields(Document doc, String path) throws VersionControlPluginException {
-        ByteArrayOutputStream baos = versionControlPlugin.getFileContentForFilePath(path);
+        String fileContent = versionControlPlugin.getFileContentForFilePath(path);
+       // ByteArrayOutputStream baos = versionControlPlugin.getFileContentForFilePath(path);
         doc.add(new Field(IndexConstants.INDEX_FIELD_TITLE, extractFilename(path), Field.Store.YES, Field.Index.NOT_ANALYZED));
         doc.add(new Field(IndexConstants.INDEX_FIELD_FILEPATH, path, Field.Store.YES, Field.Index.NOT_ANALYZED));
-        doc.add(new Field(IndexConstants.INDEX_FIELD_CONTENT, baos.toString(), Field.Store.YES, Field.Index.ANALYZED));
+        doc.add(new Field(IndexConstants.INDEX_FIELD_CONTENT, fileContent, Field.Store.YES, Field.Index.ANALYZED));
         doc.add(new Field(IndexConstants.INDEX_FIELD_REPOSITORY, repository.getName(), Field.Store.YES, Field.Index.NOT_ANALYZED));
         doc.add(new Field(IndexConstants.INDEX_FIELD_REVISION, versionControlPlugin.getRepositoryRevision(), Field.Store.YES, Field.Index.ANALYZED));
         //doc.add(new Field(IndexConstants.INDEX_FILED_REPOSITORY_GROUP, repository.getRepositoryGroupsAsString(), Field.Store.YES, Field.Index.ANALYZED));
         //doc.add(new Field(IndexConstants.INDEX_FIELD_TITLE_LC, extractFilename(path).toLowerCase(), Field.Store.YES, Field.Index.NOT_ANALYZED));
         doc.add(new Field(IndexConstants.INDEX_FIELD_FILEPATH_LC, path.toLowerCase(), Field.Store.YES, Field.Index.NOT_ANALYZED));
-        doc.add(new Field(IndexConstants.INDEX_FIELD_CONTENT_LC, baos.toString().toLowerCase(), Field.Store.YES, Field.Index.ANALYZED));
-        doc.add(new Field(IndexConstants.INDEX_FIELD_FILE_TYPE, IndexerUtils.getMimeTypeForFile(baos), Field.Store.YES, Field.Index.ANALYZED));
+        doc.add(new Field(IndexConstants.INDEX_FIELD_CONTENT_LC, fileContent.toLowerCase(), Field.Store.YES, Field.Index.ANALYZED));
+        //FIXME zeheron learn to use your VCS!!
+        //doc.add(new Field(IndexConstants.INDEX_FIELD_FILE_TYPE, IndexerUtils.getMimeTypeForFile(baos), Field.Store.YES, Field.Index.ANALYZED));
         return doc;
     }
 
