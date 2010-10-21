@@ -1,6 +1,7 @@
 package org.codesearch.commons.plugins.vcs;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -27,13 +28,13 @@ public class FilesystemPlugin implements VersionControlPlugin {
 
     /** {@inheritDoc} */
     @Override
-    public String getFileContentForFilePath(String filePath) throws VersionControlPluginException {
+    public ByteArrayOutputStream getFileContentForFilePath(String filePath) throws VersionControlPluginException {
         File f = new File(filePath);
-        String content = "";
+        ByteArrayOutputStream content = new ByteArrayOutputStream();
         try {
             BufferedReader br = new BufferedReader(new FileReader(f));
             while (br.ready()) {
-                content += br.readLine();
+                content.write(br.readLine().getBytes());
             }
         } catch (IOException ex) {
             throw new VersionControlPluginException("File could not be opened: \n" + ex);

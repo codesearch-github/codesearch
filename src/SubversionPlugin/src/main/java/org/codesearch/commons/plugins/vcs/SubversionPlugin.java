@@ -85,15 +85,15 @@ public class SubversionPlugin implements VersionControlPlugin {
 
     /** {@inheritDoc} */
     @Override
-    public String getFileContentForFilePath(String filePath) throws VersionControlPluginException {
+    public ByteArrayOutputStream getFileContentForFilePath(String filePath) throws VersionControlPluginException {
         try {
             SVNNodeKind nodeKind = repository.checkPath(filePath, -1);
             if (nodeKind != SVNNodeKind.FILE) {
-                return "";
+                return null;
             }
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             repository.getFile(filePath, -1, null, baos);
-            return baos.toString();
+            return baos;
         } catch (SVNException ex) {
             throw new VersionControlPluginException(ex.toString());
         }
@@ -125,13 +125,9 @@ public class SubversionPlugin implements VersionControlPlugin {
         return paths;
     }
 
-    /** {@inheritDoc} */
     @Override
     public String getRepositoryRevision() throws VersionControlPluginException {
-        try {
-            return Long.toString(repository.getLatestRevision());
-        } catch (SVNException ex) {
-            throw new VersionControlPluginException(ex.toString());
-        }
+        throw new UnsupportedOperationException("Not supported yet.");
     }
+
 }
