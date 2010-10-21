@@ -13,8 +13,7 @@
         <module>commons</module>
         <module>indexer</module>
         <module>searcher</module>
-        <module>BazaarPlugin</module>
-    </modules>
+  </modules>
 
     <!-- LIBRARY VERSIONS -->
     <properties>

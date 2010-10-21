@@ -42,7 +42,10 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
         </dependency>
-        
+
+
+
+
         <!--  Lucene API to create/manage index -->
         <dependency>
             <groupId>org.apache.lucene</groupId>
