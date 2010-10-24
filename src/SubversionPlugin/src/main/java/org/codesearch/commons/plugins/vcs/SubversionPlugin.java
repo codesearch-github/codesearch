@@ -59,7 +59,7 @@ public class SubversionPlugin implements VersionControlPlugin {
 
     /** {@inheritDoc} */
     @Override
-    public String getPurpose() {
+    public String getPurposes() {
         return "SVN";
     }
 

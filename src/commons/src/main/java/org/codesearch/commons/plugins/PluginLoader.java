@@ -34,11 +34,10 @@ public class PluginLoader {
     /** The list of all plugins that have been loaded. */
     @Autowired
     private List<Plugin> loadedPlugins;
-    
-    public PluginLoader(){
 
+    public PluginLoader() {
     }
-    
+
     /**
      * returns a plugin for the given purpose.
      * Searches through all loaded plugins and finds the one with the given purpose.
@@ -48,16 +47,19 @@ public class PluginLoader {
      */
     public <T extends Plugin> T getPlugin(final Class clazz, final String purpose) throws PluginLoaderException {
         for (Plugin plugin : loadedPlugins) {
-            if (plugin.getPurpose().equals(purpose)) {
-                if (clazz.isInstance(plugin)) {
-                    return (T) plugin;
+            String[] purposes = plugin.getPurposes().split(" ");
+            for (String s : purposes) {
+                if (s.equals(purpose)) {
+                    if (clazz.isInstance(plugin)) {
+                        return (T) plugin;
+                    }
                 }
             }
         }
         throw new PluginLoaderException("No Plugin found for purpose: " + purpose + " and Class: " + clazz);
     }
 
-    public void setLoadedPlugins(List<Plugin> loadedPlugins){
+    public void setLoadedPlugins(List<Plugin> loadedPlugins) {
         this.loadedPlugins = loadedPlugins;
     }
 }

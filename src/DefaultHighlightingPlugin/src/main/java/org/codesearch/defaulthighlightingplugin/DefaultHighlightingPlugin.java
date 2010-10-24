@@ -2,11 +2,14 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.codesearch.javahighlightingplugin;
+package org.codesearch.defaulthighlightingplugin;
 
 import com.uwyn.jhighlight.renderer.JavaXhtmlRenderer;
 import com.uwyn.jhighlight.renderer.XhtmlRenderer;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
+import org.codesearch.commons.constants.MimeTypeNames;
 import org.codesearch.commons.plugins.highlighting.HighlightingPlugin;
 import org.codesearch.commons.plugins.highlighting.HighlightingPluginException;
 import org.springframework.stereotype.Component;
@@ -16,7 +19,7 @@ import org.springframework.stereotype.Component;
  * @author David Froehlich
  */
 @Component
-public class JavaHighlightingPlugin implements HighlightingPlugin {
+public class DefaultHighlightingPlugin implements HighlightingPlugin {
 
     XhtmlRenderer renderer = new JavaXhtmlRenderer();
 
@@ -30,13 +33,14 @@ public class JavaHighlightingPlugin implements HighlightingPlugin {
     }
 
     @Override
-    public String getPurpose() {
-        return "JAVA";
+    public String getPurposes() {
+        String result = MimeTypeNames.JAVA+" "+MimeTypeNames.CPP+" "+MimeTypeNames.XML+" "+MimeTypeNames.HTML;
+        return result;
     }
 
     @Override
     public String getVersion() {
-        return "0.1_SNAPSHOT";
+        return "0.1SNAPSHOT";
     }
 
     @Override

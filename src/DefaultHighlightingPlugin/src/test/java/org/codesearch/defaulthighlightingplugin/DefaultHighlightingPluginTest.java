@@ -3,8 +3,9 @@
  * and open the template in the editor.
  */
 
-package org.codesearch.javahighlightingplugin;
+package org.codesearch.defaulthighlightingplugin;
 
+import org.codesearch.defaulthighlightingplugin.DefaultHighlightingPlugin;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -14,9 +15,9 @@ import junit.framework.TestCase;
  *
  * @author David Froehlich
  */
-public class JavaHighlightingPluginTest extends TestCase {
-    JavaHighlightingPlugin plugin = new JavaHighlightingPlugin();
-    public JavaHighlightingPluginTest(String testName) {
+public class DefaultHighlightingPluginTest extends TestCase {
+    DefaultHighlightingPlugin plugin = new DefaultHighlightingPlugin();
+    public DefaultHighlightingPluginTest(String testName) {
         super(testName);
     }
 

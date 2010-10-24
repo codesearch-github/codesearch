@@ -22,6 +22,7 @@
 
 package org.codesearch.commons.plugins;
 
+import java.util.Set;
 import org.springframework.stereotype.Component;
 
 /**
@@ -36,11 +37,11 @@ public interface Plugin {
      * for instance getPurpose of a VersionControlPlugin could either return 'SVN' or 'Bazaar' and so forth
      * @return the purpose of the plugin
      */
-    String getPurpose();
+    String getPurposes();
 
     /**
      * Returns the version of the plugin
      * @return the version of the plugin
      */
-    String getVersion();   
+    String getVersion();
 }

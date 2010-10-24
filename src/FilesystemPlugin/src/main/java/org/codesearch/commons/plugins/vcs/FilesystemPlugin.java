@@ -97,7 +97,7 @@ public class FilesystemPlugin implements VersionControlPlugin {
 
     /** {@inheritDoc} */
     @Override
-    public String getPurpose() {
+    public String getPurposes() {
         return "FILESYSTEM";
     }
 
