@@ -4,16 +4,12 @@
  */
 package org.codesearch.commons.utils;
 
+import eu.medsea.mimeutil.MimeType;
 import eu.medsea.mimeutil.MimeUtil;
 import java.io.ByteArrayOutputStream;
 import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import net.sf.jmimemagic.Magic;
-import net.sf.jmimemagic.MagicException;
-import net.sf.jmimemagic.MagicMatch;
-import net.sf.jmimemagic.MagicMatchNotFoundException;
-import net.sf.jmimemagic.MagicParseException;
 import org.codesearch.commons.plugins.vcs.SubversionPlugin;
 import org.codesearch.commons.plugins.vcs.VersionControlPluginException;
 
@@ -30,8 +26,8 @@ public class CommonsUtils {
      * @throws VersionControlPluginException
      */
     public static String getMimeTypeForFile(ByteArrayOutputStream baos) {
-        Collection<String> col = MimeUtil.getMimeTypes(baos.toByteArray());
-        return (String) col.toArray()[0];
+        Collection<MimeType> col = MimeUtil.getMimeTypes(baos.toByteArray());
+        return ((MimeType) col.toArray()[0]).toString();
     }
 
     /**
@@ -40,8 +36,8 @@ public class CommonsUtils {
      * @return mime type
      * @throws VersionControlPluginException
      */
-    public static Collection<String> getMimeTypesForFile(ByteArrayOutputStream baos) {
-        Collection<String> col = MimeUtil.getMimeTypes(baos.toByteArray());
+    public static Collection<MimeType> getMimeTypesForFile(ByteArrayOutputStream baos) {
+        Collection<MimeType> col = MimeUtil.getMimeTypes(baos.toByteArray());
         return col;
     }
 }
