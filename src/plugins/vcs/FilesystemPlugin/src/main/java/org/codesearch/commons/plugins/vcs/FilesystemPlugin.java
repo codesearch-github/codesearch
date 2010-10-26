@@ -6,10 +6,10 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URI;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.codesearch.commons.constants.MimeTypeNames;
 import org.codesearch.commons.utils.CommonsUtils;
 import org.springframework.stereotype.Component;
 
@@ -22,7 +22,7 @@ public class FilesystemPlugin implements VersionControlPlugin {
 
     /** the folder where all code files are located */
     private String codeLocation;
-
+    private int i = 0;
     /** {@inheritDoc} */
     @Override
     public void setRepository(URI url, String username, String password) throws VersionControlPluginException {
@@ -60,17 +60,24 @@ public class FilesystemPlugin implements VersionControlPlugin {
      * @param lastModified the time of last indexing
      */
     private void addChangedFilesFromDirectoryToSet(Set<FileDto> files, File directory, long lastModified) throws VersionControlPluginException {
-
+        Date d = new Date();
         for (File f : directory.listFiles()) {
             if (f.isDirectory()) {
                 addChangedFilesFromDirectoryToSet(files, f, lastModified);
             } else {
                 if (f.lastModified() > lastModified) {
                     ByteArrayOutputStream baos = getFileContentForFilePath(f.getAbsolutePath());
-                    files.add(new FileDto(f.getAbsolutePath(), baos, CommonsUtils.getMimeTypeForFile(baos)));
+                    //TODO replace work-around as soon as stephans mime type analyzer works
+                    String mimeType = "";
+                    if(f.getAbsolutePath().endsWith(".java")){
+                        mimeType = MimeTypeNames.JAVA;
+                    }
+                    mimeType = CommonsUtils.getMimeTypeForFile(baos);
+                    files.add(new FileDto(f.getAbsolutePath(), baos, mimeType));
                 }
             }
         }
+        System.out.println("Mime time: "+(new Date().getTime()-d.getTime()));
     }
 
     /** {@inheritDoc} */

@@ -5,8 +5,10 @@
 
 package org.codesearch.javacodeanalyzerplugin;
 
+import org.codesearch.commons.plugins.codeanalysis.javacodeanalyzerplugin.JavaCodeAnalyzerPlugin;
 import java.util.Map;
 import junit.framework.TestCase;
+import org.apache.commons.lang.NotImplementedException;
 import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 
 /**
@@ -33,8 +35,6 @@ public class JavaCodeAnalyzerPluginTest extends TestCase {
      * Test of getAstForRepository method, of class JavaCodeAnalyzerPlugin.
      */
     public void testGetAstForRepository() throws Exception{
-        RepositoryDto repo = new RepositoryDto();
-        repo.setVersionControlSystem("FILESYSTEM");
-        plugin.analyzeFile("/home/david/codesearch/src/indexer/src/main/java/org/codesearch/indexer/tasks/IndexingTask.java", repo);
+        throw new NotImplementedException();
     }
 }

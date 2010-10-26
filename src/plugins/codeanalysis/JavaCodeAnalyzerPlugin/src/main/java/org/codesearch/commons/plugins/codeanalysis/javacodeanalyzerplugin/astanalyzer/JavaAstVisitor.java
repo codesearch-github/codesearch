@@ -1,4 +1,4 @@
-package org.codesearch.javacodeanalyzerplugin.astanalyzer;
+package org.codesearch.commons.plugins.codeanalysis.javacodeanalyzerplugin.astanalyzer;
 
 import java.beans.Visibility;
 import java.util.LinkedList;
@@ -99,7 +99,7 @@ public class JavaAstVisitor extends ASTVisitor {
 
     private FileNode fileNode;
     private Map<Integer, Usage> usages;
-
+    private int methods;
     public JavaAstVisitor(FileNode fileNode, Map<Integer, Usage> usages) {
         this.fileNode = fileNode;
         this.usages = usages;
@@ -971,7 +971,7 @@ public class JavaAstVisitor extends ASTVisitor {
         //TODO figure out a way to retrieve visibility from method declaration
         for(ClassNode classNode : fileNode.getClasses()){
             TypeDeclaration parent = (TypeDeclaration) node.getParent();
-            if(classNode.getName().equals(parent.getName())){
+            if(classNode.getName().equals(parent.getName().toString())){
                 classNode.getMethodDeclarations().add(method);
             }
         }

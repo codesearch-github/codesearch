@@ -4,6 +4,7 @@
  */
 package org.codesearch.indexer.tasks;
 
+import java.io.ByteArrayOutputStream;
 import org.springframework.context.ApplicationContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
@@ -11,7 +12,10 @@ import java.util.LinkedList;
 import org.codesearch.commons.configuration.properties.PropertiesManager;
 import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
 import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
+import org.codesearch.commons.constants.MimeTypeNames;
 import org.codesearch.commons.plugins.PluginLoader;
+import org.codesearch.commons.plugins.codeanalyzing.CodeAnalyzerPlugin;
+import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -89,11 +93,13 @@ public class IndexingTaskTest {
 
     @Test
     public void testCodeAnalysis() throws Exception {
-        
         RepositoryDto repo = new RepositoryDto();
         repo.setVersionControlSystem("FILESYSTEM");
-        //pluginLoader
-     //   plugin.analyzeFile("/home/david/codesearch/src/indexer/src/main/java/org/codesearch/indexer/tasks/IndexingTask.java", repo);
+        CodeAnalyzerPlugin plugin = pluginLoader.getPlugin(CodeAnalyzerPlugin.class, MimeTypeNames.JAVA);
+        VersionControlPlugin vcPlugin = pluginLoader.getPlugin(VersionControlPlugin.class, "FILESYSTEM");
+        ByteArrayOutputStream fileContent = vcPlugin.getFileContentForFilePath("/home/david/wakmusic/trunk/Wakmusic/src/java/beans/Band.java");
+        plugin.analyzeFile(fileContent.toString(), repo);
+        System.out.println(plugin.getAstForCurrentFile().getOutlineForChildElements());
     }
 
     @Test

@@ -5,6 +5,7 @@
 
 package org.codesearch.commons.plugins.codeanalyzing.ast;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -12,7 +13,7 @@ import java.util.List;
  * @author David Froehlich
  */
 public class ClassNode extends ASTElement{
-    private List<MethodNode> methodDeclarations;
+    private List<MethodNode> methodDeclarations = new LinkedList<MethodNode>();
 
     public List<MethodNode> getMethodDeclarations() {
         return methodDeclarations;
@@ -24,7 +25,7 @@ public class ClassNode extends ASTElement{
 
     @Override
     public String getOutlineForChildElements() {
-        String outlineString = "Class definition: "+ this.getName() + " from: "+this.getDeclarationPosition() + ", length: "+this.getNodeLength()+"\n";
+        String outlineString = "  Class definition: "+ this.getName() + " from: "+this.getDeclarationPosition() + ", length: "+this.getNodeLength()+"\n";
         for(MethodNode method : methodDeclarations){
             outlineString += method.getOutlineForChildElements();
         }

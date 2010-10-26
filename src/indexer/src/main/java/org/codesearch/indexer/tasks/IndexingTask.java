@@ -111,7 +111,7 @@ public class IndexingTask implements Task {
             versionControlPlugin.setRepository(new URI(repository.getUrl()), repository.getUsername(), repository.getPassword());
             String lastIndexedRevision = propertiesManager.getPropertyFileValue(repository.getName());
             changedFiles = versionControlPlugin.getChangedFilesSinceRevision(lastIndexedRevision);
-            String lastAnalysisRevision = "";
+            String lastAnalysisRevision = "0";
             boolean retrieveNewFileList = false;
             //TODO make code less ugly...
             if (codeAnalysisEnabled) {
@@ -144,7 +144,8 @@ public class IndexingTask implements Task {
         }
     }
 
-    private void executeCodeAnalysis(boolean retrieveNewFileList, String lastAnalysisRevision) throws VersionControlPluginException, PluginLoaderException, CodeAnalyzerPluginException {
+    private void executeCodeAnalysis(boolean retrieveNewFileList, String lastAnalysisRevision) throws VersionControlPluginException, CodeAnalyzerPluginException {
+        //TODO test if the retrieving of a new file list works
         if (retrieveNewFileList) {
             changedFiles = versionControlPlugin.getChangedFilesSinceRevision(lastAnalysisRevision);
         }
@@ -156,7 +157,12 @@ public class IndexingTask implements Task {
             currentMimeType = currentFile.getMimeType();
             if (plugin == null || (!currentMimeType.equals(previousMimeType))) {
                 //load the appropriate plugin
-                plugin = pluginLoader.getPlugin(CodeAnalyzerPlugin.class, currentMimeType);
+                try{
+                    plugin = pluginLoader.getPlugin(CodeAnalyzerPlugin.class, currentMimeType);
+                } catch (PluginLoaderException ex){
+                    //in case there is no codeanalyzer plugin for the file's mime type
+                    continue;
+                }
             }
             plugin.analyzeFile(currentFile.getContent().toString(), repository);
             FileNode fn = plugin.getAstForCurrentFile();

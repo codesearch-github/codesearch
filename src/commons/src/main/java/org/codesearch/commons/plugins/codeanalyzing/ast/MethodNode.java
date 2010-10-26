@@ -16,6 +16,15 @@ public class MethodNode extends ASTElement{
     private Visibility visibility;
     private List<Variable> parameters = new LinkedList<Variable>();
     private String returnType;
+    private boolean constructor;
+
+    public boolean isConstructor() {
+        return constructor;
+    }
+
+    public void setConstructor(boolean constructor) {
+        this.constructor = constructor;
+    }
 
     public String getReturnType() {
         return returnType;
@@ -41,8 +50,8 @@ public class MethodNode extends ASTElement{
         this.visibility = visibility;
     }
 
-    public String getOutlineLink(){
-        //TODO replace with real method
+    @Override
+    public String getOutlineForChildElements() {
         String parameterString = "";
         String returnString = "";
         for(Variable v : parameters){
@@ -54,13 +63,13 @@ public class MethodNode extends ASTElement{
         if(returnType != null){
             returnString = ": "+returnType;
         }
-        String link = this.getName()+"("+parameterString+")"+returnString + " from " + super.getDeclarationPosition() + ", length: "+super.getNodeLength();
-        return link;
-    }
-
-    @Override
-    public String getOutlineForChildElements() {
-        String outlineString = "Method declaration "+this.getName() + " from "+this.getDeclarationPosition() + ", length: "+this.getNodeLength()+"\n";
+        String outlineString = "";
+        if(constructor){
+            outlineString = "    Constructor declaration " + this.getName()+"("+parameterString+") from " + this.getDeclarationPosition() + ", length: " + this.getNodeLength() + "\n";
+        }
+        else {
+            outlineString = "    Method declaration " + this.getName()+"("+parameterString+")"+returnString + " from " + super.getDeclarationPosition() + ", length: "+super.getNodeLength()+"\n";
+        }
         return outlineString;
     }
 }

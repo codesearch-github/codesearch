@@ -16,5 +16,5 @@ import org.codesearch.commons.plugins.codeanalyzing.ast.FileNode;
  */
 public interface CodeAnalyzerPlugin extends Plugin {
     FileNode getAstForCurrentFile() throws CodeAnalyzerPluginException;
-    void analyzeFile(String File, RepositoryDto repository) throws CodeAnalyzerPluginException;
+    void analyzeFile(String fileContent, RepositoryDto repository) throws CodeAnalyzerPluginException;
 }

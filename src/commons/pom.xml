@@ -68,6 +68,80 @@
             <artifactId>FilesystemPlugin</artifactId>
             <version>0.1-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>org.codesearch</groupId>
+            <artifactId>JavaCodeAnalyzerPlugin</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
+        <!-- remove -->
+        <dependency>
+            <groupId>org.eclipse.custom</groupId>
+            <artifactId>contenttype</artifactId>
+            <version>3.4.100</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.custom</groupId>
+            <artifactId>jobs</artifactId>
+            <version>3.5.0</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.custom</groupId>
+            <artifactId>resources</artifactId>
+            <version>3.6.0</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.custom</groupId>
+            <artifactId>runtime.compatibility</artifactId>
+            <version>3.2.100</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.custom</groupId>
+            <artifactId>runtime</artifactId>
+            <version>3.6.0</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.custom</groupId>
+            <artifactId>equinox.common</artifactId>
+            <version>3.6.0</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.custom</groupId>
+            <artifactId>equinox.preferences</artifactId>
+            <version>3.3.0</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.custom</groupId>
+            <artifactId>jdt.core</artifactId>
+            <version>3.6.0</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.custom</groupId>
+            <artifactId>osgi.services</artifactId>
+            <version>3.2.100</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.custom</groupId>
+            <artifactId>osgi.util</artifactId>
+            <version>3.2.100</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.custom</groupId>
+            <artifactId>osgi</artifactId>
+            <version>3.6.0</version>
+            <type>jar</type>
+        </dependency>
+        
     </dependencies>
     <build>
         <plugins>
