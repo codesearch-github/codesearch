@@ -46,6 +46,7 @@ import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
 /**
  * A plugin used to access files stored in Subversion repositories.
  * @author David Froehlich
+ * @author Stephan Stiboller
  * @author Samuel Kogler
  */
 @Component
