@@ -44,7 +44,10 @@
         </dependency>
 
 
-
+        <dependency>
+            <groupId>jmimemagic</groupId>
+            <artifactId>jmimemagic</artifactId>
+        </dependency>
 
         <!--  Lucene API to create/manage index -->
         <dependency>

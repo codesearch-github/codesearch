@@ -67,6 +67,8 @@ public final class XmlConfigurationReaderConstants {
     public static final String TASK = "task";
     /** Used to find out the type of a task */
     public static final String TASK_TYPE = "type";
+    /** Used to find out whether an indexing job is set to also add code-navigation specific fields */
+    public static final String CODE_NAVIGATION_ENABLED = "code-navigation-enabled";
     
     //JOB CONSTANTS
     /** Used to access a single job */

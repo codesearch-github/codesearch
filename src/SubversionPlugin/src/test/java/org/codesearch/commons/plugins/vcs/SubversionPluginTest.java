@@ -79,10 +79,10 @@ public class SubversionPluginTest {
         System.out.println("getPathsForChangedFilesSinceRevision");
         String revision = "218";
        // sp.setRepository(new URI("svn://portal.htl-kaindorf.at/svnsearch"), "feldruebe", "dota!123");
-        Set result = sp.getPathsForChangedFilesSinceRevision(revision);
+        Set result = sp.getChangedFilesSinceRevision(revision);
         Iterator iter = result.iterator();
-        String s = (String) iter.next();
-        assert (s.endsWith("testfile.txt"));
+        FileDto file = (FileDto) iter.next();
+        assert (file.getFilePath().endsWith("testfile.txt"));
     }
 
     /**

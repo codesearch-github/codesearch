@@ -9,7 +9,7 @@ package org.codesearch.commons.plugins.codeanalyzing.ast;
  *
  * @author David Froehlich
  */
-public class ASTElement {
+public abstract class ASTElement {
     protected int declarationPosition;
     protected int nodeLength;
     private String name;
@@ -37,4 +37,6 @@ public class ASTElement {
     public void setName(String name) {
         this.name = name;
     }
+
+    public abstract String getOutlineForChildElements();
 }

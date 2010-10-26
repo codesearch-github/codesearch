@@ -29,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  * @author David Froehlich
  */
+@Deprecated
 public class CodeAnalyzerTask implements Task {
 
     /** The dto holding the repository information */
@@ -52,32 +53,32 @@ public class CodeAnalyzerTask implements Task {
 
     @Override
     public void execute() throws TaskExecutionException {
-        try {
-            String indexLocation = null;
-            LOG.info("Starting execution of indexing task");
-            indexLocation = configReader.getSingleLinePropertyValue("index-location");
-            // Read the index status file
-            propertiesReader = new PropertiesManager(indexLocation + File.separator + "revisions.properties"); //TODO add propertiesReader path
-            // Get the version control plugins
-            versionControlPlugin = pluginLoader.getPlugin(VersionControlPlugin.class, repository.getVersionControlSystem());
-            versionControlPlugin.setRepository(new URI(repository.getUrl()), repository.getUsername(), repository.getPassword());
-            fileNames = versionControlPlugin.getPathsForChangedFilesSinceRevision(propertiesReader.getPropertyFileValue(repository.getName()));
-            //TODO retrieve mime type from file and check which plugin to use
-
-            //hardcoded section, is to be removed
-            codeAnalyzerPlugin = pluginLoader.getPlugin(CodeAnalyzerPlugin.class, "JAVA");
-            Map<String, FileNode> asts = codeAnalyzerPlugin.getAstForRepository(fileNames, repository);
-            //end of hardcoded section
-
-            //TODO add handling for ast
-
-            throw new UnsupportedOperationException("Not supported yet.");
-        } catch (URISyntaxException ex) {
-        } catch (VersionControlPluginException ex) {
-        } catch (PluginLoaderException ex) {            
-        } catch (IOException ex) {
-        } catch (ConfigurationException ex) {
-            //TODO make exception handling
-        }
+//        try {
+//            String indexLocation = null;
+//            LOG.info("Starting execution of indexing task");
+//            indexLocation = configReader.getSingleLinePropertyValue("index-location");
+//            // Read the index status file
+//            propertiesReader = new PropertiesManager(indexLocation + File.separator + "revisions.properties"); //TODO add propertiesReader path
+//            // Get the version control plugins
+//            versionControlPlugin = pluginLoader.getPlugin(VersionControlPlugin.class, repository.getVersionControlSystem());
+//            versionControlPlugin.setRepository(new URI(repository.getUrl()), repository.getUsername(), repository.getPassword());
+//            fileNames = versionControlPlugin.getPathsForChangedFilesSinceRevision(propertiesReader.getPropertyFileValue(repository.getName()));
+//            //TODO retrieve mime type from file and check which plugin to use
+//
+//            //hardcoded section, is to be removed
+//            codeAnalyzerPlugin = pluginLoader.getPlugin(CodeAnalyzerPlugin.class, "JAVA");
+//            Map<String, FileNode> asts = codeAnalyzerPlugin.getAstForRepository(fileNames, repository);
+//            //end of hardcoded section
+//
+//            //TODO add handling for ast
+//
+//            throw new UnsupportedOperationException("Not supported yet.");
+//        } catch (URISyntaxException ex) {
+//        } catch (VersionControlPluginException ex) {
+//        } catch (PluginLoaderException ex) {
+//        } catch (IOException ex) {
+//        } catch (ConfigurationException ex) {
+//            //TODO make exception handling
+//        }
     }
 }

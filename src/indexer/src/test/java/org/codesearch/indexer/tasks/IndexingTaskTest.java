@@ -11,6 +11,7 @@ import java.util.LinkedList;
 import org.codesearch.commons.configuration.properties.PropertiesManager;
 import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
 import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
+import org.codesearch.commons.plugins.PluginLoader;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -33,6 +34,8 @@ public class IndexingTaskTest {
     private IndexingTask task = new IndexingTask();
     @Autowired
     private ApplicationContext applicationContext;
+    @Autowired
+    private PluginLoader pluginLoader;
 
     public IndexingTaskTest() {
     }
@@ -85,6 +88,15 @@ public class IndexingTaskTest {
     }
 
     @Test
+    public void testCodeAnalysis() throws Exception {
+        
+        RepositoryDto repo = new RepositoryDto();
+        repo.setVersionControlSystem("FILESYSTEM");
+        //pluginLoader
+     //   plugin.analyzeFile("/home/david/codesearch/src/indexer/src/main/java/org/codesearch/indexer/tasks/IndexingTask.java", repo);
+    }
+
+    @Test
     public void testExecuteLocal() throws Exception {
         XmlConfigurationReader pm = new XmlConfigurationReader();
         List<RepositoryDto> repos = pm.getRepositories();
@@ -100,6 +112,7 @@ public class IndexingTaskTest {
                 IndexingTask t = (IndexingTask) applicationContext.getBean("indexingTask");
                 pr.setPropertyFileValue(repo.getName(), "0");
                 t.setRepository(repo);
+                t.setCodeAnalysisEnabled(true);
                 t.execute();
             }
         }

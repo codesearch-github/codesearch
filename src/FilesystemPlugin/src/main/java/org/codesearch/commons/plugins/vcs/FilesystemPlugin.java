@@ -8,6 +8,9 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.codesearch.commons.utils.CommonsUtils;
 import org.springframework.stereotype.Component;
 
 /**
@@ -44,10 +47,10 @@ public class FilesystemPlugin implements VersionControlPlugin {
 
     /** {@inheritDoc} */
     @Override
-    public Set<String> getPathsForChangedFilesSinceRevision(String revision) throws VersionControlPluginException {
-        Set<String> paths = new HashSet<String>();
-        addChangedFilesFromDirectoryToSet(paths, new File(codeLocation), Long.parseLong(revision));
-        return paths;
+    public Set<FileDto> getChangedFilesSinceRevision(String revision) throws VersionControlPluginException {
+        Set<FileDto> files = new HashSet<FileDto>();
+        addChangedFilesFromDirectoryToSet(files, new File(codeLocation), Long.parseLong(revision));
+        return files;
     }
 
     /**
@@ -56,13 +59,15 @@ public class FilesystemPlugin implements VersionControlPlugin {
      * @param directory the current directory
      * @param lastModified the time of last indexing
      */
-    private void addChangedFilesFromDirectoryToSet(Set<String> paths, File directory, long lastModified) {
+    private void addChangedFilesFromDirectoryToSet(Set<FileDto> files, File directory, long lastModified) throws VersionControlPluginException {
+
         for (File f : directory.listFiles()) {
             if (f.isDirectory()) {
-                addChangedFilesFromDirectoryToSet(paths, f, lastModified);
+                addChangedFilesFromDirectoryToSet(files, f, lastModified);
             } else {
                 if (f.lastModified() > lastModified) {
-                    paths.add(f.getAbsolutePath());
+                    ByteArrayOutputStream baos = getFileContentForFilePath(f.getAbsolutePath());
+                    files.add(new FileDto(f.getAbsolutePath(), baos, CommonsUtils.getMimeTypeForFile(baos)));
                 }
             }
         }

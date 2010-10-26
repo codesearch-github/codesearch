@@ -7,7 +7,6 @@ package org.codesearch.commons.plugins.codeanalyzing.ast;
 
 import java.util.LinkedList;
 import java.util.List;
-import org.apache.commons.lang.NotImplementedException;
 
 /**
  *
@@ -57,5 +56,11 @@ public class MethodNode extends ASTElement{
         }
         String link = this.getName()+"("+parameterString+")"+returnString + " from " + super.getDeclarationPosition() + ", length: "+super.getNodeLength();
         return link;
+    }
+
+    @Override
+    public String getOutlineForChildElements() {
+        String outlineString = "Method declaration "+this.getName() + " from "+this.getDeclarationPosition() + ", length: "+this.getNodeLength()+"\n";
+        return outlineString;
     }
 }

@@ -55,7 +55,7 @@ public interface VersionControlPlugin extends Plugin {
      * @return The paths of the changed files
      * @throws SVNException if the file could not be found in the currently set repository
      */
-    Set<String> getPathsForChangedFilesSinceRevision(String revision) throws VersionControlPluginException;
+    Set<FileDto> getChangedFilesSinceRevision(String revision) throws VersionControlPluginException;
 
     /**
      * Extracts and returns the revision number of the current set revision.

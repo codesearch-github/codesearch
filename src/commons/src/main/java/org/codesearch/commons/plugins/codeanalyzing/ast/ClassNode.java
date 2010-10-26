@@ -11,7 +11,7 @@ import java.util.List;
  *
  * @author David Froehlich
  */
-public class ClassNode {
+public class ClassNode extends ASTElement{
     private List<MethodNode> methodDeclarations;
 
     public List<MethodNode> getMethodDeclarations() {
@@ -20,5 +20,14 @@ public class ClassNode {
 
     public void setMethodDeclarations(List<MethodNode> methodDeclarations) {
         this.methodDeclarations = methodDeclarations;
+    }
+
+    @Override
+    public String getOutlineForChildElements() {
+        String outlineString = "Class definition: "+ this.getName() + " from: "+this.getDeclarationPosition() + ", length: "+this.getNodeLength()+"\n";
+        for(MethodNode method : methodDeclarations){
+            outlineString += method.getOutlineForChildElements();
+        }
+        return outlineString;
     }
 }

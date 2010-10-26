@@ -27,6 +27,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.codesearch.commons.utils.CommonsUtils;
 import org.springframework.stereotype.Component;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNLogEntry;
@@ -101,8 +104,8 @@ public class SubversionPlugin implements VersionControlPlugin {
 
     /** {@inheritDoc} */
     @Override
-    public Set<String> getPathsForChangedFilesSinceRevision(String revision) throws VersionControlPluginException {
-        Set<String> paths = new HashSet();
+    public Set<FileDto> getChangedFilesSinceRevision(String revision) throws VersionControlPluginException {
+        Set<FileDto> files = new HashSet();
         Collection logs = null;
         try {
             logs = repository.log(new String[]{}, null, Long.parseLong(revision) + 1, -1, true, false);
@@ -117,17 +120,29 @@ public class SubversionPlugin implements VersionControlPlugin {
             Iterator iter2 = entry.getChangedPaths().keySet().iterator();
             while (iter2.hasNext()) {
                 String path = (String) iter2.next();
-                if (path.lastIndexOf(".") > path.lastIndexOf("/")) {
-                    paths.add(path);
+                try {
+                    SVNNodeKind nodeKind = repository.checkPath(path, -1);
+                    if (nodeKind != SVNNodeKind.FILE) {
+                        continue;
+                    }
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    repository.getFile(path, -1, null, baos);
+                    String mimeType = CommonsUtils.getMimeTypeForFile(baos);
+                    files.add(new FileDto(path, baos, mimeType));
+                } catch (SVNException ex) {
+                    throw new VersionControlPluginException(ex.toString());
                 }
             }
         }
-        return paths;
+        return files;
     }
 
     @Override
     public String getRepositoryRevision() throws VersionControlPluginException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        try {
+            return Long.toString(repository.getLatestRevision());
+        } catch (SVNException ex) {
+            throw new VersionControlPluginException(ex.toString());
+        }
     }
-
 }

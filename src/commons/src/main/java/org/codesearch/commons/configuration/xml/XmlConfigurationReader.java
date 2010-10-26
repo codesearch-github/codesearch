@@ -102,6 +102,16 @@ public class XmlConfigurationReader {
                 for (SubnodeConfiguration sc : subConf) {
                     TaskType type = null;
                     if (sc.getString(XmlConfigurationReaderConstants.TASK_TYPE).equals("index")) { //TODO replace with a more generic method
+                        try {
+                            if (sc.getBoolean(XmlConfigurationReaderConstants.CODE_NAVIGATION_ENABLED)) {
+                                type = TaskType.codeAnalysis;
+                            } else {
+                                type = TaskType.index;
+                            }
+                        } catch (NoSuchElementException ex) {
+                            type = TaskType.index;
+                        }
+                    } else if (sc.getString(XmlConfigurationReaderConstants.TASK_TYPE).equals("index")) {
                         type = TaskType.index;
                     } else if (sc.getString(XmlConfigurationReaderConstants.TASK_TYPE).equals("clear")) {
                         type = TaskType.clear;
@@ -265,8 +275,8 @@ public class XmlConfigurationReader {
 
     public List<String> getRepositoriesForGroup(String groupName) throws ConfigurationException {
         List<String> repos = new LinkedList<String>();
-        for(RepositoryDto repo : getRepositories()){
-            if(repo.getRepositoryGroups().contains(groupName)){
+        for (RepositoryDto repo : getRepositories()) {
+            if (repo.getRepositoryGroups().contains(groupName)) {
                 repos.add(repo.getName());
             }
         }

@@ -61,9 +61,9 @@ public class TaskDto {
      * Indicates a type for the Task, depending on the type a different Task object will be created in the IndexingManager
      */
     public enum TaskType {
-
+        codeAnalysis, //Indexes the specified repository incrementally and adds code-navigation-specific fields
         clear, //Clears the entire index
-        index //indexes the specified repositories incrementally
+        index //indexes the specified repository incrementally
     }
 
     /**

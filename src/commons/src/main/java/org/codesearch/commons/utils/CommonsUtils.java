@@ -2,9 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
-package org.codesearch.indexer.core;
-
+package org.codesearch.commons.utils;
 import java.io.ByteArrayOutputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -15,12 +13,11 @@ import net.sf.jmimemagic.MagicMatchNotFoundException;
 import net.sf.jmimemagic.MagicParseException;
 import org.codesearch.commons.plugins.vcs.SubversionPlugin;
 import org.codesearch.commons.plugins.vcs.VersionControlPluginException;
-
 /**
  *
- * @author zeheron
+ * @author David Froehlich
  */
-public class IndexerUtils {
+public class CommonsUtils {
 
     /**
      * This method retrieves the mime type of the specified file
@@ -28,8 +25,8 @@ public class IndexerUtils {
      * @return mime type
      * @throws VersionControlPluginException
      */
-    public static String getMimeTypeForFile(ByteArrayOutputStream baos){
-         try {
+    public static String getMimeTypeForFile(ByteArrayOutputStream baos) {
+        try {
             MagicMatch match = Magic.getMagicMatch(baos.toByteArray());
             return match.getMimeType();
         } catch (MagicParseException ex) {
@@ -41,5 +38,4 @@ public class IndexerUtils {
         }
         return "No mime type found";
     }
-
 }

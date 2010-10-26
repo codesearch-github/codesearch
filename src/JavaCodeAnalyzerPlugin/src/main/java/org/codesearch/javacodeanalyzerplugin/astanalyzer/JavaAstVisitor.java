@@ -3,12 +3,13 @@ package org.codesearch.javacodeanalyzerplugin.astanalyzer;
 import java.beans.Visibility;
 import java.util.LinkedList;
 import java.util.List;
-import org.codesearch.commons.plugins.codeanalyzing.ast.ASTElement;
+import java.util.Map;
+import org.codesearch.commons.plugins.codeanalyzing.ast.ClassNode;
 import org.codesearch.commons.plugins.codeanalyzing.ast.FileNode;
 import org.codesearch.commons.plugins.codeanalyzing.ast.MethodNode;
+import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
 import org.codesearch.commons.plugins.codeanalyzing.ast.Variable;
 import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.AnnotationTypeDeclaration;
 import org.eclipse.jdt.core.dom.AnnotationTypeMemberDeclaration;
@@ -21,14 +22,12 @@ import org.eclipse.jdt.core.dom.AssertStatement;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.BlockComment;
-import org.eclipse.jdt.core.dom.BodyDeclaration;
 import org.eclipse.jdt.core.dom.BooleanLiteral;
 import org.eclipse.jdt.core.dom.BreakStatement;
 import org.eclipse.jdt.core.dom.CastExpression;
 import org.eclipse.jdt.core.dom.CatchClause;
 import org.eclipse.jdt.core.dom.CharacterLiteral;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
-import org.eclipse.jdt.core.dom.Comment;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.ConditionalExpression;
 import org.eclipse.jdt.core.dom.ConstructorInvocation;
@@ -42,7 +41,6 @@ import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.FieldAccess;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.ForStatement;
-import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.ImportDeclaration;
 import org.eclipse.jdt.core.dom.InfixExpression;
@@ -100,9 +98,11 @@ import org.eclipse.jdt.core.dom.WildcardType;
 public class JavaAstVisitor extends ASTVisitor {
 
     private FileNode fileNode;
+    private Map<Integer, Usage> usages;
 
-    public JavaAstVisitor(FileNode fileNode) {
+    public JavaAstVisitor(FileNode fileNode, Map<Integer, Usage> usages) {
         this.fileNode = fileNode;
+        this.usages = usages;
     }
 
     public void preVisit(ASTNode node) {
@@ -948,6 +948,7 @@ public class JavaAstVisitor extends ASTVisitor {
             //TODO add handling for constructor invocation here
             return true;
         }
+
         MethodNode method = new MethodNode();
         method.setName(node.getName().getFullyQualifiedName());
         method.setDeclarationPosition(node.getStartPosition());
@@ -963,13 +964,17 @@ public class JavaAstVisitor extends ASTVisitor {
             var.setDeclarationPosition(currParameter.getStartPosition());
             parameters.add(var);
         }
-        method.setDeclarationPosition(node.getStartPosition());
         method.setNodeLength(node.getLength());
         method.setParameters(parameters);
         method.setReturnType(node.getReturnType2().toString());
         Visibility visibility;
         //TODO figure out a way to retrieve visibility from method declaration
-        fileNode.getNodes().add(method);
+        for(ClassNode classNode : fileNode.getClasses()){
+            TypeDeclaration parent = (TypeDeclaration) node.getParent();
+            if(classNode.getName().equals(parent.getName())){
+                classNode.getMethodDeclarations().add(method);
+            }
+        }
         return true;
     }
 
@@ -1504,6 +1509,13 @@ public class JavaAstVisitor extends ASTVisitor {
      *         skipped
      */
     public boolean visit(TypeDeclaration node) {
+        ClassNode classNode = new ClassNode();
+        classNode.setName(node.getName().getFullyQualifiedName());
+        classNode.setDeclarationPosition(node.getStartPosition());
+        classNode.setNodeLength(node.getLength());
+        Visibility visibility;
+        //TODO figure out a way to retrieve visibility from method declaration
+        fileNode.getClasses().add(classNode);
         return true;
     }
 

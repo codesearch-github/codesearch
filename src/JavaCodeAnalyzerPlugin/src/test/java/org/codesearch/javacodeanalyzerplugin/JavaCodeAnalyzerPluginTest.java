@@ -32,7 +32,9 @@ public class JavaCodeAnalyzerPluginTest extends TestCase {
     /**
      * Test of getAstForRepository method, of class JavaCodeAnalyzerPlugin.
      */
-    public void testGetAstForRepository() {
-        plugin.getAstForRepository(null, null);
+    public void testGetAstForRepository() throws Exception{
+        RepositoryDto repo = new RepositoryDto();
+        repo.setVersionControlSystem("FILESYSTEM");
+        plugin.analyzeFile("/home/david/codesearch/src/indexer/src/main/java/org/codesearch/indexer/tasks/IndexingTask.java", repo);
     }
 }

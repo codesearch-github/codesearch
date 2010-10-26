@@ -48,6 +48,7 @@
             <tasks>
                 <task>
                     <type>index</type>
+                    <enable-code-analysis>true</enable-code-analysis>
                 </task>
             </tasks>
         </index-job> 

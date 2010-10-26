@@ -28,4 +28,9 @@ public class Variable extends ASTElement {
     public void setVisibility(Visibility visibility) {
         this.visibility = visibility;
     }
+
+    @Override
+    public String getOutlineForChildElements() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }

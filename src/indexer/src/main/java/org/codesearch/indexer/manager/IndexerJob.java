@@ -78,9 +78,15 @@ public class IndexerJob implements Job {
                     ((IndexingTask) task).setRepository(taskDto.getRepository());
                     break;
                 }
-                case clear:
+                case clear: {
                     task = new ClearTask();
                     ((ClearTask) task).setRepositoryName(taskDto.getRepository().getName());
+                    break;
+                } case codeAnalysis: {
+                    task = (Task) applicationContext.getBean("indexingTask"); //TODO add bean with correct setting for codeAnalysisEnabled
+                    ((IndexingTask) task).setRepository(taskDto.getRepository());
+                    ((IndexingTask) task).setCodeAnalysisEnabled(true);
+                }
             }
             try {
                 task.execute();

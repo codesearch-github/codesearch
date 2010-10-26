@@ -20,15 +20,17 @@
  */
 package org.codesearch.indexer.tasks;
 
-import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.net.URISyntaxException;
 import org.apache.commons.configuration.ConfigurationException;
+import org.codesearch.commons.plugins.codeanalyzing.CodeAnalyzerPluginException;
 import org.codesearch.indexer.exceptions.TaskExecutionException;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -49,9 +51,12 @@ import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 import org.codesearch.commons.constants.IndexConstants;
 import org.codesearch.commons.plugins.PluginLoader;
 import org.codesearch.commons.plugins.PluginLoaderException;
+import org.codesearch.commons.plugins.codeanalyzing.CodeAnalyzerPlugin;
+import org.codesearch.commons.plugins.codeanalyzing.ast.FileNode;
+import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
+import org.codesearch.commons.plugins.vcs.FileDto;
 import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
 import org.codesearch.commons.plugins.vcs.VersionControlPluginException;
-import org.codesearch.indexer.core.IndexerUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -64,8 +69,8 @@ public class IndexingTask implements Task {
 
     /** The dto holding the repository information */
     private RepositoryDto repository;
-    /** The IndexingTask to be processed */
-    private Set<String> fileNames;
+    /** the FileDtos of the files that have changed since last indexing */
+    private Set<FileDto> changedFiles;
     /* Instantiate a logger  */
     private static final Logger LOG = Logger.getLogger(IndexingTask.class);
     /** The currently active IndexWriter */
@@ -77,14 +82,18 @@ public class IndexingTask implements Task {
     /** The Version control Plugin */
     private VersionControlPlugin versionControlPlugin;
     /** The used PropertyReader */
-    private PropertiesManager propertiesReader;
+    private PropertiesManager propertiesManager;
     /** The XmlConfigurationReader used to get the configuration */
     @Autowired
     private XmlConfigurationReader configReader;
     /** The plugin loader. */
     @Autowired
     private PluginLoader pluginLoader;
-
+    /** Defines if the task is set to analyze the class and write code navigation relevant data into the binary index */
+    private boolean codeAnalysisEnabled = false;
+    private String indexLocation = null;
+    private Map<Integer, Usage> usages = new HashMap<Integer, Usage>();
+    
     /**
      * executes the task,
      * updates the index fields of the set repository
@@ -92,28 +101,32 @@ public class IndexingTask implements Task {
      */
     @Override
     public void execute() throws TaskExecutionException {
-        String indexLocation = null;
         try {
             LOG.info("Starting execution of indexing task");
-            indexLocation = configReader.getSingleLinePropertyValue("index-location");
             // Read the index status file
-            propertiesReader = new PropertiesManager(indexLocation + File.separator + "revisions.properties"); //TODO add propertiesReader path
+            indexLocation = configReader.getSingleLinePropertyValue("index-location");
+            propertiesManager = new PropertiesManager(indexLocation + File.separator + "revisions.properties"); //TODO add propertiesReader path
             // Get the version control plugins
             versionControlPlugin = pluginLoader.getPlugin(VersionControlPlugin.class, repository.getVersionControlSystem());
             versionControlPlugin.setRepository(new URI(repository.getUrl()), repository.getUsername(), repository.getPassword());
-            fileNames = versionControlPlugin.getPathsForChangedFilesSinceRevision(propertiesReader.getPropertyFileValue(repository.getName()));
-
-            if (fileNames.isEmpty()) {
-                LOG.info("Index of repository " + repository.getName() + " is up to date");
-                return;
+            String lastIndexedRevision = propertiesManager.getPropertyFileValue(repository.getName());
+            changedFiles = versionControlPlugin.getChangedFilesSinceRevision(lastIndexedRevision);
+            String lastAnalysisRevision = "";
+            boolean retrieveNewFileList = false;
+            //TODO make code less ugly...
+            if (codeAnalysisEnabled) {
+                //TODO retrieve last indexed revision
+                if (!lastAnalysisRevision.equals(lastIndexedRevision)) {
+                    retrieveNewFileList = true;
+                } else {
+                    retrieveNewFileList = false;
+                }
             }
-            File dir = new File(indexLocation);
-            indexDirectory = FSDirectory.open(dir);
+            executeIndexing();
+            if (codeAnalysisEnabled) {
+                executeCodeAnalysis(retrieveNewFileList, lastAnalysisRevision);
+            }
 
-            clearPreviousDocuments();
-            initializeIndexWriter(new WhitespaceAnalyzer(), dir); //IndexConstants.LUCENE_VERSION
-            createIndex();
-            propertiesReader.setPropertyFileValue(repository.getName(), versionControlPlugin.getRepositoryRevision());
         } catch (VersionControlPluginException ex) {
             LOG.error("VersionControlPlugin files could not be retrieved: " + ex);
         } catch (PluginLoaderException ex) {
@@ -126,7 +139,46 @@ public class IndexingTask implements Task {
             LOG.error("IOException at execution of task: " + ex);
         } catch (ConfigurationException ex) {
             LOG.error("Configuration could not be read " + ex);
+        } catch (CodeAnalyzerPluginException ex) {
+            LOG.error("Error executing code analysis \n" + ex);
         }
+    }
+
+    private void executeCodeAnalysis(boolean retrieveNewFileList, String lastAnalysisRevision) throws VersionControlPluginException, PluginLoaderException, CodeAnalyzerPluginException {
+        if (retrieveNewFileList) {
+            changedFiles = versionControlPlugin.getChangedFilesSinceRevision(lastAnalysisRevision);
+        }
+        CodeAnalyzerPlugin plugin = null;
+        String previousMimeType = null;
+        String currentMimeType = null;
+        for (FileDto currentFile : changedFiles) {
+            //check whether the new file has a new mime type or now codeAnalyzerPlugin was loaded
+            currentMimeType = currentFile.getMimeType();
+            if (plugin == null || (!currentMimeType.equals(previousMimeType))) {
+                //load the appropriate plugin
+                plugin = pluginLoader.getPlugin(CodeAnalyzerPlugin.class, currentMimeType);
+            }
+            plugin.analyzeFile(currentFile.getContent().toString(), repository);
+            FileNode fn = plugin.getAstForCurrentFile();
+
+            previousMimeType = currentMimeType;
+            System.out.println(fn.getOutlineForChildElements());
+            //TODO do something useful with the filenode
+        }
+    }
+
+    private void executeIndexing() throws IOException, ConfigurationException, VersionControlPluginException {
+        if (changedFiles.isEmpty()) {
+            LOG.info("Index of repository " + repository.getName() + " is up to date");
+            return;
+        }
+        File dir = new File(indexLocation);
+        indexDirectory = FSDirectory.open(dir);
+
+        clearPreviousDocuments();
+        initializeIndexWriter(new WhitespaceAnalyzer(), dir); //IndexConstants.LUCENE_VERSION
+        createIndex();
+        propertiesManager.setPropertyFileValue(repository.getName(), versionControlPlugin.getRepositoryRevision());
     }
 
     /**
@@ -134,19 +186,19 @@ public class IndexingTask implements Task {
      * @param doc the target document
      * @return document with added lucene fields
      */
-    public Document addLuceneFields(Document doc, String path) throws VersionControlPluginException {
-        ByteArrayOutputStream baos = versionControlPlugin.getFileContentForFilePath(path);
-        doc.add(new Field(IndexConstants.INDEX_FIELD_TITLE, extractFilename(path), Field.Store.YES, Field.Index.NOT_ANALYZED));
-        doc.add(new Field(IndexConstants.INDEX_FIELD_FILEPATH, path, Field.Store.YES, Field.Index.NOT_ANALYZED));
-        doc.add(new Field(IndexConstants.INDEX_FIELD_CONTENT, baos.toString(), Field.Store.YES, Field.Index.ANALYZED));
+    public Document addLuceneFields(Document doc, FileDto file) throws VersionControlPluginException {
+        doc.add(new Field(IndexConstants.INDEX_FIELD_TITLE, extractFilename(file.getFilePath()), Field.Store.YES, Field.Index.NOT_ANALYZED));
+        doc.add(new Field(IndexConstants.INDEX_FIELD_FILEPATH, file.getFilePath(), Field.Store.YES, Field.Index.NOT_ANALYZED));
+        doc.add(new Field(IndexConstants.INDEX_FIELD_CONTENT, file.getContent().toString(), Field.Store.YES, Field.Index.ANALYZED));
         doc.add(new Field(IndexConstants.INDEX_FIELD_REPOSITORY, repository.getName(), Field.Store.YES, Field.Index.NOT_ANALYZED));
         doc.add(new Field(IndexConstants.INDEX_FIELD_REVISION, versionControlPlugin.getRepositoryRevision(), Field.Store.YES, Field.Index.ANALYZED));
         //doc.add(new Field(IndexConstants.INDEX_FILED_REPOSITORY_GROUP, repository.getRepositoryGroupsAsString(), Field.Store.YES, Field.Index.ANALYZED));
         //doc.add(new Field(IndexConstants.INDEX_FIELD_TITLE_LC, extractFilename(path).toLowerCase(), Field.Store.YES, Field.Index.NOT_ANALYZED));
-        doc.add(new Field(IndexConstants.INDEX_FIELD_FILEPATH_LC, path.toLowerCase(), Field.Store.YES, Field.Index.NOT_ANALYZED));
-        doc.add(new Field(IndexConstants.INDEX_FIELD_CONTENT_LC, baos.toString().toLowerCase(), Field.Store.YES, Field.Index.ANALYZED));
-        //FU SAM
-        doc.add(new Field(IndexConstants.INDEX_FIELD_FILE_TYPE, IndexerUtils.getMimeTypeForFile(baos), Field.Store.YES, Field.Index.ANALYZED));
+        doc.add(new Field(IndexConstants.INDEX_FIELD_FILEPATH_LC, file.getFilePath().toLowerCase(), Field.Store.YES, Field.Index.NOT_ANALYZED));
+        doc.add(new Field(IndexConstants.INDEX_FIELD_CONTENT_LC, file.getContent().toString().toLowerCase(), Field.Store.YES, Field.Index.ANALYZED));
+        //FU SAM <-- by Stephan
+        //yeah sam, you and your criticism, who cares if only half of the changed files are committed <-- by david
+        doc.add(new Field(IndexConstants.INDEX_FIELD_FILE_TYPE, file.getMimeType(), Field.Store.YES, Field.Index.ANALYZED)); //TODO add mime type
         return doc;
     }
 
@@ -175,15 +227,15 @@ public class IndexingTask implements Task {
         }
         Document doc = new Document();
         try {
-            Iterator it = fileNames.iterator();
+            Iterator it = changedFiles.iterator();
             int i = 0;
             while (it.hasNext()) {
-                String path = (String) it.next();
-                if (!(fileIsOnIgnoreList(path))) {
+                FileDto file = (FileDto) it.next();
+                if (!(fileIsOnIgnoreList(file.getFilePath()))) {
                     // The lucene document containing all relevant indexing information
                     doc = new Document();
                     // Add fields
-                    doc = addLuceneFields(doc, path);
+                    doc = addLuceneFields(doc, file);
                     LOG.debug("Added file: " + doc.get(IndexConstants.INDEX_FIELD_TITLE) + " to index.");
                     // Add document to the index
                     indexWriter.addDocument(doc);
@@ -215,8 +267,8 @@ public class IndexingTask implements Task {
             return;
         }
         indexReader = searcher.getIndexReader();
-        for (String path : fileNames) {
-            Term term = new Term(IndexConstants.INDEX_FIELD_FILEPATH, path);
+        for (FileDto file : changedFiles) {
+            Term term = new Term(IndexConstants.INDEX_FIELD_FILEPATH, file.getFilePath());
             indexReader.deleteDocuments(term);
         }
         indexReader.close();
@@ -263,5 +315,13 @@ public class IndexingTask implements Task {
 
     public void setPluginLoader(PluginLoader pluginLoader) {
         this.pluginLoader = pluginLoader;
+    }
+
+    public boolean isCodeAnalysisEnabled() {
+        return codeAnalysisEnabled;
+    }
+
+    public void setCodeAnalysisEnabled(boolean codeAnalysisEnabled) {
+        this.codeAnalysisEnabled = codeAnalysisEnabled;
     }
 }

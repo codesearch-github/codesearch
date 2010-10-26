@@ -20,7 +20,9 @@ import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 import org.codesearch.commons.constants.MimeTypeNames;
 import org.codesearch.commons.plugins.PluginLoader;
 import org.codesearch.commons.plugins.codeanalyzing.CodeAnalyzerPlugin;
+import org.codesearch.commons.plugins.codeanalyzing.CodeAnalyzerPluginException;
 import org.codesearch.commons.plugins.codeanalyzing.ast.MethodNode;
+import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
 import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
 import org.codesearch.commons.plugins.vcs.VersionControlPluginException;
 import org.codesearch.javacodeanalyzerplugin.astanalyzer.JavaAstVisitor;
@@ -36,35 +38,35 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
 
     private PluginLoader pluginLoader = new PluginLoader();
     private VersionControlPlugin versionControlPlugin;
+    private String fileContent;
+    private FileNode fileNode;
+    private Map<Integer, Usage> usages = new HashMap<Integer, Usage>();
+    
     //TODO add spring...
-
     @Override
-    public Map<String, FileNode> getAstForRepository(Set<String> filenames, RepositoryDto repository) {
+    public void analyzeFile(String fileName, RepositoryDto repository) throws CodeAnalyzerPluginException {
         try {
+            fileNode = new FileNode();
             versionControlPlugin = pluginLoader.getPlugin(VersionControlPlugin.class, repository.getVersionControlSystem());
-        } catch (PluginLoaderException ex) {
-            //TODO add exception handling
-        }
-        ASTParser parser = ASTParser.newParser(AST.JLS3);
-        parser.setKind(ASTParser.K_COMPILATION_UNIT);
-        Map<String, FileNode> asts = new HashMap<String, FileNode>();
-
-        String fileContent = "";
-        for (String filename : filenames) {
-            try {
-                fileContent = versionControlPlugin.getFileContentForFilePath(filename).toString();
-            } catch (VersionControlPluginException ex) {
-                //TODO add exception handling
-            }
-            parser.setResolveBindings(true);
+            fileContent = versionControlPlugin.getFileContentForFilePath(fileName).toString();
+            ASTParser parser = ASTParser.newParser(AST.JLS3);
+            parser.setKind(ASTParser.K_COMPILATION_UNIT);
+            parser.setResolveBindings(false);
             parser.setSource(fileContent.toCharArray());
             ASTNode root = parser.createAST(null);
-            FileNode fileNode = new FileNode();
-            JavaAstVisitor visitor = new JavaAstVisitor(fileNode);
+            JavaAstVisitor visitor = new JavaAstVisitor(fileNode, usages);
             root.accept(visitor);
-            asts.put(filename, fileNode);
+        } catch (VersionControlPluginException ex) {
+            throw new CodeAnalyzerPluginException("Could not retrieve file content from VersionControlPlugin\n" + ex);
+        } catch (PluginLoaderException ex) {
+            throw new CodeAnalyzerPluginException("No plugin for set version control type found");
         }
-        return asts;
+
+    }
+
+    @Override
+    public FileNode getAstForCurrentFile() {
+        return fileNode;
     }
 
     @Override
