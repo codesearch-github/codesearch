@@ -21,15 +21,19 @@
 package org.codesearch.searcher.server.rpc;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Level;
-import javax.annotation.PostConstruct;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
 import org.apache.lucene.queryParser.ParseException;
 import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
 import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
+import org.codesearch.commons.plugins.PluginLoader;
+import org.codesearch.commons.plugins.PluginLoaderException;
+import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
+import org.codesearch.commons.plugins.vcs.VersionControlPluginException;
 
 import org.codesearch.searcher.client.rpc.SearcherService;
 import org.codesearch.searcher.server.DocumentSearcher;
@@ -50,6 +54,8 @@ public class SearcherServiceImpl extends AutowiringRemoteServiceServlet implemen
     private DocumentSearcher documentSearcher;
     @Autowired
     private XmlConfigurationReader xmlConfigurationReader;
+    @Autowired
+    private PluginLoader pluginLoader;
     private List<String> repositories;
     private List<String> repositoryGroups;
 
@@ -99,5 +105,26 @@ public class SearcherServiceImpl extends AutowiringRemoteServiceServlet implemen
     @Override
     public List<String> getAvailableRepositories() {
         return repositories;
+    }
+
+    @Override
+    public String getFileContentForSearchResultDto(SearchResultDto searchResultDto) {
+        String fileContent = "";
+        try {
+            RepositoryDto repositoryDto = xmlConfigurationReader.getRepositoryByName(searchResultDto.getRepository());
+            VersionControlPlugin plugin = pluginLoader.getPlugin(VersionControlPlugin.class, repositoryDto.getVersionControlSystem());
+            plugin.setRepository(new URI(repositoryDto.getUrl()), repositoryDto.getUsername(), repositoryDto.getPassword());
+            //FIXME check for binary or weird stuff
+            fileContent = plugin.getFileContentForFilePath(searchResultDto.getFilePath()).toString();
+        } catch (URISyntaxException ex) {
+            LOG.error(ex);
+        } catch (VersionControlPluginException ex) {
+            LOG.error(ex);
+        } catch (ConfigurationException ex) {
+            LOG.error(ex);
+        } catch (PluginLoaderException ex) {
+            LOG.error(ex);
+        }
+        return fileContent;
     }
 }

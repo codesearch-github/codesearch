@@ -68,13 +68,13 @@
             <artifactId>FilesystemPlugin</artifactId>
             <version>0.1-SNAPSHOT</version>
         </dependency>
-        <dependency>
+        <!--dependency>
             <groupId>org.codesearch</groupId>
             <artifactId>JavaCodeAnalyzerPlugin</artifactId>
             <version>1.0-SNAPSHOT</version>
-        </dependency>
+        </dependency-->
 
-        <!-- remove -->
+        <!-- remove 
         <dependency>
             <groupId>org.eclipse.custom</groupId>
             <artifactId>contenttype</artifactId>
@@ -140,7 +140,7 @@
             <artifactId>osgi</artifactId>
             <version>3.6.0</version>
             <type>jar</type>
-        </dependency>
+        </dependency> -->
         
     </dependencies>
     <build>
