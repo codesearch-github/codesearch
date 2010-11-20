@@ -46,5 +46,4 @@ public class FileActivity extends AbstractActivity implements Presenter {
         clientFactory.getPlaceController().goTo(place);
     }
 
-    private void retrieve
 }
