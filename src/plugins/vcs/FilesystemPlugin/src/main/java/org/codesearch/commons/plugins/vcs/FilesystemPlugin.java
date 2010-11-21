@@ -3,6 +3,7 @@ package org.codesearch.commons.plugins.vcs;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URI;
@@ -23,6 +24,7 @@ public class FilesystemPlugin implements VersionControlPlugin {
     /** the folder where all code files are located */
     private String codeLocation;
     private int i = 0;
+
     /** {@inheritDoc} */
     @Override
     public void setRepository(URI url, String username, String password) throws VersionControlPluginException {
@@ -32,17 +34,17 @@ public class FilesystemPlugin implements VersionControlPlugin {
     /** {@inheritDoc} */
     @Override
     public ByteArrayOutputStream getFileContentForFilePath(String filePath) throws VersionControlPluginException {
-        File f = new File(filePath);
-        ByteArrayOutputStream content = new ByteArrayOutputStream();
+        File file = new File(filePath);
         try {
-            BufferedReader br = new BufferedReader(new FileReader(f));
-            while (br.ready()) {
-                content.write(br.readLine().getBytes());
-            }
+            FileInputStream fis = new FileInputStream(file);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            byte fileContent[] = new byte[(int) file.length()];
+            fis.read(fileContent);
+            baos.write(fileContent);
+            return baos;
         } catch (IOException ex) {
             throw new VersionControlPluginException("File could not be opened: \n" + ex);
         }
-        return content;
     }
 
     /** {@inheritDoc} */
@@ -69,7 +71,7 @@ public class FilesystemPlugin implements VersionControlPlugin {
                     ByteArrayOutputStream baos = getFileContentForFilePath(f.getAbsolutePath());
                     //TODO replace work-around as soon as stephans mime type analyzer works
                     String mimeType = "";
-                    if(f.getAbsolutePath().endsWith(".java")){
+                    if (f.getAbsolutePath().endsWith(".java")) {
                         mimeType = MimeTypeNames.JAVA;
                     }
                     mimeType = CommonsUtils.getMimeTypeForFile(baos);
@@ -77,7 +79,7 @@ public class FilesystemPlugin implements VersionControlPlugin {
                 }
             }
         }
-        System.out.println("Mime time: "+(new Date().getTime()-d.getTime()));
+        System.out.println("Mime time: " + (new Date().getTime() - d.getTime()));
     }
 
     /** {@inheritDoc} */
@@ -118,6 +120,4 @@ public class FilesystemPlugin implements VersionControlPlugin {
     public String getVersion() {
         return "0.1";
     }
-
-
 }
