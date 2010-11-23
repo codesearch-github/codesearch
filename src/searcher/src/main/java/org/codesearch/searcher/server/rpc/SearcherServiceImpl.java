@@ -108,16 +108,14 @@ public class SearcherServiceImpl extends AutowiringRemoteServiceServlet implemen
     }
 
     @Override
-    public String getFileContent(String repositoryName, String filePath) {
-        LOG.debug("Getting file content for repository: " + repositoryName + " and file path: " + filePath);
+    public String getFileContentForSearchResultDto(SearchResultDto searchResultDto) {
         String fileContent = "";
         try {
-            RepositoryDto repositoryDto = xmlConfigurationReader.getRepositoryByName(repositoryName);
+            RepositoryDto repositoryDto = xmlConfigurationReader.getRepositoryByName(searchResultDto.getRepository());
             VersionControlPlugin plugin = pluginLoader.getPlugin(VersionControlPlugin.class, repositoryDto.getVersionControlSystem());
             plugin.setRepository(new URI(repositoryDto.getUrl()), repositoryDto.getUsername(), repositoryDto.getPassword());
             //FIXME check for binary or weird stuff
-            fileContent = plugin.getFileContentForFilePath(filePath).toString();
-            LOG.debug("Found file content:\n" + fileContent);
+            fileContent = plugin.getFileContentForFilePath(searchResultDto.getFilePath()).toString();
         } catch (URISyntaxException ex) {
             LOG.error(ex);
         } catch (VersionControlPluginException ex) {

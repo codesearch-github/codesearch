@@ -36,5 +36,5 @@ public interface SearcherService extends RemoteService {
     public List<SearchResultDto> doSearch(String query, boolean caseSensitive, List<String> selectedRepositories, List<String> selectedRepositoryGroups) throws InvalidIndexLocationException;
     public List<String> getAvailableRepositories();
     public List<String> getAvailableRepositoryGroups();
-    public String getFileContent(String repositoryName, String filePath);
+    public String getFileContentForSearchResultDto(SearchResultDto searchResultDto);
 }

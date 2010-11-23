@@ -78,7 +78,7 @@ public class DocumentSearcher {
         indexLocation = configReader.getSingleLinePropertyValue(XmlConfigurationReaderConstants.INDEX_LOCATION);
         LOG.debug("Index location set to: " + indexLocation);
         //TODO replace with appropriate Analyzer
-        queryParser = new QueryParser(Version.LUCENE_30, IndexConstants.INDEX_FIELD_CONTENT_LC, new WhitespaceAnalyzer());
+        queryParser = new QueryParser(Version.LUCENE_30, "", new WhitespaceAnalyzer());
         try {
             initSearcher();
         } catch (InvalidIndexLocationException ex) {
@@ -148,7 +148,7 @@ public class DocumentSearcher {
         }
 
         StringBuilder repoQuery = new StringBuilder();
-        repoQuery.append(" AND ");
+        repoQuery.append(" +");
         repoQuery.append(IndexConstants.INDEX_FIELD_REPOSITORY);
         repoQuery.append(":(");
 

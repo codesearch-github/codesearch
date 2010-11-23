@@ -13,7 +13,7 @@ public class FilePlace extends Place {
 
         @Override
         public String getToken(FilePlace place) {
-            return "lol";
+            return null;
         }
 
         @Override
