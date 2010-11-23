@@ -25,9 +25,10 @@
                 </tr>
             </tbody>
         </table>
-        <g:HTMLPanel ui:field="fileContent">
-            File Content goes here
-        </g:HTMLPanel>
+        <g:ScrollPanel>
+            <g:SimplePanel ui:field="fileContentPanel">
+            </g:SimplePanel>
+        </g:ScrollPanel>
 
     </g:HTMLPanel>
 </ui:UiBinder>

@@ -6,10 +6,12 @@ import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import org.codesearch.searcher.client.ui.searchview.SearchPlace;
 
@@ -27,7 +29,7 @@ public class FileViewImpl extends Composite implements FileView {
     private Presenter presenter;
     
     @UiField
-    HTMLPanel fileContent;
+    SimplePanel fileContentPanel;
 
     @UiField
     Label urlField;
@@ -54,7 +56,6 @@ public class FileViewImpl extends Composite implements FileView {
 
     @Override
     public void setFileContent(String fileContent) {
-        this.fileContent.clear();
-        this.fileContent.add(new HTML("<pre>" + fileContent + "</pre>"));
+       fileContentPanel.add(new HTML("<pre>\n" + fileContent + "</pre>"));
     }
 }

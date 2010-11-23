@@ -4,6 +4,7 @@ import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import org.codesearch.searcher.client.ClientFactory;
 import org.codesearch.searcher.client.rpc.SearcherService;
@@ -35,6 +36,18 @@ public class FileActivity extends AbstractActivity implements Presenter {
         fileView = clientFactory.getFileView();
         fileView.setPresenter(this);
         panel.setWidget(fileView.asWidget());
+        searcherServiceAsync.getFileContent("svn_local", "/home/daasdingo/workspace/svnsearch/doc/gpl", new AsyncCallback<String>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+                fileView.setFileContent("Could not get file content from the server");
+            }
+
+            @Override
+            public void onSuccess(String result) {
+                    fileView.setFileContent(result);
+            }
+        });
     }
 
     /**
