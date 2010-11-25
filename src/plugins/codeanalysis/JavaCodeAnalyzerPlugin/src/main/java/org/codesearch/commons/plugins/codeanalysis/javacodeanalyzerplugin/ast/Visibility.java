@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package org.codesearch.commons.plugins.codeanalyzing.ast;
+package org.codesearch.commons.plugins.codeanalysis.javacodeanalyzerplugin.ast;
 
 /**
  *

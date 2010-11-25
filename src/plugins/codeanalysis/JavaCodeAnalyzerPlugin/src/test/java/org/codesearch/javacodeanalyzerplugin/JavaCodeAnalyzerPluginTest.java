@@ -6,10 +6,8 @@
 package org.codesearch.javacodeanalyzerplugin;
 
 import org.codesearch.commons.plugins.codeanalysis.javacodeanalyzerplugin.JavaCodeAnalyzerPlugin;
-import java.util.Map;
 import junit.framework.TestCase;
-import org.apache.commons.lang.NotImplementedException;
-import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  *

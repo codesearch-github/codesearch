@@ -3,13 +3,15 @@
  * and open the template in the editor.
  */
 
-package org.codesearch.commons.plugins.codeanalyzing.ast;
+package org.codesearch.commons.plugins.codeanalysis.javacodeanalyzerplugin.ast;
+
+import org.codesearch.commons.plugins.codeanalyzing.ast.Node;
 
 /**
- *
+ * ASTElement that represents a variable in the source code
  * @author David Froehlich
  */
-public class Variable extends ASTElement {
+public class VariableNode extends Node {
     private String type;
     private Visibility visibility;
 
@@ -27,10 +29,5 @@ public class Variable extends ASTElement {
 
     public void setVisibility(Visibility visibility) {
         this.visibility = visibility;
-    }
-
-    @Override
-    public String getOutlineForChildElements() {
-        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

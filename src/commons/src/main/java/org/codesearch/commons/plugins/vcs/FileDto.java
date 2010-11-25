@@ -14,7 +14,8 @@ import java.io.ByteArrayOutputStream;
 public class FileDto {
     private String filePath;
     private ByteArrayOutputStream content;
-    private String mimeType;
+    /** determines whether the file is binary */
+    private boolean binary;
 
     public ByteArrayOutputStream getContent() {
         return content;
@@ -31,17 +32,17 @@ public class FileDto {
         this.filePath = filePath;
     }
 
-    public String getMimeType() {
-        return mimeType;
+    public boolean isBinary() {
+        return binary;
     }
 
-    public void setMimeType(String mimeType) {
-        this.mimeType = mimeType;
+    public void setBinary(boolean binary) {
+        this.binary = binary;
     }
 
-    public FileDto(String filePath, ByteArrayOutputStream content, String mimeType) {
+    public FileDto(String filePath, ByteArrayOutputStream content, boolean binary) {
         this.filePath = filePath;
         this.content = content;
-        this.mimeType = mimeType;
+        this.binary = binary;
     }
 }

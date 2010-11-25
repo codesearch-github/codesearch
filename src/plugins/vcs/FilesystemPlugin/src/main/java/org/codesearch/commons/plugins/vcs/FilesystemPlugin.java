@@ -1,13 +1,10 @@
 package org.codesearch.commons.plugins.vcs;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.net.URI;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import org.codesearch.commons.constants.MimeTypeNames;
@@ -23,7 +20,6 @@ public class FilesystemPlugin implements VersionControlPlugin {
 
     /** the folder where all code files are located */
     private String codeLocation;
-    private int i = 0;
 
     /** {@inheritDoc} */
     @Override
@@ -62,24 +58,21 @@ public class FilesystemPlugin implements VersionControlPlugin {
      * @param lastModified the time of last indexing
      */
     private void addChangedFilesFromDirectoryToSet(Set<FileDto> files, File directory, long lastModified) throws VersionControlPluginException {
-        Date d = new Date();
         for (File f : directory.listFiles()) {
             if (f.isDirectory()) {
                 addChangedFilesFromDirectoryToSet(files, f, lastModified);
             } else {
                 if (f.lastModified() > lastModified) {
                     ByteArrayOutputStream baos = getFileContentForFilePath(f.getAbsolutePath());
-                    //TODO replace work-around as soon as stephans mime type analyzer works
-                    String mimeType = "";
-                    if (f.getAbsolutePath().endsWith(".java")) {
-                        mimeType = MimeTypeNames.JAVA;
+                    //since it is not possible to find out if a file is binary without mime type analysis (and mime type analysis takes too long) the FilesystemPlugin will generally assume that files are not binary
+                    boolean binary = false;
+                    if (binary) {
+                        System.out.println("File " + f.getAbsolutePath() + " is binary");
                     }
-                    mimeType = CommonsUtils.getMimeTypeForFile(baos);
-                    files.add(new FileDto(f.getAbsolutePath(), baos, mimeType));
+                    files.add(new FileDto(f.getAbsolutePath(), baos, binary));
                 }
             }
         }
-        System.out.println("Mime time: " + (new Date().getTime() - d.getTime()));
     }
 
     /** {@inheritDoc} */

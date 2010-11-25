@@ -6,21 +6,19 @@ package org.codesearch.commons.plugins.codeanalysis.javacodeanalyzerplugin;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.codesearch.commons.plugins.PluginLoaderException;
-import org.codesearch.commons.plugins.codeanalyzing.ast.FileNode;
+import java.util.Map.Entry;
+import java.util.TreeMap;
+import org.codesearch.commons.plugins.codeanalysis.javacodeanalyzerplugin.ast.FileNode;
 import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 import org.codesearch.commons.constants.MimeTypeNames;
-import org.codesearch.commons.plugins.PluginLoader;
 import org.codesearch.commons.plugins.codeanalyzing.CodeAnalyzerPlugin;
 import org.codesearch.commons.plugins.codeanalyzing.CodeAnalyzerPluginException;
 import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
-import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
-import org.codesearch.commons.plugins.vcs.VersionControlPluginException;
 import org.codesearch.commons.plugins.codeanalysis.javacodeanalyzerplugin.astanalyzer.JavaAstVisitor;
+import org.codesearch.commons.plugins.codeanalyzing.ast.CompoundNode;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
-import org.eclipse.jdt.internal.core.jdom.CompilationUnit;
 import org.springframework.stereotype.Component;
 
 /**
@@ -29,8 +27,10 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
+
     private FileNode fileNode;
     private Map<Integer, Usage> usages = new HashMap<Integer, Usage>();
+    private Map<Integer, CompoundNode> ast = new TreeMap<Integer, CompoundNode>();
 
     //TODO add spring...
     @Override
@@ -43,16 +43,33 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
         ASTNode root = parser.createAST(null);
         JavaAstVisitor visitor = new JavaAstVisitor(fileNode, usages);
         root.accept(visitor);
+        fileNode.addCompoundNodesToMap(ast);
+        int chars = 0;
+        String[] lines = fileContent.split("\n");
+        int lineNumber = 0;
+        for (Entry<Integer, CompoundNode> currentNode : ast.entrySet()) {
+            while (lineNumber < lines.length) {
+                if (currentNode.getKey() < chars) {
+                    currentNode.getValue().setStartLine(lineNumber);
+                    break;
+                }
+                chars += lines[lineNumber].length() + 1;
+                lineNumber++;
+            }
+        }
+        for(CompoundNode node : ast.values()){
+            System.out.println(node.getOutlineLink());
+        }
     }
 
     @Override
-    public FileNode getAstForCurrentFile() {
-        return fileNode;
+    public Map<Integer, CompoundNode> getAstForCurrentFile() {
+        return ast;
     }
 
     @Override
     public String getPurposes() {
-        return MimeTypeNames.JAVA;
+        return "java";
     }
 
     @Override

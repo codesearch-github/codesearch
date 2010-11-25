@@ -8,9 +8,6 @@ import eu.medsea.mimeutil.MimeType;
 import eu.medsea.mimeutil.MimeUtil;
 import java.io.ByteArrayOutputStream;
 import java.util.Collection;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.codesearch.commons.plugins.vcs.SubversionPlugin;
 import org.codesearch.commons.plugins.vcs.VersionControlPluginException;
 
 /**

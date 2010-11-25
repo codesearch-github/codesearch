@@ -5,6 +5,9 @@
 package org.codesearch.indexer.tasks;
 
 import java.io.ByteArrayOutputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.apache.commons.configuration.ConfigurationException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
@@ -13,6 +16,7 @@ import org.codesearch.commons.configuration.properties.PropertiesManager;
 import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
 import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 import org.codesearch.commons.constants.MimeTypeNames;
+import org.codesearch.commons.database.DBAccess;
 import org.codesearch.commons.plugins.PluginLoader;
 import org.codesearch.commons.plugins.codeanalyzing.CodeAnalyzerPlugin;
 import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
@@ -54,6 +58,11 @@ public class IndexingTaskTest {
 
     @Before
     public void setUp() {
+        try {
+            DBAccess.setupConnections();
+        } catch (ConfigurationException ex) {
+            //TODO add useful error handling
+        }
     }
 
     @After
@@ -80,12 +89,11 @@ public class IndexingTaskTest {
     public void testExecute() throws Exception {
 //        XmlConfigurationReader pm = new XmlConfigurationReader();
 //        List<RepositoryDto> repos = pm.getRepositories();
-//        PropertiesManager pr = new PropertiesManager("/tmp/test/revisions.properties");
-//
 //        for (RepositoryDto repo : repos) {
-//            if (!repo.getVersionControlSystem().equals("FILESYTEM")) {
+//            if (!repo.getVersionControlSystem().equals("FILESYSTEM")) {
 //                IndexingTask t = (IndexingTask) applicationContext.getBean("indexingTask");
 //                t.setRepository(repo);
+//                t.setCodeAnalysisEnabled(true);
 //                t.execute();
 //            }
 //        }
@@ -95,11 +103,11 @@ public class IndexingTaskTest {
     public void testCodeAnalysis() throws Exception {
         RepositoryDto repo = new RepositoryDto();
         repo.setVersionControlSystem("FILESYSTEM");
-        CodeAnalyzerPlugin plugin = pluginLoader.getPlugin(CodeAnalyzerPlugin.class, MimeTypeNames.JAVA);
+        CodeAnalyzerPlugin plugin = pluginLoader.getPlugin(CodeAnalyzerPlugin.class, "java");
         VersionControlPlugin vcPlugin = pluginLoader.getPlugin(VersionControlPlugin.class, "FILESYSTEM");
         ByteArrayOutputStream fileContent = vcPlugin.getFileContentForFilePath("/home/david/wakmusic/trunk/Wakmusic/src/java/beans/Band.java");
         plugin.analyzeFile(fileContent.toString(), repo);
-        System.out.println(plugin.getAstForCurrentFile().getOutlineForChildElements());
+     //   System.out.println(plugin.getAstForCurrentFile().getOutlineForChildElements());
     }
 
     @Test

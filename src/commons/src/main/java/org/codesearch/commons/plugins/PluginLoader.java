@@ -49,7 +49,7 @@ public class PluginLoader {
         for (Plugin plugin : loadedPlugins) {
             String[] purposes = plugin.getPurposes().split(" ");
             for (String s : purposes) {
-                if (s.equals(purpose)) {
+                if (s.equalsIgnoreCase(purpose)) {
                     if (clazz.isInstance(plugin)) {
                         return (T) plugin;
                     }

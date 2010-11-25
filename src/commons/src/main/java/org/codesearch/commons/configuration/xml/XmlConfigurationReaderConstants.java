@@ -80,4 +80,13 @@ public final class XmlConfigurationReaderConstants {
     /** Used to retrieve the repositories of the task */
     public static final String JOB_REPOSITORY = "repositories";
 
+    //DATABASE CONSTANTS
+    public static final String DB_USERNAME = "db-username";
+    public static final String DB_PASSWORD = "db-password";
+    public static final String DB_DRIVER = "db-driver";
+    public static final String DB_URL = "db-url";
+    public static final String DB_PORT_NUMBER = "db-port-number";
+    public static final String DB_NAME = "db-name";
+    public static final String DB_MAX_CONNECTIONS = "db-max-connections";
+    public static final String DBMS = "dbms";
 }

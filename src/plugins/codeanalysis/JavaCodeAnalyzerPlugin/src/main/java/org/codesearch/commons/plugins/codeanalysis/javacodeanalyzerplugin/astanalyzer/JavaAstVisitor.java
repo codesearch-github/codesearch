@@ -1,14 +1,14 @@
 package org.codesearch.commons.plugins.codeanalysis.javacodeanalyzerplugin.astanalyzer;
 
-import java.beans.Visibility;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import org.codesearch.commons.plugins.codeanalyzing.ast.ClassNode;
-import org.codesearch.commons.plugins.codeanalyzing.ast.FileNode;
-import org.codesearch.commons.plugins.codeanalyzing.ast.MethodNode;
+import org.codesearch.commons.plugins.codeanalysis.javacodeanalyzerplugin.ast.ClassNode;
+import org.codesearch.commons.plugins.codeanalysis.javacodeanalyzerplugin.ast.FileNode;
+import org.codesearch.commons.plugins.codeanalysis.javacodeanalyzerplugin.ast.MethodNode;
 import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
-import org.codesearch.commons.plugins.codeanalyzing.ast.Variable;
+import org.codesearch.commons.plugins.codeanalysis.javacodeanalyzerplugin.ast.VariableNode;
+import org.codesearch.commons.plugins.codeanalysis.javacodeanalyzerplugin.ast.Visibility;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.AnnotationTypeDeclaration;
@@ -100,6 +100,7 @@ public class JavaAstVisitor extends ASTVisitor {
     private FileNode fileNode;
     private Map<Integer, Usage> usages;
     private int methods;
+
     public JavaAstVisitor(FileNode fileNode, Map<Integer, Usage> usages) {
         this.fileNode = fileNode;
         this.usages = usages;
@@ -944,35 +945,58 @@ public class JavaAstVisitor extends ASTVisitor {
      *         skipped
      */
     public boolean visit(MethodDeclaration node) {
-        if (node.isConstructor()) {
-            //TODO add handling for constructor invocation here
-            return true;
-        }
-
+        //Create method node
         MethodNode method = new MethodNode();
+        //if method is a constructor
+        method.setConstructor(node.isConstructor());
         method.setName(node.getName().getFullyQualifiedName());
-        method.setDeclarationPosition(node.getStartPosition());
-        List<Variable> parameters = new LinkedList<Variable>();
+        //retrieve parameters and add to methodnode
+        List<VariableNode> parameters = new LinkedList<VariableNode>();
         List params = node.parameters();
         SingleVariableDeclaration currParameter = null;
         for (int i = 0; i < params.size(); i++) {
             currParameter = (SingleVariableDeclaration) params.get(i);
-            Variable var = new Variable();
-            var.setNodeLength(currParameter.getLength());
+            VariableNode var = new VariableNode();
             var.setName(currParameter.getName().getIdentifier());
             var.setType(currParameter.getType().toString());
-            var.setDeclarationPosition(currParameter.getStartPosition());
+            var.setStartPosition(currParameter.getStartPosition());
             parameters.add(var);
         }
         method.setNodeLength(node.getLength());
+        int startPosition = node.getStartPosition();
+        //the astparser counts the beginning of the javadoc as the beginning of the method
+        if (node.getJavadoc() != null) {
+            startPosition += node.getJavadoc().getLength() + 1;
+        }
+        method.setStartPosition(startPosition);
         method.setParameters(parameters);
-        method.setReturnType(node.getReturnType2().toString());
+        try {
+            method.setReturnType(node.getReturnType2().toString());
+        } catch (NullPointerException ex) {
+            method.setReturnType(null);
+        }
         Visibility visibility;
+        //TODO add handling for other modifiers
+        switch (node.getModifiers()) {
+            case Modifier.PRIVATE:
+                visibility = Visibility.private_vis;
+                break;
+            case Modifier.PUBLIC:
+                visibility = Visibility.public_vis;
+                break;
+            case Modifier.PROTECTED:
+                visibility = Visibility.public_vis;
+                break;
+            default:
+                visibility = Visibility.default_vis;
+        }
+        System.out.println(node.getModifiers());
+        method.setVisibility(visibility);
         //TODO figure out a way to retrieve visibility from method declaration
-        for(ClassNode classNode : fileNode.getClasses()){
-            TypeDeclaration parent = (TypeDeclaration) node.getParent();
-            if(classNode.getName().equals(parent.getName().toString())){
-                classNode.getMethodDeclarations().add(method);
+        TypeDeclaration parent = (TypeDeclaration) node.getParent();
+        for (ClassNode classNode : fileNode.getClasses()) {
+            if (classNode.getName().equals(parent.getName().toString())) {
+                classNode.getMethods().add(method);
             }
         }
         return true;
@@ -992,6 +1016,8 @@ public class JavaAstVisitor extends ASTVisitor {
      *         skipped
      */
     public boolean visit(MethodInvocation node) {
+        node.getName().getStartPosition();
+        //TODO do this
         return true;
     }
 
@@ -1511,7 +1537,7 @@ public class JavaAstVisitor extends ASTVisitor {
     public boolean visit(TypeDeclaration node) {
         ClassNode classNode = new ClassNode();
         classNode.setName(node.getName().getFullyQualifiedName());
-        classNode.setDeclarationPosition(node.getStartPosition());
+        classNode.setStartPosition(node.getStartPosition());
         classNode.setNodeLength(node.getLength());
         Visibility visibility;
         //TODO figure out a way to retrieve visibility from method declaration

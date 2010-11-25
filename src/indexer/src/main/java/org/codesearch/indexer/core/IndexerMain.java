@@ -20,9 +20,12 @@
  */
 package org.codesearch.indexer.core;
 
+import java.sql.SQLException;
+import java.util.logging.Level;
 import javax.servlet.ServletContextEvent;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
+import org.codesearch.commons.database.DBAccess;
 import org.codesearch.indexer.manager.IndexingManager;
 import org.quartz.SchedulerException;
 import org.springframework.context.ApplicationContext;
@@ -47,14 +50,20 @@ public class IndexerMain implements javax.servlet.ServletContextListener {
      */
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        applicationContext = new ClassPathXmlApplicationContext("classpath:org/codesearch/indexer/IndexerBeans.xml");
         try {
-            indexingManager = new IndexingManager();
-            indexingManager.startScheduler();
-        } catch (SchedulerException ex) {
-            LOG.error("Problem with scheduler at context initialization: " + ex);
+            applicationContext = new ClassPathXmlApplicationContext("classpath:org/codesearch/indexer/IndexerBeans.xml");
+            DBAccess.setupConnections();
+            try {
+                indexingManager = new IndexingManager();
+                indexingManager.startScheduler();
+            } catch (SchedulerException ex) {
+                LOG.error("Problem with scheduler at context initialization: " + ex);
+            } catch (ConfigurationException ex) {
+                LOG.error("Problem with configuration at context initialization: " + ex);
+            }
         } catch (ConfigurationException ex) {
-            LOG.error("Problem with configuration at context initialization: " + ex);
+            //TODO add useful error handling
+            java.util.logging.Logger.getLogger(IndexerMain.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

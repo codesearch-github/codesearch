@@ -4,24 +4,14 @@
  */
 package org.codesearch.indexer.tasks;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
 import org.codesearch.commons.configuration.properties.PropertiesManager;
 import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
 import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 import org.codesearch.commons.plugins.PluginLoader;
-import org.codesearch.commons.plugins.PluginLoaderException;
 import org.codesearch.commons.plugins.codeanalyzing.CodeAnalyzerPlugin;
-import org.codesearch.commons.plugins.codeanalyzing.ast.FileNode;
 import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
-import org.codesearch.commons.plugins.vcs.VersionControlPluginException;
 import org.codesearch.indexer.exceptions.TaskExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
 

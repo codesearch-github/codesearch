@@ -22,18 +22,20 @@ package org.codesearch.commons.plugins.vcs;
 
 import java.io.ByteArrayOutputStream;
 import java.net.URI;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.codesearch.commons.utils.CommonsUtils;
 import org.springframework.stereotype.Component;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNLogEntry;
 import org.tmatesoft.svn.core.SVNNodeKind;
+import org.tmatesoft.svn.core.SVNProperties;
+import org.tmatesoft.svn.core.SVNProperty;
 import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.auth.BasicAuthenticationManager;
 import org.tmatesoft.svn.core.auth.ISVNAuthenticationManager;
@@ -106,6 +108,7 @@ public class SubversionPlugin implements VersionControlPlugin {
     /** {@inheritDoc} */
     @Override
     public Set<FileDto> getChangedFilesSinceRevision(String revision) throws VersionControlPluginException {
+        //   Date date = new Date();
         Set<FileDto> files = new HashSet();
         Collection logs = null;
         try {
@@ -121,20 +124,36 @@ public class SubversionPlugin implements VersionControlPlugin {
             Iterator iter2 = entry.getChangedPaths().keySet().iterator();
             while (iter2.hasNext()) {
                 String path = (String) iter2.next();
-                try {
-                    SVNNodeKind nodeKind = repository.checkPath(path, -1);
-                    if (nodeKind != SVNNodeKind.FILE) {
-                        continue;
+                boolean fileAlreadyInSet = false;
+                for (FileDto currentFile : files) {
+                    if (currentFile.getFilePath().equals(path)) {
+                        fileAlreadyInSet = true;
                     }
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    repository.getFile(path, -1, null, baos);
-                    String mimeType = CommonsUtils.getMimeTypeForFile(baos);
-                    files.add(new FileDto(path, baos, mimeType));
-                } catch (SVNException ex) {
-                    throw new VersionControlPluginException(ex.toString());
+                }
+                if (!fileAlreadyInSet) {
+                    try {
+                        SVNNodeKind nodeKind = repository.checkPath(path, -1);
+                        if (nodeKind != SVNNodeKind.FILE) {
+                            continue;
+                        }
+                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                        SVNProperties properties = new SVNProperties();
+                        repository.getFile(path, -1, properties, baos);
+                        String mimeType = properties.getStringValue(SVNProperty.MIME_TYPE);
+                        boolean binary = false;
+                   //     System.out.println(mimeType);
+                        if (mimeType != null && mimeType.equals("application/octet-stream")) {
+                            binary = true;
+                        }
+                        //TODO test if there might be other binary file types
+                        files.add(new FileDto(path, baos, binary));
+                    } catch (SVNException ex) {
+                        throw new VersionControlPluginException(ex.toString());
+                    }
                 }
             }
         }
+        //     System.out.println("retrieval of file list took " + (new Date().getTime() - date.getTime()) + " miliseconds");//TODO remove after testing
         return files;
     }
 

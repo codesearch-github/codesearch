@@ -22,7 +22,10 @@ package org.codesearch.indexer.tasks;
 
 import java.io.FileNotFoundException;
 import java.net.URISyntaxException;
+import java.sql.SQLException;
+import java.util.logging.Level;
 import org.apache.commons.configuration.ConfigurationException;
+import org.codesearch.commons.database.DatabaseAccessException;
 import org.codesearch.commons.plugins.codeanalyzing.CodeAnalyzerPluginException;
 import org.codesearch.indexer.exceptions.TaskExecutionException;
 import java.io.File;
@@ -31,6 +34,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -49,10 +53,11 @@ import org.codesearch.commons.configuration.properties.PropertiesManager;
 import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
 import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 import org.codesearch.commons.constants.IndexConstants;
+import org.codesearch.commons.database.DBAccess;
 import org.codesearch.commons.plugins.PluginLoader;
 import org.codesearch.commons.plugins.PluginLoaderException;
 import org.codesearch.commons.plugins.codeanalyzing.CodeAnalyzerPlugin;
-import org.codesearch.commons.plugins.codeanalyzing.ast.FileNode;
+import org.codesearch.commons.plugins.codeanalyzing.ast.CompoundNode;
 import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
 import org.codesearch.commons.plugins.vcs.FileDto;
 import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
@@ -93,7 +98,7 @@ public class IndexingTask implements Task {
     private boolean codeAnalysisEnabled = false;
     private String indexLocation = null;
     private Map<Integer, Usage> usages = new HashMap<Integer, Usage>();
-    
+
     /**
      * executes the task,
      * updates the index fields of the set repository
@@ -105,28 +110,27 @@ public class IndexingTask implements Task {
             LOG.info("Starting execution of indexing task");
             // Read the index status file
             indexLocation = configReader.getSingleLinePropertyValue("index-location");
-            propertiesManager = new PropertiesManager(indexLocation + File.separator + "revisions.properties"); //TODO add propertiesReader path
+            propertiesManager = new PropertiesManager(indexLocation + File.separator + "revisions.properties");
             // Get the version control plugins
             versionControlPlugin = pluginLoader.getPlugin(VersionControlPlugin.class, repository.getVersionControlSystem());
             versionControlPlugin.setRepository(new URI(repository.getUrl()), repository.getUsername(), repository.getPassword());
             String lastIndexedRevision = propertiesManager.getPropertyFileValue(repository.getName());
             changedFiles = versionControlPlugin.getChangedFilesSinceRevision(lastIndexedRevision);
-            String lastAnalysisRevision = "0";
+            String lastAnalysisRevision = DBAccess.getLastAnalyzedRevisionOfRepository(repository.getName());
             boolean retrieveNewFileList = false;
-            //TODO make code less ugly...
+            executeIndexing();
             if (codeAnalysisEnabled) {
-                //TODO retrieve last indexed revision
                 if (!lastAnalysisRevision.equals(lastIndexedRevision)) {
                     retrieveNewFileList = true;
                 } else {
                     retrieveNewFileList = false;
                 }
-            }
-            executeIndexing();
-            if (codeAnalysisEnabled) {
                 executeCodeAnalysis(retrieveNewFileList, lastAnalysisRevision);
+                DBAccess.setLastAnalyzedRevisionOfRepository(repository.getName(), versionControlPlugin.getRepositoryRevision());
             }
-
+            propertiesManager.setPropertyFileValue(repository.getName(), versionControlPlugin.getRepositoryRevision());
+        } catch (DatabaseAccessException ex) {
+            LOG.error("Error at DatabaseConnection \n" + ex);
         } catch (VersionControlPluginException ex) {
             LOG.error("VersionControlPlugin files could not be retrieved: " + ex);
         } catch (PluginLoaderException ex) {
@@ -150,26 +154,35 @@ public class IndexingTask implements Task {
             changedFiles = versionControlPlugin.getChangedFilesSinceRevision(lastAnalysisRevision);
         }
         CodeAnalyzerPlugin plugin = null;
-        String previousMimeType = null;
-        String currentMimeType = null;
+        String currentFileType = null;
+        String previousFileType = null;
         for (FileDto currentFile : changedFiles) {
-            //check whether the new file has a new mime type or now codeAnalyzerPlugin was loaded
-            currentMimeType = currentFile.getMimeType();
-            if (plugin == null || (!currentMimeType.equals(previousMimeType))) {
+            try {
                 //load the appropriate plugin
-                try{
-                    plugin = pluginLoader.getPlugin(CodeAnalyzerPlugin.class, currentMimeType);
-                } catch (PluginLoaderException ex){
-                    //in case there is no codeanalyzer plugin for the file's mime type
+                try {
+                    currentFileType = currentFile.getFilePath().substring(currentFile.getFilePath().lastIndexOf(".") + 1); //TODO add handling for files without file endings or hidden files
+                } catch (StringIndexOutOfBoundsException ex) {
                     continue;
                 }
+                if (plugin == null || (!currentFileType.equals(previousFileType))) {
+                    //load the appropriate plugin
+                    try {
+                        plugin = pluginLoader.getPlugin(CodeAnalyzerPlugin.class, currentFileType);
+                    } catch (PluginLoaderException ex) {
+                        //in case there is no codeanalyzer plugin for the file ending
+                        continue;
+                    }
+                }
+                plugin.analyzeFile(currentFile.getContent().toString(), repository);
+                Map<Integer, CompoundNode> ast = plugin.getAstForCurrentFile();
+//                for (Entry<Integer, CompoundNode> currentEntry : ast.entrySet()) {
+//                    System.out.println(currentEntry.getValue().getOutlineLink());
+//                }
+                previousFileType = currentFileType;
+                DBAccess.setBinaryIndexForFile(currentFile.getFilePath(), repository.getName(), ast);
+            } catch (DatabaseAccessException ex) {
+                LOG.error("Error at DatabaseConnection \n" + ex);
             }
-            plugin.analyzeFile(currentFile.getContent().toString(), repository);
-            FileNode fn = plugin.getAstForCurrentFile();
-
-            previousMimeType = currentMimeType;
-            System.out.println(fn.getOutlineForChildElements());
-            //TODO do something useful with the filenode
         }
     }
 
@@ -184,7 +197,6 @@ public class IndexingTask implements Task {
         clearPreviousDocuments();
         initializeIndexWriter(new WhitespaceAnalyzer(), dir); //IndexConstants.LUCENE_VERSION
         createIndex();
-        propertiesManager.setPropertyFileValue(repository.getName(), versionControlPlugin.getRepositoryRevision());
     }
 
     /**
@@ -195,16 +207,19 @@ public class IndexingTask implements Task {
     public Document addLuceneFields(Document doc, FileDto file) throws VersionControlPluginException {
         doc.add(new Field(IndexConstants.INDEX_FIELD_TITLE, extractFilename(file.getFilePath()), Field.Store.YES, Field.Index.NOT_ANALYZED));
         doc.add(new Field(IndexConstants.INDEX_FIELD_FILEPATH, file.getFilePath(), Field.Store.YES, Field.Index.NOT_ANALYZED));
-        doc.add(new Field(IndexConstants.INDEX_FIELD_CONTENT, file.getContent().toString(), Field.Store.YES, Field.Index.ANALYZED));
+        if (!file.isBinary()) {
+            doc.add(new Field(IndexConstants.INDEX_FIELD_CONTENT, file.getContent().toString(), Field.Store.YES, Field.Index.ANALYZED));
+            doc.add(new Field(IndexConstants.INDEX_FIELD_CONTENT_LC, file.getContent().toString().toLowerCase(), Field.Store.YES, Field.Index.ANALYZED));
+        }
         doc.add(new Field(IndexConstants.INDEX_FIELD_REPOSITORY, repository.getName(), Field.Store.YES, Field.Index.NOT_ANALYZED));
         doc.add(new Field(IndexConstants.INDEX_FIELD_REVISION, versionControlPlugin.getRepositoryRevision(), Field.Store.YES, Field.Index.ANALYZED));
         //doc.add(new Field(IndexConstants.INDEX_FILED_REPOSITORY_GROUP, repository.getRepositoryGroupsAsString(), Field.Store.YES, Field.Index.ANALYZED));
         //doc.add(new Field(IndexConstants.INDEX_FIELD_TITLE_LC, extractFilename(path).toLowerCase(), Field.Store.YES, Field.Index.NOT_ANALYZED));
         doc.add(new Field(IndexConstants.INDEX_FIELD_FILEPATH_LC, file.getFilePath().toLowerCase(), Field.Store.YES, Field.Index.NOT_ANALYZED));
-        doc.add(new Field(IndexConstants.INDEX_FIELD_CONTENT_LC, file.getContent().toString().toLowerCase(), Field.Store.YES, Field.Index.ANALYZED));
         //FU SAM <-- by Stephan
         //yeah sam, you and your criticism, who cares if only half of the changed files are committed <-- by david
-        doc.add(new Field(IndexConstants.INDEX_FIELD_FILE_TYPE, file.getMimeType(), Field.Store.YES, Field.Index.ANALYZED)); //TODO add mime type
+        //TODO remove pointless conversation, yeah I write a todo instead of just removing it, let's see who finds this comment <-- by david
+        //doc.add(new Field(IndexConstants.INDEX_FIELD_FILE_TYPE, file.getMimeType(), Field.Store.YES, Field.Index.ANALYZED)); //TODO add mime type
         return doc;
     }
 
