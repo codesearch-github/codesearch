@@ -6,28 +6,37 @@
         {
             padding: 0px;
         }
-    </ui:style>
-    <g:HTMLPanel>
-        <g:Button ui:field="backButton" text="Back" />
-        <table class="fileinfo">
-            <tbody>
-                <tr>
-                    <td>Repository</td>
-                    <td>
-                        <g:Label ui:field="repositoryField" />
-                    </td>
-                </tr>
-                <tr>
-                    <td>URL</td>
-                    <td>
-                        <g:Label ui:field="urlField" />
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-        <g:HTMLPanel ui:field="fileContent">
-            File Content goes here
-        </g:HTMLPanel>
 
-    </g:HTMLPanel>
+        .fileinfo td
+        {
+            border: 1px solid black;
+        }
+    </ui:style>
+    <g:DockLayoutPanel unit="EM">
+        <g:north size="6">
+            <g:HTMLPanel>
+                <g:Button ui:field="backButton" text="Back" />
+                <table class="fileinfo">
+                    <tbody>
+                        <tr>
+                            <td>Repository</td>
+                            <td>
+                                <g:Label ui:field="repositoryField" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Path</td>
+                            <td>
+                                <g:Label ui:field="pathField" />
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </g:HTMLPanel>
+        </g:north>
+        <g:center>
+            <g:ScrollPanel ui:field="fileContent" />
+        </g:center>
+    </g:DockLayoutPanel>
+
 </ui:UiBinder>

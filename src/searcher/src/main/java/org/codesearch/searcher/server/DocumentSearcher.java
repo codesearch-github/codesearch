@@ -53,18 +53,14 @@ public class DocumentSearcher {
     private static final Logger LOG = Logger.getLogger(DocumentSearcher.class);
     /** The parser used for parsing search terms to lucene queries */
     private QueryParser queryParser;
+    /** The parser used for parsing search terms to lucene queries - case sensitive*/
+    private QueryParser queryParserCaseSensitive;
     /** The searcher used for searching the lucene index */
     private IndexSearcher indexSearcher;
     /** Whether the searcher has been initialized. **/
     private boolean searcherInitialized = false;
     /** The location of the index. **/
     private String indexLocation;
-    /** whether the current search is case sensitive or not */
-    private boolean caseSensitive;
-    /** the repositories used for the search */
-    private List<String> repositoryNames = new LinkedList<String>();
-    /** the repository groups used for the search*/
-    private List<String> repositoryGroupNames = new LinkedList<String>();
     @Autowired
     private XmlConfigurationReader xmlConfigurationReader;
 
@@ -77,8 +73,10 @@ public class DocumentSearcher {
         // Retrieve index location from the configuration
         indexLocation = configReader.getSingleLinePropertyValue(XmlConfigurationReaderConstants.INDEX_LOCATION);
         LOG.debug("Index location set to: " + indexLocation);
-        //TODO replace with appropriate Analyzer
-        queryParser = new QueryParser(Version.LUCENE_30, "", new WhitespaceAnalyzer());
+        //TODO make or find proper analyzers for search
+        queryParser = new QueryParser(Version.LUCENE_30, IndexConstants.INDEX_FIELD_CONTENT_LC, new LowerCaseWhiteSpaceAnalyzer());
+        queryParserCaseSensitive = new QueryParser(Version.LUCENE_30, IndexConstants.INDEX_FIELD_CONTENT, new WhitespaceAnalyzer());
+
         try {
             initSearcher();
         } catch (InvalidIndexLocationException ex) {
@@ -100,7 +98,15 @@ public class DocumentSearcher {
             initSearcher();
         }
         List<SearchResultDto> results = new LinkedList<SearchResultDto>();
-        Query query = queryParser.parse(parseQuery(searchString, caseSensitive, repositoryNames, repositoryGroupNames));
+        String finalSearchString = parseQuery(searchString, caseSensitive, repositoryNames, repositoryGroupNames);
+
+        Query query = null;
+        if (caseSensitive) {
+            query = queryParserCaseSensitive.parse(finalSearchString);
+        } else {
+            query = queryParser.parse(finalSearchString);
+        }
+
         LOG.info("Searching index with query: " + query.toString());
         //Retrieve all search results from search
         TopDocs topDocs = indexSearcher.search(query, 1000);
@@ -124,16 +130,9 @@ public class DocumentSearcher {
      * @param term the search term
      * @return the lucene conform query
      */
-    public String parseQuery(String term, boolean caseSensitive, List<String> repositoryNames, List<String> repositoryGroupNames) throws ConfigurationException { //TODO rename, same name as lucene and make private after finished testing
-        String query = "";
-
-        if (caseSensitive) {
-            query = IndexConstants.INDEX_FIELD_CONTENT + ":\"" + term + "\"";
-        } else {
-            query = IndexConstants.INDEX_FIELD_CONTENT_LC + ":\"" + term.toLowerCase() + "\"";
-        }
-        query = appendRepositoriesToQuery(query, repositoryNames, repositoryGroupNames);
-        return query;
+    public String parseQuery(String term, boolean caseSensitive, List<String> repositoryNames, List<String> repositoryGroupNames) throws ConfigurationException {
+        //TODO rename method, same name as lucene and make private after finished testing
+        return appendRepositoriesToQuery(term, repositoryNames, repositoryGroupNames);
     }
 
     private String appendRepositoriesToQuery(String query, List<String> repositoryNames, List<String> repositoryGroupNames) throws ConfigurationException {
@@ -148,7 +147,7 @@ public class DocumentSearcher {
         }
 
         StringBuilder repoQuery = new StringBuilder();
-        repoQuery.append(" +");
+        repoQuery.append(" AND ");
         repoQuery.append(IndexConstants.INDEX_FIELD_REPOSITORY);
         repoQuery.append(":(");
 
@@ -156,7 +155,7 @@ public class DocumentSearcher {
             repoQuery.append(repo);
             repoQuery.append(" OR ");
         }
-        repoQuery = new StringBuilder(repoQuery.substring(0, repoQuery.length()- 4));
+        repoQuery = new StringBuilder(repoQuery.substring(0, repoQuery.length() - 4));
         repoQuery.append(")");
 
         return query + repoQuery.toString();

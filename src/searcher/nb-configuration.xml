@@ -21,7 +21,6 @@
     along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
 
 -->
-
 <project-shared-configuration>
     <!--
 This file contains additional configuration written by modules in the NetBeans IDE.
@@ -35,4 +34,7 @@ Without this configuration present, some functionality in the IDE may be limited
         </config-files>
         <config-file-groups/>
     </spring-data>
+    <spellchecker-wordlist xmlns="http://www.netbeans.org/ns/spellchecker-wordlist/1">
+        <word>lucene</word>
+    </spellchecker-wordlist>
 </project-shared-configuration>

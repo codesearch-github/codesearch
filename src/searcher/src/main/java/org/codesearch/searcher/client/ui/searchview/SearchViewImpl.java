@@ -20,8 +20,6 @@
  */
 package org.codesearch.searcher.client.ui.searchview;
 
-import com.google.gwt.cell.client.ClickableTextCell;
-import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -31,7 +29,6 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.cellview.client.CellTable;
-import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.SimplePager.TextLocation;
 import com.google.gwt.user.cellview.client.TextColumn;
@@ -45,6 +42,9 @@ import com.google.gwt.user.client.ui.TabLayoutPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
+import com.google.gwt.view.client.NoSelectionModel;
+import com.google.gwt.view.client.SelectionChangeEvent;
+import com.google.gwt.view.client.SingleSelectionModel;
 import java.util.List;
 import org.codesearch.searcher.client.ui.fileview.FilePlace;
 import org.codesearch.searcher.shared.SearchResultDto;
@@ -58,9 +58,9 @@ public class SearchViewImpl extends Composite implements SearchView {
 
     // UIBINDER STUFF
     @UiTemplate("SearchView.ui.xml")
-    interface SearchViewUiBinder extends UiBinder<Widget, SearchViewImpl> { }
+    interface SearchViewUiBinder extends UiBinder<Widget, SearchViewImpl> {
+    }
     private static SearchViewUiBinder uiBinder = GWT.create(SearchViewUiBinder.class);
-
     // RESULT LIST RELATED
     private ListDataProvider<SearchResultDto> searchResultDataProvider;
     private Presenter presenter;
@@ -68,7 +68,6 @@ public class SearchViewImpl extends Composite implements SearchView {
     CellTable<SearchResultDto> resultTable;
     @UiField(provided = true)
     SimplePager resultTablePager;
-    
     // OTHER UI ELEMENTS
     @UiField
     TextBox searchBox;
@@ -92,7 +91,7 @@ public class SearchViewImpl extends Composite implements SearchView {
         updateRepositoryDisplay();
         resultView.setVisible(true);
     }
-    
+
     @UiHandler("searchButton")
     void onSearchButton(ClickEvent e) {
         presenter.doSearch();
@@ -173,35 +172,56 @@ public class SearchViewImpl extends Composite implements SearchView {
     private void initResultTable() {
         resultTable = new CellTable<SearchResultDto>(30);
         resultTable.addColumn(new TextColumn<SearchResultDto>() {
+
             @Override
             public String getValue(SearchResultDto dto) {
                 return String.valueOf(dto.getRelevance());
             }
         }, "Relevance");
 
-        ClickableTextCell clickCell = new ClickableTextCell();
+//        ClickableTextCell clickCell = new ClickableTextCell();
+//
+//        Column clickColumn = new Column<SearchResultDto, String>(clickCell) {
+//            @Override
+//            public String getValue(SearchResultDto object) {
+//                return object.getFilePath();
+//            }
+//        };
+//
+//        //FIXME find method to get clicked repository, currently using fixed value
+//        clickColumn.setFieldUpdater(new FieldUpdater<SearchResultDto, String>() {
+//            @Override
+//            public void update(int index, SearchResultDto object, String value) {
+//
+//            }
+//        });
 
-        Column clickColumn = new Column<SearchResultDto, String>(clickCell) {
+        resultTable.addColumn(new TextColumn<SearchResultDto>() {
+
             @Override
             public String getValue(SearchResultDto object) {
                 return object.getFilePath();
             }
-        };
-
-        clickColumn.setFieldUpdater(new FieldUpdater<SearchResultDto, String>() {
-            @Override
-            public void update(int index, SearchResultDto object, String value) {
-                presenter.goTo(new FilePlace());
-            }
-        });
-
-        resultTable.addColumn(clickColumn, "Path");
+        }, "Path");
         resultTable.addColumn(new TextColumn<SearchResultDto>() {
+
             @Override
             public String getValue(SearchResultDto dto) {
                 return dto.getRepository();
             }
         }, "Repository");
+
+        final NoSelectionModel<SearchResultDto> selectionModel = new NoSelectionModel<SearchResultDto>();
+        resultTable.setSelectionModel(selectionModel);
+        selectionModel.addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
+            @Override
+            public void onSelectionChange(SelectionChangeEvent event) {
+                SearchResultDto selected = selectionModel.getLastSelectedObject();
+                if (selected != null) {
+                    presenter.goTo(new FilePlace(selected.getRepository(), selected.getFilePath()));
+                }
+            }
+        });
         // Create a Pager to control the table.
         SimplePager.Resources pagerResources = GWT.create(SimplePager.Resources.class);
         resultTablePager = new SimplePager(TextLocation.CENTER, pagerResources, false, 0, true);

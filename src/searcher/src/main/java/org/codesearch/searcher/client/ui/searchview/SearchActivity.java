@@ -76,13 +76,13 @@ public class SearchActivity extends AbstractActivity implements SearchView.Prese
         if (searchView.getRepositorySearchType() == SearchView.RepositorySearchType.REPOSITORY) {
             for (int i = 0; i < searchView.getRepositoryList().getItemCount(); i++) {
                 if (searchView.getRepositoryList().isItemSelected(i)) {
-                    selectedRepositories.add(searchView.getRepositoryList().getValue(i));
+                    selectedRepositories.add(searchView.getRepositoryList().getItemText(i));
                 }
             }
         } else {
             for (int i = 0; i < searchView.getRepositoryList().getItemCount(); i++) {
                 if (searchView.getRepositoryList().isItemSelected(i)) {
-                    selectedRepositoryGroups.add(searchView.getRepositoryList().getValue(i));
+                    selectedRepositoryGroups.add(searchView.getRepositoryList().getItemText(i));
                 }
             }
         }

@@ -32,6 +32,7 @@ import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
 import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 import org.codesearch.commons.plugins.PluginLoader;
 import org.codesearch.commons.plugins.PluginLoaderException;
+import org.codesearch.commons.plugins.highlighting.HighlightingPlugin;
 import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
 import org.codesearch.commons.plugins.vcs.VersionControlPluginException;
 
@@ -108,14 +109,15 @@ public class SearcherServiceImpl extends AutowiringRemoteServiceServlet implemen
     }
 
     @Override
-    public String getFileContentForSearchResultDto(SearchResultDto searchResultDto) {
+    public String getFileContent(String repository, String filePath) {
         String fileContent = "";
         try {
-            RepositoryDto repositoryDto = xmlConfigurationReader.getRepositoryByName(searchResultDto.getRepository());
+            RepositoryDto repositoryDto = xmlConfigurationReader.getRepositoryByName(repository);
             VersionControlPlugin plugin = pluginLoader.getPlugin(VersionControlPlugin.class, repositoryDto.getVersionControlSystem());
             plugin.setRepository(new URI(repositoryDto.getUrl()), repositoryDto.getUsername(), repositoryDto.getPassword());
             //FIXME check for binary or weird stuff
-            fileContent = new String(plugin.getFileContentForFilePath(searchResultDto.getFilePath()));
+            //TODO highlighting
+            fileContent = new String(plugin.getFileContentForFilePath(filePath).toString());
         } catch (URISyntaxException ex) {
             LOG.error(ex);
         } catch (VersionControlPluginException ex) {

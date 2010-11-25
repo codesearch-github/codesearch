@@ -7,8 +7,6 @@ package org.codesearch.defaulthighlightingplugin;
 import com.uwyn.jhighlight.renderer.JavaXhtmlRenderer;
 import com.uwyn.jhighlight.renderer.XhtmlRenderer;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 import org.codesearch.commons.constants.MimeTypeNames;
 import org.codesearch.commons.plugins.highlighting.HighlightingPlugin;
 import org.codesearch.commons.plugins.highlighting.HighlightingPluginException;
@@ -34,7 +32,7 @@ public class DefaultHighlightingPlugin implements HighlightingPlugin {
 
     @Override
     public String getPurposes() {
-        String result = MimeTypeNames.JAVA+" "+MimeTypeNames.CPP+" "+MimeTypeNames.XML+" "+MimeTypeNames.HTML;
+        String result = MimeTypeNames.JAVA + " " + MimeTypeNames.CPP + " " + MimeTypeNames.XML + " " + MimeTypeNames.HTML;
         return result;
     }
 

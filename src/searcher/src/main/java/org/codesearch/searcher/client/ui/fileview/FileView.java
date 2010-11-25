@@ -10,6 +10,8 @@ import com.google.gwt.user.client.ui.IsWidget;
 public interface FileView extends IsWidget {
 
     public void setFileContent(String fileContent);
+    public void setFilePath(String filePath);
+    public void setRepository(String repository);
     public void setPresenter(FileView.Presenter presenter);
 
     public interface Presenter {
