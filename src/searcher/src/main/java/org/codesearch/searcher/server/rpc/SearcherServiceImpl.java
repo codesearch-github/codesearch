@@ -115,7 +115,7 @@ public class SearcherServiceImpl extends AutowiringRemoteServiceServlet implemen
             VersionControlPlugin plugin = pluginLoader.getPlugin(VersionControlPlugin.class, repositoryDto.getVersionControlSystem());
             plugin.setRepository(new URI(repositoryDto.getUrl()), repositoryDto.getUsername(), repositoryDto.getPassword());
             //FIXME check for binary or weird stuff
-            fileContent = plugin.getFileContentForFilePath(searchResultDto.getFilePath()).toString();
+            fileContent = new String(plugin.getFileContentForFilePath(searchResultDto.getFilePath()));
         } catch (URISyntaxException ex) {
             LOG.error(ex);
         } catch (VersionControlPluginException ex) {

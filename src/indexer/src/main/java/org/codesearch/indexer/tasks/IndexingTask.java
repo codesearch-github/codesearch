@@ -110,7 +110,7 @@ public class IndexingTask implements Task {
             LOG.info("Starting execution of indexing task");
             // Read the index status file
             indexLocation = configReader.getSingleLinePropertyValue("index-location");
-            propertiesManager = new PropertiesManager(indexLocation + File.separator + "revisions.properties");
+            propertiesManager = new PropertiesManager(indexLocation + File.separator + "revisions.properties"); //TODO add propertiesReader path
             // Get the version control plugins
             versionControlPlugin = pluginLoader.getPlugin(VersionControlPlugin.class, repository.getVersionControlSystem());
             versionControlPlugin.setRepository(new URI(repository.getUrl()), repository.getUsername(), repository.getPassword());
@@ -216,10 +216,8 @@ public class IndexingTask implements Task {
         //doc.add(new Field(IndexConstants.INDEX_FILED_REPOSITORY_GROUP, repository.getRepositoryGroupsAsString(), Field.Store.YES, Field.Index.ANALYZED));
         //doc.add(new Field(IndexConstants.INDEX_FIELD_TITLE_LC, extractFilename(path).toLowerCase(), Field.Store.YES, Field.Index.NOT_ANALYZED));
         doc.add(new Field(IndexConstants.INDEX_FIELD_FILEPATH_LC, file.getFilePath().toLowerCase(), Field.Store.YES, Field.Index.NOT_ANALYZED));
-        //FU SAM <-- by Stephan
-        //yeah sam, you and your criticism, who cares if only half of the changed files are committed <-- by david
-        //TODO remove pointless conversation, yeah I write a todo instead of just removing it, let's see who finds this comment <-- by david
-        //doc.add(new Field(IndexConstants.INDEX_FIELD_FILE_TYPE, file.getMimeType(), Field.Store.YES, Field.Index.ANALYZED)); //TODO add mime type
+        doc.add(new Field(IndexConstants.INDEX_FIELD_CONTENT_LC, file.getContent().toString().toLowerCase(), Field.Store.YES, Field.Index.ANALYZED));
+      // doc.add(new Field(IndexConstants.INDEX_FIELD_FILE_TYPE, file.getMimeType(), Field.Store.YES, Field.Index.ANALYZED)); //TODO add mime type
         return doc;
     }
 

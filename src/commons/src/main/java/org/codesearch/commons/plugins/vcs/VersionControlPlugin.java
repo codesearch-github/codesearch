@@ -47,7 +47,7 @@ public interface VersionControlPlugin extends Plugin {
      * @param filePath The file path relative to the current repository URL
      * @return The retrieved file content
      */
-    ByteArrayOutputStream getFileContentForFilePath(String filePath) throws VersionControlPluginException;
+    byte[] getFileContentForFilePath(String filePath) throws VersionControlPluginException;
 
     /**
      * Returns a list of changed file paths since the given revision.

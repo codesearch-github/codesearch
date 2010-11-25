@@ -5,23 +5,21 @@
 
 package org.codesearch.commons.plugins.vcs;
 
-import java.io.ByteArrayOutputStream;
-
 /**
  * stores information about a specific file in a repository
  * @author David Froehlich
  */
 public class FileDto {
     private String filePath;
-    private ByteArrayOutputStream content;
+    private byte[] content;
     /** determines whether the file is binary */
     private boolean binary;
 
-    public ByteArrayOutputStream getContent() {
+    public byte[] getContent() {
         return content;
     }
 
-    public void setContent(ByteArrayOutputStream content) {
+    public void setContent(byte[] content) {
         this.content = content;
     }
     public String getFilePath() {
@@ -40,7 +38,7 @@ public class FileDto {
         this.binary = binary;
     }
 
-    public FileDto(String filePath, ByteArrayOutputStream content, boolean binary) {
+    public FileDto(String filePath, byte[] content, boolean binary) {
         this.filePath = filePath;
         this.content = content;
         this.binary = binary;

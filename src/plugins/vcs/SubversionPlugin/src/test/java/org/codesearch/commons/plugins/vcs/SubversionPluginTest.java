@@ -92,7 +92,7 @@ public class SubversionPluginTest {
     public void testGetFileContentForFilePath() throws Exception {
         System.out.println("getFileContentForFilePath");
         String filePath = "/svnsearch/trunk/src/main/java/com/bearingpoint/ta/svnsearch/testfile.txt";
-        String result = sp.getFileContentForFilePath(filePath).toString();
+        String result = new String(sp.getFileContentForFilePath(filePath));
         assert (result.equals("test"));
     }
 }

@@ -91,7 +91,7 @@ public class SubversionPlugin implements VersionControlPlugin {
 
     /** {@inheritDoc} */
     @Override
-    public ByteArrayOutputStream getFileContentForFilePath(String filePath) throws VersionControlPluginException {
+    public byte[] getFileContentForFilePath(String filePath) throws VersionControlPluginException {
         try {
             SVNNodeKind nodeKind = repository.checkPath(filePath, -1);
             if (nodeKind != SVNNodeKind.FILE) {
@@ -99,7 +99,7 @@ public class SubversionPlugin implements VersionControlPlugin {
             }
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             repository.getFile(filePath, -1, null, baos);
-            return baos;
+            return baos.toByteArray();
         } catch (SVNException ex) {
             throw new VersionControlPluginException(ex.toString());
         }
@@ -146,7 +146,7 @@ public class SubversionPlugin implements VersionControlPlugin {
                             binary = true;
                         }
                         //TODO test if there might be other binary file types
-                        files.add(new FileDto(path, baos, binary));
+                        files.add(new FileDto(path, baos.toByteArray(), binary));
                     } catch (SVNException ex) {
                         throw new VersionControlPluginException(ex.toString());
                     }

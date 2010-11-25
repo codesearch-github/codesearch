@@ -7,6 +7,8 @@ package org.codesearch.commons.utils;
 import eu.medsea.mimeutil.MimeType;
 import eu.medsea.mimeutil.MimeUtil;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.Collection;
 import org.codesearch.commons.plugins.vcs.VersionControlPluginException;
 
@@ -22,9 +24,26 @@ public class CommonsUtils {
      * @return mime type
      * @throws VersionControlPluginException
      */
-    public static String getMimeTypeForFile(ByteArrayOutputStream baos) {
-        Collection<MimeType> col = MimeUtil.getMimeTypes(baos.toByteArray());
+    public static String getMimeTypeForFile(byte[] bArray) {
+        Collection<MimeType> col = MimeUtil.getMimeTypes(bArray);
         return ((MimeType) col.toArray()[0]).toString();
+    }
+
+      /**
+     * Converts a file to a byte[]
+     * @param file
+     * @return byte[] file content
+     * @throws Exception
+     */
+    public static byte[] convertFileToByteArray(File file) throws Exception {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        FileInputStream fileInputStream = new FileInputStream(file);
+        byte[] buffer = new byte[16384];
+        for (int len = fileInputStream.read(buffer); len > 0; len = fileInputStream.read(buffer)) {
+            byteArrayOutputStream.write(buffer, 0, len);
+        }
+        fileInputStream.close();
+        return byteArrayOutputStream.toByteArray();
     }
 
     /**

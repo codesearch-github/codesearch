@@ -1,0 +1,98 @@
+<?xml version="1.0"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.codesearch</groupId>
+    <artifactId>BazaarPlugin</artifactId>
+    <version>0.1-SNAPSHOT</version>
+
+    <name>BazaarPlugin</name>
+    <description>A plugin for codesearch used to access files stored in Subversion repositories.</description>
+
+    <parent>
+        <groupId>org.codesearch</groupId>
+        <artifactId>codesearch</artifactId>
+        <version>0.1-SNAPSHOT</version>
+    </parent>
+
+    <repositories>
+        <repository>
+            <id>bzr-lib</id>
+            <url>http://verterok.com.ar/maven-repo/</url>
+            <name>bazaar library</name>
+        </repository>
+    </repositories>
+
+    <build>
+        <plugins>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+
+                        </manifest>
+
+                    </archive>
+                </configuration>
+
+            </plugin>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>onejar-maven-plugin.googlecode.com</id>
+            <url>http://onejar-maven-plugin.googlecode.com/svn/mavenrepo</url>
+        </pluginRepository>
+    </pluginRepositories>
+    <dependencies>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.vcs.bazaar.client</groupId>
+            <artifactId>bzr-java-lib</artifactId>
+            <version>0.5.2-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.codesearch</groupId>
+            <artifactId>commons</artifactId>
+            <version>0.1-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
+</project>
+

@@ -105,8 +105,8 @@ public class IndexingTaskTest {
         repo.setVersionControlSystem("FILESYSTEM");
         CodeAnalyzerPlugin plugin = pluginLoader.getPlugin(CodeAnalyzerPlugin.class, "java");
         VersionControlPlugin vcPlugin = pluginLoader.getPlugin(VersionControlPlugin.class, "FILESYSTEM");
-        ByteArrayOutputStream fileContent = vcPlugin.getFileContentForFilePath("/home/david/wakmusic/trunk/Wakmusic/src/java/beans/Band.java");
-        plugin.analyzeFile(fileContent.toString(), repo);
+        byte[] fileContent = vcPlugin.getFileContentForFilePath("/home/david/wakmusic/trunk/Wakmusic/src/java/beans/Band.java");
+        plugin.analyzeFile(new String(fileContent), repo);
      //   System.out.println(plugin.getAstForCurrentFile().getOutlineForChildElements());
     }
 
