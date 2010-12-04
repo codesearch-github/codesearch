@@ -53,7 +53,7 @@ public class BazaarPlugin implements VersionControlPlugin {
     @Override
     public void setRepository(URI url, String username, String password) throws VersionControlPluginException {
         try {
-            bl = bzr_util.createBranchLocation(password, username, password);
+            bl = bzr_util.createBranchLocation(url.toString(), username, password);
         } catch (URISyntaxException ex) {
             throw new VersionControlPluginException(ex.toString());
         }
@@ -79,9 +79,17 @@ public class BazaarPlugin implements VersionControlPlugin {
             List<IBazaarLogMessage> iblm = bzr_util.getChangesSinceRevison(bl.getURI().toString(), revision);
             for (IBazaarLogMessage log : iblm) {
                 for (IBazaarStatus bs : log.getAffectedFiles()) {
-                    byte[] content = CommonsUtils.convertFileToByteArray(bs.getFile());
-                    FileDto fd = new FileDto(bl.getURI().toString(), content, false); //TODO: ADD MIME TYPE...
-                    files.add(fd);
+                    boolean exists = false;
+                    for (FileDto file : files) {
+                        if (file.getFilePath().equals(bs.getAbsolutePath())) {
+                            exists = true;
+                        }
+                    }
+                    if (!exists) {
+                        byte[] content = CommonsUtils.convertFileToByteArray(bs.getFile());
+                        FileDto fd = new FileDto(bs.getAbsolutePath(), content, false); //TODO: ADD MIME TYPE...
+                        files.add(fd);
+                    }
                 }
             }
         } catch (BazaarClientException ex) {

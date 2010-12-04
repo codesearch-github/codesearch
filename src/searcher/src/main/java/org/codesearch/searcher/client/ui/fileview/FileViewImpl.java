@@ -7,6 +7,7 @@ import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
@@ -52,7 +53,9 @@ public class FileViewImpl extends Composite implements FileView {
         this.fileContent.clear();
         //TODO after inserting highlighting, re-enable this
 //        this.fileContent.add(new HTML("<pre>" + fileContent + "</pre>"));
-        this.fileContent.add(new HTML("<pre>" + SafeHtmlUtils.htmlEscape(fileContent) + "</pre>"));
+        Window.alert(fileContent);
+        this.fileContent.add(new HTML("<pre>" + fileContent + "</pre>"));
+        System.out.println(fileContent);
         this.fileContent.onResize();
     }
 

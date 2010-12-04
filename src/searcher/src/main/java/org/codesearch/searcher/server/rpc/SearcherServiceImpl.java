@@ -25,14 +25,17 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
 import org.apache.lucene.queryParser.ParseException;
 import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
 import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
+import org.codesearch.commons.constants.MimeTypeNames;
 import org.codesearch.commons.plugins.PluginLoader;
 import org.codesearch.commons.plugins.PluginLoaderException;
 import org.codesearch.commons.plugins.highlighting.HighlightingPlugin;
+import org.codesearch.commons.plugins.highlighting.HighlightingPluginException;
 import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
 import org.codesearch.commons.plugins.vcs.VersionControlPluginException;
 
@@ -113,11 +116,16 @@ public class SearcherServiceImpl extends AutowiringRemoteServiceServlet implemen
         String fileContent = "";
         try {
             RepositoryDto repositoryDto = xmlConfigurationReader.getRepositoryByName(repository);
-            VersionControlPlugin plugin = pluginLoader.getPlugin(VersionControlPlugin.class, repositoryDto.getVersionControlSystem());
-            plugin.setRepository(new URI(repositoryDto.getUrl()), repositoryDto.getUsername(), repositoryDto.getPassword());
+            VersionControlPlugin vcPlugin = pluginLoader.getPlugin(VersionControlPlugin.class, repositoryDto.getVersionControlSystem());
+            vcPlugin.setRepository(new URI(repositoryDto.getUrl()), repositoryDto.getUsername(), repositoryDto.getPassword());
             //FIXME check for binary or weird stuff
             //TODO highlighting
-            fileContent = new String(plugin.getFileContentForFilePath(filePath).toString());
+            HighlightingPlugin hlPlugin = pluginLoader.getPlugin(HighlightingPlugin.class, MimeTypeNames.JAVA);
+            fileContent = new String(vcPlugin.getFileContentForFilePath(filePath));
+         //   System.out.println(fileContent);
+            fileContent = hlPlugin.parseToHtml(fileContent);
+        } catch (HighlightingPluginException ex) {
+            LOG.error(ex);
         } catch (URISyntaxException ex) {
             LOG.error(ex);
         } catch (VersionControlPluginException ex) {

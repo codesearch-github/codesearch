@@ -126,7 +126,7 @@ public class IndexingTaskTest {
                 IndexingTask t = (IndexingTask) applicationContext.getBean("indexingTask");
                 pr.setPropertyFileValue(repo.getName(), "0");
                 t.setRepository(repo);
-                t.setCodeAnalysisEnabled(true);
+                t.setCodeAnalysisEnabled(false);
                 t.execute();
             }
         }

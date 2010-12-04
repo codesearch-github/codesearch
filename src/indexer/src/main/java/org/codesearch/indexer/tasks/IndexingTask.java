@@ -116,10 +116,11 @@ public class IndexingTask implements Task {
             versionControlPlugin.setRepository(new URI(repository.getUrl()), repository.getUsername(), repository.getPassword());
             String lastIndexedRevision = propertiesManager.getPropertyFileValue(repository.getName());
             changedFiles = versionControlPlugin.getChangedFilesSinceRevision(lastIndexedRevision);
-            String lastAnalysisRevision = DBAccess.getLastAnalyzedRevisionOfRepository(repository.getName());
+            
             boolean retrieveNewFileList = false;
             executeIndexing();
             if (codeAnalysisEnabled) {
+                String lastAnalysisRevision = DBAccess.getLastAnalyzedRevisionOfRepository(repository.getName());
                 if (!lastAnalysisRevision.equals(lastIndexedRevision)) {
                     retrieveNewFileList = true;
                 } else {
@@ -208,15 +209,14 @@ public class IndexingTask implements Task {
         doc.add(new Field(IndexConstants.INDEX_FIELD_TITLE, extractFilename(file.getFilePath()), Field.Store.YES, Field.Index.NOT_ANALYZED));
         doc.add(new Field(IndexConstants.INDEX_FIELD_FILEPATH, file.getFilePath(), Field.Store.YES, Field.Index.NOT_ANALYZED));
         if (!file.isBinary()) {
-            doc.add(new Field(IndexConstants.INDEX_FIELD_CONTENT, file.getContent().toString(), Field.Store.YES, Field.Index.ANALYZED));
-            doc.add(new Field(IndexConstants.INDEX_FIELD_CONTENT_LC, file.getContent().toString().toLowerCase(), Field.Store.YES, Field.Index.ANALYZED));
+            doc.add(new Field(IndexConstants.INDEX_FIELD_CONTENT, new String(file.getContent()), Field.Store.YES, Field.Index.ANALYZED));
+            doc.add(new Field(IndexConstants.INDEX_FIELD_CONTENT_LC, new String(file.getContent()).toLowerCase(), Field.Store.YES, Field.Index.ANALYZED));
         }
         doc.add(new Field(IndexConstants.INDEX_FIELD_REPOSITORY, repository.getName(), Field.Store.YES, Field.Index.NOT_ANALYZED));
         doc.add(new Field(IndexConstants.INDEX_FIELD_REVISION, versionControlPlugin.getRepositoryRevision(), Field.Store.YES, Field.Index.ANALYZED));
         //doc.add(new Field(IndexConstants.INDEX_FILED_REPOSITORY_GROUP, repository.getRepositoryGroupsAsString(), Field.Store.YES, Field.Index.ANALYZED));
         //doc.add(new Field(IndexConstants.INDEX_FIELD_TITLE_LC, extractFilename(path).toLowerCase(), Field.Store.YES, Field.Index.NOT_ANALYZED));
         doc.add(new Field(IndexConstants.INDEX_FIELD_FILEPATH_LC, file.getFilePath().toLowerCase(), Field.Store.YES, Field.Index.NOT_ANALYZED));
-        doc.add(new Field(IndexConstants.INDEX_FIELD_CONTENT_LC, file.getContent().toString().toLowerCase(), Field.Store.YES, Field.Index.ANALYZED));
       // doc.add(new Field(IndexConstants.INDEX_FIELD_FILE_TYPE, file.getMimeType(), Field.Store.YES, Field.Index.ANALYZED)); //TODO add mime type
         return doc;
     }

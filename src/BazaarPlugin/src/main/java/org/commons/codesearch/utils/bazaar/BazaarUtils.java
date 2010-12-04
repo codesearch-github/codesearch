@@ -29,6 +29,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
 import org.vcs.bazaar.client.BazaarClientFactory;
 import org.vcs.bazaar.client.BazaarClientPreferences;
 import org.vcs.bazaar.client.BazaarPreference;
@@ -50,17 +51,18 @@ public class BazaarUtils {
 
     private static BazaarUtils instance;
     private IBazaarClient bazaarClient;
-    private String executablePath = "/usr/bin/bzr";
+    private String executablePath = "/usr/bin/bzr"; //TODO read path form config
+    private static final Logger LOG = Logger.getLogger(BazaarUtils.class);
 
     /**
      * Contstructor
      */
     private BazaarUtils() {
         try {
-            BazaarClientFactory.setupBestAvailableBackend();
             BazaarClientPreferences.getInstance().set(BazaarPreference.EXECUTABLE, executablePath);
-        } catch (BazaarClientException bce) {
-            //TODO: add logging
+            BazaarClientFactory.setupBestAvailableBackend();
+        } catch (BazaarClientException ex) {
+            LOG.error(ex);
         }
         this.bazaarClient = BazaarClientFactory.createClient(CommandLineClientFactory.CLIENT_TYPE);
     }
@@ -105,12 +107,13 @@ public class BazaarUtils {
     public BranchLocation createBranchLocation(String repositoryUrl, String userName, String password) throws URISyntaxException {
         BranchLocation branchLocation = new BranchLocation(repositoryUrl);
         URI uri = branchLocation.getURI();
-        if ( !userName.isEmpty() && !password.isEmpty()) {
+        if (!userName.isEmpty() && !password.isEmpty()) {
             URI newURI = new URI(uri.getScheme(), userName + ":" + password, uri.getPath(), uri.getQuery(), uri.getFragment());
             branchLocation = new BranchLocation(newURI);
             return branchLocation;
+        } else {
+            return branchLocation;
         }
-        else return branchLocation;
     }
 
     /**
@@ -120,9 +123,8 @@ public class BazaarUtils {
      * @throws URISyntaxException
      */
     public BranchLocation createBranchLocation(String repositoryUrl) throws URISyntaxException {
-     return createBranchLocation(repositoryUrl, null, null);
+        return createBranchLocation(repositoryUrl, null, null);
     }
-
 
     /**
      * Retrieves the information about the change details since the specified
@@ -151,10 +153,8 @@ public class BazaarUtils {
      * @return
      * @throws BazaarClientException
      */
-    public String getLatestRevisionNumber(BranchLocation bl) throws BazaarClientException
-    {
+    public String getLatestRevisionNumber(BranchLocation bl) throws BazaarClientException {
         IBazaarLogMessage logMessage = bazaarClient.log(bl, new Option("-r-1")).get(0);
         return logMessage.getRevision().getValue();
     }
-   
 }

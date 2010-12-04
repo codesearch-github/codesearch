@@ -16,9 +16,9 @@ import org.codesearch.commons.plugins.codeanalyzing.CodeAnalyzerPluginException;
 import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
 import org.codesearch.commons.plugins.codeanalysis.javacodeanalyzerplugin.astanalyzer.JavaAstVisitor;
 import org.codesearch.commons.plugins.codeanalyzing.ast.CompoundNode;
-import org.eclipse.jdt.core.dom.AST;
-import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.ASTParser;
+import org.codesearch.org.eclipse.jdt.core.dom.AST;
+import org.codesearch.org.eclipse.jdt.core.dom.ASTNode;
+import org.codesearch.org.eclipse.jdt.core.dom.ASTParser;
 import org.springframework.stereotype.Component;
 
 /**

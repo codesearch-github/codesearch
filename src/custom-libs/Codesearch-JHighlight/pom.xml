@@ -8,9 +8,9 @@
     <version>0.1-SNAPSHOT</version>
   </parent>
   <groupId>org.codesearch</groupId>
-  <artifactId>Codesearch-JHighlight</artifactId>
+  <artifactId>JHighlight</artifactId>
   <version>1.0-SNAPSHOT</version>
-  <name>Codesearch-JHighlight</name>
+  <name>JHighlight</name>
   <url>http://maven.apache.org</url>
   <dependencies>
     <dependency>
