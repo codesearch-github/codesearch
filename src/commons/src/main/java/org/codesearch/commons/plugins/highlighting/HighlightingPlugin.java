@@ -17,7 +17,7 @@ public interface HighlightingPlugin extends Plugin {
      * @param text
      * @return
      */
-    String parseToHtml(String text) throws HighlightingPluginException;
+    String parseToHtml(String text, String mimeType) throws HighlightingPluginException;
 
     /**
      * returns the string token that is used to mark the beginning of an escape part in the codes that will not be converted to html
