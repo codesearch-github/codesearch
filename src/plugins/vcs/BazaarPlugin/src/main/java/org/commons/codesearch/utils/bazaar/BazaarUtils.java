@@ -32,13 +32,17 @@ import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.vcs.bazaar.client.BazaarClientFactory;
 import org.vcs.bazaar.client.BazaarClientPreferences;
+import org.vcs.bazaar.client.BazaarNotificationHandler;
 import org.vcs.bazaar.client.BazaarPreference;
 import org.vcs.bazaar.client.IBazaarClient;
 import org.vcs.bazaar.client.IBazaarLogMessage;
+import org.vcs.bazaar.client.IBazaarNotifyListener;
+import org.vcs.bazaar.client.commandline.CommandLineClient;
 import org.vcs.bazaar.client.commandline.CommandLineClientFactory;
 import org.vcs.bazaar.client.commandline.commands.options.Option;
 import org.vcs.bazaar.client.core.BazaarClientException;
 import org.vcs.bazaar.client.core.BranchLocation;
+import org.vcs.bazaar.client.utils.BazaarUtilities;
 
 /**
  * This class hold serveral methods that can be used to access
@@ -51,20 +55,46 @@ public class BazaarUtils {
 
     private static BazaarUtils instance;
     private IBazaarClient bazaarClient;
-    private String executablePath = "/usr/bin/bzr"; //TODO read path form config
-    private static final Logger LOG = Logger.getLogger(BazaarUtils.class);
+    private String executablePath = "/usr/bin/bzr";
 
     /**
      * Contstructor
      */
     private BazaarUtils() {
         try {
-            BazaarClientPreferences.getInstance().set(BazaarPreference.EXECUTABLE, executablePath);
-            BazaarClientFactory.setupBestAvailableBackend();
-        } catch (BazaarClientException ex) {
-            LOG.error(ex);
+////            BazaarClientPreferences.getInstance().set(BazaarPreference.EXECUTABLE, "/usr/bin/bzr");
+////            CommandLineClientFactory.setup(true);
+////            BazaarClientFactory.setPreferredClientType(CommandLineClientFactory.CLIENT_TYPE);
+////            bazaarClient = BazaarClientFactory.createClient(BazaarClientFactory.getPreferredClientType());
+//    System.out.println("IS ENTERING!");
+//            BazaarClientPreferences.getInstance().set(BazaarPreference.EXECUTABLE, "/usr/bin/bzr");
+//            System.out.println("EXE SET");
+//            //BazaarClientFactory.setupBestAvailableBackend(true);
+//            System.out.println("back");
+//            bazaarClient = BazaarClientFactory.createClient(CommandLineClientFactory.CLIENT_TYPE);
+//            System.out.println("clienttype");
+//            if(bazaarClient == null)
+//                System.out.println("FAIL NULL!");
+//            else
+//                System.out.println("WORKING!");
+////        } catch (BazaarClientException bce) {
+////            //TODO: add logging
+////        }
+            CommandLineClientFactory.setup(true);
+            BazaarClientFactory.setPreferredClientType(CommandLineClientFactory.CLIENT_TYPE);
+            BazaarClientFactory.setupBestAvailableBackend(true);
+            this.bazaarClient = BazaarClientFactory.createClient(CommandLineClientFactory.CLIENT_TYPE);
+
+        } catch (BazaarClientException bce) {
+            if (bce.getMessage().equals("bzr-xmloutput >= 0.6.0 plugin not found")) {
+                System.out.println("xmlplugin failed...");
+            }
         }
-        this.bazaarClient = BazaarClientFactory.createClient(CommandLineClientFactory.CLIENT_TYPE);
+
+
+
+
+
     }
 
     /**
@@ -95,7 +125,7 @@ public class BazaarUtils {
 
     /**
      * Creates a new BranchLocation for the given repositoryUrl and
-     * if the username and password are not null it will use them to
+     * if the username and password are not empty it will use them to
      * authenticate.
      * 
      * @param repositoryUrl
@@ -109,6 +139,7 @@ public class BazaarUtils {
         URI uri = branchLocation.getURI();
         if (!userName.isEmpty() && !password.isEmpty()) {
             URI newURI = new URI(uri.getScheme(), userName + ":" + password, uri.getPath(), uri.getQuery(), uri.getFragment());
+            System.out.println("URI" +uri.getScheme()+userName + ":" + password+ uri.getPath()+ uri.getQuery()+ uri.getFragment());
             branchLocation = new BranchLocation(newURI);
             return branchLocation;
         } else {
@@ -123,7 +154,7 @@ public class BazaarUtils {
      * @throws URISyntaxException
      */
     public BranchLocation createBranchLocation(String repositoryUrl) throws URISyntaxException {
-        return createBranchLocation(repositoryUrl, null, null);
+        return createBranchLocation(repositoryUrl, "", "");
     }
 
     /**

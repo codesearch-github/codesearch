@@ -74,11 +74,6 @@
             <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>org.codesearch</groupId>
-            <artifactId>DefaultHighlightingPlugin</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>5.1.9</version>
@@ -88,13 +83,6 @@
             <artifactId>JHighlight</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
-        <!--dependency>
-            <groupId>org.codesearch</groupId>
-            <artifactId>JavaCodeAnalyzerPlugin</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency-->
-        
-        
     </dependencies>
     <build>
         <plugins>

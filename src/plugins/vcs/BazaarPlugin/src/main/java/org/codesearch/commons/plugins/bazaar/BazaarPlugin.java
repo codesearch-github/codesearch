@@ -79,17 +79,12 @@ public class BazaarPlugin implements VersionControlPlugin {
             List<IBazaarLogMessage> iblm = bzr_util.getChangesSinceRevison(bl.getURI().toString(), revision);
             for (IBazaarLogMessage log : iblm) {
                 for (IBazaarStatus bs : log.getAffectedFiles()) {
-                    boolean exists = false;
-                    for (FileDto file : files) {
-                        if (file.getFilePath().equals(bs.getAbsolutePath())) {
-                            exists = true;
-                        }
-                    }
-                    if (!exists) {
-                        byte[] content = CommonsUtils.convertFileToByteArray(bs.getFile());
-                        FileDto fd = new FileDto(bs.getAbsolutePath(), content, false); //TODO: ADD MIME TYPE...
-                        files.add(fd);
-                    }
+                    System.out.println("PATH: " + bs.getPath());
+                    System.out.println("BRANCHROOT: " + bs.getBranchRoot());
+                    System.out.println("STATUS: " + bs.getShortStatus());
+                    byte[] content = CommonsUtils.convertFileToByteArray(bs.getFile());
+                    FileDto fd = new FileDto(bs.getAbsolutePath(), content, false); //TODO: ADD MIME TYPE...
+                    files.add(fd);
                 }
             }
         } catch (BazaarClientException ex) {
