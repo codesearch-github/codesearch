@@ -11,11 +11,6 @@
         {
             border: 1px solid black;
         }
-
-        .java_type
-        {
-            color: rgb(0,44,221);
-        }
     </ui:style>
     <g:DockLayoutPanel unit="EM">
         <g:north size="6">

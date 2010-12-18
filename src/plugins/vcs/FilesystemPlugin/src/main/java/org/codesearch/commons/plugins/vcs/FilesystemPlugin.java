@@ -7,8 +7,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
-import org.codesearch.commons.constants.MimeTypeNames;
-import org.codesearch.commons.utils.CommonsUtils;
 import org.springframework.stereotype.Component;
 
 /**

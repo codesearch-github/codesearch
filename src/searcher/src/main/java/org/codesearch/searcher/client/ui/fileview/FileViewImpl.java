@@ -53,7 +53,7 @@ public class FileViewImpl extends Composite implements FileView {
         this.fileContent.clear();
         //TODO after inserting highlighting, re-enable this
 //        this.fileContent.add(new HTML("<pre>" + fileContent + "</pre>"));
-        this.fileContent.add(new HTML("<pre>" + fileContent + "</pre>"));
+        this.fileContent.add(new HTML(fileContent));
         this.fileContent.onResize();
     }
 

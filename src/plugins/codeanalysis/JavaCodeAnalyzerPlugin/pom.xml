@@ -5,7 +5,7 @@
     <groupId>org.codesearch</groupId>
     <artifactId>JavaCodeAnalyzerPlugin</artifactId>
     <packaging>jar</packaging>
-    <version>1.0-SNAPSHOT</version>
+    <version>0.1-SNAPSHOT</version>
     <name>JavaCodeAnalyzerPlugin</name>
     <url>http://maven.apache.org</url>
     <build>
@@ -21,6 +21,16 @@
             </plugin>
         </plugins>
     </build>
+    <repositories>
+        <repository>
+            <id>javaparser</id>
+            <name>JavaParser Repository</name>
+            <url>http://javaparser.googlecode.com/svn/maven2</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
@@ -29,14 +39,14 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>com.google.code.javaparser</groupId>
+            <artifactId>javaparser</artifactId>
+            <version>1.0.8</version>
+        </dependency>
+        <dependency>
             <groupId>org.codesearch</groupId>
             <artifactId>commons</artifactId>
             <version>0.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-            <version>3.0.5.RELEASE</version>
-        </dependency>
+            </dependency>
     </dependencies>
 </project>

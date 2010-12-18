@@ -76,7 +76,8 @@ public class DocumentSearcher {
         //TODO make or find proper analyzers for search
         queryParser = new QueryParser(Version.LUCENE_30, IndexConstants.INDEX_FIELD_CONTENT_LC, new LowerCaseWhiteSpaceAnalyzer());
         queryParserCaseSensitive = new QueryParser(Version.LUCENE_30, IndexConstants.INDEX_FIELD_CONTENT, new WhitespaceAnalyzer());
-
+        queryParser.setAllowLeadingWildcard(true);
+        queryParserCaseSensitive.setAllowLeadingWildcard(true);
         try {
             initSearcher();
         } catch (InvalidIndexLocationException ex) {
@@ -99,7 +100,6 @@ public class DocumentSearcher {
         }
         List<SearchResultDto> results = new LinkedList<SearchResultDto>();
         String finalSearchString = parseQuery(searchString, caseSensitive, repositoryNames, repositoryGroupNames);
-
         Query query = null;
         if (caseSensitive) {
             query = queryParserCaseSensitive.parse(finalSearchString);

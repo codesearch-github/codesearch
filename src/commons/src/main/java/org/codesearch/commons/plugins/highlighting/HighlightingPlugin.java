@@ -13,9 +13,10 @@ import org.codesearch.commons.plugins.Plugin;
 public interface HighlightingPlugin extends Plugin {
 
     /**
-     * parses the text to html,
-     * @param text
-     * @return
+     * parses the text to html code escaping all html-similar characters (<, >)
+     * @param text the text that will be parsed
+     * @param mimeType the mimeType of the file containing the text
+     * @return the html-save and highlighted code
      */
     String parseToHtml(String text, String mimeType) throws HighlightingPluginException;
 

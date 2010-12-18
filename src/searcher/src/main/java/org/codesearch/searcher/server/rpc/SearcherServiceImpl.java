@@ -31,13 +31,13 @@ import org.apache.log4j.Logger;
 import org.apache.lucene.queryParser.ParseException;
 import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
 import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
-import org.codesearch.commons.constants.MimeTypeNames;
 import org.codesearch.commons.plugins.PluginLoader;
 import org.codesearch.commons.plugins.PluginLoaderException;
 import org.codesearch.commons.plugins.highlighting.HighlightingPlugin;
 import org.codesearch.commons.plugins.highlighting.HighlightingPluginException;
 import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
 import org.codesearch.commons.plugins.vcs.VersionControlPluginException;
+import org.codesearch.commons.utils.MimeTypeUtil;
 
 import org.codesearch.searcher.client.rpc.SearcherService;
 import org.codesearch.searcher.server.DocumentSearcher;
@@ -115,15 +115,32 @@ public class SearcherServiceImpl extends AutowiringRemoteServiceServlet implemen
     public String getFileContent(String repository, String filePath) {
         String fileContent = "";
         try {
+            String guessedMimeType = MimeTypeUtil.guessMimeTypeViaFileEnding(filePath);
+            if(guessedMimeType == null){
+                guessedMimeType = MimeTypeUtil.HTML; //FIXME
+            }
             RepositoryDto repositoryDto = xmlConfigurationReader.getRepositoryByName(repository);
-            VersionControlPlugin vcPlugin = pluginLoader.getPlugin(VersionControlPlugin.class, repositoryDto.getVersionControlSystem());
+            VersionControlPlugin vcPlugin = null;
+            try {
+                vcPlugin = pluginLoader.getPlugin(VersionControlPlugin.class, repositoryDto.getVersionControlSystem());
+            } catch (PluginLoaderException ex) {
+                LOG.error(ex);
+            }
             vcPlugin.setRepository(new URI(repositoryDto.getUrl()), repositoryDto.getUsername(), repositoryDto.getPassword());
             //FIXME check for binary or weird stuff
-            //TODO highlighting
-            HighlightingPlugin hlPlugin = pluginLoader.getPlugin(HighlightingPlugin.class, MimeTypeNames.JAVA);
+            HighlightingPlugin hlPlugin = null;
+            try {
+                hlPlugin = pluginLoader.getPlugin(HighlightingPlugin.class, guessedMimeType);
+            } catch (PluginLoaderException ex) {
+                try {
+                    hlPlugin = pluginLoader.getPlugin(HighlightingPlugin.class, MimeTypeUtil.HTML);
+                    //TODO make code less ugly
+                } catch (PluginLoaderException ex1) {
+                    LOG.error(ex1);
+                }
+            }
             fileContent = new String(vcPlugin.getFileContentForFilePath(filePath));
-         //   System.out.println(fileContent);
-            fileContent = hlPlugin.parseToHtml(fileContent);
+            fileContent = hlPlugin.parseToHtml(fileContent, guessedMimeType);
         } catch (HighlightingPluginException ex) {
             LOG.error(ex);
         } catch (URISyntaxException ex) {
@@ -131,8 +148,6 @@ public class SearcherServiceImpl extends AutowiringRemoteServiceServlet implemen
         } catch (VersionControlPluginException ex) {
             LOG.error(ex);
         } catch (ConfigurationException ex) {
-            LOG.error(ex);
-        } catch (PluginLoaderException ex) {
             LOG.error(ex);
         }
         return fileContent;

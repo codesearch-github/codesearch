@@ -43,8 +43,6 @@
     <global-blacklist-filenames>
         <filename>*.jpg</filename>
         <filename>*.txt</filename>
-        <filename>*.PNG</filename>
-        <filename>*.png</filename>
         <filename>*img*</filename>
         <filename>*.svn*</filename>
         <filename>*.class*</filename>

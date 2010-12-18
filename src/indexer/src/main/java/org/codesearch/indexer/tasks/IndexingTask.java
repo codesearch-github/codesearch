@@ -96,8 +96,8 @@ public class IndexingTask implements Task {
     private PluginLoader pluginLoader;
     /** Defines if the task is set to analyze the class and write code navigation relevant data into the binary index */
     private boolean codeAnalysisEnabled = false;
+    /** the location of the lucene index */
     private String indexLocation = null;
-    private Map<Integer, Usage> usages = new HashMap<Integer, Usage>();
 
     /**
      * executes the task,
@@ -149,20 +149,30 @@ public class IndexingTask implements Task {
         }
     }
 
+    /**
+     * executes the code analysis for the currently set repsository
+     * @param retrieveNewFileList determines whether the code analysis should retrieve a new list of changed files,
+     * needed if the lastIndexedRevision (stored in a properties file in the index directory) differs from the lastAnalysisRevision (stored in the database)
+     * @param lastAnalysisRevision the revision of the repository where code analysis was last executed
+     * @throws VersionControlPluginException if no VCP could be loaded for the set repository
+     * @throws CodeAnalyzerPluginException if the source code of one of the files could not be analyzed
+     */
     private void executeCodeAnalysis(boolean retrieveNewFileList, String lastAnalysisRevision) throws VersionControlPluginException, CodeAnalyzerPluginException {
-        //TODO test if the retrieving of a new file list works
         if (retrieveNewFileList) {
             changedFiles = versionControlPlugin.getChangedFilesSinceRevision(lastAnalysisRevision);
         }
+        //the code analyzer plugin used to analyze the entire repository
         CodeAnalyzerPlugin plugin = null;
+        //in case a file has the same filetype (and needs the same analyzer) as the file before the plugin will not be loaded a second time
+        //TODO probably replace with a factory pattern
         String currentFileType = null;
         String previousFileType = null;
         for (FileDto currentFile : changedFiles) {
             try {
-                //load the appropriate plugin
                 try {
                     currentFileType = currentFile.getFilePath().substring(currentFile.getFilePath().lastIndexOf(".") + 1); //TODO add handling for files without file endings or hidden files
                 } catch (StringIndexOutOfBoundsException ex) {
+                    //In case the file has no ending no code analyzis will be executed
                     continue;
                 }
                 if (plugin == null || (!currentFileType.equals(previousFileType))) {
@@ -174,12 +184,10 @@ public class IndexingTask implements Task {
                         continue;
                     }
                 }
-                plugin.analyzeFile(currentFile.getContent().toString(), repository);
+                plugin.analyzeFile(new String(currentFile.getContent()), repository);
                 Map<Integer, CompoundNode> ast = plugin.getAstForCurrentFile();
-//                for (Entry<Integer, CompoundNode> currentEntry : ast.entrySet()) {
-//                    System.out.println(currentEntry.getValue().getOutlineLink());
-//                }
                 previousFileType = currentFileType;
+                //write the AST information into the database
                 DBAccess.setBinaryIndexForFile(currentFile.getFilePath(), repository.getName(), ast);
             } catch (DatabaseAccessException ex) {
                 LOG.error("Error at DatabaseConnection \n" + ex);

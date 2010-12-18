@@ -15,7 +15,6 @@ import java.util.LinkedList;
 import org.codesearch.commons.configuration.properties.PropertiesManager;
 import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
 import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
-import org.codesearch.commons.constants.MimeTypeNames;
 import org.codesearch.commons.database.DBAccess;
 import org.codesearch.commons.plugins.PluginLoader;
 import org.codesearch.commons.plugins.codeanalyzing.CodeAnalyzerPlugin;
@@ -126,7 +125,7 @@ public class IndexingTaskTest {
                 IndexingTask t = (IndexingTask) applicationContext.getBean("indexingTask");
                 pr.setPropertyFileValue(repo.getName(), "0");
                 t.setRepository(repo);
-                t.setCodeAnalysisEnabled(false);
+                t.setCodeAnalysisEnabled(true);
                 t.execute();
             }
         }
