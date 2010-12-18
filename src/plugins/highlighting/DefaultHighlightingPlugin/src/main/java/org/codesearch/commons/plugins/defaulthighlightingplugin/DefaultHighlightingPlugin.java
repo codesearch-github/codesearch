@@ -7,7 +7,6 @@ package org.codesearch.commons.plugins.defaulthighlightingplugin;
 import com.uwyn.jhighlight.renderer.CppXhtmlRenderer;
 import com.uwyn.jhighlight.renderer.JavaXhtmlRenderer;
 import com.uwyn.jhighlight.renderer.XhtmlRenderer;
-import com.uwyn.jhighlight.renderer.XhtmlRendererFactory;
 import com.uwyn.jhighlight.renderer.XmlXhtmlRenderer;
 import java.io.IOException;
 import org.codesearch.commons.plugins.highlighting.HighlightingPlugin;
@@ -33,7 +32,6 @@ public class DefaultHighlightingPlugin implements HighlightingPlugin {
             } else if (mimeType.equals(MimeTypeUtil.CPP)) {
                 renderer = new CppXhtmlRenderer();
             } else if (mimeType.equals(MimeTypeUtil.HTML)) {
-                //       renderer = new XhtmlRenderer() {}
                 renderer = new XmlXhtmlRenderer();
             } else if (mimeType.equals(MimeTypeUtil.XML)) {
                 renderer = new XmlXhtmlRenderer();

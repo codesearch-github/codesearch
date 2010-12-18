@@ -44,6 +44,7 @@ import org.codesearch.searcher.server.DocumentSearcher;
 import org.codesearch.searcher.shared.InvalidIndexLocationException;
 import org.codesearch.searcher.shared.SearchResultDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.util.HtmlUtils;
 
 /**
  * Service used for search operations.
@@ -116,31 +117,19 @@ public class SearcherServiceImpl extends AutowiringRemoteServiceServlet implemen
         String fileContent = "";
         try {
             String guessedMimeType = MimeTypeUtil.guessMimeTypeViaFileEnding(filePath);
-            if(guessedMimeType == null){
-                guessedMimeType = MimeTypeUtil.HTML; //FIXME
-            }
+            
             RepositoryDto repositoryDto = xmlConfigurationReader.getRepositoryByName(repository);
-            VersionControlPlugin vcPlugin = null;
-            try {
-                vcPlugin = pluginLoader.getPlugin(VersionControlPlugin.class, repositoryDto.getVersionControlSystem());
-            } catch (PluginLoaderException ex) {
-                LOG.error(ex);
-            }
+            VersionControlPlugin vcPlugin = pluginLoader.getPlugin(VersionControlPlugin.class, repositoryDto.getVersionControlSystem());
             vcPlugin.setRepository(new URI(repositoryDto.getUrl()), repositoryDto.getUsername(), repositoryDto.getPassword());
-            //FIXME check for binary or weird stuff
-            HighlightingPlugin hlPlugin = null;
-            try {
-                hlPlugin = pluginLoader.getPlugin(HighlightingPlugin.class, guessedMimeType);
-            } catch (PluginLoaderException ex) {
-                try {
-                    hlPlugin = pluginLoader.getPlugin(HighlightingPlugin.class, MimeTypeUtil.HTML);
-                    //TODO make code less ugly
-                } catch (PluginLoaderException ex1) {
-                    LOG.error(ex1);
-                }
-            }
             fileContent = new String(vcPlugin.getFileContentForFilePath(filePath));
-            fileContent = hlPlugin.parseToHtml(fileContent, guessedMimeType);
+
+            try {
+                HighlightingPlugin hlPlugin = pluginLoader.getPlugin(HighlightingPlugin.class, guessedMimeType);
+                fileContent = hlPlugin.parseToHtml(fileContent, guessedMimeType);
+            } catch (PluginLoaderException ex) {
+                // No plugin found, just escape to HTML
+                fileContent = "<pre>" + HtmlUtils.htmlEscape(fileContent) + "</pre>";
+            }
         } catch (HighlightingPluginException ex) {
             LOG.error(ex);
         } catch (URISyntaxException ex) {
@@ -149,7 +138,10 @@ public class SearcherServiceImpl extends AutowiringRemoteServiceServlet implemen
             LOG.error(ex);
         } catch (ConfigurationException ex) {
             LOG.error(ex);
+        } catch (PluginLoaderException ex) {
+            LOG.error(ex);
         }
+
         return fileContent;
     }
 }

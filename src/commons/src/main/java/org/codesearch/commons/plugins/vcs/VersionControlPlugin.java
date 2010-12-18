@@ -21,10 +21,10 @@
 
 package org.codesearch.commons.plugins.vcs;
 
-import java.io.ByteArrayOutputStream;
 import java.net.URI;
 import java.util.Set;
 import org.codesearch.commons.plugins.Plugin;
+import org.tmatesoft.svn.core.SVNException;
 
 /**
  * Base for all version control plugins.

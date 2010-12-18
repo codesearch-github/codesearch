@@ -9,9 +9,8 @@
     </parent>
     <groupId>org.codesearch</groupId>
     <artifactId>DefaultHighlightingPlugin</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>0.1-SNAPSHOT</version>
     <name>DefaultHighlightingPlugin</name>
-    <url>http://maven.apache.org</url>
     <dependencies>
         <dependency>
             <groupId>org.codesearch</groupId>
@@ -20,13 +19,12 @@
         </dependency>
         <dependency>
             <groupId>org.codesearch</groupId>
-            <artifactId>Codesearch-JHighlight</artifactId>
+            <artifactId>JHighlight</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>3.8.1</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

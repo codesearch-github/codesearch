@@ -46,6 +46,13 @@
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
         </dependency>
+        
+        <dependency>
+            <groupId>org.codesearch</groupId>
+            <artifactId>DefaultHighlightingPlugin</artifactId>
+            <version>0.1-SNAPSHOT</version>
+        </dependency>
+
         <dependency>
             <groupId>org.codesearch</groupId>
             <artifactId>commons</artifactId>

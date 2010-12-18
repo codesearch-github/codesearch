@@ -5,17 +5,12 @@
 
 package org.codesearch.commons.plugins.defaulthighlightingplugin;
 
-import com.uwyn.jhighlight.highlighter.XmlHighlighter;
-import com.uwyn.jhighlight.renderer.CppXhtmlRenderer;
-import com.uwyn.jhighlight.renderer.JavaXhtmlRenderer;
 import com.uwyn.jhighlight.renderer.XmlXhtmlRenderer;
-import org.codesearch.commons.plugins.defaulthighlightingplugin.DefaultHighlightingPlugin;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import junit.framework.TestCase;
 import org.codesearch.commons.utils.MimeTypeUtil;
 

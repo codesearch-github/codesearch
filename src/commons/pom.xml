@@ -57,7 +57,13 @@
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-core</artifactId>
         </dependency>
-        <!-- Remove as fast as possible -->
+        <!-- MySQL database -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+        </dependency>
+
+        <!-- Default included plugins -->
         <dependency>
             <groupId>org.codesearch</groupId>
             <artifactId>SubversionPlugin</artifactId>
@@ -68,21 +74,11 @@
             <artifactId>FilesystemPlugin</artifactId>
             <version>0.1-SNAPSHOT</version>
         </dependency>
-        <dependency>
+        <!--dependency>
             <groupId>org.codesearch</groupId>
             <artifactId>JavaCodeAnalyzerPlugin</artifactId>
             <version>1.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.9</version>
-        </dependency>
-        <dependency>
-            <groupId>org.codesearch</groupId>
-            <artifactId>JHighlight</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
+        </dependency-->
     </dependencies>
     <build>
         <plugins>
