@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Set;
+import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNLogEntry;
@@ -53,6 +54,7 @@ public class SubversionPlugin implements VersionControlPlugin {
 
     /** The repository that is currently accessed. */
     private SVNRepository repository;
+    private static final Logger LOG = Logger.getLogger(SubversionPlugin.class);
 
     public SubversionPlugin() {
         DAVRepositoryFactory.setup();
@@ -88,15 +90,22 @@ public class SubversionPlugin implements VersionControlPlugin {
 
     /** {@inheritDoc} */
     @Override
-    public byte[] getFileContentForFilePath(String filePath) throws VersionControlPluginException {
+    public FileDto getFileForFilePath(String filePath) throws VersionControlPluginException {
         try {
+            LOG.debug("Retrieving file: " + filePath);
+            FileDto fileDto = new FileDto();
             SVNNodeKind nodeKind = repository.checkPath(filePath, -1);
             if (nodeKind != SVNNodeKind.FILE) {
                 return null;
             }
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            repository.getFile(filePath, -1, null, baos);
-            return baos.toByteArray();
+
+            SVNProperties properties = new SVNProperties();
+            repository.getFile(filePath, -1, properties, baos);
+            boolean binary = !SVNProperty.isTextMimeType(properties.getStringValue(SVNProperty.MIME_TYPE));
+            fileDto.setContent(baos.toByteArray());
+            fileDto.setBinary(binary);
+            return fileDto;
         } catch (SVNException ex) {
             throw new VersionControlPluginException(ex.toString());
         }
@@ -105,7 +114,6 @@ public class SubversionPlugin implements VersionControlPlugin {
     /** {@inheritDoc} */
     @Override
     public Set<FileDto> getChangedFilesSinceRevision(String revision) throws VersionControlPluginException {
-        //   Date date = new Date();
         Set<FileDto> files = new HashSet();
         Collection logs = null;
         try {
@@ -128,29 +136,10 @@ public class SubversionPlugin implements VersionControlPlugin {
                     }
                 }
                 if (!fileAlreadyInSet) {
-                    try {
-                        SVNNodeKind nodeKind = repository.checkPath(path, -1);
-                        if (nodeKind != SVNNodeKind.FILE) {
-                            continue;
-                        }
-                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                        SVNProperties properties = new SVNProperties();
-                        repository.getFile(path, -1, properties, baos);
-                        String mimeType = properties.getStringValue(SVNProperty.MIME_TYPE);
-                        boolean binary = false;
-                   //     System.out.println(mimeType);
-                        if (mimeType != null && mimeType.equals("application/octet-stream")) {
-                            binary = true;
-                        }
-                        //TODO test if there might be other binary file types
-                        files.add(new FileDto(path, baos.toByteArray(), binary));
-                    } catch (SVNException ex) {
-                        throw new VersionControlPluginException(ex.toString());
-                    }
+                    files.add(getFileForFilePath(path));
                 }
             }
         }
-        //     System.out.println("retrieval of file list took " + (new Date().getTime() - date.getTime()) + " miliseconds");//TODO remove after testing
         return files;
     }
 

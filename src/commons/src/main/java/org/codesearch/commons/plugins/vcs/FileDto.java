@@ -2,7 +2,6 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package org.codesearch.commons.plugins.vcs;
 
 /**
@@ -10,6 +9,7 @@ package org.codesearch.commons.plugins.vcs;
  * @author David Froehlich
  */
 public class FileDto {
+
     private String filePath;
     private byte[] content;
     /** determines whether the file is binary */
@@ -22,6 +22,7 @@ public class FileDto {
     public void setContent(byte[] content) {
         this.content = content;
     }
+
     public String getFilePath() {
         return filePath;
     }
@@ -36,6 +37,9 @@ public class FileDto {
 
     public void setBinary(boolean binary) {
         this.binary = binary;
+    }
+
+    public FileDto() {
     }
 
     public FileDto(String filePath, byte[] content, boolean binary) {

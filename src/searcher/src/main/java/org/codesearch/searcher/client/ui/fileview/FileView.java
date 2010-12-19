@@ -4,12 +4,12 @@ import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.IsWidget;
 
 /**
- * View that can display a file's content.
+ * View that can display a file.
  * @author Samuel Kogler
  */
 public interface FileView extends IsWidget {
 
-    public void setFileContent(String fileContent);
+    public void setFileContent(String fileContent, boolean binary);
     public void setFilePath(String filePath);
     public void setRepository(String repository);
     public void setPresenter(FileView.Presenter presenter);

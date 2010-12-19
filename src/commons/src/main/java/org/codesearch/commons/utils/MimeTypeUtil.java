@@ -21,8 +21,14 @@ public class MimeTypeUtil {
     public static final String HTML = "text/html";
     /** the mime type for PNG files */
     public static final String PNG = "image/png";
+    /** the mime type for JPEG files */
+    public static final String JPEG = "image/jpeg";
+    /** the mime type for TIFF files */
+    public static final String TIFF = "image/tiff";
     /** the mime type for GIF files */
     public static final String GIF = "image/gif";
+    /** the mime type for BMP files */
+    public static final String BMP = "image/bmp";
     /** the mime type for UNKNOWN files */
     public static final String UNKNOWN = "unknown";
 
@@ -37,7 +43,13 @@ public class MimeTypeUtil {
             put("xml", XML);
             put("html", HTML);
             put("png", PNG);
+            put("jpg", JPEG);
+            put("jpe", JPEG);
+            put("jpeg", JPEG);
+            put("tif", TIFF);
+            put("tiff", TIFF);
             put("gif", GIF);
+            put("bmp", BMP);
         }
     };
 

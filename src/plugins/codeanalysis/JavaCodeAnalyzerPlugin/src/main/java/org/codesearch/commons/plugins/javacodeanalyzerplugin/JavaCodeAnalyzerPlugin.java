@@ -63,6 +63,6 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
     }
 
     public String getVersion() {
-        return "0.1-SNAPSHOT"; //
+        return "0.1-SNAPSHOT";
     }
 }

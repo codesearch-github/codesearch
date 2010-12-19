@@ -47,7 +47,7 @@ public class FilesystemPluginTest {
         FilesystemPlugin instance = new FilesystemPlugin();
         Set<FileDto> files = instance.getChangedFilesSinceRevision("0");
         FileDto file = (FileDto) files.toArray()[0];
-        byte[] content =  instance.getFileContentForFilePath(file.getFilePath());
+        byte[] content =  instance.getFileForFilePath(file.getFilePath());
         System.out.println(content.toString());
     }
 }

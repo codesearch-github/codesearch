@@ -25,7 +25,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Level;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
 import org.apache.lucene.queryParser.ParseException;
@@ -41,6 +40,7 @@ import org.codesearch.commons.utils.MimeTypeUtil;
 
 import org.codesearch.searcher.client.rpc.SearcherService;
 import org.codesearch.searcher.server.DocumentSearcher;
+import org.codesearch.searcher.shared.FileDto;
 import org.codesearch.searcher.shared.InvalidIndexLocationException;
 import org.codesearch.searcher.shared.SearchResultDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -113,23 +113,27 @@ public class SearcherServiceImpl extends AutowiringRemoteServiceServlet implemen
     }
 
     @Override
-    public String getFileContent(String repository, String filePath) {
-        String fileContent = "";
+    public FileDto getFileContent(String repository, String filePath) {
+        LOG.debug("Retrieving file content for file: " + filePath + " @ " + repository);
+        FileDto file = new FileDto();
+        //TODO find out whether file is binary
         try {
             String guessedMimeType = MimeTypeUtil.guessMimeTypeViaFileEnding(filePath);
             
             RepositoryDto repositoryDto = xmlConfigurationReader.getRepositoryByName(repository);
             VersionControlPlugin vcPlugin = pluginLoader.getPlugin(VersionControlPlugin.class, repositoryDto.getVersionControlSystem());
+            
             vcPlugin.setRepository(new URI(repositoryDto.getUrl()), repositoryDto.getUsername(), repositoryDto.getPassword());
-            fileContent = new String(vcPlugin.getFileContentForFilePath(filePath));
+            org.codesearch.commons.plugins.vcs.FileDto vcFile = vcPlugin.getFileForFilePath(filePath);
 
             try {
                 HighlightingPlugin hlPlugin = pluginLoader.getPlugin(HighlightingPlugin.class, guessedMimeType);
-                fileContent = hlPlugin.parseToHtml(fileContent, guessedMimeType);
+                file.setFileContent(hlPlugin.parseToHtml(vcFile.getContent(), guessedMimeType));
             } catch (PluginLoaderException ex) {
                 // No plugin found, just escape to HTML
-                fileContent = "<pre>" + HtmlUtils.htmlEscape(fileContent) + "</pre>";
+                file.setFileContent(HtmlUtils.htmlEscape(new String(vcFile.getContent())));
             }
+            file.setBinary(vcFile.isBinary());
         } catch (HighlightingPluginException ex) {
             LOG.error(ex);
         } catch (URISyntaxException ex) {
@@ -141,7 +145,8 @@ public class SearcherServiceImpl extends AutowiringRemoteServiceServlet implemen
         } catch (PluginLoaderException ex) {
             LOG.error(ex);
         }
-
-        return fileContent;
+        LOG.debug("Finished retrieving file content for file: " + filePath + " @ " + repository);
+        return file;
     }
+
 }

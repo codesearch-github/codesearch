@@ -29,14 +29,14 @@ public class FilePlace extends Place {
 
         @Override
         public String getToken(FilePlace place) {
-            return place.getRepository() + "@" + place.getFilePath();
+            return place.getFilePath() + "@" + place.getRepository();
         }
 
         @Override
         public FilePlace getPlace(String token) {
             String[] parts = token.split("@");
             if (parts.length == 2) {
-                return new FilePlace(parts[0], parts[1]);
+                return new FilePlace(parts[1], parts[0]);
             } else {
                 return null;
             }

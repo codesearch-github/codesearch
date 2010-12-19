@@ -3,13 +3,14 @@ package org.codesearch.searcher.client.ui.fileview;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.HasClickHandlers;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -26,7 +27,11 @@ public class FileViewImpl extends Composite implements FileView {
     private static FileViewUiBinder uiBinder = GWT.create(FileViewUiBinder.class);
     private Presenter presenter;
     @UiField
-    ScrollPanel fileContent;
+    FlowPanel fileContentContainer;
+    @UiField
+    FlowPanel lineNumbersContainer;
+    @UiField
+    ScrollPanel scrollWrapper;
     @UiField
     Label pathField;
     @UiField
@@ -49,12 +54,28 @@ public class FileViewImpl extends Composite implements FileView {
     }
 
     @Override
-    public void setFileContent(String fileContent) {
-        this.fileContent.clear();
-        //TODO after inserting highlighting, re-enable this
-//        this.fileContent.add(new HTML("<pre>" + fileContent + "</pre>"));
-        this.fileContent.add(new HTML(fileContent));
-        this.fileContent.onResize();
+    public void setFileContent(String fileContent, boolean binary) {
+        //FIXME chek if this code runs twice
+        fileContentContainer.clear();
+        lineNumbersContainer.clear();
+        lineNumbersContainer.setVisible(!binary);
+
+        if (!binary) {
+            String[] fileContentArray = fileContent.split("\n");
+            StringBuilder fileContentBuilder = new StringBuilder();
+            fileContentBuilder.append("<pre>");
+            for (int i = 0; i < fileContentArray.length; i++) {
+                //TODO change back once binary recognition works
+                fileContentBuilder.append(fileContentArray[i]).append("\n");
+//                fileContentBuilder.append("<span id=\"line").append(i + 1).append("\">").append(fileContentArray[i]).append("</span>\n");
+                lineNumbersContainer.add(new Hyperlink(String.valueOf(i + 1), "#line" + i));
+            }
+            fileContentBuilder.append("</pre>");
+            fileContent = fileContentBuilder.toString();
+        }
+
+        fileContentContainer.add(new HTML(fileContent));
+        scrollWrapper.onResize();
     }
 
     @Override

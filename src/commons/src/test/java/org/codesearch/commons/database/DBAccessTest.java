@@ -5,13 +5,11 @@
 package org.codesearch.commons.database;
 
 import java.util.ArrayList;
-import java.util.Random;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  *
@@ -59,7 +57,6 @@ public class DBAccessTest {
     public void testSetupConnections() throws Exception {
 //        System.out.println("setupConnections");
 //        DBUtils.setupConnections();
-//        // TODO review the generated test code and remove the default call to fail.
 //        fail("The test case is a prototype.");
     }
 
@@ -73,7 +70,6 @@ public class DBAccessTest {
 //        String expResult = "";
 //        String result = DBUtils.getLastAnalyzedRevisionOfRepository(repositoryName);
 //        assertEquals(expResult, result);
-//        // TODO review the generated test code and remove the default call to fail.
 //        fail("The test case is a prototype.");
     }
 
@@ -85,7 +81,6 @@ public class DBAccessTest {
 //        System.out.println("createRepositoryEntryInDatabase");
 //        String repositoryName = "";
 //        DBUtils.createRepositoryEntry(repositoryName);
-//        // TODO review the generated test code and remove the default call to fail.
 //        fail("The test case is a prototype.");
     }
 
@@ -98,7 +93,6 @@ public class DBAccessTest {
 //        String repositoryName = "";
 //        String revision = "";
 //        DBUtils.setLastAnalyzedRevisionOfRepository(repositoryName, revision);
-//        // TODO review the generated test code and remove the default call to fail.
 //        fail("The test case is a prototype.");
     }
 
@@ -111,7 +105,6 @@ public class DBAccessTest {
 //        String filePath = "";
 //        String repository = "";
 //        DBUtils.ensureThatRecordExists(filePath, repository);
-//        // TODO review the generated test code and remove the default call to fail.
 //        fail("The test case is a prototype.");
     }
 }

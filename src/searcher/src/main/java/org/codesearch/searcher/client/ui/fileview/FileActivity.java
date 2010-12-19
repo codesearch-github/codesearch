@@ -4,13 +4,13 @@ import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import org.codesearch.searcher.client.ClientFactory;
 import org.codesearch.searcher.client.rpc.SearcherService;
 import org.codesearch.searcher.client.rpc.SearcherServiceAsync;
 import org.codesearch.searcher.client.ui.fileview.FileView.Presenter;
+import org.codesearch.searcher.shared.FileDto;
 
 /**
  * Presenter for the file view.
@@ -43,6 +43,7 @@ public class FileActivity extends AbstractActivity implements Presenter {
         fileView.setFilePath(filePath);
         fileView.setRepository(repository);
         panel.setWidget(fileView.asWidget());
+        fileView.setFileContent("loading file...", true);
         searcherServiceAsync.getFileContent(repository, filePath, new GetFileContentCallback());
     }
 
@@ -56,17 +57,17 @@ public class FileActivity extends AbstractActivity implements Presenter {
     }
 
 
-    private class GetFileContentCallback implements AsyncCallback<String>  {
+    private class GetFileContentCallback implements AsyncCallback<FileDto>  {
 
         @Override
         public void onFailure(Throwable caught) {
-            Window.alert("Error getting file:\n" + caught.toString());
+            fileView.setFileContent("Error getting file:\n" + caught.toString(), true);
         }
 
         @Override
-        public void onSuccess(String result) {
-            fileContent = result;
-            fileView.setFileContent(fileContent);
+        public void onSuccess(FileDto result) {
+            fileContent = result.getFileContent();
+            fileView.setFileContent(fileContent, result.isBinary());
         }
 
     }

@@ -5,18 +5,35 @@
         .fileinfo
         {
             padding: 0px;
+            background-color: #EEE;
+        }
+        
+        .lineNumbersPanel
+        {
+            float: left;
+            width: 2em;
+            color: #EEE;
+            border-right: 1px solid #666;
+            margin-right: 0.5em;
+            text-align: right;
         }
 
-        .fileinfo td
+        .lineNumbersPanel a
         {
-            border: 1px solid black;
+            color: #666;
+        }
+
+        .fileDisplay
+        {
+            border-top: 3px solid #0081ff;
+            padding-top: 0px;
         }
     </ui:style>
     <g:DockLayoutPanel unit="EM">
-        <g:north size="6">
+        <g:north size="5">
             <g:HTMLPanel>
                 <g:Button ui:field="backButton" text="Back" />
-                <table class="fileinfo">
+                <table class="{style.fileinfo}" width="100%">
                     <tbody>
                         <tr>
                             <td>Repository</td>
@@ -35,7 +52,12 @@
             </g:HTMLPanel>
         </g:north>
         <g:center>
-            <g:ScrollPanel ui:field="fileContent" />
+            <g:ScrollPanel ui:field="scrollWrapper" addStyleNames="{style.fileDisplay}">
+                <g:FlowPanel>
+                    <g:FlowPanel ui:field="lineNumbersContainer" addStyleNames="{style.lineNumbersPanel}"/>
+                    <g:FlowPanel ui:field="fileContentContainer" />
+                </g:FlowPanel>
+            </g:ScrollPanel>
         </g:center>
     </g:DockLayoutPanel>
 

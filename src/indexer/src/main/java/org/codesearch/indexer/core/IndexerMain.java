@@ -20,8 +20,6 @@
  */
 package org.codesearch.indexer.core;
 
-import java.sql.SQLException;
-import java.util.logging.Level;
 import javax.servlet.ServletContextEvent;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
@@ -63,7 +61,7 @@ public class IndexerMain implements javax.servlet.ServletContextListener {
             }
         } catch (ConfigurationException ex) {
             //TODO add useful error handling
-            java.util.logging.Logger.getLogger(IndexerMain.class.getName()).log(Level.SEVERE, null, ex);
+            LOG.error(ex);
         }
     }
 

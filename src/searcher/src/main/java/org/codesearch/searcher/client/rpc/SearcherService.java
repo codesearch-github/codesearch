@@ -24,6 +24,7 @@ package org.codesearch.searcher.client.rpc;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import java.util.List;
+import org.codesearch.searcher.shared.FileDto;
 import org.codesearch.searcher.shared.InvalidIndexLocationException;
 import org.codesearch.searcher.shared.SearchResultDto;
 
@@ -36,5 +37,5 @@ public interface SearcherService extends RemoteService {
     public List<SearchResultDto> doSearch(String query, boolean caseSensitive, List<String> selectedRepositories, List<String> selectedRepositoryGroups) throws InvalidIndexLocationException;
     public List<String> getAvailableRepositories();
     public List<String> getAvailableRepositoryGroups();
-    public String getFileContent(String repository, String filePath);
+    public FileDto getFileContent(String repository, String filePath);
 }

@@ -27,15 +27,24 @@ public class FilesystemPlugin implements VersionControlPlugin {
 
     /** {@inheritDoc} */
     @Override
-    public byte[] getFileContentForFilePath(String filePath) throws VersionControlPluginException {
-        File file = new File(filePath);
+    public FileDto getFileForFilePath(String filePath) throws VersionControlPluginException {
+        
         try {
+            File file = new File(filePath);
+            FileDto fileDto = new FileDto();
+
             FileInputStream fis = new FileInputStream(file);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             byte fileContent[] = new byte[(int) file.length()];
             fis.read(fileContent);
-            baos.write(fileContent);
-            return baos.toByteArray();
+
+            //TODO find method to guess this quickly
+            // assume that files are not binary because MIME detection takes too long
+
+            fileDto.setContent(fileContent);
+            fileDto.setBinary(false);
+
+            return fileDto;
         } catch (IOException ex) {
             throw new VersionControlPluginException("File could not be opened: \n" + ex);
         }
@@ -62,11 +71,7 @@ public class FilesystemPlugin implements VersionControlPlugin {
                 addChangedFilesFromDirectoryToSet(files, f, lastModified);
             } else {
                 if (f.lastModified() > lastModified) {
-                    byte[] barray = getFileContentForFilePath(f.getAbsolutePath());
-                    //since it is not possible to find out if a file is binary without mime type analysis (and mime type analysis takes too long) the FilesystemPlugin will generally assume that files are not binary
-                    boolean binary = false;
-                    
-                    files.add(new FileDto(f.getAbsolutePath(), barray, binary));
+                    files.add(getFileForFilePath(f.getAbsolutePath()));
                 }
             }
         }

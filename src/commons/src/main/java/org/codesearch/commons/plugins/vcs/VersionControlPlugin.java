@@ -43,17 +43,16 @@ public interface VersionControlPlugin extends Plugin {
     void setRepository(URI url, String username, String password) throws VersionControlPluginException;
 
     /**
-     * Retrieves the file content for the given file path.
+     * Retrieves the file corresponding to the given file path.
      * @param filePath The file path relative to the current repository URL
-     * @return The retrieved file content
+     * @return The retrieved file
      */
-    byte[] getFileContentForFilePath(String filePath) throws VersionControlPluginException;
+    FileDto getFileForFilePath(String filePath) throws VersionControlPluginException;
 
     /**
-     * Returns a list of changed file paths since the given revision.
+     * Returns a list of changed files since the given revision.
      * @param revision The given revision
-     * @return The paths of the changed files
-     * @throws SVNException if the file could not be found in the currently set repository
+     * @return The changed files
      */
     Set<FileDto> getChangedFilesSinceRevision(String revision) throws VersionControlPluginException;
 

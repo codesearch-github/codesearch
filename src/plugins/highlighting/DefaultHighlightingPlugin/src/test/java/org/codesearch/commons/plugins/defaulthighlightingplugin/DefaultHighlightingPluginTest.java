@@ -52,7 +52,7 @@ public class DefaultHighlightingPluginTest extends TestCase {
         while(br.ready()){
             input += br.readLine() + "\n";
         }
-        String result = plugin.parseToHtml(input, MimeTypeUtil.JAVA);
+        String result = plugin.parseToHtml(input.getBytes(), MimeTypeUtil.JAVA);
         //System.out.println(result);
     }
 }

@@ -122,13 +122,13 @@ public abstract class XhtmlRenderer implements Renderer {
                         }
                     }
                     newline = false;
-                    w.write(StringUtils.replace(StringUtils.encodeHtml(StringUtils.replace(token, "\n", "")), " ", "&nbsp;"));
+                    w.write(StringUtils.replace(StringUtils.encodeHtml(token), " ", "&nbsp;"));
                 }
                 index += length;
 
             }
 
-            w.write("</span><br />\n");
+            w.write("</span>");
             newline = true;
         }
 

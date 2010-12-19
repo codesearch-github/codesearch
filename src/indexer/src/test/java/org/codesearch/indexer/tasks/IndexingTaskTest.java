@@ -4,9 +4,6 @@
  */
 package org.codesearch.indexer.tasks;
 
-import java.io.ByteArrayOutputStream;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.commons.configuration.ConfigurationException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +15,7 @@ import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 import org.codesearch.commons.database.DBAccess;
 import org.codesearch.commons.plugins.PluginLoader;
 import org.codesearch.commons.plugins.codeanalyzing.CodeAnalyzerPlugin;
+import org.codesearch.commons.plugins.vcs.FileDto;
 import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -102,10 +100,10 @@ public class IndexingTaskTest {
     public void testCodeAnalysis() throws Exception {
         RepositoryDto repo = new RepositoryDto();
         repo.setVersionControlSystem("FILESYSTEM");
-        CodeAnalyzerPlugin plugin = pluginLoader.getPlugin(CodeAnalyzerPlugin.class, "java");
-        VersionControlPlugin vcPlugin = pluginLoader.getPlugin(VersionControlPlugin.class, "FILESYSTEM");
-        byte[] fileContent = vcPlugin.getFileContentForFilePath("/home/david/wakmusic/trunk/Wakmusic/src/java/beans/Band.java");
-        plugin.analyzeFile(new String(fileContent), repo);
+        CodeAnalyzerPlugin codeAnalyzerPlugin = pluginLoader.getPlugin(CodeAnalyzerPlugin.class, "java");
+        VersionControlPlugin versionControlPlugin = pluginLoader.getPlugin(VersionControlPlugin.class, "FILESYSTEM");
+        FileDto fileDto = versionControlPlugin.getFileForFilePath("/home/david/wakmusic/trunk/Wakmusic/src/java/beans/Band.java");
+        codeAnalyzerPlugin.analyzeFile(new String(fileDto.getContent()), repo);
      //   System.out.println(plugin.getAstForCurrentFile().getOutlineForChildElements());
     }
 
