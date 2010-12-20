@@ -2,7 +2,6 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package org.codesearch.commons.plugins.javacodeanalyzerplugin.ast;
 
 import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.MethodNode;
@@ -10,12 +9,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import org.codesearch.commons.plugins.codeanalyzing.ast.CompoundNode;
+import org.codesearch.commons.plugins.codeanalyzing.ast.Node;
 
 /**
  * ASTNode that represents a class in the source code
  * @author David Froehlich
  */
-public class ClassNode extends CompoundNode{
+public class ClassNode extends CompoundNode {
+
     private List<MethodNode> methods = new LinkedList<MethodNode>();
 
     public List<MethodNode> getMethods() {
@@ -25,10 +26,13 @@ public class ClassNode extends CompoundNode{
     public void setMethods(List<MethodNode> methods) {
         this.methods = methods;
     }
-    
+
     public String getOutlineForChildElements() {
-        String outlineString = "  Class definition: "+ this.getName() + " from: "+this.getStartPosition() + ", length: "+this.getNodeLength()+"\n";
-        for(MethodNode method : methods){
+        //String outlineString = "  Class definition: "+ this.getName() + " from: "+this.getStartPositionInLin() + ", length: "+this.getNodeLength()+"\n";
+
+        //TODo add useful outlineName for class
+        String outlineString = "";
+        for (MethodNode method : methods) {
             outlineString += method.getOutlineForChildElements();
         }
         return outlineString;
@@ -36,14 +40,14 @@ public class ClassNode extends CompoundNode{
 
     @Override
     public String getOutlineLink() {
-        return "<a href='#"+startLine+"'>"+name+"</a>";
+        return "<a href='#" + startLine + "'>" + name + "</a>";
     }
 
     @Override
-    public void addCompoundNodesToMap(Map<Integer, CompoundNode> map) {
-        for(MethodNode method : methods){
-            map.put(method.getStartPosition(), method);
-            method.addCompoundNodesToMap(map);
+    public void addCompoundNodesToList(List<CompoundNode> nodes) {
+        for (MethodNode method : methods) {
+            nodes.add(method);
+            method.addCompoundNodesToList(nodes);
         }
     }
 }

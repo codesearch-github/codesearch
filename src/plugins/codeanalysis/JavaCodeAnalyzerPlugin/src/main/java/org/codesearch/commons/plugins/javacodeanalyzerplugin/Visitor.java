@@ -26,6 +26,7 @@ import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.VariableNode;
  * @author David Froehlich
  */
 //TODO rename
+@Deprecated
 public class Visitor extends VoidVisitorAdapter {
 
     private FileNode fileNode;
@@ -55,17 +56,17 @@ public class Visitor extends VoidVisitorAdapter {
         int nodeLength = n.getEndColumn() - n.getBeginColumn();
         clazz.setName(clazzName);
         clazz.setStartLine(startLine);
-        clazz.setStartPosition(startLine);
+  //      clazz.setStartPosition(startLine);
         clazz.setNodeLength(nodeLength);
         fileNode.getClasses().add(clazz);
         super.visit(n, arg);
     }
 
-//    @Override
-//    public void visit(MethodCallExpr n, Object arg) {
-//        super.visit(n, arg);
-//        System.out.println("Method " + n.getName() + " is called in line " + n.getBeginLine());
-//    }
+    @Override
+    public void visit(MethodCallExpr n, Object arg) {
+        super.visit(n, arg);
+        System.out.println("Method " + n.getName() + " is called in line " + n.getBeginLine());
+    }
     @Override
     public void visit(MethodDeclaration n, Object arg) {
         MethodNode method = new MethodNode();

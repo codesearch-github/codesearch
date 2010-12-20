@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import org.codesearch.commons.plugins.codeanalyzing.ast.CompoundNode;
+import org.codesearch.commons.plugins.codeanalyzing.ast.Node;
 
 /**
  * AST element that represents a class in the source code file
@@ -26,7 +27,7 @@ public class FileNode extends CompoundNode {
     }
     
     public String getOutlineForChildElements(){
-        String outlineString = "File: "+this.getName()+" from: "+this.getStartPosition() + ", length: "+this.getNodeLength()+"\n";
+        String outlineString = "File: "+this.getName()+" from: "+this.getStartPositionInLine() + ", length: "+this.getNodeLength()+"\n";
         for(ClassNode currentClass : classes){
             outlineString += currentClass.getOutlineForChildElements();
         }
@@ -39,10 +40,10 @@ public class FileNode extends CompoundNode {
     }
 
     @Override
-    public void addCompoundNodesToMap(Map<Integer, CompoundNode> map) {
+    public void addCompoundNodesToList(List<CompoundNode> nodes) {
         for(ClassNode clazz : classes){
-            map.put(clazz.getStartPosition(), clazz);
-            clazz.addCompoundNodesToMap(map);
+            nodes.add(clazz);
+            clazz.addCompoundNodesToList(nodes);
         }
     }
 }

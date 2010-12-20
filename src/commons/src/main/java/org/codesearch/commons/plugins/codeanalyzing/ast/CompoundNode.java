@@ -4,7 +4,7 @@
  */
 package org.codesearch.commons.plugins.codeanalyzing.ast;
 
-import java.util.Map;
+import java.util.List;
 
 /**
  * Superclass for all ASTNodes that have a body (for instance MethodNodes and ClassNodes)
@@ -22,5 +22,10 @@ public abstract class CompoundNode extends Node {
     }
 
     public abstract String getOutlineLink();
-    public abstract void addCompoundNodesToMap(Map<Integer, CompoundNode> map);
+
+    /**
+     * recursively adds all compound nodes within the current node to the list
+     * @param nodes
+     */
+    public abstract void addCompoundNodesToList(List<CompoundNode> nodes);
 }

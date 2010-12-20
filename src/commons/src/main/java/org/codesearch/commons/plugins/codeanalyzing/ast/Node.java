@@ -11,10 +11,19 @@ import java.io.Serializable;
  * Superclass for all ASTNodes used for code analysis.
  * @author David Froehlich
  */
-public abstract class Node implements Serializable{
+public abstract class Node implements Serializable, Comparable<Node>{
     protected int startLine;
-    protected int startPosition;
+    protected int startPositionInLine;
+    protected int startPositionAbsolute;
     protected String name;
+
+    @Override
+    public int compareTo(Node other){
+        if(this.startLine == other.startLine){
+            return this.startPositionInLine - other.startPositionInLine;
+        }
+        return startLine - other.startLine;
+    }
 
     public int getStartLine() {
         return startLine;
@@ -24,14 +33,22 @@ public abstract class Node implements Serializable{
         this.startLine = startLine;
     }
 
-    public int getStartPosition() {
-        return startPosition;
+    public int getStartPositionInLine() {
+        return startPositionInLine;
     }
 
-    public void setStartPosition(int startPosition) {
-        this.startPosition = startPosition;
+    public void setStartPositionInLine(int startPositionInLine) {
+        this.startPositionInLine = startPositionInLine;
     }
 
+    public int getStartPositionAbsolute() {
+        return startPositionAbsolute;
+    }
+
+    public void setStartPositionAbsolute(int startPositionAbsolute) {
+        this.startPositionAbsolute = startPositionAbsolute;
+    }
+    
     public String getName() {
         return name;
     }

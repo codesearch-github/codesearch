@@ -4,11 +4,15 @@
  */
 package org.codesearch.indexer.tasks;
 
+<<<<<<< TREE
+=======
 import org.apache.commons.configuration.ConfigurationException;
+>>>>>>> MERGE-SOURCE
 import org.springframework.context.ApplicationContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 import java.util.LinkedList;
+import javax.naming.ConfigurationException;
 import org.codesearch.commons.configuration.properties.PropertiesManager;
 import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
 import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
@@ -55,11 +59,7 @@ public class IndexingTaskTest {
 
     @Before
     public void setUp() {
-        try {
-            DBAccess.setupConnections();
-        } catch (ConfigurationException ex) {
-            //TODO add useful error handling
-        }
+        DBAccess.setupConnections();
     }
 
     @After
@@ -72,7 +72,7 @@ public class IndexingTaskTest {
         ignoredFileNames.add("*.xml");
         ignoredFileNames.add("*test*");
         ignoredFileNames.add("*/test/*");
-        task.setRepository(new RepositoryDto(null, null, null, null, false, null, ignoredFileNames,null));
+        task.setRepository(new RepositoryDto(null, null, null, null, false, null, ignoredFileNames, null));
         assert (task.fileIsOnIgnoreList("asdf.xml"));
         assert (task.fileIsOnIgnoreList("asdftestasdf"));
         assert (task.fileIsOnIgnoreList("/test/fasdf"));
@@ -100,11 +100,19 @@ public class IndexingTaskTest {
     public void testCodeAnalysis() throws Exception {
         RepositoryDto repo = new RepositoryDto();
         repo.setVersionControlSystem("FILESYSTEM");
+<<<<<<< TREE
+        CodeAnalyzerPlugin plugin = pluginLoader.getPlugin(CodeAnalyzerPlugin.class, "java");
+        VersionControlPlugin vcPlugin = pluginLoader.getPlugin(VersionControlPlugin.class, "FILESYSTEM");
+        byte[] fileContent = vcPlugin.getFileContentForFilePath("/home/david/wakmusic/trunk/Wakmusic/src/java/beans/Band.java");
+        plugin.analyzeFile(new String(fileContent), repo);
+        //   System.out.println(plugin.getAstForCurrentFile().getOutlineForChildElements());
+=======
         CodeAnalyzerPlugin codeAnalyzerPlugin = pluginLoader.getPlugin(CodeAnalyzerPlugin.class, "java");
         VersionControlPlugin versionControlPlugin = pluginLoader.getPlugin(VersionControlPlugin.class, "FILESYSTEM");
         FileDto fileDto = versionControlPlugin.getFileForFilePath("/home/david/wakmusic/trunk/Wakmusic/src/java/beans/Band.java");
         codeAnalyzerPlugin.analyzeFile(new String(fileDto.getContent()), repo);
      //   System.out.println(plugin.getAstForCurrentFile().getOutlineForChildElements());
+>>>>>>> MERGE-SOURCE
     }
 
     @Test

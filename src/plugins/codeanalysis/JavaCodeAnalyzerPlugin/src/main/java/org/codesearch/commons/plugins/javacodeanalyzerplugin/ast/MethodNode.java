@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import org.codesearch.commons.plugins.codeanalyzing.ast.CompoundNode;
+import org.codesearch.commons.plugins.codeanalyzing.ast.Node;
 
 /**
  * ASTElement that represents a method in the source code
@@ -51,7 +52,7 @@ public class MethodNode extends CompoundNode {
     public void setVisibility(Visibility visibility) {
         this.visibility = visibility;
     }
-
+//TODO probably remove method
     public String getOutlineForChildElements() {
         String parameterString = "";
         String returnString = "";
@@ -66,9 +67,9 @@ public class MethodNode extends CompoundNode {
         }
         String outlineString = "";
         if (constructor) {
-            outlineString = "    Constructor declaration " + this.getName() + "(" + parameterString + ") from " + this.getStartPosition() + ", length: " + this.getNodeLength() + "\n";
+            outlineString = "    Constructor declaration " + this.getName() + "(" + parameterString + ") from " + this.getStartPositionAbsolute() + ", length: " + this.getNodeLength() + "\n";
         } else {
-            outlineString = "    Method declaration " + this.getName() + "(" + parameterString + ")" + returnString + " from " + super.getStartPosition() + ", length: " + super.getNodeLength() + "\n";
+            outlineString = "    Method declaration " + this.getName() + "(" + parameterString + ")" + returnString + " from " + super.getStartPositionAbsolute() + ", length: " + super.getNodeLength() + "\n";
         }
         return outlineString;
     }
@@ -90,10 +91,10 @@ public class MethodNode extends CompoundNode {
                 break;
         }
         for (VariableNode v : parameters) {
-            parameterString += v.getType() + " " + v.getName() + ",";
+            parameterString += v.getType() + " " + v.getName() + ", ";
         }
         if (parameterString.length() > 0) {
-            parameterString = parameterString.substring(0, parameterString.length() - 1);
+            parameterString = parameterString.substring(0, parameterString.length() - 2);
         }
         if (returnType != null) {
             returnString = ": " + returnType;
@@ -107,6 +108,6 @@ public class MethodNode extends CompoundNode {
     }
 
     @Override
-    public void addCompoundNodesToMap(Map<Integer, CompoundNode> map) {
+    public void addCompoundNodesToList(List<CompoundNode> nodes) {
     }
 }

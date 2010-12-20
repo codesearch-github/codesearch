@@ -48,7 +48,7 @@ public class JavaCodeAnalyzerPluginTest extends TestCase {
     public void testAnalyzeFile() throws Exception {
         System.out.println("analyzeFile");
         String fileContent = "";
-        BufferedReader br = new BufferedReader(new FileReader("/home/david/codesearch/src/indexer/src/main/java/org/codesearch/indexer/tasks/IndexingTask.java"));
+        BufferedReader br = new BufferedReader(new FileReader("/home/david/codesearch/src/indexer/src/main/java/org/codesearch/indexer/tasks/test.java"));
 
         while(br.ready()){
             fileContent += br.readLine()+"\n";
