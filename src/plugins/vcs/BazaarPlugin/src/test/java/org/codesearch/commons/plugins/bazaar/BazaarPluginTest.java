@@ -7,7 +7,7 @@ package org.codesearch.commons.plugins.bazaar;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Set;
-import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
+import org.codesearch.commons.plugins.vcs.FileDto;
 import org.codesearch.commons.plugins.vcs.VersionControlPluginException;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -17,42 +17,32 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
- *
+ * This class tests the functionality of the BZRPlugin
+ * @author Stephan Stiboller
  * @author David Froehlich
+ *
  */
 public class BazaarPluginTest {
 
     BazaarPlugin plugin = new BazaarPlugin();
+    private String localPath = "file:///home/zeheron/workspace/testground/bazaar/";
 
     public BazaarPluginTest() {
     }
 
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
-
     @Before
     public void setUp() throws URISyntaxException, VersionControlPluginException {
-        String url = "bzr+ssh://bazaar.launchpad.net/%2Bbranch/codesearch/";
-        plugin.setRepository(new URI(url), "", "");
+        plugin.setRepository(new URI(localPath), "", "");
     }
-
-    @After
-    public void tearDown() {
-    }
-
+    
     /**
      * Test of getFileContentForFilePath method, of class BazaarPlugin.
      */
-   // @Test
+    @Test
     public void testGetFileContentForFilePath() throws Exception {
         System.out.println("getFileContentForFilePath");
-        String filePath = "bzr+ssh://bazaar.launchpad.net/%2Bbranch/codesearch//src/searcher/src/test/java/SearcherInterfaceTest.java";
-        byte[] result = plugin.getFileContentForFilePath(filePath);
+        String filePath = "file:///home/zeheron/workspace/testground/bazaar/test.java";
+        byte[] result = plugin.getFileForFilePath(filePath).getContent();
         boolean content = false;
         if(result != null)
             content = true;
@@ -65,9 +55,9 @@ public class BazaarPluginTest {
     @Test
     public void testGetChangedFilesSinceRevision() throws Exception {
         System.out.println("getChangedFilesSinceRevision");
-        String revision = "100";
+        String revision = "1";
         boolean expResult = false;
-        Set result = plugin.getChangedFilesSinceRevision(revision);
+        Set<FileDto> result = plugin.getChangedFilesSinceRevision(revision);
         if(result != null)
             expResult=true;
         assertTrue(expResult);

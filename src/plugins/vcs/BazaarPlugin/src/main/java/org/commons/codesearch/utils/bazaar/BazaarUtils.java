@@ -23,6 +23,7 @@ package org.commons.codesearch.utils.bazaar;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.logging.Level;
 import org.vcs.bazaar.client.BazaarRevision;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -30,19 +31,23 @@ import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+import org.vcs.bazaar.client.BazaarClient;
 import org.vcs.bazaar.client.BazaarClientFactory;
 import org.vcs.bazaar.client.BazaarClientPreferences;
 import org.vcs.bazaar.client.BazaarNotificationHandler;
 import org.vcs.bazaar.client.BazaarPreference;
+import org.vcs.bazaar.client.BazaarRevisionRange;
 import org.vcs.bazaar.client.IBazaarClient;
 import org.vcs.bazaar.client.IBazaarLogMessage;
 import org.vcs.bazaar.client.IBazaarNotifyListener;
+import org.vcs.bazaar.client.IBazaarRevisionSpec;
 import org.vcs.bazaar.client.commandline.CommandLineClient;
 import org.vcs.bazaar.client.commandline.CommandLineClientFactory;
 import org.vcs.bazaar.client.commandline.commands.options.Option;
 import org.vcs.bazaar.client.core.BazaarClientException;
 import org.vcs.bazaar.client.core.BranchLocation;
 import org.vcs.bazaar.client.utils.BazaarUtilities;
+import org.vcs.bazaar.client.xmlrpc.BzrXmlRpcError;
 
 /**
  * This class hold serveral methods that can be used to access
@@ -50,36 +55,18 @@ import org.vcs.bazaar.client.utils.BazaarUtilities;
  * @author zeheron
  */
 public class BazaarUtils {
-    //TODO: add ssh auth
+    //TODO: add ssh auth with external client
     //TODO: add logging
 
     private static BazaarUtils instance;
     private IBazaarClient bazaarClient;
-    private String executablePath = "/usr/bin/bzr";
 
+    
     /**
      * Contstructor
      */
     private BazaarUtils() {
         try {
-////            BazaarClientPreferences.getInstance().set(BazaarPreference.EXECUTABLE, "/usr/bin/bzr");
-////            CommandLineClientFactory.setup(true);
-////            BazaarClientFactory.setPreferredClientType(CommandLineClientFactory.CLIENT_TYPE);
-////            bazaarClient = BazaarClientFactory.createClient(BazaarClientFactory.getPreferredClientType());
-//    System.out.println("IS ENTERING!");
-//            BazaarClientPreferences.getInstance().set(BazaarPreference.EXECUTABLE, "/usr/bin/bzr");
-//            System.out.println("EXE SET");
-//            //BazaarClientFactory.setupBestAvailableBackend(true);
-//            System.out.println("back");
-//            bazaarClient = BazaarClientFactory.createClient(CommandLineClientFactory.CLIENT_TYPE);
-//            System.out.println("clienttype");
-//            if(bazaarClient == null)
-//                System.out.println("FAIL NULL!");
-//            else
-//                System.out.println("WORKING!");
-////        } catch (BazaarClientException bce) {
-////            //TODO: add logging
-////        }
             CommandLineClientFactory.setup(true);
             BazaarClientFactory.setPreferredClientType(CommandLineClientFactory.CLIENT_TYPE);
             BazaarClientFactory.setupBestAvailableBackend(true);
@@ -90,11 +77,14 @@ public class BazaarUtils {
                 System.out.println("xmlplugin failed...");
             }
         }
+    }
 
-
-
-
-
+    /*
+     * Sets the work dir
+     */
+    public void setWorkingDirectory(String Path)
+    {
+       bazaarClient.setWorkDir(new File("/home/zeheron/workspace/testground/bazaar/"));
     }
 
     /**
@@ -116,10 +106,10 @@ public class BazaarUtils {
      * @throws BazaarClientException
      * @throws IOException
      */
-    public byte[] retrieveFileContent(URI url, String revision) throws BazaarClientException, IOException {
+    public byte[] retrieveFileContent(URI uri, String revision) throws BazaarClientException, IOException {
         int revisionNumber = Integer.parseInt(revision);
         BazaarRevision bRevision = BazaarRevision.getRevision(revisionNumber);
-        InputStream in = bazaarClient.cat(new File(url), bRevision);
+        InputStream in = bazaarClient.cat(new File(uri), bRevision);
         return IOUtils.toByteArray(in);
     }
 
@@ -134,8 +124,8 @@ public class BazaarUtils {
      * @return BranchLocation
      * @throws URISyntaxException
      */
-    public BranchLocation createBranchLocation(String repositoryUrl, String userName, String password) throws URISyntaxException {
-        BranchLocation branchLocation = new BranchLocation(repositoryUrl);
+    public BranchLocation createBranchLocation(String repositoryUri, String userName, String password) throws URISyntaxException {
+        BranchLocation branchLocation = new BranchLocation(repositoryUri);
         URI uri = branchLocation.getURI();
         if (!userName.isEmpty() && !password.isEmpty()) {
             URI newURI = new URI(uri.getScheme(), userName + ":" + password, uri.getPath(), uri.getQuery(), uri.getFragment());
@@ -166,7 +156,7 @@ public class BazaarUtils {
      * @throws BazaarClientException
      * @throws URISyntaxException
      */
-    public List<IBazaarLogMessage> getChangesSinceRevison(String repositoryUrl, String revision) throws BazaarClientException, URISyntaxException {
+    public List<IBazaarLogMessage> getChangesSinceRevison(BranchLocation bl, String revision) throws BazaarClientException, URISyntaxException {
         List<Option> options = new ArrayList<Option>();
         String revisionRange = revision + "..";
         if (revision != null) {
@@ -175,7 +165,7 @@ public class BazaarUtils {
         }
         options.add(new Option("-v"));
         Option[] optionArray = options.toArray(new Option[options.size()]);
-        return bazaarClient.log(createBranchLocation(repositoryUrl), optionArray);
+        return bazaarClient.log(bl, optionArray);
     }
 
     /**

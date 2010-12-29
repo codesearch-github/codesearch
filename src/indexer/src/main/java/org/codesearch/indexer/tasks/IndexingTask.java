@@ -22,10 +22,8 @@ package org.codesearch.indexer.tasks;
 
 import java.io.FileNotFoundException;
 import java.net.URISyntaxException;
-<<<<<<< TREE
-=======
+
 import org.apache.commons.configuration.ConfigurationException;
->>>>>>> MERGE-SOURCE
 import org.codesearch.commons.database.DatabaseAccessException;
 import org.codesearch.commons.plugins.codeanalyzing.CodeAnalyzerPluginException;
 import org.codesearch.indexer.exceptions.TaskExecutionException;
@@ -33,15 +31,10 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Iterator;
-<<<<<<< TREE
 import java.util.List;
-=======
-import java.util.Map;
->>>>>>> MERGE-SOURCE
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.naming.ConfigurationException;
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.WhitespaceAnalyzer;

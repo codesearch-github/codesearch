@@ -20,9 +20,11 @@
  */
 package org.codesearch.commons.plugins.bazaar;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.codesearch.commons.plugins.vcs.FileDto;
@@ -37,7 +39,7 @@ import org.vcs.bazaar.client.core.BazaarClientException;
 import org.vcs.bazaar.client.core.BranchLocation;
 
 /**
- * A plugin used to access files stored in Subversion repositories.
+ * A plugin used to access files stored in Bazaar repositories.
  * @author Stephan Stiboller
  */
 @Component
@@ -54,15 +56,16 @@ public class BazaarPlugin implements VersionControlPlugin {
     public void setRepository(URI url, String username, String password) throws VersionControlPluginException {
         try {
             bl = bzr_util.createBranchLocation(url.toString(), username, password);
+            bzr_util.setWorkingDirectory(url.toString().substring(6));
         } catch (URISyntaxException ex) {
             throw new VersionControlPluginException(ex.toString());
         }
     }
 
     @Override
-    public byte[] getFileContentForFilePath(String filePath) throws VersionControlPluginException {
+    public FileDto getFileForFilePath(String filePath) throws VersionControlPluginException {
         try {
-            return bzr_util.retrieveFileContent(new URI(filePath), getRepositoryRevision());
+            return new FileDto(filePath, bzr_util.retrieveFileContent(new URI(filePath), getRepositoryRevision()), true);
         } catch (URISyntaxException ex) {
             throw new VersionControlPluginException(ex.toString());
         } catch (BazaarClientException ex) {
@@ -74,14 +77,13 @@ public class BazaarPlugin implements VersionControlPlugin {
 
     @Override
     public Set<FileDto> getChangedFilesSinceRevision(String revision) throws VersionControlPluginException {
-        Set<FileDto> files = null;
+        Set<FileDto> files = new HashSet<FileDto>();
         try {
-            List<IBazaarLogMessage> iblm = bzr_util.getChangesSinceRevison(bl.getURI().toString(), revision);
+            System.out.println("bl  " + bl.getURI().toString());
+            List<IBazaarLogMessage> iblm = bzr_util.getChangesSinceRevison(bl, revision);
             for (IBazaarLogMessage log : iblm) {
                 for (IBazaarStatus bs : log.getAffectedFiles()) {
-                    System.out.println("PATH: " + bs.getPath());
-                    System.out.println("BRANCHROOT: " + bs.getBranchRoot());
-                    System.out.println("STATUS: " + bs.getShortStatus());
+                    System.out.println("STATUS: " + bs.getFile().getAbsolutePath());
                     byte[] content = CommonsUtils.convertFileToByteArray(bs.getFile());
                     FileDto fd = new FileDto(bs.getAbsolutePath(), content, false); //TODO: ADD MIME TYPE...
                     files.add(fd);

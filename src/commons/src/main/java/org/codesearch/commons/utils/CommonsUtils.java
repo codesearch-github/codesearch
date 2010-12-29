@@ -29,21 +29,27 @@ public class CommonsUtils {
         return ((MimeType) col.toArray()[0]).toString();
     }
 
-      /**
+    /**
      * Converts a file to a byte[]
      * @param file
      * @return byte[] file content
      * @throws Exception
      */
     public static byte[] convertFileToByteArray(File file) throws Exception {
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        FileInputStream fileInputStream = new FileInputStream(file);
-        byte[] buffer = new byte[16384];
-        for (int len = fileInputStream.read(buffer); len > 0; len = fileInputStream.read(buffer)) {
-            byteArrayOutputStream.write(buffer, 0, len);
-        }
-        fileInputStream.close();
-        return byteArrayOutputStream.toByteArray();
+        FileInputStream fis = new FileInputStream(file);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        byte fileContent[] = new byte[(int) file.length()];
+        fis.read(fileContent);
+        return fileContent;
+
+//        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+//        FileInputStream fileInputStream = new FileInputStream(file);
+//        byte[] buffer = new byte[16384];
+//        for (int len = fileInputStream.read(buffer); len > 0; len = fileInputStream.read(buffer)) {
+//            byteArrayOutputStream.write(buffer, 0, len);
+//        }
+//        fileInputStream.close();
+//        return byteArrayOutputStream.toByteArray();
     }
 
     /**
