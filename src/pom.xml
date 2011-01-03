@@ -106,7 +106,7 @@
                 <artifactId>commons-lang</artifactId>
                 <version>2.4</version>
             </dependency>
-             <dependency>
+            <dependency>
                 <groupId>commons-codec</groupId>
                 <artifactId>commons-codec</artifactId>
                 <version>1.4</version>
@@ -142,6 +142,30 @@
                 <artifactId>servlet-api</artifactId>
                 <version>2.5</version>
             </dependency>
+            <!-- Log4J -->
+            <dependency>
+                <groupId>log4j</groupId>
+                <artifactId>log4j</artifactId>
+                <version>1.2.14</version>
+            </dependency>
+            <!-- MYSQL CONNECTOR -->
+            <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>5.1.9</version>
+            </dependency>
+            <!-- GUESS ENCODING LIBRARY -->
+            <dependency>
+                <groupId>org.codehaus.guessencoding</groupId>
+                <artifactId>guessencoding</artifactId>
+                <version>1.4</version>
+            </dependency>
+            <dependency>
+                <groupId>jmimemagic</groupId>
+                <artifactId>jmimemagic</artifactId>
+                <version>0.1.2</version>
+            </dependency>
+
             <!-- TEST DEPENDENCIES -->
             <dependency>
                 <groupId>junit</groupId>
@@ -154,27 +178,6 @@
                 <artifactId>spring-test</artifactId>
                 <version>${spring.version}</version>
                 <scope>test</scope>
-            </dependency>
-            <!-- Log4J -->
-            <dependency>
-                <groupId>log4j</groupId>
-                <artifactId>log4j</artifactId>
-                <version>1.2.14</version>
-            </dependency>
-            <dependency>
-                <groupId>jmimemagic</groupId>
-                <artifactId>jmimemagic</artifactId>
-                <version>0.1.2</version>
-            </dependency>
-            <dependency>
-                <groupId>eu.medsea.mimeutil</groupId>
-                <artifactId>mime-util</artifactId>
-                <version>2.1.1</version>
-            </dependency>
-            <dependency>
-                <groupId>mysql</groupId>
-                <artifactId>mysql-connector-java</artifactId>
-                <version>5.1.9</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

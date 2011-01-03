@@ -1,0 +1,28 @@
+# Mime type definitions for Codesearch
+# MIME             binary/text  FILE ENDINGS
+
+text/plain              text   txt text
+text/html		text   html htm
+text/x-script.zsh       text   zsh
+text/x-c                text   cpp cxx cc
+text/x-h                text   h
+text/x-java-source      text   java
+image/gif		binary gif
+image/png               binary png x-png`
+image/bmp               binary bmp
+image/ief		binary ief
+image/jpeg		binary jpeg jpg jpe
+image/tiff		binary tiff tif
+image/x-xwindowdump	binary xwd
+application/rtf		text   rtf
+application/xml		text   xml xslt xhtml
+application/x-tex	text   tex
+audio/basic		binary au
+audio/midi		binary midi mid
+audio/x-aifc		binary aifc
+audio/x-aiff            binary aif aiff
+audio/x-mpeg		binary mpeg mpg
+audio/x-wav             binary wav
+video/mpeg		binary mpeg mpg mpe
+video/quicktime		binary qt mov
+video/x-msvideo		binary avi

@@ -1,10 +1,24 @@
-/*
- * Copyright 2004-2006 Geert Bevin <gbevin[remove] at uwyn dot com>
- * Distributed under the terms of either:
- * - the common development and distribution license (CDDL), v1.0; or
- * - the GNU Lesser General Public License, v2.1 or later
- * $Id: JHighlightVersion.java 3108 2006-03-13 18:03:00Z gbevin $
+/**
+ * Copyright 2010 David Froehlich   <david.froehlich@businesssoftware.at>,
+ *                Samuel Kogler     <samuel.kogler@gmail.com>,
+ *                Stephan Stiboller <stistc06@htlkaindorf.at>
+ *
+ * This file is part of Codesearch.
+ *
+ * Codesearch is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Codesearch is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package com.uwyn.jhighlight;
 
 import java.io.ByteArrayOutputStream;

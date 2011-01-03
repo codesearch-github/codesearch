@@ -20,6 +20,9 @@
  */
 package org.codesearch.searcher.client;
 
+import org.codesearch.searcher.client.ui.RootContainer;
+import org.codesearch.searcher.client.ui.searchview.SearchPlace;
+
 import com.google.gwt.activity.shared.ActivityManager;
 import com.google.gwt.activity.shared.ActivityMapper;
 import com.google.gwt.core.client.EntryPoint;
@@ -28,13 +31,7 @@ import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceController;
 import com.google.gwt.place.shared.PlaceHistoryHandler;
-import com.google.gwt.user.client.ui.AcceptsOneWidget;
-import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
-import com.google.gwt.user.client.ui.Widget;
-import org.codesearch.searcher.client.ui.RootContainer;
-import org.codesearch.searcher.client.ui.searchview.SearchPlace;
 
 /**
  * The entry point for the searcher.
@@ -47,8 +44,6 @@ public class SearcherEntryPoint implements EntryPoint {
 
     @Override
     public void onModuleLoad() {
-        //FIXME should be like this, doesnt work
-        //ClientFactory clientFactory = GWT.create(ClientFactory.class);
         ClientFactory clientFactory = new ClientFactoryImpl();
         EventBus eventBus = clientFactory.getEventBus();
         PlaceController placeController = clientFactory.getPlaceController();
@@ -64,6 +59,4 @@ public class SearcherEntryPoint implements EntryPoint {
         RootLayoutPanel.get().add(rootContainer);
         historyHandler.handleCurrentHistory();
     }
-
-   
 }

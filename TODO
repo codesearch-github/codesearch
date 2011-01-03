@@ -1,0 +1,21 @@
+// Please feel free to add items to this list!
+
+Missing features
+================
+
+ - Highlight search term
+ - Go to line
+ - Repository file browsing
+ - Code navigation side panel
+ - fast binary file recognition method
+ - Raw file button
+ - Extended file information: e.g Author, Commit date etc
+
+Important TODOs
+===============
+ - Refactor every System.out that is not in a Unit test
+   This helps debugging problems; please use appropriate logging levels
+ - Fix exception handling; quite often, 
+   problems are just caught and ignored 
+   See that exception handling is consistent throughout the program
+

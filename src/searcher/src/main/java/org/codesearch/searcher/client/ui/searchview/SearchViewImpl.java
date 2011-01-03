@@ -44,7 +44,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.NoSelectionModel;
 import com.google.gwt.view.client.SelectionChangeEvent;
-import com.google.gwt.view.client.SingleSelectionModel;
 import java.util.List;
 import org.codesearch.searcher.client.ui.fileview.FilePlace;
 import org.codesearch.searcher.shared.SearchResultDto;
@@ -178,23 +177,6 @@ public class SearchViewImpl extends Composite implements SearchView {
                 return String.valueOf(dto.getRelevance());
             }
         }, "Relevance");
-
-//        ClickableTextCell clickCell = new ClickableTextCell();
-//
-//        Column clickColumn = new Column<SearchResultDto, String>(clickCell) {
-//            @Override
-//            public String getValue(SearchResultDto object) {
-//                return object.getFilePath();
-//            }
-//        };
-//
-//        //FIXME find method to get clicked repository, currently using fixed value
-//        clickColumn.setFieldUpdater(new FieldUpdater<SearchResultDto, String>() {
-//            @Override
-//            public void update(int index, SearchResultDto object, String value) {
-//
-//            }
-//        });
 
         resultTable.addColumn(new TextColumn<SearchResultDto>() {
 

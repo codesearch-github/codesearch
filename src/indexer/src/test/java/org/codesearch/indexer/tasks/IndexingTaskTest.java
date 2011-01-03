@@ -1,18 +1,35 @@
+/**
+ * Copyright 2010 David Froehlich   <david.froehlich@businesssoftware.at>,
+ *                Samuel Kogler     <samuel.kogler@gmail.com>,
+ *                Stephan Stiboller <stistc06@htlkaindorf.at>
+ *
+ * This file is part of Codesearch.
+ *
+ * Codesearch is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Codesearch is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
 package org.codesearch.indexer.tasks;
 
-<<<<<<< TREE
-=======
 import org.apache.commons.configuration.ConfigurationException;
->>>>>>> MERGE-SOURCE
 import org.springframework.context.ApplicationContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 import java.util.LinkedList;
-import javax.naming.ConfigurationException;
 import org.codesearch.commons.configuration.properties.PropertiesManager;
 import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
 import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
@@ -35,6 +52,7 @@ import org.springframework.test.context.support.GenericXmlContextLoader;
 /**
  *
  * @author David Froehlich
+ * @author Samuel Kogler
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(loader = GenericXmlContextLoader.class, locations = {"classpath:org/codesearch/commons/CommonsBeans.xml", "classpath:org/codesearch/indexer/IndexerBeans.xml"})
@@ -59,7 +77,11 @@ public class IndexingTaskTest {
 
     @Before
     public void setUp() {
-        DBAccess.setupConnections();
+        try {
+            DBAccess.setupConnections();
+        } catch (ConfigurationException ex) {
+            System.out.println(ex);
+        }
     }
 
     @After
@@ -98,21 +120,14 @@ public class IndexingTaskTest {
 
     @Test
     public void testCodeAnalysis() throws Exception {
-        RepositoryDto repo = new RepositoryDto();
-        repo.setVersionControlSystem("FILESYSTEM");
-<<<<<<< TREE
-        CodeAnalyzerPlugin plugin = pluginLoader.getPlugin(CodeAnalyzerPlugin.class, "java");
-        VersionControlPlugin vcPlugin = pluginLoader.getPlugin(VersionControlPlugin.class, "FILESYSTEM");
-        byte[] fileContent = vcPlugin.getFileContentForFilePath("/home/david/wakmusic/trunk/Wakmusic/src/java/beans/Band.java");
-        plugin.analyzeFile(new String(fileContent), repo);
+//        RepositoryDto repo = new RepositoryDto();
+//        repo.setVersionControlSystem("FILESYSTEM");
+//
+//        CodeAnalyzerPlugin codeAnalyzerPlugin = pluginLoader.getPlugin(CodeAnalyzerPlugin.class, "java");
+//        VersionControlPlugin versionControlPlugin = pluginLoader.getPlugin(VersionControlPlugin.class, "FILESYSTEM");
+//        FileDto fileDto = versionControlPlugin.getFileForFilePath("/home/david/wakmusic/trunk/Wakmusic/src/java/beans/Band.java");
+//        codeAnalyzerPlugin.analyzeFile(new String(fileDto.getContent()), repo);
         //   System.out.println(plugin.getAstForCurrentFile().getOutlineForChildElements());
-=======
-        CodeAnalyzerPlugin codeAnalyzerPlugin = pluginLoader.getPlugin(CodeAnalyzerPlugin.class, "java");
-        VersionControlPlugin versionControlPlugin = pluginLoader.getPlugin(VersionControlPlugin.class, "FILESYSTEM");
-        FileDto fileDto = versionControlPlugin.getFileForFilePath("/home/david/wakmusic/trunk/Wakmusic/src/java/beans/Band.java");
-        codeAnalyzerPlugin.analyzeFile(new String(fileDto.getContent()), repo);
-     //   System.out.println(plugin.getAstForCurrentFile().getOutlineForChildElements());
->>>>>>> MERGE-SOURCE
     }
 
     @Test
@@ -121,10 +136,9 @@ public class IndexingTaskTest {
         List<RepositoryDto> repos = pm.getRepositories();
         PropertiesManager pr = new PropertiesManager("/tmp/test/revisions.properties");
 
-        ClearTask clear = new ClearTask();
-        clear.setRepositoryName(null);
-
+        ClearTask clear = (ClearTask) applicationContext.getBean("clearTask");
         clear.execute();
+        
         for (RepositoryDto repo : repos) {
             if (repo.getVersionControlSystem().equals("FILESYSTEM")) {
                 repo.setUrl(repo.getUrl().replace("$home", System.getProperty("user.home")));

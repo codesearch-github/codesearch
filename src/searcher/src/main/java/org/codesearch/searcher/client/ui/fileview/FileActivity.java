@@ -1,3 +1,24 @@
+/**
+ * Copyright 2010 David Froehlich   <david.froehlich@businesssoftware.at>,
+ *                Samuel Kogler     <samuel.kogler@gmail.com>,
+ *                Stephan Stiboller <stistc06@htlkaindorf.at>
+ *
+ * This file is part of Codesearch.
+ *
+ * Codesearch is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Codesearch is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.codesearch.searcher.client.ui.fileview;
 
 import com.google.gwt.activity.shared.AbstractActivity;
@@ -23,7 +44,6 @@ public class FileActivity extends AbstractActivity implements Presenter {
     private SearcherServiceAsync searcherServiceAsync = GWT.create(SearcherService.class);
     private String repository;
     private String filePath;
-    private String fileContent;
 
     public FileActivity(ClientFactory clientFactory, String repository, String filePath) {
         this.clientFactory = clientFactory;
@@ -42,9 +62,10 @@ public class FileActivity extends AbstractActivity implements Presenter {
         fileView.setPresenter(this);
         fileView.setFilePath(filePath);
         fileView.setRepository(repository);
+        fileView.connectEventHandlers();
         panel.setWidget(fileView.asWidget());
         fileView.setFileContent("loading file...", true);
-        searcherServiceAsync.getFileContent(repository, filePath, new GetFileContentCallback());
+        searcherServiceAsync.getFile(repository, filePath, new GetFileCallback());
     }
 
     /**
@@ -53,11 +74,11 @@ public class FileActivity extends AbstractActivity implements Presenter {
      */
     @Override
     public void goTo(Place place) {
+        fileView.disconnectEventHandlers();
         clientFactory.getPlaceController().goTo(place);
     }
 
-
-    private class GetFileContentCallback implements AsyncCallback<FileDto>  {
+    private class GetFileCallback implements AsyncCallback<FileDto>  {
 
         @Override
         public void onFailure(Throwable caught) {
@@ -66,8 +87,7 @@ public class FileActivity extends AbstractActivity implements Presenter {
 
         @Override
         public void onSuccess(FileDto result) {
-            fileContent = result.getFileContent();
-            fileView.setFileContent(fileContent, result.isBinary());
+            fileView.setFileContent(result.getFileContent(), result.isBinary());
         }
 
     }

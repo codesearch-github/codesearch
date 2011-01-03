@@ -22,7 +22,6 @@ package org.codesearch.indexer.tasks;
 
 import java.io.FileNotFoundException;
 import java.net.URISyntaxException;
-
 import org.apache.commons.configuration.ConfigurationException;
 import org.codesearch.commons.database.DatabaseAccessException;
 import org.codesearch.commons.plugins.codeanalyzing.CodeAnalyzerPluginException;
@@ -72,8 +71,6 @@ public class IndexingTask implements Task {
     private RepositoryDto repository;
     /** the FileDtos of the files that have changed since last indexing */
     private Set<FileDto> changedFiles;
-    /* Instantiate a logger  */
-    private static final Logger LOG = Logger.getLogger(IndexingTask.class);
     /** The currently active IndexWriter */
     private IndexWriter indexWriter;
     /** The indexReader used to delete documents */
@@ -94,6 +91,8 @@ public class IndexingTask implements Task {
     private boolean codeAnalysisEnabled = false;
     /** the location of the lucene index */
     private String indexLocation = null;
+    /* Logger */
+    private static final Logger LOG = Logger.getLogger(IndexingTask.class);
 
     /**
      * executes the task,
@@ -146,7 +145,7 @@ public class IndexingTask implements Task {
     }
 
     /**
-     * executes the code analysis for the currently set repsository
+     * executes the code analysis for the currently set repository
      * @param retrieveNewFileList determines whether the code analysis should retrieve a new list of changed files,
      * needed if the lastIndexedRevision (stored in a properties file in the index directory) differs from the lastAnalysisRevision (stored in the database)
      * @param lastAnalysisRevision the revision of the repository where code analysis was last executed
@@ -233,7 +232,7 @@ public class IndexingTask implements Task {
     public void initializeIndexWriter(Analyzer luceneAnalyzer, File dir) {
         try {
             indexWriter = new IndexWriter(indexDirectory, luceneAnalyzer, IndexWriter.MaxFieldLength.LIMITED);
-            LOG.debug("IndexWriter initilaization successful: " + dir.getAbsolutePath());
+            LOG.debug("IndexWriter initialization successful: " + dir.getAbsolutePath());
         } catch (IOException ex) {
             LOG.error(ex);
             LOG.error("IndexWriter initialization error: Could not open directory " + dir.getAbsolutePath());
@@ -250,10 +249,8 @@ public class IndexingTask implements Task {
         }
         Document doc = new Document();
         try {
-            Iterator it = changedFiles.iterator();
             int i = 0;
-            while (it.hasNext()) {
-                FileDto file = (FileDto) it.next();
+            for(FileDto file : changedFiles) {
                 if (!(fileIsOnIgnoreList(file.getFilePath()))) {
                     // The lucene document containing all relevant indexing information
                     doc = new Document();
@@ -273,7 +270,7 @@ public class IndexingTask implements Task {
         } catch (IOException ex) {
             LOG.error("Adding file to index: " + doc.get("title") + " failed! \n" + ex);
         } catch (NullPointerException ex) {
-            LOG.error("NullPointerException: FileContentDirectory is empty!" + ex);
+            LOG.error("NullPointerException: FileContentDirectory is empty! " + ex);
         }
         return true;
     }
@@ -334,10 +331,6 @@ public class IndexingTask implements Task {
 
     public void setRepository(RepositoryDto repository) {
         this.repository = repository;
-    }
-
-    public void setPluginLoader(PluginLoader pluginLoader) {
-        this.pluginLoader = pluginLoader;
     }
 
     public boolean isCodeAnalysisEnabled() {

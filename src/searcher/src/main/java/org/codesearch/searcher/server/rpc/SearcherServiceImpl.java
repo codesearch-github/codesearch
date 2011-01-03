@@ -25,6 +25,12 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
+import net.sf.jmimemagic.Magic;
+import net.sf.jmimemagic.MagicException;
+import net.sf.jmimemagic.MagicMatch;
+import net.sf.jmimemagic.MagicMatchNotFoundException;
+import net.sf.jmimemagic.MagicParseException;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
 import org.apache.lucene.queryParser.ParseException;
@@ -52,6 +58,7 @@ import org.springframework.web.util.HtmlUtils;
  */
 public class SearcherServiceImpl extends AutowiringRemoteServiceServlet implements SearcherService {
 
+    private static final long serialVersionUID = 1389141189614933738L;
     /** The logger. */
     private static final Logger LOG = Logger.getLogger(SearcherServiceImpl.class);
     /** The document searcher used to search the index. */
@@ -113,18 +120,42 @@ public class SearcherServiceImpl extends AutowiringRemoteServiceServlet implemen
     }
 
     @Override
-    public FileDto getFileContent(String repository, String filePath) {
+    public FileDto getFile(String repository, String filePath) {
         LOG.debug("Retrieving file content for file: " + filePath + " @ " + repository);
         FileDto file = new FileDto();
-        //TODO find out whether file is binary
         try {
-            String guessedMimeType = MimeTypeUtil.guessMimeTypeViaFileEnding(filePath);
-            
+
+            String fileName = filePath.substring(filePath.lastIndexOf('/') + 1);
+            LOG.debug("file name: " + fileName);
+
+            String guessedMimeType = MimeTypeUtil.guessMimeTypeViaFileEnding(fileName);
+
+            LOG.debug("detected mime is: " + guessedMimeType);
+            file.setBinary(MimeTypeUtil.isBinaryType(guessedMimeType));
+
             RepositoryDto repositoryDto = xmlConfigurationReader.getRepositoryByName(repository);
             VersionControlPlugin vcPlugin = pluginLoader.getPlugin(VersionControlPlugin.class, repositoryDto.getVersionControlSystem());
-            
+
             vcPlugin.setRepository(new URI(repositoryDto.getUrl()), repositoryDto.getUsername(), repositoryDto.getPassword());
             org.codesearch.commons.plugins.vcs.FileDto vcFile = vcPlugin.getFileForFilePath(filePath);
+
+            if (MimeTypeUtil.UNKNOWN.equals(guessedMimeType)) {
+                MagicMatch magicMatch;
+                try {
+                    magicMatch = Magic.getMagicMatch(vcFile.getContent());
+                    LOG.debug("MAGIC DETECT: " + magicMatch.getMimeType());
+                    if(magicMatch.getMimeType().startsWith("text/")) {
+                        file.setBinary(false);
+                    }
+
+                } catch (MagicParseException ex) {
+                    LOG.debug("NO MAGIC MATCH");
+                } catch (MagicMatchNotFoundException ex) {
+                    LOG.debug("NO MAGIC MATCH");
+                } catch (MagicException ex) {
+                    LOG.debug("NO MAGIC MATCH");
+                }
+            }
 
             try {
                 HighlightingPlugin hlPlugin = pluginLoader.getPlugin(HighlightingPlugin.class, guessedMimeType);
@@ -133,7 +164,6 @@ public class SearcherServiceImpl extends AutowiringRemoteServiceServlet implemen
                 // No plugin found, just escape to HTML
                 file.setFileContent(HtmlUtils.htmlEscape(new String(vcFile.getContent())));
             }
-            file.setBinary(vcFile.isBinary());
         } catch (HighlightingPluginException ex) {
             LOG.error(ex);
         } catch (URISyntaxException ex) {
@@ -148,5 +178,4 @@ public class SearcherServiceImpl extends AutowiringRemoteServiceServlet implemen
         LOG.debug("Finished retrieving file content for file: " + filePath + " @ " + repository);
         return file;
     }
-
 }

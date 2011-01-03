@@ -24,7 +24,6 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import org.apache.log4j.Logger;
-import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
 import org.codesearch.commons.configuration.xml.dto.TaskDto;
 import org.codesearch.indexer.core.IndexerMain;
 import org.codesearch.indexer.tasks.IndexingTask;
@@ -50,8 +49,6 @@ public class IndexerJob implements Job {
     private List<TaskDto> taskList = new LinkedList<TaskDto>();
     /** Instantiate a logger */
     private static final Logger LOG = Logger.getLogger(IndexerJob.class);
-    /** The XmlConfigReader used to retrieve configuration */
-    private XmlConfigurationReader configReader;
 
     /**
      * Executes all tasks from the taskList one after another
@@ -63,7 +60,6 @@ public class IndexerJob implements Job {
         LOG.info("Executing IndexerJob");
         ApplicationContext applicationContext = IndexerMain.getApplicationContext();
         terminated = (Boolean) jec.getJobDetail().getJobDataMap().get("terminated");
-        configReader = new XmlConfigurationReader(); //TODO replace with spring injection
         taskList = (List<TaskDto>) (jec.getJobDetail().getJobDataMap().get("tasks"));
         Task task = null;
         Date startDate = new Date();
@@ -79,10 +75,11 @@ public class IndexerJob implements Job {
                     break;
                 }
                 case clear: {
-                    task = new ClearTask();
+                    task = (Task) applicationContext.getBean("clearTask");
                     ((ClearTask) task).setRepositoryName(taskDto.getRepository().getName());
                     break;
-                } case codeAnalysis: {
+                }
+                case codeAnalysis: {
                     task = (Task) applicationContext.getBean("indexingTask"); //TODO add bean with correct setting for codeAnalysisEnabled
                     ((IndexingTask) task).setRepository(taskDto.getRepository());
                     ((IndexingTask) task).setCodeAnalysisEnabled(true);

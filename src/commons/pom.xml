@@ -43,15 +43,6 @@
             <artifactId>spring-context</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>eu.medsea.mimeutil</groupId>
-            <artifactId>mime-util</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>jmimemagic</groupId>
-            <artifactId>jmimemagic</artifactId>
-        </dependency>
-
         <!--  Lucene API to create/manage index -->
         <dependency>
             <groupId>org.apache.lucene</groupId>
