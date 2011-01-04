@@ -27,6 +27,7 @@ import java.net.URISyntaxException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.apache.log4j.Logger;
 import org.codesearch.commons.plugins.vcs.FileDto;
 import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
 import org.codesearch.commons.plugins.vcs.VersionControlPluginException;
@@ -47,6 +48,7 @@ public class BazaarPlugin implements VersionControlPlugin {
 
     private BazaarUtils bzr_util;
     private BranchLocation bl;
+    private static final Logger LOG = Logger.getLogger(BazaarPlugin.class);
 
     public BazaarPlugin() {
         bzr_util = BazaarUtils.getInstance();
@@ -83,7 +85,7 @@ public class BazaarPlugin implements VersionControlPlugin {
             List<IBazaarLogMessage> iblm = bzr_util.getChangesSinceRevison(bl, revision);
             for (IBazaarLogMessage log : iblm) {
                 for (IBazaarStatus bs : log.getAffectedFiles()) {
-                    System.out.println("STATUS: " + bs.getFile().getAbsolutePath());
+                    LOG.debug("Filepath retrieved: " + bs.getFile().getAbsolutePath());
                     byte[] content = CommonsUtils.convertFileToByteArray(bs.getFile());
                     FileDto fd = new FileDto(bs.getAbsolutePath(), content, false); //TODO: ADD MIME TYPE...
                     files.add(fd);

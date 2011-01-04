@@ -29,6 +29,38 @@
             </goals>
         </action>
         <action>
+            <actionName>run</actionName>
+            <goals>
+                <goal>package</goal>
+            </goals>
+            <properties>
+                <netbeans.deploy>true</netbeans.deploy>
+                <netbeans.deploy.clientUrlPart>/searcher</netbeans.deploy.clientUrlPart>
+            </properties>
+        </action>
+        <action>
+            <actionName>debug</actionName>
+            <goals>
+                <goal>package</goal>
+            </goals>
+            <properties>
+                <netbeans.deploy>true</netbeans.deploy>
+                <netbeans.deploy.clientUrlPart>/searcher</netbeans.deploy.clientUrlPart>
+                <netbeans.deploy.debugmode>true</netbeans.deploy.debugmode>
+            </properties>
+        </action>
+        <action>
+            <actionName>profile</actionName>
+            <goals>
+                <goal>package</goal>
+            </goals>
+            <properties>
+                <netbeans.deploy>true</netbeans.deploy>
+                <netbeans.deploy.clientUrlPart>/searcher</netbeans.deploy.clientUrlPart>
+                <netbeans.deploy.profilemode>true</netbeans.deploy.profilemode>
+            </properties>
+        </action>
+        <action>
             <actionName>CUSTOM-gwt debug</actionName>
             <displayName>gwt debug</displayName>
             <goals>

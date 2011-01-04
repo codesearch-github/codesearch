@@ -56,10 +56,11 @@ import org.vcs.bazaar.client.xmlrpc.BzrXmlRpcError;
  */
 public class BazaarUtils {
     //TODO: add ssh auth with external client
-    //TODO: add logging
+   
 
     private static BazaarUtils instance;
     private IBazaarClient bazaarClient;
+    private static final Logger LOG = Logger.getLogger(BazaarUtils.class);
 
     
     /**
@@ -74,7 +75,7 @@ public class BazaarUtils {
 
         } catch (BazaarClientException bce) {
             if (bce.getMessage().equals("bzr-xmloutput >= 0.6.0 plugin not found")) {
-                System.out.println("xmlplugin failed...");
+                LOG.debug("xmlplugin failed...");
             }
         }
     }
@@ -82,9 +83,10 @@ public class BazaarUtils {
     /*
      * Sets the work dir
      */
-    public void setWorkingDirectory(String Path)
+    public void setWorkingDirectory(String path)
     {
-       bazaarClient.setWorkDir(new File("/home/zeheron/workspace/testground/bazaar/"));
+       LOG.debug("Set workdirektory: " + path);
+       bazaarClient.setWorkDir(new File(path));
     }
 
     /**

@@ -25,11 +25,14 @@
  */
 package org.codesearch.indexer.tasks;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.commons.configuration.ConfigurationException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 import java.util.LinkedList;
+import javax.naming.ConfigurationException;
 import org.codesearch.commons.configuration.properties.PropertiesManager;
 import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
 import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
@@ -120,14 +123,12 @@ public class IndexingTaskTest {
 
     @Test
     public void testCodeAnalysis() throws Exception {
-//        RepositoryDto repo = new RepositoryDto();
-//        repo.setVersionControlSystem("FILESYSTEM");
-//
-//        CodeAnalyzerPlugin codeAnalyzerPlugin = pluginLoader.getPlugin(CodeAnalyzerPlugin.class, "java");
-//        VersionControlPlugin versionControlPlugin = pluginLoader.getPlugin(VersionControlPlugin.class, "FILESYSTEM");
-//        FileDto fileDto = versionControlPlugin.getFileForFilePath("/home/david/wakmusic/trunk/Wakmusic/src/java/beans/Band.java");
-//        codeAnalyzerPlugin.analyzeFile(new String(fileDto.getContent()), repo);
-        //   System.out.println(plugin.getAstForCurrentFile().getOutlineForChildElements());
+        RepositoryDto repo = new RepositoryDto();
+        repo.setVersionControlSystem("FILESYSTEM");
+        CodeAnalyzerPlugin codeAnalyzerPlugin = pluginLoader.getPlugin(CodeAnalyzerPlugin.class, "java");
+        VersionControlPlugin versionControlPlugin = pluginLoader.getPlugin(VersionControlPlugin.class, "FILESYSTEM");
+        FileDto fileDto = versionControlPlugin.getFileForFilePath("/home/david/wakmusic/trunk/Wakmusic/src/java/beans/Band.java");
+        codeAnalyzerPlugin.analyzeFile(new String(fileDto.getContent()), repo);
     }
 
     @Test
