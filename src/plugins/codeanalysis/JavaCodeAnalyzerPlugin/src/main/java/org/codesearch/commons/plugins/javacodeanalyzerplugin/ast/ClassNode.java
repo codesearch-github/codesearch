@@ -25,12 +25,10 @@
  */
 package org.codesearch.commons.plugins.javacodeanalyzerplugin.ast;
 
-import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.MethodNode;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
+import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
 import org.codesearch.commons.plugins.codeanalyzing.ast.CompoundNode;
-import org.codesearch.commons.plugins.codeanalyzing.ast.Node;
 
 /**
  * ASTNode that represents a class in the source code
@@ -39,7 +37,16 @@ import org.codesearch.commons.plugins.codeanalyzing.ast.Node;
 public class ClassNode extends CompoundNode {
 
     private List<MethodNode> methods = new LinkedList<MethodNode>();
+    private List<VariableNode> attributes = new LinkedList<VariableNode>();
 
+    public List<VariableNode> getAttributes() {
+        return attributes;
+    }
+
+    public void setAttributes(List<VariableNode> attributes) {
+        this.attributes = attributes;
+    }
+    
     public List<MethodNode> getMethods() {
         return methods;
     }
@@ -65,10 +72,15 @@ public class ClassNode extends CompoundNode {
     }
 
     @Override
-    public void addCompoundNodesToList(List<CompoundNode> nodes) {
+    public void addCompoundNodesToList(List<AstNode> nodes) {
         for (MethodNode method : methods) {
             nodes.add(method);
             method.addCompoundNodesToList(nodes);
+        }
+        for (VariableNode var : attributes){
+            if(var.getVisibility() == Visibility.public_vis || var.getVisibility() == Visibility.protected_vis){
+                nodes.add(var);
+            }
         }
     }
 }

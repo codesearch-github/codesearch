@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+        <action>
+            <actionName>CUSTOM-debug_maven</actionName>
+            <displayName>debug_maven</displayName>
+            <goals>
+                <goal>test</goal>
+            </goals>
+            <properties>
+                <maven.test.skip>false</maven.test.skip>
+                <maven.surefire.debug>true</maven.surefire.debug>
+            </properties>
+        </action>
+    </actions>

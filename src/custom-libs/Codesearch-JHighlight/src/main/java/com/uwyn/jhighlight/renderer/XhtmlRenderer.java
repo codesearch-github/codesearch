@@ -18,7 +18,6 @@
  * You should have received a copy of the GNU General Public License
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.uwyn.jhighlight.renderer;
 
 import java.io.*;
@@ -68,6 +67,7 @@ public abstract class XhtmlRenderer implements Renderer {
      * @see #highlight(String, String, String, boolean)
      * @since 1.0
      */
+    @Override
     public void highlight(String name, InputStream in, OutputStream out, String encoding, boolean fragment)
             throws IOException {
         ExplicitStateHighlighter highlighter = getHighlighter();
@@ -90,7 +90,7 @@ public abstract class XhtmlRenderer implements Renderer {
         } else {
             w.write(getXhtmlHeader(name));
         }
-
+        StringBuilder sb = new StringBuilder();
         String line;
         String token;
         int length;
@@ -107,47 +107,58 @@ public abstract class XhtmlRenderer implements Renderer {
             Reader lineReader = new StringReader(line);
             highlighter.setReader(lineReader);
             int index = 0;
+
             while (index < line.length()) {
                 style = highlighter.getNextToken();
                 length = highlighter.getTokenLength();
                 token = line.substring(index, index + length);
-
-                if (token.equals("begin_escape")) {
+                boolean append = true;
+                if (token.startsWith("_begin_escape_")) {
                     escaped = true;
-                } else if (escaped) {
-                    if (token.equals("end_escape")) {
-                        escaped = false;
-                    } else {
-                        w.write(token);
+                    sb.deleteCharAt(sb.length()-1);
+                    token = token.substring(14);
+                    if(token.length() == 0){
+                        append = false;
                     }
-                } else {
+                } else if (escaped) {
+                    if (token.startsWith("_end_escape_")) {
+                        escaped = false;
+                        sb.deleteCharAt(sb.length()-1);
+                        token = token.substring(12);
+                        if(token.length() == 0){
+                            append = false;
+                        }
+                    } else {
+                        sb.append(token);
+                        append = false;
+                    }
+                }
 
+                if (append) {
                     if (style != previous_style
                             || newline) {
                         css_class = getCssClass(style);
 
                         if (css_class != null) {
                             if (previous_style != 0 && !newline) {
-                                w.write("</span>");
+                                sb.append("</span>");
                             }
-                            w.write("<span class=\"" + css_class + "\">");
+                            sb.append("<span class=\"").append(css_class).append("\">");
 
                             previous_style = style;
                         }
                     }
                     newline = false;
-                    w.write(StringUtils.replace(StringUtils.encodeHtml(token), " ", "&nbsp;"));
+                    sb.append(StringUtils.encodeHtml(token));
                 }
                 index += length;
-
             }
-
-            w.write("</span>");
+            sb.append("</span>");
             newline = true;
         }
-
+        w.write(sb.toString());
         if (!fragment) {
-            w.write(getXhtmlFooter());
+            w.append(getXhtmlFooter());
         }
 
         w.flush();
@@ -173,6 +184,7 @@ public abstract class XhtmlRenderer implements Renderer {
      * @see #highlight(String, InputStream, OutputStream, String, boolean)
      * @since 1.0
      */
+    @Override
     public String highlight(String name, String in, String encoding, boolean fragment)
             throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -218,7 +230,7 @@ public abstract class XhtmlRenderer implements Renderer {
      * @since 1.0
      */
     protected String getCssClassDefinitions() {
-        StringBuffer css = new StringBuffer();
+        StringBuilder css = new StringBuilder();
 
         Properties properties = new Properties();
 

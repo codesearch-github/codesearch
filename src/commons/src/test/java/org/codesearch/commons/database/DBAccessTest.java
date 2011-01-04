@@ -26,6 +26,12 @@
 package org.codesearch.commons.database;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
+import org.codesearch.commons.plugins.codeanalyzing.ast.CompoundNode;
+import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -58,6 +64,17 @@ public class DBAccessTest {
     public void tearDown() {
     }
 
+    @Test
+    public void testSetAnalysisDataForFile() throws Exception {
+        String filePath = "asdf";
+        String repository = "svn_local";
+        List<String> types = new LinkedList<String>();
+        types.add("testType1");
+        types.add("org.blargh.testType2");
+        Object usages = new LinkedList();
+        DBAccess.setAnalysisDataForFile(filePath, repository, usages, usages, types);
+    }
+
     /**
      * Test of setBinaryIndexForFile method, of class DBUtils.
      */
@@ -66,9 +83,10 @@ public class DBAccessTest {
         String filePath = "asdf";
         String repository = "svn_local";
         //dummy object, dunno why i picked arraylist
-        ArrayList list = new ArrayList();
-        DBAccess.setBinaryIndexForFile(filePath, repository, list);
-        assert DBAccess.getBinaryIndexForFile(filePath, repository) != null;
+        List<Usage> usages = new LinkedList<Usage>();
+        usages.add(new Usage(0, 0, 0, 0, ""));
+//        DBAccess.setAnalysisDataForFile(filePath, repository, usages, Collections.EMPTY_LIST, Collections.EMPTY_LIST);
+      //  assert (List<Usage>)(DBAccess.getBinaryIndexForFile(filePath, repository)) != null;
     }
 
     /**
@@ -122,10 +140,9 @@ public class DBAccessTest {
      */
     @Test
     public void testEnsureThatRecordExists() throws Exception {
-//        System.out.println("ensureThatRecordExists");
-//        String filePath = "";
-//        String repository = "";
-//        DBUtils.ensureThatRecordExists(filePath, repository);
-//        fail("The test case is a prototype.");
+        System.out.println("ensureThatRecordExists");
+        String filePath = "asdf";
+        String repository = "svn_local";
+        System.out.println(DBAccess.ensureThatRecordExists(filePath, repository));
     }
 }

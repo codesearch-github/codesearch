@@ -65,7 +65,7 @@ public class FilesystemPlugin implements VersionControlPlugin {
             fileDto.setFilePath(filePath);
             fileDto.setContent(fileContent);
             fileDto.setBinary(false);
-
+            fileDto.setFilePath(filePath);
             return fileDto;
         } catch (IOException ex) {
             throw new VersionControlPluginException("File could not be opened: \n" + ex);

@@ -68,12 +68,13 @@ public class DefaultHighlightingPluginTest extends TestCase {
             String value = (String) cssStyles.get(key);
             System.out.println(key + "{\n"+value+"\n}");
         }
-        BufferedReader br = new BufferedReader(new FileReader(new File(System.getProperty("user.home")+"/workspace/test/test.java")));
+        BufferedReader br = new BufferedReader(new FileReader("/home/david/workspace/svnsearch/WakMusic/src/java/servlets/AddEvent.java"));
         String input = "";
         while(br.ready()){
             input += br.readLine() + "\n";
         }
+
         String result = plugin.parseToHtml(input.getBytes(), MimeTypeUtil.JAVA);
-        //System.out.println(result);
+        System.out.println(result);
     }
 }

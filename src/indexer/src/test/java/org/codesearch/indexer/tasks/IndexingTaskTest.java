@@ -38,9 +38,6 @@ import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
 import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 import org.codesearch.commons.database.DBAccess;
 import org.codesearch.commons.plugins.PluginLoader;
-import org.codesearch.commons.plugins.codeanalyzing.CodeAnalyzerPlugin;
-import org.codesearch.commons.plugins.vcs.FileDto;
-import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -79,12 +76,7 @@ public class IndexingTaskTest {
     }
 
     @Before
-    public void setUp() {
-        try {
-            DBAccess.setupConnections();
-        } catch (ConfigurationException ex) {
-            System.out.println(ex);
-        }
+    public void setUp() throws ConfigurationException {
     }
 
     @After
@@ -144,7 +136,7 @@ public class IndexingTaskTest {
             if (repo.getVersionControlSystem().equals("FILESYSTEM")) {
                 repo.setUrl(repo.getUrl().replace("$home", System.getProperty("user.home")));
                 IndexingTask t = (IndexingTask) applicationContext.getBean("indexingTask");
-                pr.setPropertyFileValue(repo.getName(), "0");
+           //     pr.setPropertyFileValue(repo.getName(), "0");
                 t.setRepository(repo);
                 t.setCodeAnalysisEnabled(true);
                 t.execute();

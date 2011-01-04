@@ -28,9 +28,8 @@ package org.codesearch.commons.plugins.javacodeanalyzerplugin.ast;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
+import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
 import org.codesearch.commons.plugins.codeanalyzing.ast.CompoundNode;
-import org.codesearch.commons.plugins.codeanalyzing.ast.Node;
 
 /**
  * AST element that represents a class in the source code file
@@ -61,7 +60,7 @@ public class FileNode extends CompoundNode {
     }
 
     @Override
-    public void addCompoundNodesToList(List<CompoundNode> nodes) {
+    public void addCompoundNodesToList(List<AstNode> nodes) {
         for(ClassNode clazz : classes){
             nodes.add(clazz);
             clazz.addCompoundNodesToList(nodes);

@@ -31,7 +31,7 @@ import java.util.List;
  * Superclass for all ASTNodes that have a body (for instance MethodNodes and ClassNodes)
  * @author David Froehlich
  */
-public abstract class CompoundNode extends Node {
+public abstract class CompoundNode extends AstNode {
     protected int nodeLength;
 
     public int getNodeLength() {
@@ -48,5 +48,5 @@ public abstract class CompoundNode extends Node {
      * recursively adds all compound nodes within the current node to the list
      * @param nodes
      */
-    public abstract void addCompoundNodesToList(List<CompoundNode> nodes);
+    public abstract void addCompoundNodesToList(List<AstNode> nodes);
 }

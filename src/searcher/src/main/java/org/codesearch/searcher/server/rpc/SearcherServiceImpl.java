@@ -36,8 +36,11 @@ import org.apache.log4j.Logger;
 import org.apache.lucene.queryParser.ParseException;
 import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
 import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
+import org.codesearch.commons.database.DBAccess;
+import org.codesearch.commons.database.DatabaseAccessException;
 import org.codesearch.commons.plugins.PluginLoader;
 import org.codesearch.commons.plugins.PluginLoaderException;
+import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
 import org.codesearch.commons.plugins.highlighting.HighlightingPlugin;
 import org.codesearch.commons.plugins.highlighting.HighlightingPluginException;
 import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
@@ -144,12 +147,11 @@ public class SearcherServiceImpl extends AutowiringRemoteServiceServlet implemen
                 try {
                     magicMatch = Magic.getMagicMatch(vcFile.getContent());
                     LOG.debug("MAGIC DETECT: " + magicMatch.getMimeType());
-                    if(magicMatch.getMimeType().startsWith("text/")) {
+                    if (magicMatch.getMimeType().startsWith("text/")) {
                         file.setBinary(false);
                     }
-
                 } catch (MagicParseException ex) {
-                    LOG.debug("NO MAGIC MATCH");
+                    LOG.debug("NO MAGIC MATCH"); //TODO add a better log entry
                 } catch (MagicMatchNotFoundException ex) {
                     LOG.debug("NO MAGIC MATCH");
                 } catch (MagicException ex) {
@@ -159,7 +161,10 @@ public class SearcherServiceImpl extends AutowiringRemoteServiceServlet implemen
 
             try {
                 HighlightingPlugin hlPlugin = pluginLoader.getPlugin(HighlightingPlugin.class, guessedMimeType);
-                file.setFileContent(hlPlugin.parseToHtml(vcFile.getContent(), guessedMimeType));
+                String highlightingEscapeStartToken = hlPlugin.getEscapeStartToken();
+                String highlightingEscapeEndToken = hlPlugin.getEscapeEndToken();
+                byte[] parsedFileContent = addUsageLinksToFileContent(vcFile.getContent(), filePath, repository, highlightingEscapeStartToken, highlightingEscapeEndToken);
+                file.setFileContent(hlPlugin.parseToHtml(parsedFileContent, guessedMimeType));
             } catch (PluginLoaderException ex) {
                 // No plugin found, just escape to HTML
                 file.setFileContent(HtmlUtils.htmlEscape(new String(vcFile.getContent())));
@@ -177,5 +182,42 @@ public class SearcherServiceImpl extends AutowiringRemoteServiceServlet implemen
         }
         LOG.debug("Finished retrieving file content for file: " + filePath + " @ " + repository);
         return file;
+    }
+
+    private byte[] addUsageLinksToFileContent(byte[] fileContentBytes, String filePath, String repository, String hlEscapeStartToken, String hlEscapeEndToken) {
+        try {
+            List<Usage> usages = DBAccess.getUsagesForFile(filePath, repository);
+            String resultString = "";
+            if (usages == null) {
+                //in case there is no entry for the filePath it is a file that has not been analyzed
+                return fileContentBytes;
+            }
+            String[] contentLines = new String(fileContentBytes).split("\n");
+            int usageIndex = 0;
+            outer:
+            for (int lineNumber = 1; lineNumber < contentLines.length; lineNumber++) {
+                String currentLine = contentLines[lineNumber - 1];
+                while (usageIndex < usages.size()) {
+                    Usage currentUsage = usages.get(usageIndex);
+                    if (currentUsage.getStartLine() == lineNumber) {
+                        int startColumn = currentUsage.getStartColumn();
+                        int referenceLine = currentUsage.getReferenceLine();
+                        String preamble = currentLine.substring(0, startColumn - 1); //-1
+                        String anchorBegin = hlEscapeStartToken + "<a class='testLink' onclick='goToLine(" + (referenceLine+1) + ");'>" + hlEscapeEndToken;
+                        String anchorEnd = hlEscapeStartToken + "</a>" + hlEscapeEndToken;
+                        String remainingLine = currentLine.substring(startColumn - 1 + currentUsage.getReplacedString().length());
+                        currentLine = preamble + anchorBegin + currentUsage.getReplacedString() + anchorEnd + remainingLine;
+                        usageIndex++;
+                    } else {
+                        resultString += currentLine + "\n";
+                        continue outer;
+                    }
+                }
+            }
+            return resultString.getBytes();
+        } catch (DatabaseAccessException ex) {
+            LOG.error(ex);
+        }
+        return fileContentBytes;
     }
 }

@@ -28,6 +28,7 @@ import org.codesearch.commons.database.DBAccess;
 import org.codesearch.indexer.manager.IndexingManager;
 import org.quartz.SchedulerException;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
@@ -41,7 +42,6 @@ public class IndexerMain implements ServletContextListener {
     private IndexingManager indexingManager;
     /** the application context used to retrieve spring-beans in the indexer */
     private static ApplicationContext applicationContext;
-    
 
     /**
      * Instantiates the IndexingManager and starts its scheduler
@@ -49,24 +49,19 @@ public class IndexerMain implements ServletContextListener {
      */
     @Override
     public void contextInitialized(ServletContextEvent sce) {
+        applicationContext = new ClassPathXmlApplicationContext("classpath:org/codesearch/indexer/IndexerBeans.xml");
+        DBAccess.setupConnections();
         try {
+            indexingManager = new IndexingManager();
+            indexingManager.startScheduler();
             applicationContext = WebApplicationContextUtils.getWebApplicationContext(sce.getServletContext());
-            DBAccess.setupConnections();
-            try {
-                indexingManager = new IndexingManager();
-                indexingManager.startScheduler();
-            } catch (SchedulerException ex) {
-                LOG.error("Problem with scheduler at context initialization: " + ex);
-            } catch (ConfigurationException ex) {
-                LOG.error("Problem with configuration at context initialization: " + ex);
-            }
+        } catch (SchedulerException ex) {
+            LOG.error("Problem with scheduler at context initialization: " + ex);
         } catch (ConfigurationException ex) {
-            //TODO add useful error handling
-            LOG.error(ex);
+            LOG.error("Problem with configuration at context initialization: " + ex);
         }
     }
 
-   
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
     }

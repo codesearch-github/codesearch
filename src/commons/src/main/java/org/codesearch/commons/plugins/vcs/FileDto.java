@@ -25,6 +25,9 @@
  */
 package org.codesearch.commons.plugins.vcs;
 
+import java.util.List;
+import org.codesearch.commons.plugins.codeanalyzing.ast.ExternalLink;
+
 /**
  * stores information about a specific file in a repository
  * @author David Froehlich
@@ -35,6 +38,24 @@ public class FileDto {
     private byte[] content;
     /** determines whether the file is binary */
     private boolean binary;
+    private List<ExternalLink> externalLinks;
+    private List<String> imports;
+
+    public List<String> getImports() {
+        return imports;
+    }
+
+    public void setImports(List<String> imports) {
+        this.imports = imports;
+    }
+
+    public List<ExternalLink> getExternalLinks() {
+        return externalLinks;
+    }
+
+    public void setExternalLinks(List<ExternalLink> externalLinks) {
+        this.externalLinks = externalLinks;
+    }
 
     public byte[] getContent() {
         return content;

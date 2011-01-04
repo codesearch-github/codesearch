@@ -27,9 +27,8 @@ package org.codesearch.commons.plugins.javacodeanalyzerplugin.ast;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
+import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
 import org.codesearch.commons.plugins.codeanalyzing.ast.CompoundNode;
-import org.codesearch.commons.plugins.codeanalyzing.ast.Node;
 
 /**
  * ASTElement that represents a method in the source code
@@ -41,6 +40,15 @@ public class MethodNode extends CompoundNode {
     private List<VariableNode> parameters = new LinkedList<VariableNode>();
     private String returnType;
     private boolean constructor;
+    private List<VariableNode> localVariables = new LinkedList<VariableNode>();
+
+    public List<VariableNode> getLocalVariables() {
+        return localVariables;
+    }
+
+    public void setLocalVariables(List<VariableNode> localVariables) {
+        this.localVariables = localVariables;
+    }
 
     public boolean isConstructor() {
         return constructor;
@@ -129,6 +137,6 @@ public class MethodNode extends CompoundNode {
     }
 
     @Override
-    public void addCompoundNodesToList(List<CompoundNode> nodes) {
+    public void addCompoundNodesToList(List<AstNode> nodes) {
     }
 }

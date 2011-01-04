@@ -26,15 +26,24 @@
 
 package org.codesearch.commons.plugins.javacodeanalyzerplugin.ast;
 
-import org.codesearch.commons.plugins.codeanalyzing.ast.Node;
+import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
 
 /**
  * ASTElement that represents a variable in the source code
  * @author David Froehlich
  */
-public class VariableNode extends Node {
+public class VariableNode extends AstNode {
     private String type;
     private Visibility visibility;
+    private boolean attribute;
+
+    public boolean getAttribute() {
+        return attribute;
+    }
+
+    public void setAttribute(boolean attribute) {
+        this.attribute = attribute;
+    }
 
     public String getType() {
         return type;

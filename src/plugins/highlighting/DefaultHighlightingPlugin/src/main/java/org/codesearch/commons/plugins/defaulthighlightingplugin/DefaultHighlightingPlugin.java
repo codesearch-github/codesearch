@@ -104,12 +104,12 @@ public class DefaultHighlightingPlugin implements HighlightingPlugin {
     /** {@inheritDoc} */
     @Override
     public String getEscapeStartToken() {
-        return "begin_escape";
+        return " _begin_escape_";
     }
 
     /** {@inheritDoc} */
     @Override
     public String getEscapeEndToken() {
-        return "end_escape";
+        return " _end_escape_";
     }
 }

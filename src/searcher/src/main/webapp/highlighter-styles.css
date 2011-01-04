@@ -27,6 +27,10 @@
         Purpose of the stylesheet follows.
 */
 
+.testLink{
+    color: rgb(10, 250, 250);
+}
+
 .java_type{
     color: rgb(0,44,221);
 }

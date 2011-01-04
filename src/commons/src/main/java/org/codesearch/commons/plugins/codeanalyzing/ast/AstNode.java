@@ -32,14 +32,24 @@ import java.io.Serializable;
  * Superclass for all ASTNodes used for code analysis.
  * @author David Froehlich
  */
-public abstract class Node implements Serializable, Comparable<Node>{
+public abstract class AstNode implements Serializable, Comparable<AstNode>{
     protected int startLine;
     protected int startPositionInLine;
     protected int startPositionAbsolute;
     protected String name;
+    /** the start line of the parent node */
+    protected int parentLineDeclaration;
+
+    public int getParentLineDeclaration() {
+        return parentLineDeclaration;
+    }
+
+    public void setParentLineDeclaration(int parentLineDeclaration) {
+        this.parentLineDeclaration = parentLineDeclaration;
+    }
 
     @Override
-    public int compareTo(Node other){
+    public int compareTo(AstNode other){
         if(this.startLine == other.startLine){
             return this.startPositionInLine - other.startPositionInLine;
         }

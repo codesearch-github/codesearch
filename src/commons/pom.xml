@@ -65,11 +65,11 @@
             <artifactId>FilesystemPlugin</artifactId>
             <version>0.1-SNAPSHOT</version>
         </dependency>
-        <!--dependency>
+        <dependency>
             <groupId>org.codesearch</groupId>
             <artifactId>JavaCodeAnalyzerPlugin</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency-->
+            <version>0.1-SNAPSHOT</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

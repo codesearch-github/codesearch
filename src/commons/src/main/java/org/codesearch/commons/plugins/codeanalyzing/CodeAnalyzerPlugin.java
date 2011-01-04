@@ -30,13 +30,21 @@ package org.codesearch.commons.plugins.codeanalyzing;
 import java.util.List;
 import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 import org.codesearch.commons.plugins.Plugin;
-import org.codesearch.commons.plugins.codeanalyzing.ast.CompoundNode;
+import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
+import org.codesearch.commons.plugins.codeanalyzing.ast.ExternalLink;
+import org.codesearch.commons.plugins.codeanalyzing.ast.ExternalUsage;
+import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
 
 /**
  *
  * @author David Froehlich
  */
 public interface CodeAnalyzerPlugin extends Plugin {
-    List<CompoundNode> getAstForCurrentFile() throws CodeAnalyzerPluginException;
+    List<AstNode> getAstForCurrentFile() throws CodeAnalyzerPluginException;
+    List<String> getTypeDeclarations() throws CodeAnalyzerPluginException;
+    List<Usage> getUsages() throws CodeAnalyzerPluginException;
+    List<ExternalLink> getExternalLinks();
     void analyzeFile(String fileContent, RepositoryDto repository) throws CodeAnalyzerPluginException;
+    List<ExternalUsage> parseExternalLinks(String fileContent, List<String> imports, List<ExternalLink> externalLinks, String repository);
+    List<String> getImports();
 }

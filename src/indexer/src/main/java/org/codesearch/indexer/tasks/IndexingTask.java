@@ -20,7 +20,7 @@
  */
 package org.codesearch.indexer.tasks;
 
-import java.io.FileNotFoundException;
+import java.io.*;
 import java.net.URISyntaxException;
 import org.apache.commons.configuration.ConfigurationException;
 import org.codesearch.commons.database.DatabaseAccessException;
@@ -53,7 +53,10 @@ import org.codesearch.commons.database.DBAccess;
 import org.codesearch.commons.plugins.PluginLoader;
 import org.codesearch.commons.plugins.PluginLoaderException;
 import org.codesearch.commons.plugins.codeanalyzing.CodeAnalyzerPlugin;
+import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
 import org.codesearch.commons.plugins.codeanalyzing.ast.CompoundNode;
+import org.codesearch.commons.plugins.codeanalyzing.ast.ExternalLink;
+import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
 import org.codesearch.commons.plugins.vcs.FileDto;
 import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
 import org.codesearch.commons.plugins.vcs.VersionControlPluginException;
@@ -113,7 +116,7 @@ public class IndexingTask implements Task {
             changedFiles = versionControlPlugin.getChangedFilesSinceRevision(lastIndexedRevision);
             
             boolean retrieveNewFileList = false;
-            executeIndexing();
+            this.executeIndexing();
             if (codeAnalysisEnabled) {
                 String lastAnalysisRevision = DBAccess.getLastAnalyzedRevisionOfRepository(repository.getName());
                 if (!lastAnalysisRevision.equals(lastIndexedRevision)) {
@@ -125,6 +128,8 @@ public class IndexingTask implements Task {
                 DBAccess.setLastAnalyzedRevisionOfRepository(repository.getName(), versionControlPlugin.getRepositoryRevision());
             }
             propertiesManager.setPropertyFileValue(repository.getName(), versionControlPlugin.getRepositoryRevision());
+        } catch (org.apache.commons.configuration.ConfigurationException ex) {
+            LOG.error("Error at DatabaseConnection \n" + ex);
         } catch (DatabaseAccessException ex) {
             LOG.error("Error at DatabaseConnection \n" + ex);
         } catch (VersionControlPluginException ex) {
@@ -137,8 +142,6 @@ public class IndexingTask implements Task {
             LOG.error("Index not found at task execution" + ex);
         } catch (IOException ex) {
             LOG.error("IOException at execution of task: " + ex);
-        } catch (ConfigurationException ex) {
-            LOG.error("Configuration could not be read " + ex);
         } catch (CodeAnalyzerPluginException ex) {
             LOG.error("Error executing code analysis \n" + ex);
         }
@@ -180,10 +183,16 @@ public class IndexingTask implements Task {
                     }
                 }
                 plugin.analyzeFile(new String(currentFile.getContent()), repository);
-                List<CompoundNode> ast = plugin.getAstForCurrentFile();
+                List<AstNode> ast = plugin.getAstForCurrentFile();
+                List<String> typeDeclarations = plugin.getTypeDeclarations();
+                List<Usage> usages = plugin.getUsages();
+                currentFile.setImports(plugin.getImports());
                 previousFileType = currentFileType;
+                //add the externalLinks to the FileDto, so they can be parsed after the regular indexing is finished
+                currentFile.setExternalLinks(plugin.getExternalLinks());
+                
                 //write the AST information into the database
-                DBAccess.setBinaryIndexForFile(currentFile.getFilePath(), repository.getName(), ast);
+                DBAccess.setAnalysisDataForFile(currentFile.getFilePath(), repository.getName(), ast, usages, typeDeclarations); //TODO work here
             } catch (DatabaseAccessException ex) {
                 LOG.error("Error at DatabaseConnection \n" + ex);
             }
