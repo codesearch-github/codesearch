@@ -10,7 +10,7 @@ Missing features
  - fast binary file recognition method
  - Raw file button
  - Extended file information: e.g Author, Commit date etc
-
+ - Enum Handling for Code Navigation
 Important TODOs
 ===============
  - Refactor every System.out that is not in a Unit test
@@ -21,8 +21,10 @@ Important TODOs
 
 Minor Bugs
 ===============
-usages of parameters in methods are not correctly linked
+ - usages of parameters in methods are not correctly linked
+ - if no record for repository exists in database it should automatically be created
+ - PropertyManager constantly assumes that the property file does not exist, therefor creates a new one
 
 Unsolveable bugs
 ===============
-When using an overloaded method with an external field or external method as parameter it can not be correctly determined which method is the correct one
+ - When using an overloaded method with an external field or external method as parameter it can not be correctly determined which method is the correct one

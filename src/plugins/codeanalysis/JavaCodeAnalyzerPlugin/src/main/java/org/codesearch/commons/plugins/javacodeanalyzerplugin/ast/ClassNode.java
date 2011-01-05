@@ -29,6 +29,7 @@ import java.util.LinkedList;
 import java.util.List;
 import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
 import org.codesearch.commons.plugins.codeanalyzing.ast.CompoundNode;
+import org.codesearch.commons.plugins.codeanalyzing.ast.Visibility;
 
 /**
  * ASTNode that represents a class in the source code
@@ -67,8 +68,8 @@ public class ClassNode extends CompoundNode {
     }
 
     @Override
-    public String getOutlineLink() {
-        return "<a href='#" + startLine + "'>" + name + "</a>";
+    public String getOutlineName() {
+        return name;
     }
 
     @Override
@@ -78,9 +79,20 @@ public class ClassNode extends CompoundNode {
             method.addCompoundNodesToList(nodes);
         }
         for (VariableNode var : attributes){
-            if(var.getVisibility() == Visibility.public_vis || var.getVisibility() == Visibility.protected_vis){
+            if(var.getVisibility() == Visibility.PUBLIC || var.getVisibility() == Visibility.PROTECTED){
                 nodes.add(var);
             }
         }
+    }
+
+    @Override
+    public List<AstNode> getChildNodes() {
+        List<AstNode> childNodes = new LinkedList<AstNode>();
+        childNodes.addAll(this.attributes);
+        for(MethodNode currentMethod : methods){
+            childNodes.add(currentMethod);
+            childNodes.addAll(currentMethod.getChildNodes());
+        }
+        return childNodes;
     }
 }

@@ -18,11 +18,6 @@
  * You should have received a copy of the GNU General Public License
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.codesearch.commons.plugins.javacodeanalyzerplugin;
 
 import japa.parser.JavaParser;
@@ -37,12 +32,24 @@ import japa.parser.ast.body.MethodDeclaration;
 import japa.parser.ast.body.Parameter;
 import japa.parser.ast.body.TypeDeclaration;
 import japa.parser.ast.body.VariableDeclarator;
+import japa.parser.ast.expr.ArrayAccessExpr;
+import japa.parser.ast.expr.ArrayCreationExpr;
+import japa.parser.ast.expr.ArrayInitializerExpr;
+import japa.parser.ast.expr.AssignExpr;
 import japa.parser.ast.expr.BinaryExpr;
+import japa.parser.ast.expr.CastExpr;
 import japa.parser.ast.expr.ConditionalExpr;
 import japa.parser.ast.expr.EnclosedExpr;
 import japa.parser.ast.expr.Expression;
+import japa.parser.ast.expr.FieldAccessExpr;
+import japa.parser.ast.expr.InstanceOfExpr;
+import japa.parser.ast.expr.MemberValuePair;
 import japa.parser.ast.expr.MethodCallExpr;
 import japa.parser.ast.expr.NameExpr;
+import japa.parser.ast.expr.ObjectCreationExpr;
+import japa.parser.ast.expr.SingleMemberAnnotationExpr;
+import japa.parser.ast.expr.SuperExpr;
+import japa.parser.ast.expr.ThisExpr;
 import japa.parser.ast.expr.UnaryExpr;
 import japa.parser.ast.expr.VariableDeclarationExpr;
 import japa.parser.ast.stmt.BlockStmt;
@@ -75,11 +82,11 @@ import org.codesearch.commons.plugins.codeanalyzing.ast.ExternalUsage;
 import org.codesearch.commons.plugins.codeanalyzing.ast.ExternalVariableLink;
 
 import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
+import org.codesearch.commons.plugins.codeanalyzing.ast.Visibility;
 import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.ClassNode;
 import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.FileNode;
 import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.MethodNode;
 import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.VariableNode;
-import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.Visibility;
 import org.springframework.stereotype.Component;
 
 /**
@@ -118,7 +125,13 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
             buildAST(cu);
             fileNode.addCompoundNodesToList(ast);
             //parse usages via UsageVisitor
-            String packageName = cu.getPackage().getName().toString();
+            String packageName = null;
+            try{
+                packageName = cu.getPackage().getName().toString();
+            }catch(NullPointerException ex){
+                //in case the class has no package
+            }
+            
             UsageVisitor uv = new UsageVisitor(util, packageName);
             cu.accept(uv, null);
             usages = util.getUsages();
@@ -128,6 +141,7 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
             Collections.sort(usages);
             Collections.sort(ast);
             parseAbsoluteCharPositions();
+            
         } catch (ParseException ex) {
             System.out.println(ex.toString());
             //TODO throw exception
@@ -159,23 +173,25 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
         newClazz.setNodeLength(nodeLength);
         fileNode.getClasses().add(newClazz);
         //iterate all methods and attributes in class
-        for (BodyDeclaration member : type.getMembers()) {
-            if (member instanceof ClassOrInterfaceDeclaration) {
-                parseContentOfClass((TypeDeclaration) member);
-            } else if (member instanceof MethodDeclaration) {
-                parseContentOfMethod(newClazz, (MethodDeclaration) member);
-            } else if (member instanceof ConstructorDeclaration) {
-                parseContentOfConstructor(newClazz, (ConstructorDeclaration) member);
-            } else if (member instanceof FieldDeclaration) {
-                FieldDeclaration fieldDeclaration = (FieldDeclaration) member;
-                for (VariableDeclarator v : fieldDeclaration.getVariables()) {
-                    VariableNode newVariable = new VariableNode();
-                    newVariable.setName(v.getId().getName());
-                    newVariable.setType(fieldDeclaration.getType().toString());
-                    newVariable.setStartLine(fieldDeclaration.getBeginLine());
-                    newVariable.setStartPositionInLine(fieldDeclaration.getBeginColumn());
-                    newVariable.setAttribute(true);
-                    newClazz.getAttributes().add(newVariable);
+        if (type.getMembers() != null) {
+            for (BodyDeclaration member : type.getMembers()) {
+                if (member instanceof ClassOrInterfaceDeclaration) {
+                    parseContentOfClass((TypeDeclaration) member);
+                } else if (member instanceof MethodDeclaration) {
+                    parseContentOfMethod(newClazz, (MethodDeclaration) member);
+                } else if (member instanceof ConstructorDeclaration) {
+                    parseContentOfConstructor(newClazz, (ConstructorDeclaration) member);
+                } else if (member instanceof FieldDeclaration) {
+                    FieldDeclaration fieldDeclaration = (FieldDeclaration) member;
+                    for (VariableDeclarator v : fieldDeclaration.getVariables()) {
+                        VariableNode newVariable = new VariableNode();
+                        newVariable.setName(v.getId().getName());
+                        newVariable.setType(fieldDeclaration.getType().toString());
+                        newVariable.setStartLine(fieldDeclaration.getBeginLine());
+                        newVariable.setStartPositionInLine(fieldDeclaration.getBeginColumn());
+                        newVariable.setAttribute(true);
+                        newClazz.getAttributes().add(newVariable);
+                    }
                 }
             }
         }
@@ -299,7 +315,7 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
         if (expr == null) {
             return;
         }
-        if(expr.getBeginLine() == 104){
+        if (expr.getBeginLine() == 104) {
             expr.getBeginLine();
         }
         expr.setData(parent);
@@ -327,10 +343,69 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
             parseConditionExpr((ConditionalExpr) expr, parent);
         } else if (expr instanceof MethodCallExpr) {
             MethodCallExpr methodCallExpr = (MethodCallExpr) expr;
-            for(Expression currentExpr : methodCallExpr.getArgs()){
+            for (Expression currentExpr : methodCallExpr.getArgs()) {
                 parseExpression(currentExpr, expr);
             }
+        } else if (expr instanceof ArrayAccessExpr) {
+            ArrayAccessExpr aae = (ArrayAccessExpr) expr;
+            parseExpression(aae.getIndex(), expr);
+            parseExpression(aae.getName(), expr);
+        } else if (expr instanceof ArrayCreationExpr) {
+            ArrayCreationExpr ace = (ArrayCreationExpr) expr;
+            for (Expression currentExpr : ace.getDimensions()) {
+                parseExpression(currentExpr, expr);
+            }
+            parseExpression(ace.getInitializer(), expr);
+        } else if (expr instanceof ArrayInitializerExpr) {
+            ArrayInitializerExpr aie = (ArrayInitializerExpr) expr;
+            for (Expression currentExpr : aie.getValues()) {
+                parseExpression(currentExpr, expr);
+            }
+        } else if (expr instanceof AssignExpr) {
+            AssignExpr ae = (AssignExpr) expr;
+            parseExpression(ae.getValue(), expr);
+            parseExpression(ae.getTarget(), expr);
+        } else if (expr instanceof BinaryExpr) {
+            BinaryExpr be = (BinaryExpr) expr;
+            parseExpression(be.getLeft(), expr);
+            parseExpression(be.getRight(), expr);
+        } else if (expr instanceof CastExpr) {
+            CastExpr ce = (CastExpr) expr;
+            parseExpression(ce.getExpr(), expr);
+        } else if (expr instanceof ConditionalExpr) {
+            ConditionalExpr ce = (ConditionalExpr) expr;
+            parseExpression(ce.getCondition(), expr);
+            parseExpression(ce.getElseExpr(), expr);
+            parseExpression(ce.getThenExpr(), expr);
+        } else if (expr instanceof EnclosedExpr) {
+            EnclosedExpr ee = (EnclosedExpr) expr;
+            parseExpression(ee.getInner(), expr);
+        } else if (expr instanceof FieldAccessExpr) {
+            FieldAccessExpr fae = (FieldAccessExpr) expr;
+            parseExpression(fae.getScope(), expr);
+        } else if (expr instanceof InstanceOfExpr) {
+            InstanceOfExpr ioe = (InstanceOfExpr) expr;
+            parseExpression(ioe.getExpr(), parent);
+        } else if (expr instanceof ObjectCreationExpr) {
+            ObjectCreationExpr oje = (ObjectCreationExpr) expr;
+            for (Expression arg : oje.getArgs()) {
+                parseExpression(arg, expr);
+            }
+            parseExpression(oje.getScope(), expr);
+        } else if (expr instanceof SingleMemberAnnotationExpr) {
+            SingleMemberAnnotationExpr smae = (SingleMemberAnnotationExpr) expr;
+            parseExpression(smae.getMemberValue(), expr);
+        } else if (expr instanceof SuperExpr) {
+            SuperExpr se = (SuperExpr) expr;
+            parseExpression(se.getClassExpr(), expr);
+        } else if (expr instanceof ThisExpr) {
+            ThisExpr te = (ThisExpr) expr;
+            parseExpression(te.getClassExpr(), expr);
+        } else if (expr instanceof UnaryExpr) {
+            UnaryExpr ue = (UnaryExpr) expr;
+            parseExpression(ue.getExpr(), expr);
         }
+
         //TODO check for ArrayCreationExpr and ArrayInitializerExpr
     }
 
@@ -364,7 +439,7 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
     }
 
     private void parseIfStmt(IfStmt stmt, Node parent) {
-        if(stmt.getBeginLine() == 96){
+        if (stmt.getBeginLine() == 96) {
             stmt.getBeginColumn();
         }
         stmt.setData(parent);
@@ -463,7 +538,7 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
                 }
                 if (fullyQualifiedName != null) {
                     filePath = DBAccess.getFilePathForTypeDeclaration(fullyQualifiedName, repository);
-                    if(filePath == null){
+                    if (filePath == null) {
                         continue;
                     }
                 } else {
@@ -475,8 +550,8 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
                 } else if (el instanceof ExternalVariableLink) {
                     ExternalVariableLink extVarLink = (ExternalVariableLink) el;
                     List<AstNode> fileAst = (List<AstNode>) DBAccess.getBinaryIndexForFile(filePath, repository);
-                    for(AstNode currentNode : fileAst){
-                        if(currentNode instanceof VariableNode && currentNode.getName().equals(extVarLink.getVariableName())){
+                    for (AstNode currentNode : fileAst) {
+                        if (currentNode instanceof VariableNode && currentNode.getName().equals(extVarLink.getVariableName())) {
                             referenceLineNumber = currentNode.getStartLine();
                         }
                     }

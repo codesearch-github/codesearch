@@ -32,6 +32,13 @@ import java.util.List;
  * @author David Froehlich
  */
 public abstract class CompoundNode extends AstNode {
+
+    /**
+     * returns a list of all child nodes
+     * @return all child nodes
+     */
+    public abstract List<AstNode> getChildNodes();
+
     protected int nodeLength;
 
     public int getNodeLength() {
@@ -41,9 +48,6 @@ public abstract class CompoundNode extends AstNode {
     public void setNodeLength(int nodeLength) {
         this.nodeLength = nodeLength;
     }
-
-    public abstract String getOutlineLink();
-
     /**
      * recursively adds all compound nodes within the current node to the list
      * @param nodes

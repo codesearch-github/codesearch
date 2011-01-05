@@ -108,15 +108,15 @@ public class IndexingTask implements Task {
             LOG.info("Starting execution of indexing task");
             // Read the index status file
             indexLocation = configReader.getSingleLinePropertyValue("index-location");
-            propertiesManager = new PropertiesManager(indexLocation + File.separator + "revisions.properties"); //TODO add propertiesReader path
+            propertiesManager = new PropertiesManager("/tmp/test/revisions.properties");
             // Get the version control plugins
             versionControlPlugin = pluginLoader.getPlugin(VersionControlPlugin.class, repository.getVersionControlSystem());
             versionControlPlugin.setRepository(new URI(repository.getUrl()), repository.getUsername(), repository.getPassword());
             String lastIndexedRevision = propertiesManager.getPropertyFileValue(repository.getName());
             changedFiles = versionControlPlugin.getChangedFilesSinceRevision(lastIndexedRevision);
             
-            boolean retrieveNewFileList = false;
-            this.executeIndexing();
+            boolean retrieveNewFileList = false;//FIXME
+//            this.executeIndexing(); 
             if (codeAnalysisEnabled) {
                 String lastAnalysisRevision = DBAccess.getLastAnalyzedRevisionOfRepository(repository.getName());
                 if (!lastAnalysisRevision.equals(lastIndexedRevision)) {

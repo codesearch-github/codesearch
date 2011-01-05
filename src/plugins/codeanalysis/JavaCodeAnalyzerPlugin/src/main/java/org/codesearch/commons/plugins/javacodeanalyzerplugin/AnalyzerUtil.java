@@ -18,11 +18,11 @@ import org.codesearch.commons.plugins.codeanalyzing.ast.ExternalLink;
 import org.codesearch.commons.plugins.codeanalyzing.ast.ExternalMethodLink;
 import org.codesearch.commons.plugins.codeanalyzing.ast.ExternalVariableLink;
 import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
+import org.codesearch.commons.plugins.codeanalyzing.ast.Visibility;
 import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.ClassNode;
 import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.FileNode;
 import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.MethodNode;
 import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.VariableNode;
-import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.Visibility;
 
 /**
  * Provides several methods needed for Java CodeAnalysis
@@ -244,16 +244,16 @@ public class AnalyzerUtil {
         Visibility visibility;
         switch (modifier) {
             case 0:
-                visibility = Visibility.default_vis;
+                visibility = Visibility.DEFAULT;
                 break;
             case 1:
-                visibility = Visibility.public_vis;
+                visibility = Visibility.PUBLIC;
                 break;
             case 2:
-                visibility = Visibility.private_vis;
+                visibility = Visibility.PRIVATE;
                 break;
             default:
-                visibility = Visibility.default_vis;
+                visibility = Visibility.DEFAULT;
             //TODO implement other cases
         }
         return visibility;

@@ -55,8 +55,8 @@ public class FileNode extends CompoundNode {
     }
 
     @Override
-    public String getOutlineLink() {
-        return "";
+    public String getOutlineName() {
+        return null;
     }
 
     @Override
@@ -65,5 +65,15 @@ public class FileNode extends CompoundNode {
             nodes.add(clazz);
             clazz.addCompoundNodesToList(nodes);
         }
+    }
+
+    @Override
+    public List<AstNode> getChildNodes() {
+        List<AstNode> childNodes = new LinkedList<AstNode>();
+        for(ClassNode currentClass : classes){
+            childNodes.add(currentClass);
+            childNodes.addAll(currentClass.getChildNodes());
+        }
+        return childNodes;
     }
 }

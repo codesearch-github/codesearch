@@ -34,7 +34,6 @@ import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
  */
 public class VariableNode extends AstNode {
     private String type;
-    private Visibility visibility;
     private boolean attribute;
 
     public boolean getAttribute() {
@@ -53,11 +52,11 @@ public class VariableNode extends AstNode {
         this.type = type;
     }
 
-    public Visibility getVisibility() {
-        return visibility;
-    }
-
-    public void setVisibility(Visibility visibility) {
-        this.visibility = visibility;
+    @Override
+    public String getOutlineName() {
+        if(attribute){
+           return type + " " + name;
+        }
+        return null;
     }
 }

@@ -55,10 +55,9 @@ public class FilesystemPlugin implements VersionControlPlugin {
             FileDto fileDto = new FileDto();
 
             FileInputStream fis = new FileInputStream(file);
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
             byte fileContent[] = new byte[(int) file.length()];
             fis.read(fileContent);
-
+            fis.close();
             //TODO find method to guess this quickly
             // assume that files are not binary because MIME detection takes too long
 
@@ -69,6 +68,9 @@ public class FilesystemPlugin implements VersionControlPlugin {
             return fileDto;
         } catch (IOException ex) {
             throw new VersionControlPluginException("File could not be opened: \n" + ex);
+        }
+        catch (NullPointerException ex){
+            return null;
         }
     }
 

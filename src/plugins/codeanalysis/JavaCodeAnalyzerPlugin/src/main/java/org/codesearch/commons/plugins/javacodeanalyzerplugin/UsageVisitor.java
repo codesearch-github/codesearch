@@ -24,7 +24,7 @@
  * and open the template in the editor.
  */
 package org.codesearch.commons.plugins.javacodeanalyzerplugin;
-
+//TODO implement ArrayCreationExpr
 import japa.parser.ast.ImportDeclaration;
 import japa.parser.ast.body.ClassOrInterfaceDeclaration;
 import japa.parser.ast.expr.ArrayAccessExpr;
@@ -36,7 +36,7 @@ import japa.parser.ast.stmt.ReturnStmt;
 import japa.parser.ast.visitor.VoidVisitorAdapter;
 import java.util.LinkedList;
 import java.util.List;
-import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.Visibility;
+import org.codesearch.commons.plugins.codeanalyzing.ast.Visibility;
 
 /**
  * a visitor used to visit the AST created by the JavaParser
@@ -123,7 +123,7 @@ public class UsageVisitor extends VoidVisitorAdapter {
     @Override
     public void visit(ClassOrInterfaceDeclaration n, Object arg) {
         super.visit(n, arg);
-        if (util.getVisibilityFromModifier(n.getModifiers()) == Visibility.public_vis) {
+        if (util.getVisibilityFromModifier(n.getModifiers()) == Visibility.PUBLIC) {
             this.typeDeclarations.add(this.packageName + "." + n.getName());
         }
     }

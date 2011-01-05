@@ -25,6 +25,7 @@
  */
 package org.codesearch.commons.plugins.javacodeanalyzerplugin.ast;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
@@ -35,8 +36,6 @@ import org.codesearch.commons.plugins.codeanalyzing.ast.CompoundNode;
  * @author David Froehlich
  */
 public class MethodNode extends CompoundNode {
-
-    private Visibility visibility;
     private List<VariableNode> parameters = new LinkedList<VariableNode>();
     private String returnType;
     private boolean constructor;
@@ -74,13 +73,6 @@ public class MethodNode extends CompoundNode {
         this.parameters = parameters;
     }
 
-    public Visibility getVisibility() {
-        return visibility;
-    }
-
-    public void setVisibility(Visibility visibility) {
-        this.visibility = visibility;
-    }
 //TODO probably remove method
     public String getOutlineForChildElements() {
         String parameterString = "";
@@ -104,21 +96,10 @@ public class MethodNode extends CompoundNode {
     }
 
     @Override
-    public String getOutlineLink() {
+    public String getOutlineName() {
         String parameterString = "";
         String returnString = "";
-        String visibilityString = "";
-        switch (visibility) {
-            case private_vis:
-                visibilityString = "private ";
-                break;
-            case public_vis:
-                visibilityString = "public ";
-                break;
-            case protected_vis:
-                visibilityString = "protected ";
-                break;
-        }
+        
         for (VariableNode v : parameters) {
             parameterString += v.getType() + " " + v.getName() + ", ";
         }
@@ -128,7 +109,7 @@ public class MethodNode extends CompoundNode {
         if (returnType != null) {
             returnString = ": " + returnType;
         }
-        String outlineString = "<a href='#" + startLine + "'>"  + visibilityString + this.getName() + "(" + parameterString + ")";
+        String outlineString = this.getName() + "(" + parameterString + ")";
         if (!constructor) {
             outlineString += returnString;
         }
@@ -138,5 +119,13 @@ public class MethodNode extends CompoundNode {
 
     @Override
     public void addCompoundNodesToList(List<AstNode> nodes) {
+    }
+
+    @Override
+    public List<AstNode> getChildNodes() {
+        List<AstNode> childNodes = new LinkedList<AstNode>();
+        childNodes.addAll(localVariables);
+        childNodes.addAll(parameters);
+        return childNodes;
     }
 }

@@ -251,6 +251,7 @@ public class DBAccess {
             ps.execute();
             ResultSet rs = ps.getResultSet();
             rs.first();
+            connectionPool.releaseConnection(conn);
             return rs.getInt("repository_id");
         } catch (SQLException ex) {
             throw new DatabaseAccessException("SQLException while trying to access the database\n" + ex);
@@ -283,8 +284,8 @@ public class DBAccess {
                 for (int i = 0; i < types.size(); i++) {
                     ps.setString(i + 1, types.get(i));
                 }
-                ps.execute();
             }
+            ps.execute(); //FIXME
             connectionPool.releaseConnection(conn);
         } catch (SQLException ex) {
             throw new DatabaseAccessException("SQLException while trying to access the database\n" + ex);
@@ -305,7 +306,7 @@ public class DBAccess {
             rs = ps.getResultSet();
             if (!rs.first()) {
                 //In case no record for this data exists
-                ps = conn.prepareStatement(STMT_CREATE_FILE_RECORD);
+                ps = conn.prepareStatement(STMT_CREATE_FILE_RECORD, Statement.RETURN_GENERATED_KEYS);
                 ps.setString(1, filePath);
                 ps.setString(2, repository);
                 ps.execute();

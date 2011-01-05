@@ -37,6 +37,18 @@ public abstract class AstNode implements Serializable, Comparable<AstNode>{
     protected int startPositionInLine;
     protected int startPositionAbsolute;
     protected String name;
+    protected Visibility visibility;
+
+    public abstract String getOutlineName();
+
+    public Visibility getVisibility() {
+        return visibility;
+    }
+
+    public void setVisibility(Visibility visibility) {
+        this.visibility = visibility;
+    }
+
     /** the start line of the parent node */
     protected int parentLineDeclaration;
 

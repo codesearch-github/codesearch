@@ -87,7 +87,7 @@ public class ConnectionPool {
                 return connections.pollFirst();
             }
         } else {
-            throw new DatabaseAccessException("All connections currently in use, increase connection limit in configuration and check if a connection is not released in DBUtils");
+            throw new DatabaseAccessException("All connections currently in use, increase connection limit in configuration and check if a connection is not released in DBAccess");
         }
     }
 

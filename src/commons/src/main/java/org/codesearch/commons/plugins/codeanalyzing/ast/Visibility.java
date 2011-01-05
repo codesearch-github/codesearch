@@ -19,20 +19,15 @@
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-package org.codesearch.commons.plugins.javacodeanalyzerplugin.ast;
+package org.codesearch.commons.plugins.codeanalyzing.ast;
 
 /**
- *
+ * 
  * @author David Froehlich
  */
 public enum Visibility {
-    private_vis,
-    public_vis,
-    protected_vis,
-    default_vis
+  PRIVATE,
+  PUBLIC,
+  PROTECTED,
+  DEFAULT
 }
