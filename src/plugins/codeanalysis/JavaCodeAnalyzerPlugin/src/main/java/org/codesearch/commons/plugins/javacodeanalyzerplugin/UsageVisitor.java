@@ -29,6 +29,7 @@ import japa.parser.ast.ImportDeclaration;
 import japa.parser.ast.body.ClassOrInterfaceDeclaration;
 import japa.parser.ast.expr.ArrayAccessExpr;
 import japa.parser.ast.expr.AssignExpr;
+import japa.parser.ast.expr.BinaryExpr;
 import japa.parser.ast.expr.FieldAccessExpr;
 import japa.parser.ast.expr.MethodCallExpr;
 import japa.parser.ast.expr.NameExpr;
@@ -73,17 +74,19 @@ public class UsageVisitor extends VoidVisitorAdapter {
             //first add a link to the method declaration
             util.addLinkToMethodDeclaration(n);
         } else {
-   //         util.addLinkToExternalMethodDeclaration(n);
+            //         util.addLinkToExternalMethodDeclaration(n);
         }
     }
-
 
     @Override
     public void visit(ReturnStmt n, Object arg) {
         super.visit(n, arg);
-        try{
-        util.addLinkToVariableDeclaration(n.getBeginLine(), n.getBeginColumn(), n.getExpr().toString(), n);
-        } catch (NullPointerException exs){
+        try {
+            if (n.getExpr() instanceof NameExpr) {
+                NameExpr name = (NameExpr) n.getExpr();
+                util.addLinkToVariableDeclaration(name.getBeginLine(), name.getBeginColumn(), name.getName(), n);
+            }
+        } catch (NullPointerException exs) {
             return;
         }
     }
@@ -103,7 +106,6 @@ public class UsageVisitor extends VoidVisitorAdapter {
     @Override
     public void visit(AssignExpr n, Object arg) {
         super.visit(n, arg);
-
         if (n.getTarget() instanceof NameExpr) {
             NameExpr target = (NameExpr) n.getTarget();
             util.addLinkToVariableDeclaration(target.getBeginLine(), target.getBeginColumn(), target.getName(), n);
@@ -117,7 +119,21 @@ public class UsageVisitor extends VoidVisitorAdapter {
     @Override
     public void visit(FieldAccessExpr n, Object arg) {
         super.visit(n, arg);
-      //  util.addLinkToExternalVariableDeclaration(n.getBeginLine(), n.getBeginColumn(), n.getField(), n, n.getScope().toString());
+        if (n.getScope().toString().equals("this")) {
+            util.addLinkToVariableDeclaration(n.getBeginLine(), n.getBeginColumn() + 5, n.toString(), n);
+        }
+        //  util.addLinkToExternalVariableDeclaration(n.getBeginLine(), n.getBeginColumn(), n.getField(), n, n.getScope().toString());
+    }
+
+    @Override
+    public void visit(BinaryExpr n, Object arg) {
+        super.visit(n, arg);
+        if (n.getLeft() instanceof NameExpr) {
+            util.addLinkToVariableDeclaration(n.getLeft().getBeginLine(), n.getLeft().getBeginColumn(), n.getLeft().toString(), n);
+        }
+        if (n.getRight() instanceof NameExpr) {
+            util.addLinkToVariableDeclaration(n.getRight().getBeginLine(), n.getRight().getBeginColumn(), n.getRight().toString(), n);
+        }
     }
 
     @Override

@@ -52,7 +52,7 @@ public class AnalyzerUtil {
             //System.out.println("variableName " + varName);
             return;
         }
-        usages.add(new Usage(startColumn, lineNumber, varName.length(), refVar.getStartLine(), varName));
+        usages.add(new Usage(startColumn, lineNumber, refVar.getName().length(), refVar.getStartLine(), refVar.getName()));
     }
 
     public void addLinkToExternalVariableDeclaration(int lineNumber, int startColumn, String varName, Node parent, String className) {

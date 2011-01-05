@@ -115,8 +115,8 @@ public class IndexingTask implements Task {
             String lastIndexedRevision = propertiesManager.getPropertyFileValue(repository.getName());
             changedFiles = versionControlPlugin.getChangedFilesSinceRevision(lastIndexedRevision);
             
-            boolean retrieveNewFileList = false;//FIXME
-//            this.executeIndexing(); 
+            boolean retrieveNewFileList = false;
+      //FIXME  //    this.executeIndexing();
             if (codeAnalysisEnabled) {
                 String lastAnalysisRevision = DBAccess.getLastAnalyzedRevisionOfRepository(repository.getName());
                 if (!lastAnalysisRevision.equals(lastIndexedRevision)) {
@@ -156,6 +156,7 @@ public class IndexingTask implements Task {
      * @throws CodeAnalyzerPluginException if the source code of one of the files could not be analyzed
      */
     private void executeCodeAnalysis(boolean retrieveNewFileList, String lastAnalysisRevision) throws VersionControlPluginException, CodeAnalyzerPluginException {
+        LOG.info("Starting code analysis");
         if (retrieveNewFileList) {
             changedFiles = versionControlPlugin.getChangedFilesSinceRevision(lastAnalysisRevision);
         }
@@ -193,9 +194,11 @@ public class IndexingTask implements Task {
                 
                 //write the AST information into the database
                 DBAccess.setAnalysisDataForFile(currentFile.getFilePath(), repository.getName(), ast, usages, typeDeclarations); //TODO work here
+                LOG.info("Finished code analysis");
             } catch (DatabaseAccessException ex) {
                 LOG.error("Error at DatabaseConnection \n" + ex);
             }
+            
         }
     }
 

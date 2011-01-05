@@ -11,6 +11,7 @@ Missing features
  - Raw file button
  - Extended file information: e.g Author, Commit date etc
  - Enum Handling for Code Navigation
+ - Preserve Index Consistency feature
 Important TODOs
 ===============
  - Refactor every System.out that is not in a Unit test

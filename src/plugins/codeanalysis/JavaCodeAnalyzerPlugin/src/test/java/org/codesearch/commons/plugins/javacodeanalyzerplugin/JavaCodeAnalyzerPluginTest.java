@@ -119,7 +119,7 @@ public class JavaCodeAnalyzerPluginTest extends TestCase {
 
     public void testIntegrationOfUsages() throws Exception {
         String fileContent = "";
-        BufferedReader br = new BufferedReader(new FileReader("/home/david/workspace/svnsearch/WakMusic/src/java/servlets/AddEvent.java"));
+        BufferedReader br = new BufferedReader(new FileReader("/home/david/workspace/svnsearch/codesearch/src/commons/src/main/java/org/codesearch/commons/utils/mime/FileType.java"));
         while (br.ready()) {
             fileContent += br.readLine() + "\n";
         }
@@ -137,24 +137,24 @@ public class JavaCodeAnalyzerPluginTest extends TestCase {
         int usageIndex = 0;
         outer:
         for (int lineNumber = 1; lineNumber < contentLines.length; lineNumber++) {
-            String currentLine = contentLines[lineNumber-1];
-            while (usageIndex < usages.size()) {
-                Usage currentUsage = usages.get(usageIndex);
-                if (currentUsage.getStartLine() == lineNumber) {
-                    int startColumn = currentUsage.getStartColumn();
-                    int referenceLine = currentUsage.getReferenceLine();
-                    String preamble = currentLine.substring(0, startColumn - 1);//-1
-                    String anchorBegin = hlEscapeStartToken + "<a class='testLink' onclick='goToLine(" + referenceLine + ");'>" + hlEscapeEndToken;
-                    String anchorEnd = hlEscapeStartToken + "</a>" + hlEscapeEndToken;
-                    String remainingLine = currentLine.substring(startColumn - 1 + currentUsage.getReplacedString().length());
-                    currentLine = preamble + anchorBegin + currentUsage.getReplacedString() + anchorEnd + remainingLine;
-                    usageIndex++;
-                } else {
-                    resultString += currentLine + "\n";
-                    continue outer;
+                String currentLine = contentLines[lineNumber - 1];
+                while (usageIndex < usages.size()) {
+                    Usage currentUsage = usages.get(usageIndex);
+                    if (currentUsage.getStartLine() == lineNumber) {
+                        int startColumn = currentUsage.getStartColumn();
+                        int referenceLine = currentUsage.getReferenceLine();
+                        String preamble = currentLine.substring(0, startColumn - 1); //-1
+                        String anchorBegin = hlEscapeStartToken + "<a class='testLink' onclick='goToLine(" + (referenceLine+1) + ");'>" + hlEscapeEndToken;
+                        String anchorEnd = hlEscapeStartToken + "</a>" + hlEscapeEndToken;
+                        String remainingLine = currentLine.substring(startColumn - 1 + currentUsage.getReplacedString().length());
+                        currentLine = preamble + anchorBegin + currentUsage.getReplacedString() + anchorEnd + remainingLine;
+                        usageIndex++;
+                    } else {
+                        resultString += currentLine + "\n";
+                        continue outer;
+                    }
                 }
             }
-        }
         System.out.println(resultString);
     }
 

@@ -237,40 +237,41 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
     }
 
     private void parseStatement(Statement stmt, Node parent) {
+        stmt.setData(parent);
         try {
             if (stmt instanceof IfStmt) {
                 parseIfStmt((IfStmt) stmt, parent);
             } else if (stmt instanceof BlockStmt) {
                 parseBlockStmt((BlockStmt) stmt, parent);
             } else if (stmt instanceof ExpressionStmt) {
-                parseExpression(((ExpressionStmt) stmt).getExpression(), parent);
+                parseExpression(((ExpressionStmt) stmt).getExpression(), stmt);
             } else if (stmt instanceof DoStmt) {
                 DoStmt doStmt = (DoStmt) stmt;
-                parseExpression(doStmt.getCondition(), parent);
-                parseStatement(doStmt.getBody(), parent);
+                parseExpression(doStmt.getCondition(), stmt);
+                parseStatement(doStmt.getBody(), stmt);
             } else if (stmt instanceof ForStmt) {
                 ForStmt forStmt = (ForStmt) stmt;
-                parseStatement(forStmt.getBody(), parent);
+                parseStatement(forStmt.getBody(), stmt);
                 for (Expression expr : forStmt.getInit()) {
-                    parseExpression(expr, parent);
+                    parseExpression(expr, stmt);
                 }
             } else if (stmt instanceof ForeachStmt) {
                 ForeachStmt foreachStmt = (ForeachStmt) stmt;
-                parseStatement(foreachStmt.getBody(), parent);
-                parseExpression(foreachStmt.getVariable(), parent);
-                parseExpression(foreachStmt.getIterable(), parent);
+                parseStatement(foreachStmt.getBody(), stmt);
+                parseExpression(foreachStmt.getVariable(), stmt);
+                parseExpression(foreachStmt.getIterable(), stmt);
             } else if (stmt instanceof SwitchStmt) {
                 SwitchStmt switchStmt = (SwitchStmt) stmt;
-                parseExpression(switchStmt.getSelector(), parent);
+                parseExpression(switchStmt.getSelector(), stmt);
                 for (SwitchEntryStmt switchEntry : switchStmt.getEntries()) {
                     for (Statement switchEntryStatement : switchEntry.getStmts()) {
-                        parseStatement(switchEntryStatement, parent);
+                        parseStatement(switchEntryStatement, stmt);
                     }
                 }
             } else if (stmt instanceof TryStmt) {
                 TryStmt tryStmt = (TryStmt) stmt;
-                parseStatement(tryStmt.getTryBlock(), parent);
-                parseStatement(tryStmt.getFinallyBlock(), parent);
+                parseStatement(tryStmt.getTryBlock(), stmt);
+                parseStatement(tryStmt.getFinallyBlock(), stmt);
                 if (tryStmt.getCatchs() == null) {
                     return;
                 }
@@ -285,15 +286,15 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
                     var.setType(param.getType().toString());
                     var.setName(param.getId().getName());
                     parentMethod.getLocalVariables().add(var);
-                    parseStatement(catchClause.getCatchBlock(), parent);
+                    parseStatement(catchClause.getCatchBlock(), stmt);
                 }
             } else if (stmt instanceof WhileStmt) {
                 WhileStmt whileStmt = (WhileStmt) stmt;
-                parseExpression(whileStmt.getCondition(), parent);
-                parseStatement(whileStmt.getBody(), parent);
+                parseExpression(whileStmt.getCondition(), stmt);
+                parseStatement(whileStmt.getBody(), stmt);
             } else if (stmt instanceof ReturnStmt) {
                 ReturnStmt returnStmt = (ReturnStmt) stmt;
-                parseExpression(returnStmt.getExpr(), parent);
+                parseExpression(returnStmt.getExpr(), stmt);
             } else {
             }
         } catch (NullPointerException ex) {
@@ -315,9 +316,6 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
         if (expr == null) {
             return;
         }
-        if (expr.getBeginLine() == 104) {
-            expr.getBeginLine();
-        }
         expr.setData(parent);
         if (expr instanceof VariableDeclarationExpr) {
             VariableDeclarationExpr vars = (VariableDeclarationExpr) expr;
@@ -328,7 +326,8 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
                 //in case it is an attribute
                 for (VariableDeclarator variableDeclaration : ((VariableDeclarationExpr) expr).getVars()) {
                     VariableNode var = new VariableNode();
-                    var.setParentLineDeclaration(parent.getBeginLine());
+                    Node grandParent = (Node)parent.getData();
+                    var.setParentLineDeclaration(grandParent.getBeginLine());
                     var.setAttribute(false);
                     var.setStartLine(expr.getBeginLine());
                     var.setStartPositionInLine(expr.getBeginColumn());
@@ -467,6 +466,7 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
                 String paramName = param.getId().getName();
                 String paramType = param.getType().toString();
                 newParam.setType(paramType);
+                newParam.setStartLine(param.getBeginLine());
                 newParam.setName(paramName);
                 newMethod.getParameters().add(newParam);
             }

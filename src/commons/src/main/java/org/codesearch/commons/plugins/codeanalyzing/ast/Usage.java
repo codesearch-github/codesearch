@@ -90,7 +90,7 @@ public class Usage implements Comparable<Usage>, Serializable {
     @Override
     public int compareTo(Usage other){
         if(this.startLine == other.startLine){
-            return this.startColumn - other.startColumn;
+            return other.startColumn - this.startColumn;
         }
         return startLine - other.startLine;
     }
