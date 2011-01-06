@@ -56,7 +56,7 @@ public interface VersionControlPlugin extends Plugin {
     Set<FileDto> getChangedFilesSinceRevision(String revision) throws VersionControlPluginException;
 
     /**
-     * Extracts and returns the revision number of the current set revision.
+     * Extracts and returns the revision number of the currently set revision.
      * @return The revision number
      */
     String getRepositoryRevision() throws VersionControlPluginException;

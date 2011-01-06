@@ -56,6 +56,9 @@ public class SubversionPlugin implements VersionControlPlugin {
     private SVNRepository repository;
     private static final Logger LOG = Logger.getLogger(SubversionPlugin.class);
 
+    /**
+     * creates a new instance of SubversionPlugin and sets up all factories required for connections
+     */
     public SubversionPlugin() {
         DAVRepositoryFactory.setup();
         SVNRepositoryFactoryImpl.setup();
@@ -143,6 +146,7 @@ public class SubversionPlugin implements VersionControlPlugin {
         return files;
     }
 
+    /**{@inheritDoc }*/
     @Override
     public String getRepositoryRevision() throws VersionControlPluginException {
         try {

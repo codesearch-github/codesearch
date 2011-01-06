@@ -106,14 +106,18 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
     private List<String> imports;
     AnalyzerUtil util;
 
+    /** {@inheritDoc} */
     @Override
     public List<AstNode> getAstForCurrentFile() throws CodeAnalyzerPluginException {
+        if (ast == null) {
+            throw new CodeAnalyzerPluginException("No AST information available, you must first analyze a file");
+        }
         return ast;
     }
 
-    //TODO remove repository
+    /** {@inheritDoc} */
     @Override
-    public void analyzeFile(final String fileContent, RepositoryDto repository) throws CodeAnalyzerPluginException {
+    public void analyzeFile(final String fileContent) throws CodeAnalyzerPluginException {
         CompilationUnit cu = null;
         ast = new LinkedList<AstNode>();
         fileNode = new FileNode();
@@ -127,12 +131,12 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
             fileNode.addCompoundNodesToList(ast);
             //parse usages via UsageVisitor
             String packageName = null;
-            try{
+            try {
                 packageName = cu.getPackage().getName().toString();
-            }catch(NullPointerException ex){
+            } catch (NullPointerException ex) {
                 //in case the class has no package
             }
-            
+
             UsageVisitor uv = new UsageVisitor(util, packageName);
             cu.accept(uv, null);
             usages = util.getUsages();
@@ -142,7 +146,7 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
             Collections.sort(usages);
             Collections.sort(ast);
             parseAbsoluteCharPositions();
-            
+
         } catch (ParseException ex) {
             System.out.println(ex.toString());
             //TODO throw exception
@@ -272,7 +276,9 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
             } else if (stmt instanceof TryStmt) {
                 TryStmt tryStmt = (TryStmt) stmt;
                 parseStatement(tryStmt.getTryBlock(), stmt);
-                parseStatement(tryStmt.getFinallyBlock(), stmt);
+                if (tryStmt.getFinallyBlock() != null) {
+                    parseStatement(tryStmt.getFinallyBlock(), stmt);
+                }
                 if (tryStmt.getCatchs() == null) {
                     return;
                 }
@@ -296,13 +302,13 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
             } else if (stmt instanceof ReturnStmt) {
                 ReturnStmt returnStmt = (ReturnStmt) stmt;
                 parseExpression(returnStmt.getExpr(), stmt);
-            } else if(stmt instanceof ExplicitConstructorInvocationStmt) {
+            } else if (stmt instanceof ExplicitConstructorInvocationStmt) {
                 ExplicitConstructorInvocationStmt ecis = (ExplicitConstructorInvocationStmt) stmt;
                 parseExpression(ecis.getExpr(), ecis);
             }
         } catch (NullPointerException ex) {
+            //FIXME
         }
-        //TODO implement handling for conditions
     }
 
     private void parseBlockStmt(BlockStmt stmt, Node parent) {
@@ -329,7 +335,7 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
                 //in case it is an attribute
                 for (VariableDeclarator variableDeclaration : ((VariableDeclarationExpr) expr).getVars()) {
                     VariableNode var = new VariableNode();
-                    Node grandParent = (Node)parent.getData();
+                    Node grandParent = (Node) parent.getData();
                     var.setParentLineDeclaration(grandParent.getBeginLine());
                     var.setAttribute(false);
                     var.setStartLine(expr.getBeginLine());
@@ -345,9 +351,12 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
             parseConditionExpr((ConditionalExpr) expr, parent);
         } else if (expr instanceof MethodCallExpr) {
             MethodCallExpr methodCallExpr = (MethodCallExpr) expr;
-            for (Expression currentExpr : methodCallExpr.getArgs()) {
-                parseExpression(currentExpr, expr);
+            if (methodCallExpr.getArgs() != null) {
+                for (Expression currentExpr : methodCallExpr.getArgs()) {
+                    parseExpression(currentExpr, expr);
+                }
             }
+            parseExpression(methodCallExpr.getScope(), methodCallExpr);
         } else if (expr instanceof ArrayAccessExpr) {
             ArrayAccessExpr aae = (ArrayAccessExpr) expr;
             parseExpression(aae.getIndex(), expr);
@@ -406,6 +415,11 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
         } else if (expr instanceof UnaryExpr) {
             UnaryExpr ue = (UnaryExpr) expr;
             parseExpression(ue.getExpr(), expr);
+        } else if (expr instanceof ObjectCreationExpr) {
+            ObjectCreationExpr oce = (ObjectCreationExpr) expr;
+            for (Expression ex : oce.getArgs()) {
+                parseExpression(ex, expr);
+            }
         }
 
         //TODO check for ArrayCreationExpr and ArrayInitializerExpr
@@ -417,14 +431,7 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
             //TODO implement
             return;
         }
-        if (expr instanceof NameExpr) {
-            String varName = expr.toString();
-            VariableNode refVar = util.getVariableDeclarationForUsage(expr.getBeginLine(), varName, parent);
-            if (refVar != null) {
-                int referenceLineNumber = refVar.getStartLine();
-                usages.add(new Usage(varName.length(), expr.getBeginColumn(), expr.getBeginLine(), referenceLineNumber, varName));
-            }
-        } else if (expr instanceof UnaryExpr) {
+        if (expr instanceof UnaryExpr) {
             UnaryExpr unaryExpr = (UnaryExpr) expr;
             parseConditionExpr(unaryExpr.getExpr(), parent);
             return;
@@ -435,15 +442,14 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
         } else if (expr instanceof EnclosedExpr) {
             EnclosedExpr enclosedExpr = (EnclosedExpr) expr;
             parseConditionExpr(enclosedExpr.getInner(), parent);
+        } else if (expr instanceof MethodCallExpr) {
+            parseExpression(expr, parent);
         } else if (expr != null) {
             return;
         }
     }
 
     private void parseIfStmt(IfStmt stmt, Node parent) {
-        if (stmt.getBeginLine() == 96) {
-            stmt.getBeginColumn();
-        }
         stmt.setData(parent);
         parseConditionExpr(stmt.getCondition(), stmt);
         //TODO add usage handling for condition expressions
@@ -501,31 +507,46 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public String getPurposes() {
         return "java"; //FIXME
     }
 
+    /** {@inheritDoc} */
     @Override
     public String getVersion() {
         return "0.1-SNAPSHOT";
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<String> getTypeDeclarations() throws CodeAnalyzerPluginException {
+        if (typeDeclarations == null) {
+            throw new CodeAnalyzerPluginException("No type declaration information available, you must first analyze a file");
+        }
         return typeDeclarations;
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<Usage> getUsages() throws CodeAnalyzerPluginException {
+        if (usages == null) {
+            throw new CodeAnalyzerPluginException("No usage information available, you must first analyze a file");
+        }
         return usages;
     }
 
+    /** {@inheritDoc} */
     @Override
-    public List<ExternalLink> getExternalLinks() {
+    public List<ExternalLink> getExternalLinks() throws CodeAnalyzerPluginException {
+        if (externalLinks == null) {
+            throw new CodeAnalyzerPluginException("No external link information available, you must first analyze a file");
+        }
         return externalLinks;
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<ExternalUsage> parseExternalLinks(String fileContent, List<String> imports, List<ExternalLink> externalLinks, String repository) {
         List<ExternalUsage> usages = new LinkedList<ExternalUsage>(); //TODO rename
@@ -573,6 +594,7 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
         return usages;
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<String> getImports() {
         return imports;

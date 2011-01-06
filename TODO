@@ -12,6 +12,7 @@ Missing features
  - Extended file information: e.g Author, Commit date etc
  - Enum Handling for Code Navigation
  - Preserve Index Consistency feature
+
 Important TODOs
 ===============
  - Refactor every System.out that is not in a Unit test
@@ -26,7 +27,87 @@ Minor Bugs
  - if no record for repository exists in database it should automatically be created
  - PropertyManager constantly assumes that the property file does not exist, therefor creates a new one
  - execution of code analysis sometimes causes an exception at databse access -> try with empty database
+ - when looking at a file and hitting the back button, the search result retrieved in the search before is not displayed, so you have to enter the search information again
 
 Unsolveable bugs
 ===============
  - When using an overloaded method with an external field or external method as parameter it can not be correctly determined which method is the correct one
+
+Missing documentation
+===============
+
+-- Stephan
+Method setRepository at line 42 in file src/plugins/vcs/GitPlugin/src/main/java/org/codesearch/commons/plugins/git/GitPlugin.java is not commented #1
+Method getChangedFilesSinceRevision at line 58 in file src/plugins/vcs/GitPlugin/src/main/java/org/codesearch/commons/plugins/git/GitPlugin.java is not commented #2
+Method getFileForFilePath at line 63 in file src/plugins/vcs/GitPlugin/src/main/java/org/codesearch/commons/plugins/git/GitPlugin.java is not commented #3
+Method getRepositoryRevision at line 76 in file src/plugins/vcs/GitPlugin/src/main/java/org/codesearch/commons/plugins/git/GitPlugin.java is not commented #4
+Method getPurposes at line 87 in file src/plugins/vcs/GitPlugin/src/main/java/org/codesearch/commons/plugins/git/GitPlugin.java is not commented #5
+Method getVersion at line 92 in file src/plugins/vcs/GitPlugin/src/main/java/org/codesearch/commons/plugins/git/GitPlugin.java is not commented #6
+Method setWorkingDirectory at line 86 in file src/plugins/vcs/BazaarPlugin/src/main/java/org/commons/codesearch/utils/bazaar/BazaarUtils.java is not commented #7
+Method setRepository at line 58 in file src/plugins/vcs/BazaarPlugin/src/main/java/org/codesearch/commons/plugins/bazaar/BazaarPlugin.java is not commented #8
+Method getFileForFilePath at line 68 in file src/plugins/vcs/BazaarPlugin/src/main/java/org/codesearch/commons/plugins/bazaar/BazaarPlugin.java is not commented #9
+Method getChangedFilesSinceRevision at line 81 in file src/plugins/vcs/BazaarPlugin/src/main/java/org/codesearch/commons/plugins/bazaar/BazaarPlugin.java is not commented #10
+Method getRepositoryRevision at line 108 in file src/plugins/vcs/BazaarPlugin/src/main/java/org/codesearch/commons/plugins/bazaar/BazaarPlugin.java is not commented #11
+Method getPurposes at line 117 in file src/plugins/vcs/BazaarPlugin/src/main/java/org/codesearch/commons/plugins/bazaar/BazaarPlugin.java is not commented #12
+Method getVersion at line 122 in file src/plugins/vcs/BazaarPlugin/src/main/java/org/codesearch/commons/plugins/bazaar/BazaarPlugin.java is not commented #13
+
+-- David
+Method visit at line 118 in file src/plugins/codeanalysis/JavaCodeAnalyzerPlugin/src/main/java/org/codesearch/commons/plugins/javacodeanalyzerplugin/UsageVisitor.java is not commented #14
+Method visit at line 131 in file src/plugins/codeanalysis/JavaCodeAnalyzerPlugin/src/main/java/org/codesearch/commons/plugins/javacodeanalyzerplugin/UsageVisitor.java is not commented #15
+Method visit at line 143 in file src/plugins/codeanalysis/JavaCodeAnalyzerPlugin/src/main/java/org/codesearch/commons/plugins/javacodeanalyzerplugin/UsageVisitor.java is not commented #16
+Method visit at line 156 in file src/plugins/codeanalysis/JavaCodeAnalyzerPlugin/src/main/java/org/codesearch/commons/plugins/javacodeanalyzerplugin/UsageVisitor.java is not commented #17
+Method visit at line 165 in file src/plugins/codeanalysis/JavaCodeAnalyzerPlugin/src/main/java/org/codesearch/commons/plugins/javacodeanalyzerplugin/UsageVisitor.java is not commented #18
+Method visit at line 176 in file src/plugins/codeanalysis/JavaCodeAnalyzerPlugin/src/main/java/org/codesearch/commons/plugins/javacodeanalyzerplugin/UsageVisitor.java is not commented #19
+Method buildAST at line 161 in file src/plugins/codeanalysis/JavaCodeAnalyzerPlugin/src/main/java/org/codesearch/commons/plugins/javacodeanalyzerplugin/JavaCodeAnalyzerPlugin.java is not commented #20
+Method parseContentOfClass at line 168 in file src/plugins/codeanalysis/JavaCodeAnalyzerPlugin/src/main/java/org/codesearch/commons/plugins/javacodeanalyzerplugin/JavaCodeAnalyzerPlugin.java is not commented #21
+Method parseContentOfMethod at line 205 in file src/plugins/codeanalysis/JavaCodeAnalyzerPlugin/src/main/java/org/codesearch/commons/plugins/javacodeanalyzerplugin/JavaCodeAnalyzerPlugin.java is not commented #22
+Method parseStatement at line 244 in file src/plugins/codeanalysis/JavaCodeAnalyzerPlugin/src/main/java/org/codesearch/commons/plugins/javacodeanalyzerplugin/JavaCodeAnalyzerPlugin.java is not commented #23
+Method parseBlockStmt at line 312 in file src/plugins/codeanalysis/JavaCodeAnalyzerPlugin/src/main/java/org/codesearch/commons/plugins/javacodeanalyzerplugin/JavaCodeAnalyzerPlugin.java is not commented #24
+Method parseExpression at line 322 in file src/plugins/codeanalysis/JavaCodeAnalyzerPlugin/src/main/java/org/codesearch/commons/plugins/javacodeanalyzerplugin/JavaCodeAnalyzerPlugin.java is not commented #25
+Method parseConditionExpr at line 418 in file src/plugins/codeanalysis/JavaCodeAnalyzerPlugin/src/main/java/org/codesearch/commons/plugins/javacodeanalyzerplugin/JavaCodeAnalyzerPlugin.java is not commented #26
+Method parseIfStmt at line 447 in file src/plugins/codeanalysis/JavaCodeAnalyzerPlugin/src/main/java/org/codesearch/commons/plugins/javacodeanalyzerplugin/JavaCodeAnalyzerPlugin.java is not commented #27
+Method parseContentOfConstructor at line 458 in file src/plugins/codeanalysis/JavaCodeAnalyzerPlugin/src/main/java/org/codesearch/commons/plugins/javacodeanalyzerplugin/JavaCodeAnalyzerPlugin.java is not commented #28
+Method parseAbsoluteCharPositions at line 489 in file src/plugins/codeanalysis/JavaCodeAnalyzerPlugin/src/main/java/org/codesearch/commons/plugins/javacodeanalyzerplugin/JavaCodeAnalyzerPlugin.java is not commented #29
+Method getOutlineForChildElements at line 59 in file src/plugins/codeanalysis/JavaCodeAnalyzerPlugin/src/main/java/org/codesearch/commons/plugins/javacodeanalyzerplugin/ast/ClassNode.java is not commented #30
+Method getOutlineName at line 70 in file src/plugins/codeanalysis/JavaCodeAnalyzerPlugin/src/main/java/org/codesearch/commons/plugins/javacodeanalyzerplugin/ast/ClassNode.java is not commented #31
+Method addCompoundNodesToList at line 75 in file src/plugins/codeanalysis/JavaCodeAnalyzerPlugin/src/main/java/org/codesearch/commons/plugins/javacodeanalyzerplugin/ast/ClassNode.java is not commented #32
+Method getChildNodes at line 88 in file src/plugins/codeanalysis/JavaCodeAnalyzerPlugin/src/main/java/org/codesearch/commons/plugins/javacodeanalyzerplugin/ast/ClassNode.java is not commented #33
+Method getOutlineForChildElements at line 49 in file src/plugins/codeanalysis/JavaCodeAnalyzerPlugin/src/main/java/org/codesearch/commons/plugins/javacodeanalyzerplugin/ast/FileNode.java is not commented #34
+Method getOutlineName at line 57 in file src/plugins/codeanalysis/JavaCodeAnalyzerPlugin/src/main/java/org/codesearch/commons/plugins/javacodeanalyzerplugin/ast/FileNode.java is not commented #35
+Method addCompoundNodesToList at line 62 in file src/plugins/codeanalysis/JavaCodeAnalyzerPlugin/src/main/java/org/codesearch/commons/plugins/javacodeanalyzerplugin/ast/FileNode.java is not commented #36
+Method getChildNodes at line 70 in file src/plugins/codeanalysis/JavaCodeAnalyzerPlugin/src/main/java/org/codesearch/commons/plugins/javacodeanalyzerplugin/ast/FileNode.java is not commented #37
+Method getOutlineName at line 55 in file src/plugins/codeanalysis/JavaCodeAnalyzerPlugin/src/main/java/org/codesearch/commons/plugins/javacodeanalyzerplugin/ast/VariableNode.java is not commented #38
+Method getOutlineForChildElements at line 77 in file src/plugins/codeanalysis/JavaCodeAnalyzerPlugin/src/main/java/org/codesearch/commons/plugins/javacodeanalyzerplugin/ast/MethodNode.java is not commented #39
+Method getOutlineName at line 98 in file src/plugins/codeanalysis/JavaCodeAnalyzerPlugin/src/main/java/org/codesearch/commons/plugins/javacodeanalyzerplugin/ast/MethodNode.java is not commented #40
+Method getChildNodes at line 124 in file src/plugins/codeanalysis/JavaCodeAnalyzerPlugin/src/main/java/org/codesearch/commons/plugins/javacodeanalyzerplugin/ast/MethodNode.java is not commented #41
+Method getGloballyIgnoredFileNames at line 191 in file src/commons/src/main/java/org/codesearch/commons/configuration/xml/XmlConfigurationReader.java is not commented #42
+Method getRepositoriesForGroup at line 276 in file src/commons/src/main/java/org/codesearch/commons/configuration/xml/XmlConfigurationReader.java is not commented #43
+Method clearConfigurationReader at line 302 in file src/commons/src/main/java/org/codesearch/commons/configuration/xml/XmlConfigurationReader.java is not commented #44
+Method setPropertyFileLocation at line 78 in file src/commons/src/main/java/org/codesearch/commons/configuration/properties/PropertiesManager.java is not commented #45
+Method initProperties at line 83 in file src/commons/src/main/java/org/codesearch/commons/configuration/properties/PropertiesManager.java is not commented #46
+
+-- Samuel
+Method equals at line 23 in file src/commons/src/main/java/org/codesearch/commons/utils/mime/FileType.java is not commented #47
+Method hashCode at line 38 in file src/commons/src/main/java/org/codesearch/commons/utils/mime/FileType.java is not commented #48
+Method readDefinitionFile at line 108 in file src/commons/src/main/java/org/codesearch/commons/utils/MimeTypeUtil.java is not commented #49
+
+-- David
+Method compareTo at line 63 in file src/commons/src/main/java/org/codesearch/commons/plugins/codeanalyzing/ast/AstNode.java is not commented #50
+Method compareTo at line 90 in file src/commons/src/main/java/org/codesearch/commons/plugins/codeanalyzing/ast/Usage.java is not commented #51
+Method getUsagesForFile at line 69 in file src/commons/src/main/java/org/codesearch/commons/database/DBAccess.java is not commented #52
+Method getFilePathForTypeDeclaration at line 98 in file src/commons/src/main/java/org/codesearch/commons/database/DBAccess.java is not commented #53
+Method getFilePathForTypeDeclaration at line 119 in file src/commons/src/main/java/org/codesearch/commons/database/DBAccess.java is not commented #54
+Method setupConnections at line 141 in file src/commons/src/main/java/org/codesearch/commons/database/DBAccess.java is not commented #55
+Method getLastAnalyzedRevisionOfRepository at line 158 in file src/commons/src/main/java/org/codesearch/commons/database/DBAccess.java is not commented #56
+Method getBinaryIndexForFile at line 181 in file src/commons/src/main/java/org/codesearch/commons/database/DBAccess.java is not commented #57
+Method createRepositoryEntry at line 212 in file src/commons/src/main/java/org/codesearch/commons/database/DBAccess.java is not commented #58
+Method setLastAnalyzedRevisionOfRepository at line 227 in file src/commons/src/main/java/org/codesearch/commons/database/DBAccess.java is not commented #59
+Method getRepoIdForRepoName at line 243 in file src/commons/src/main/java/org/codesearch/commons/database/DBAccess.java is not commented #60
+Method setAnalysisDataForFile at line 261 in file src/commons/src/main/java/org/codesearch/commons/database/DBAccess.java is not commented #61
+Method ensureThatRecordExists at line 295 in file src/commons/src/main/java/org/codesearch/commons/database/DBAccess.java is not commented #62
+Method setProperties at line 52 in file src/commons/src/main/java/org/codesearch/commons/database/ConnectionPool.java is not commented #63
+Method getInstance at line 66 in file src/commons/src/main/java/org/codesearch/commons/database/ConnectionPool.java is not commented #64
+Method getConnection at line 73 in file src/commons/src/main/java/org/codesearch/commons/database/ConnectionPool.java is not commented #65
+Method releaseConnection at line 94 in file src/commons/src/main/java/org/codesearch/commons/database/ConnectionPool.java is not commented #66
+Method execute at line 65 in file src/indexer/src/main/java/org/codesearch/indexer/tasks/CodeAnalyzerTask.java is not commented #67
+Method execute at line 56 in file src/indexer/src/main/java/org/codesearch/indexer/tasks/ClearTask.java is not commented #68

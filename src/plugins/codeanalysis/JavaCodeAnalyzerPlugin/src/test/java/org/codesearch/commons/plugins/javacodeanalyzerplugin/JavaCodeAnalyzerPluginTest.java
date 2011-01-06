@@ -20,6 +20,10 @@
  */
 package org.codesearch.commons.plugins.javacodeanalyzerplugin;
 
+import japa.parser.JavaParser;
+import japa.parser.ParseException;
+import japa.parser.ast.CompilationUnit;
+import japa.parser.ast.body.ClassOrInterfaceDeclaration;
 import japa.parser.ast.body.MethodDeclaration;
 import japa.parser.ast.visitor.VoidVisitorAdapter;
 import java.io.BufferedReader;
@@ -28,6 +32,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import junit.framework.TestCase;
 import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 import org.codesearch.commons.plugins.codeanalyzing.CodeAnalyzerPluginException;
@@ -101,26 +107,28 @@ public class JavaCodeAnalyzerPluginTest extends TestCase {
     public void testCodeCommentCompletion() {
 //        try {
 //            try {
-//                checkContentOfFile(new File("/home/david/workspace/svnsearch/"));
+//                try {
+//                    checkContentOfFile(new File("/home/david/codesearch/"));
+//                } catch (ParseException ex) {
+//
+//                }
 //            } catch (CodeAnalyzerPluginException ex) {
-//                Logger.getLogger(JavaCodeAnalyzerPluginTest.class.getName()).log(Level.SEVERE, null, ex);
+//
 //            }
 //        } catch (FileNotFoundException ex) {
-//            Logger.getLogger(JavaCodeAnalyzerPluginTest.class.getName()).log(Level.SEVERE, null, ex);
+//
 //        } catch (IOException ex) {
-//            Logger.getLogger(JavaCodeAnalyzerPluginTest.class.getName()).log(Level.SEVERE, null, ex);
 //        }
     }
 
     public void testIntegrationOfUsages() throws Exception {
         String fileContent = "";
-        BufferedReader br = new BufferedReader(new FileReader("/home/david/workspace/svnsearch/codesearch/src/commons/src/main/java/org/codesearch/commons/utils/mime/FileType.java"));
+        BufferedReader br = new BufferedReader(new FileReader("/home/david/workspace/svnsearch/codesearch/src/plugins/vcs/BazaarPlugin/src/main/java/org/commons/codesearch/utils/bazaar/BazaarUtils.java"));
         while (br.ready()) {
             fileContent += br.readLine() + "\n";
         }
-        RepositoryDto repo = new RepositoryDto("test", "test", "test", "test", true, "SVN", null, null);
         plugin = new JavaCodeAnalyzerPlugin();
-        plugin.analyzeFile(fileContent, repo);
+        plugin.analyzeFile(fileContent);
         List<ExternalLink> externalLinks = plugin.getExternalLinks();
         List<String> imports = plugin.getImports();
         //  List<ExternalUsage> usages = plugin.parseExternalLinks(fileContent, imports, externalLinks, "svn_local");
@@ -155,22 +163,17 @@ public class JavaCodeAnalyzerPluginTest extends TestCase {
         System.out.println(resultString);
     }
 
-    private void checkContentOfFile(File file) throws FileNotFoundException, IOException, CodeAnalyzerPluginException {
+    private void checkContentOfFile(File file) throws FileNotFoundException, IOException, CodeAnalyzerPluginException, ParseException {
         if (file.isDirectory()) {
             for (File child : file.listFiles()) {
                 checkContentOfFile(child);
             }
         } else {
-            if (file.getAbsolutePath().endsWith(".java")) {
-                String fileContent = "";
-                System.out.println(file.getAbsolutePath());
-                BufferedReader br = new BufferedReader(new FileReader(file));
-                while (br.ready()) {
-                    fileContent += br.readLine() + "\n";
-                }
-
-                plugin.analyzeFile(fileContent, null);
-
+            String truncFileName = file.getAbsolutePath().replaceAll("/home/david/codesearch/", "");
+            if (file.getAbsolutePath().endsWith(".java") && !file.getAbsolutePath().contains("searcher") && !file.getAbsolutePath().contains("/test/") && !file.getAbsolutePath().contains("jhighlight") && !file.getAbsolutePath().contains("resources")) {
+                CompletionVisitor cv = new CompletionVisitor();
+                CompilationUnit cu = JavaParser.parse(file);
+                cu.accept(cv, truncFileName);
             }
         }
 

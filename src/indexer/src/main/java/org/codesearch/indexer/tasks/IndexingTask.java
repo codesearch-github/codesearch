@@ -116,7 +116,7 @@ public class IndexingTask implements Task {
             changedFiles = versionControlPlugin.getChangedFilesSinceRevision(lastIndexedRevision);
             
             boolean retrieveNewFileList = false;
-            this.executeIndexing();
+         //FIXME   this.executeIndexing();
             if (codeAnalysisEnabled) {
                 String lastAnalysisRevision = DBAccess.getLastAnalyzedRevisionOfRepository(repository.getName());
                 if (!lastAnalysisRevision.equals(lastIndexedRevision)) {
@@ -183,7 +183,7 @@ public class IndexingTask implements Task {
                         continue;
                     }
                 }
-                plugin.analyzeFile(new String(currentFile.getContent()), repository);
+                plugin.analyzeFile(new String(currentFile.getContent()));
                 List<AstNode> ast = plugin.getAstForCurrentFile();
                 List<String> typeDeclarations = plugin.getTypeDeclarations();
                 List<Usage> usages = plugin.getUsages();
@@ -202,6 +202,12 @@ public class IndexingTask implements Task {
         }
     }
 
+    /**
+     * creates/updates the index of all files in the changedFiles list
+     * @throws IOException if the index could not be read
+     * @throws ConfigurationException if the necessary configuration could not be read from the config file
+     * @throws VersionControlPluginException if the current revision could not be determined from the VersionControlPlugin
+     */
     private void executeIndexing() throws IOException, ConfigurationException, VersionControlPluginException {
         if (changedFiles.isEmpty()) {
             LOG.info("Index of repository " + repository.getName() + " is up to date");

@@ -36,15 +36,61 @@ import org.codesearch.commons.plugins.codeanalyzing.ast.ExternalUsage;
 import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
 
 /**
- *
+ * A plugin used to analyze the content of a source code file
+ * Parses all information necessary to display an outline of the file and provide code navigation
  * @author David Froehlich
  */
 public interface CodeAnalyzerPlugin extends Plugin {
+    /**
+     * returns the simplified AST created by the analyzeFile method
+     * @return the simplified AST of the currently set file
+     * @throws CodeAnalyzerPluginException if the analyzeFile method was not executed before
+     */
     List<AstNode> getAstForCurrentFile() throws CodeAnalyzerPluginException;
+
+    /**
+     * returns all a list of all type declarations created in the file
+     * @return the type declarations
+     * @throws CodeAnalyzerPluginException if the analyzeFile method was not executed before
+     */
     List<String> getTypeDeclarations() throws CodeAnalyzerPluginException;
+
+    /**
+     * returns a list of all usages in the file
+     * @return the usages
+     * @throws CodeAnalyzerPluginExceptionv if the analyzeFile method was not executed before
+     */
     List<Usage> getUsages() throws CodeAnalyzerPluginException;
-    List<ExternalLink> getExternalLinks();
-    void analyzeFile(String fileContent, RepositoryDto repository) throws CodeAnalyzerPluginException;
+
+    /**
+     * returns a list of all external links that can later be parsed to ExternalUsages
+     * @return the external links
+     * @throws CodeAnalyzerPluginException if the analyzeFile method was not executed before
+     */
+    List<ExternalLink> getExternalLinks() throws CodeAnalyzerPluginException;
+
+    /**
+     * analyzes the file and extracts information about the type declarations, usages, external links and the ast
+     * @param fileContent the content of the file
+     * @throws CodeAnalyzerPluginException if the analysis failed
+     */
+    void analyzeFile(String fileContent) throws CodeAnalyzerPluginException;
+
+    /**
+     * parses the external links to external usages
+     * after the entire repository was analyzed the reference line number can be extracted from the corresponding declarations
+     * @param fileContent the content of the file
+     * @param imports all imports declared in the file
+     * @param externalLinks the external links parsed by the analyzeFile() method
+     * @param repository the repository holding the file
+     * @return all external usages
+     */
     List<ExternalUsage> parseExternalLinks(String fileContent, List<String> imports, List<ExternalLink> externalLinks, String repository);
-    List<String> getImports();
+
+    /**
+     * returns all imports declared in the file
+     * @return the imports
+     * @throws CodeAnalyzerPluginException if the analyzeFile method was not executed before
+     */
+    List<String> getImports() throws CodeAnalyzerPluginException;
 }

@@ -49,14 +49,14 @@ public class ConnectionPool {
     private String dbName;
     private String dbms;
 
-    public void setProperties(String username, String password, String driver, String url, String portNumber, String dbName, String dbms, int remainingConneciton) {
+    public void setProperties(String username, String password, String driver, String url, String portNumber, String dbName, String dbms, int remainingConnections) {
         this.username = username;
         this.password = password;
         this.driver = driver;
         this.url = url;
         this.portNumber = portNumber;
         this.dbName = dbName;
-        this.remainingConnections = remainingConneciton;
+        this.remainingConnections = remainingConnections;
         this.dbms = dbms;
     }
 

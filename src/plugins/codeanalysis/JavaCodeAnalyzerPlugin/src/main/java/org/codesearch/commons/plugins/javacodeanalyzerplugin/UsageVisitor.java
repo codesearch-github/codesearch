@@ -30,10 +30,13 @@ import japa.parser.ast.body.ClassOrInterfaceDeclaration;
 import japa.parser.ast.expr.ArrayAccessExpr;
 import japa.parser.ast.expr.AssignExpr;
 import japa.parser.ast.expr.BinaryExpr;
+import japa.parser.ast.expr.ConditionalExpr;
 import japa.parser.ast.expr.Expression;
 import japa.parser.ast.expr.FieldAccessExpr;
 import japa.parser.ast.expr.MethodCallExpr;
 import japa.parser.ast.expr.NameExpr;
+import japa.parser.ast.expr.ObjectCreationExpr;
+import japa.parser.ast.expr.UnaryExpr;
 import japa.parser.ast.stmt.ExplicitConstructorInvocationStmt;
 import japa.parser.ast.stmt.ReturnStmt;
 import japa.parser.ast.visitor.VoidVisitorAdapter;
@@ -53,11 +56,21 @@ public class UsageVisitor extends VoidVisitorAdapter {
     private List<String> typeDeclarations = new LinkedList<String>();
     private List<String> imports = new LinkedList<String>();
 
+    /**
+     * creates a new instance of UsageVisitor
+     * @param util the AnalyzerUtil class that will be used for this visitor
+     * @param packageName the package name of the currently analyzed file
+     */
     public UsageVisitor(AnalyzerUtil util, String packageName) {
         this.util = util;
         this.packageName = packageName;
     }
 
+    /**
+     * adds an entry to the import list
+     * @param n the ImportDeclaration that is added
+     * @param arg null
+     */
     @Override
     public void visit(ImportDeclaration n, Object arg) {
         super.visit(n, arg);
@@ -68,6 +81,12 @@ public class UsageVisitor extends VoidVisitorAdapter {
         imports.add(importName);
     }
 
+    /**
+     * checks the parameters of the invocation if they are NameExpr
+     * if so, adds a usage for the variable used as a parameter
+     * @param n the ExplicitConstructorInvocationStmt
+     * @param arg the parent Node of the Stmt
+     */
     @Override
     public void visit(ExplicitConstructorInvocationStmt n, Object arg) {
         super.visit(n, arg);
@@ -81,9 +100,22 @@ public class UsageVisitor extends VoidVisitorAdapter {
 
     }
 
+    /**
+     * adds a link from the MethodCall to the MethodNode and from the parameters to the VariableNodes
+     * @param n the MethodCallExpr
+     * @param arg the parent node of the MethodCallExpr
+     */
     @Override
     public void visit(MethodCallExpr n, Object arg) {
         super.visit(n, arg);
+        List<Expression> parameterList = n.getArgs();
+        if (parameterList != null) {
+            for (Expression currentParameter : parameterList) {
+                if (currentParameter instanceof NameExpr) {
+                    util.addLinkToVariableDeclaration(currentParameter.getBeginLine(), currentParameter.getBeginColumn(), currentParameter.toString(), n);
+                }
+            }
+        }
         if (n.getScope() == null || n.getScope().toString().equals("this")) {
             //in case the method is a method from the current class
             //first add a link to the method declaration
@@ -96,6 +128,7 @@ public class UsageVisitor extends VoidVisitorAdapter {
 
     @Override
     public void visit(ReturnStmt n, Object arg) {
+        
         super.visit(n, arg);
         try {
             if (n.getExpr() instanceof NameExpr) {
@@ -120,6 +153,18 @@ public class UsageVisitor extends VoidVisitorAdapter {
     }
 
     @Override
+    public void visit(ObjectCreationExpr n, Object arg) {
+        super.visit(n, arg);
+        if (n.getArgs() != null) {
+            for (Expression expr : n.getArgs()) {
+                if (expr instanceof NameExpr) {
+                    util.addLinkToVariableDeclaration(expr.getBeginLine(), expr.getBeginColumn(), expr.toString(), n);
+                }
+            }
+        }
+    }
+
+    @Override
     public void visit(AssignExpr n, Object arg) {
         super.visit(n, arg);
         if (n.getTarget() instanceof NameExpr) {
@@ -129,6 +174,27 @@ public class UsageVisitor extends VoidVisitorAdapter {
         if (n.getValue() instanceof NameExpr) {
             NameExpr value = (NameExpr) n.getValue();
             util.addLinkToVariableDeclaration(value.getBeginLine(), value.getBeginColumn(), value.getName(), n);
+        }
+    }
+
+
+
+    @Override
+    public void visit(UnaryExpr n, Object arg) {
+        super.visit(n, arg);
+        if (n.getExpr() instanceof NameExpr) {
+            NameExpr expr = (NameExpr) n.getExpr();
+            util.addLinkToVariableDeclaration(expr.getBeginLine(), expr.getBeginColumn(), expr.toString(), n);
+        }
+    }
+
+    @Override
+    public void visit(ConditionalExpr n, Object arg) {
+        super.visit(n, arg);
+        Expression expr = n.getCondition();
+        if (expr instanceof NameExpr) {
+            String varName = expr.toString();
+            util.addLinkToVariableDeclaration(expr.getBeginLine(), expr.getBeginColumn(), varName, expr);
         }
     }
 
