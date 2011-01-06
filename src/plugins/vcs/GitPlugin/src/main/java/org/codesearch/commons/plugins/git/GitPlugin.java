@@ -63,7 +63,7 @@ public class GitPlugin implements VersionControlPlugin {
     @Override
     public FileDto getFileForFilePath(String filePath) throws VersionControlPluginException {
         try {
-            return gitUtil.retrieveFile(repository, filePath);
+            return gitUtil.retrieveFile(repository, filePath, Integer.valueOf(getRepositoryRevision()));
         } catch (AmbiguousObjectException ex) {
             throw new VersionControlPluginException(ex.toString());
         } catch (MissingObjectException ex) {

@@ -35,7 +35,7 @@
             </goals>
             <properties>
                 <netbeans.deploy>true</netbeans.deploy>
-                <netbeans.deploy.clientUrlPart>/searcher</netbeans.deploy.clientUrlPart>
+                <netbeans.deploy.clientUrlPart>/searcher-0.1-SNAPSHOT</netbeans.deploy.clientUrlPart>
             </properties>
         </action>
         <action>
@@ -45,7 +45,7 @@
             </goals>
             <properties>
                 <netbeans.deploy>true</netbeans.deploy>
-                <netbeans.deploy.clientUrlPart>/searcher</netbeans.deploy.clientUrlPart>
+                <netbeans.deploy.clientUrlPart>/searcher-0.1-SNAPSHOT</netbeans.deploy.clientUrlPart>
                 <netbeans.deploy.debugmode>true</netbeans.deploy.debugmode>
             </properties>
         </action>
@@ -56,7 +56,7 @@
             </goals>
             <properties>
                 <netbeans.deploy>true</netbeans.deploy>
-                <netbeans.deploy.clientUrlPart>/searcher</netbeans.deploy.clientUrlPart>
+                <netbeans.deploy.clientUrlPart>/searcher-0.1-SNAPSHOT</netbeans.deploy.clientUrlPart>
                 <netbeans.deploy.profilemode>true</netbeans.deploy.profilemode>
             </properties>
         </action>

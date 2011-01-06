@@ -20,7 +20,9 @@
  */
 package org.codesearch.commons.plugins.bazaar;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -31,7 +33,6 @@ import org.apache.log4j.Logger;
 import org.codesearch.commons.plugins.vcs.FileDto;
 import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
 import org.codesearch.commons.plugins.vcs.VersionControlPluginException;
-import org.codesearch.commons.utils.CommonsUtils;
 import org.commons.codesearch.utils.bazaar.BazaarUtils;
 import org.springframework.stereotype.Component;
 import org.vcs.bazaar.client.IBazaarLogMessage;
@@ -86,8 +87,11 @@ public class BazaarPlugin implements VersionControlPlugin {
             for (IBazaarLogMessage log : iblm) {
                 for (IBazaarStatus bs : log.getAffectedFiles()) {
                     LOG.debug("Filepath retrieved: " + bs.getFile().getAbsolutePath());
-                    byte[] content = CommonsUtils.convertFileToByteArray(bs.getFile());
-                    FileDto fd = new FileDto(bs.getAbsolutePath(), content, false); //TODO: ADD MIME TYPE...
+                    FileInputStream fis = new FileInputStream(bs.getFile());
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    byte fileContent[] = new byte[(int) bs.getFile().length()];
+                    fis.read(fileContent);
+                    FileDto fd = new FileDto(bs.getAbsolutePath(), fileContent, false); //TODO: ADD MIME TYPE...
                     files.add(fd);
                 }
             }

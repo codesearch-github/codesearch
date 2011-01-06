@@ -137,6 +137,7 @@ public class BazaarUtils {
         } else {
             return branchLocation;
         }
+        
     }
 
     /**
