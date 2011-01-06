@@ -129,7 +129,13 @@ public class AnalyzerUtil {
         } else {
             //    throw new NotImplementedException(); //FIXME
         }
-
+        if (parameterList != null) {
+            for (Expression currentParameter : parameterList) {
+                if (currentParameter instanceof NameExpr) {
+                    addLinkToVariableDeclaration(currentParameter.getBeginLine(), currentParameter.getBeginColumn(), currentParameter.toString(), n);
+                }
+            }
+        }
     }
 
     public MethodNode getMethodAtLine(int lineNumber) {
@@ -233,7 +239,7 @@ public class AnalyzerUtil {
     public ClassNode getClassAtLine(int lineNumber) {
         ClassNode classNode = null;
         for (ClassNode clazz : fileNode.getClasses()) {
-            if (classNode == null || (clazz.getStartLine() > classNode.getStartLine() && clazz.getStartLine() < lineNumber)) {
+            if (classNode == null || (clazz.getStartLine() > classNode.getStartLine() && clazz.getStartLine() < lineNumber && clazz.getStartLine() + clazz.getNodeLength() > lineNumber)) {
                 classNode = clazz;
             }
         }

@@ -30,9 +30,11 @@ import japa.parser.ast.body.ClassOrInterfaceDeclaration;
 import japa.parser.ast.expr.ArrayAccessExpr;
 import japa.parser.ast.expr.AssignExpr;
 import japa.parser.ast.expr.BinaryExpr;
+import japa.parser.ast.expr.Expression;
 import japa.parser.ast.expr.FieldAccessExpr;
 import japa.parser.ast.expr.MethodCallExpr;
 import japa.parser.ast.expr.NameExpr;
+import japa.parser.ast.stmt.ExplicitConstructorInvocationStmt;
 import japa.parser.ast.stmt.ReturnStmt;
 import japa.parser.ast.visitor.VoidVisitorAdapter;
 import java.util.LinkedList;
@@ -67,6 +69,19 @@ public class UsageVisitor extends VoidVisitorAdapter {
     }
 
     @Override
+    public void visit(ExplicitConstructorInvocationStmt n, Object arg) {
+        super.visit(n, arg);
+        if (n.getArgs() != null) {
+            for (Expression expr : n.getArgs()) {
+                if (expr instanceof NameExpr) {
+                    util.addLinkToVariableDeclaration(expr.getBeginLine(), expr.getBeginColumn(), expr.toString(), n);
+                }
+            }
+        }
+
+    }
+
+    @Override
     public void visit(MethodCallExpr n, Object arg) {
         super.visit(n, arg);
         if (n.getScope() == null || n.getScope().toString().equals("this")) {
@@ -74,6 +89,7 @@ public class UsageVisitor extends VoidVisitorAdapter {
             //first add a link to the method declaration
             util.addLinkToMethodDeclaration(n);
         } else {
+            util.addLinkToVariableDeclaration(n.getBeginLine(), n.getBeginColumn(), n.getScope().toString(), n);
             //         util.addLinkToExternalMethodDeclaration(n);
         }
     }

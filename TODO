@@ -25,6 +25,7 @@ Minor Bugs
  - usages of parameters in methods are not correctly linked
  - if no record for repository exists in database it should automatically be created
  - PropertyManager constantly assumes that the property file does not exist, therefor creates a new one
+ - execution of code analysis sometimes causes an exception at databse access -> try with empty database
 
 Unsolveable bugs
 ===============

@@ -55,6 +55,7 @@ import japa.parser.ast.expr.VariableDeclarationExpr;
 import japa.parser.ast.stmt.BlockStmt;
 import japa.parser.ast.stmt.CatchClause;
 import japa.parser.ast.stmt.DoStmt;
+import japa.parser.ast.stmt.ExplicitConstructorInvocationStmt;
 import japa.parser.ast.stmt.ExpressionStmt;
 import japa.parser.ast.stmt.ForStmt;
 import japa.parser.ast.stmt.ForeachStmt;
@@ -166,7 +167,7 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
         int startLine = type.getBeginLine();
         //    int endLine = n.getEndLine();
         String clazzName = type.getName();
-        int nodeLength = type.getEndColumn() - type.getBeginColumn();
+        int nodeLength = type.getEndLine() - type.getBeginLine();
         newClazz.setName(clazzName);
         newClazz.setStartLine(startLine);
         newClazz.setStartPositionInLine(type.getBeginColumn());
@@ -295,7 +296,9 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
             } else if (stmt instanceof ReturnStmt) {
                 ReturnStmt returnStmt = (ReturnStmt) stmt;
                 parseExpression(returnStmt.getExpr(), stmt);
-            } else {
+            } else if(stmt instanceof ExplicitConstructorInvocationStmt) {
+                ExplicitConstructorInvocationStmt ecis = (ExplicitConstructorInvocationStmt) stmt;
+                parseExpression(ecis.getExpr(), ecis);
             }
         } catch (NullPointerException ex) {
         }
@@ -473,6 +476,10 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
         } catch (NullPointerException ex) {
         }
         parentClass.getMethods().add(newMethod);
+        //iterate all statements in the method recursively and check for declarations/usages
+        if (constructor.getBlock() != null) {
+            parseStatement(constructor.getBlock(), constructor);
+        }
     }
 
     private void parseAbsoluteCharPositions() {

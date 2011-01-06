@@ -194,7 +194,7 @@ public class SearcherServiceImpl extends AutowiringRemoteServiceServlet implemen
             String[] contentLines = new String(fileContentBytes).split("\n");
             int usageIndex = 0;
             outer:
-            for (int lineNumber = 1; lineNumber < contentLines.length; lineNumber++) {
+            for (int lineNumber = 1; lineNumber <= contentLines.length; lineNumber++) {
                 String currentLine = contentLines[lineNumber - 1];
                 while (usageIndex < usages.size()) {
                     Usage currentUsage = usages.get(usageIndex);
@@ -202,7 +202,7 @@ public class SearcherServiceImpl extends AutowiringRemoteServiceServlet implemen
                         int startColumn = currentUsage.getStartColumn();
                         int referenceLine = currentUsage.getReferenceLine();
                         String preamble = currentLine.substring(0, startColumn - 1); //-1
-                        String anchorBegin = hlEscapeStartToken + "<a class='testLink' onclick='goToLine(" + (referenceLine+1) + ");'>" + hlEscapeEndToken;
+                        String anchorBegin = hlEscapeStartToken + "<a class='testLink' onclick='goToLine(" + (referenceLine + 1) + ");'>" + hlEscapeEndToken;
                         String anchorEnd = hlEscapeStartToken + "</a>" + hlEscapeEndToken;
                         String remainingLine = currentLine.substring(startColumn - 1 + currentUsage.getReplacedString().length());
                         currentLine = preamble + anchorBegin + currentUsage.getReplacedString() + anchorEnd + remainingLine;
@@ -212,7 +212,9 @@ public class SearcherServiceImpl extends AutowiringRemoteServiceServlet implemen
                         continue outer;
                     }
                 }
+                resultString += currentLine + "\n";
             }
+            resultString = resultString.substring(0, resultString.length() - 1); //Truncates the last \n char
             return resultString.getBytes();
         } catch (DatabaseAccessException ex) {
             LOG.error(ex);

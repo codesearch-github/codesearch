@@ -116,7 +116,7 @@ public class IndexingTask implements Task {
             changedFiles = versionControlPlugin.getChangedFilesSinceRevision(lastIndexedRevision);
             
             boolean retrieveNewFileList = false;
-      //FIXME  //    this.executeIndexing();
+         //FIXME   this.executeIndexing();
             if (codeAnalysisEnabled) {
                 String lastAnalysisRevision = DBAccess.getLastAnalyzedRevisionOfRepository(repository.getName());
                 if (!lastAnalysisRevision.equals(lastIndexedRevision)) {
