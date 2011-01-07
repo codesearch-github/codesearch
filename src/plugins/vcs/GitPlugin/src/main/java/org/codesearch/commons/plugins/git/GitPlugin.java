@@ -57,7 +57,11 @@ public class GitPlugin implements VersionControlPlugin {
 
     @Override
     public Set<FileDto> getChangedFilesSinceRevision(String revision) throws VersionControlPluginException {
-        return null;
+        try {
+            return gitUtil.getChangedFilesSinceRevision(repository, revision);
+        } catch (IOException ex) {
+            throw new VersionControlPluginException(ex.toString());
+        }
     }
 
     @Override

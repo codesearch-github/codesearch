@@ -7,6 +7,7 @@ package org.codesearch.commons.utils.git;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.apache.log4j.Logger;
@@ -140,11 +141,11 @@ public class GitUtils {
      * @return null if the file does not exist in given revision
      * @throws IOException
      */
-    public List<FileDto> getChangedFilesSinceRevision(Repository repo, String revision) throws IOException {
+    public Set<FileDto> getChangedFilesSinceRevision(Repository repo, String revision) throws IOException {
         final RevWalk rw = new RevWalk(repo);
         final TreeWalk tw = new TreeWalk(repo);
         final int headRevision = retrieveHeadRevisionForRepository(repo);
-        List<FileDto> changedFiles = new ArrayList<FileDto>();
+        Set<FileDto> changedFiles = new HashSet<FileDto>();
         RevTree headTree = rw.parseTree(repo.resolve(Constants.HEAD));
         RevTree specTree = headTree;
         tw.setFilter(TreeFilter.ANY_DIFF);
