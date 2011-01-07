@@ -19,14 +19,12 @@
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package org.codesearch.commons.plugins.javacodeanalyzerplugin.ast;
 
+import java.util.LinkedList;
+import java.util.List;
 import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
+import org.codesearch.commons.plugins.codeanalyzing.ast.Visibility;
 
 /**
  * ASTElement that represents a variable in the source code
@@ -35,6 +33,10 @@ import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
 public class VariableNode extends AstNode {
     private String type;
     private boolean attribute;
+
+    public VariableNode() {
+        this.visibility = Visibility.NONE;
+    }
 
     public boolean getAttribute() {
         return attribute;
@@ -54,9 +56,24 @@ public class VariableNode extends AstNode {
 
     @Override
     public String getOutlineName() {
-        if(attribute){
+        if(attribute) {
            return type + " " + name;
         }
         return null;
+    }
+
+    @Override
+    public List<AstNode> getChildNodes() {
+        return new LinkedList<AstNode>();
+    }
+
+    @Override
+    public boolean showInOutline() {
+//        if(visibility != Visibility.NONE) {
+//            return true;
+//        } else {
+//            return false;
+//        }
+        return attribute;
     }
 }

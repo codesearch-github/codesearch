@@ -18,51 +18,46 @@
  * You should have received a copy of the GNU General Public License
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package org.codesearch.commons.plugins.codeanalyzing.ast;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Superclass for all ASTNodes used for code analysis.
  * @author David Froehlich
  */
-public abstract class AstNode implements Serializable, Comparable<AstNode>{
+public abstract class AstNode implements Serializable, Comparable<AstNode> {
+
     protected int startLine;
     protected int startPositionInLine;
     protected int startPositionAbsolute;
     protected String name;
     protected Visibility visibility;
-
-    public abstract String getOutlineName();
-
-    public Visibility getVisibility() {
-        return visibility;
-    }
-
-    public void setVisibility(Visibility visibility) {
-        this.visibility = visibility;
-    }
-
     /** the start line of the parent node */
     protected int parentLineDeclaration;
 
-    public int getParentLineDeclaration() {
-        return parentLineDeclaration;
-    }
+    /**
+     * Returns the text to be displayed as name in the outline.
+     * @return
+     */
+    public abstract String getOutlineName();
 
-    public void setParentLineDeclaration(int parentLineDeclaration) {
-        this.parentLineDeclaration = parentLineDeclaration;
-    }
+    /**
+     * Whether this {@link AstNode} should be shown in the outline.
+     * @return
+     */
+    public abstract boolean showInOutline();
+
+    /**
+     * returns a list of all child nodes
+     * @return all child nodes
+     */
+    public abstract List<AstNode> getChildNodes();
 
     @Override
-    public int compareTo(AstNode other){
-        if(this.startLine == other.startLine){
+    public int compareTo(AstNode other) {
+        if (this.startLine == other.startLine) {
             return this.startPositionInLine - other.startPositionInLine;
         }
         return startLine - other.startLine;
@@ -91,12 +86,28 @@ public abstract class AstNode implements Serializable, Comparable<AstNode>{
     public void setStartPositionAbsolute(int startPositionAbsolute) {
         this.startPositionAbsolute = startPositionAbsolute;
     }
-    
+
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Visibility getVisibility() {
+        return visibility;
+    }
+
+    public void setVisibility(Visibility visibility) {
+        this.visibility = visibility;
+    }
+
+    public int getParentLineDeclaration() {
+        return parentLineDeclaration;
+    }
+
+    public void setParentLineDeclaration(int parentLineDeclaration) {
+        this.parentLineDeclaration = parentLineDeclaration;
     }
 }

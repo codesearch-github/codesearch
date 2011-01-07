@@ -23,19 +23,11 @@
 -->
 
 <root>
-    <!-- db-properties
-    public static final String DB_USERNAME = "db-username";
-    public static final String DB_PASSWORD = "db-password";
-    public static final String DBMS = "dbms";
-    public static final String DB_SERVERNAME = "db-servername";
-    public static final String DB_PORT_NUMBER = "db-port-number";
-    public static final String DB_NAME = "db-name";-->
-
     <dbms>mysql</dbms>
-    <db-username>codesearch_db</db-username>
-    <db-password>dota!123</db-password>
-    <db-driver>org.gjt.mm.mysql.Driver</db-driver>
-    <db-url>localhost</db-url>
+    <db-username>root</db-username>
+    <db-password></db-password>
+    <db-driver>com.mysql.jdbc.Driver</db-driver>
+    <db-url>127.0.0.1</db-url>
     <db-port-number>3306</db-port-number>
     <db-name>codesearch</db-name>
     <db-max-connections>100</db-max-connections>

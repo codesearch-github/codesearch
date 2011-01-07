@@ -29,5 +29,6 @@ public enum Visibility {
   PRIVATE,
   PUBLIC,
   PROTECTED,
-  DEFAULT
+  DEFAULT,
+  NONE
 }

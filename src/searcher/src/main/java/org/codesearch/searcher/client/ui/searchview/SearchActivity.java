@@ -50,12 +50,14 @@ public class SearchActivity extends AbstractActivity implements SearchView.Prese
      */
     private class DoSearchHandler implements AsyncCallback<List<SearchResultDto>> {
 
+        /** {@inheritDoc} */
         @Override
         public void onFailure(Throwable caught) {
             Window.alert("Exception calling the search service on the server:\n" + caught);
             searchView.getResultsView().setVisible(false);
         }
 
+        /** {@inheritDoc} */
         @Override
         public void onSuccess(List<SearchResultDto> resultList) {
             searchView.setSearchResults(resultList);
@@ -72,6 +74,7 @@ public class SearchActivity extends AbstractActivity implements SearchView.Prese
      * @param panel
      * @param eventBus
      */
+    /** {@inheritDoc} */
     @Override
     public void start(AcceptsOneWidget panel, EventBus eventBus) {
         searchView = clientFactory.getSearchView();
@@ -84,11 +87,13 @@ public class SearchActivity extends AbstractActivity implements SearchView.Prese
      * Navigate to a new place.
      * @param place
      */
+    /** {@inheritDoc} */
     @Override
     public void goTo(Place place) {
         clientFactory.getPlaceController().goTo(place);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void doSearch() {
         String query = searchView.getSearchBox().getValue();
@@ -114,11 +119,13 @@ public class SearchActivity extends AbstractActivity implements SearchView.Prese
     private void updateRepositories() {
         searcherServiceAsync.getAvailableRepositories(new AsyncCallback<List<String>>() {
 
+            /** {@inheritDoc} */
             @Override
             public void onFailure(Throwable caught) {
                 Window.alert("Remote call trying to fetch available repositories failed:\n" + caught);
             }
 
+            /** {@inheritDoc} */
             @Override
             public void onSuccess(List<String> result) {
                 searchView.setAvailableRepositories(result);
@@ -126,11 +133,13 @@ public class SearchActivity extends AbstractActivity implements SearchView.Prese
         });
         searcherServiceAsync.getAvailableRepositoryGroups(new AsyncCallback<List<String>>() {
 
+            /** {@inheritDoc} */
             @Override
             public void onFailure(Throwable caught) {
                 Window.alert("Remote call trying to fetch available repository groups failed:\n" + caught);
             }
 
+            /** {@inheritDoc} */
             @Override
             public void onSuccess(List<String> result) {
                 for (String repo : result) {

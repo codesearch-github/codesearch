@@ -1,10 +1,5 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.codesearch.commons.plugins.javacodeanalyzerplugin;
 
-import com.mysql.jdbc.NotImplemented;
 import japa.parser.ast.Node;
 import japa.parser.ast.expr.BooleanLiteralExpr;
 import japa.parser.ast.expr.CharLiteralExpr;
@@ -18,7 +13,6 @@ import japa.parser.ast.expr.NameExpr;
 import japa.parser.ast.expr.StringLiteralExpr;
 import java.util.LinkedList;
 import java.util.List;
-import org.apache.commons.lang.NotImplementedException;
 import org.codesearch.commons.plugins.codeanalyzing.ast.ExternalLink;
 import org.codesearch.commons.plugins.codeanalyzing.ast.ExternalMethodLink;
 import org.codesearch.commons.plugins.codeanalyzing.ast.ExternalVariableLink;

@@ -29,7 +29,6 @@ import org.codesearch.indexer.exceptions.TaskExecutionException;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -54,8 +53,6 @@ import org.codesearch.commons.plugins.PluginLoader;
 import org.codesearch.commons.plugins.PluginLoaderException;
 import org.codesearch.commons.plugins.codeanalyzing.CodeAnalyzerPlugin;
 import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
-import org.codesearch.commons.plugins.codeanalyzing.ast.CompoundNode;
-import org.codesearch.commons.plugins.codeanalyzing.ast.ExternalLink;
 import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
 import org.codesearch.commons.plugins.vcs.FileDto;
 import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
@@ -105,7 +102,7 @@ public class IndexingTask implements Task {
     @Override
     public void execute() throws TaskExecutionException {
         try {
-            LOG.info("Starting execution of indexing task");
+            LOG.info("Starting indexing of repository: " + repository.getName());
             // Read the index status file
             indexLocation = configReader.getSingleLinePropertyValue("index-location");
             propertiesManager = new PropertiesManager("/tmp/test/revisions.properties");
@@ -114,9 +111,9 @@ public class IndexingTask implements Task {
             versionControlPlugin.setRepository(new URI(repository.getUrl()), repository.getUsername(), repository.getPassword());
             String lastIndexedRevision = propertiesManager.getPropertyFileValue(repository.getName());
             changedFiles = versionControlPlugin.getChangedFilesSinceRevision(lastIndexedRevision);
-            
+
             boolean retrieveNewFileList = false;
-         //FIXME   this.executeIndexing();
+            executeIndexing();
             if (codeAnalysisEnabled) {
                 String lastAnalysisRevision = DBAccess.getLastAnalyzedRevisionOfRepository(repository.getName());
                 if (!lastAnalysisRevision.equals(lastIndexedRevision)) {
@@ -145,6 +142,7 @@ public class IndexingTask implements Task {
         } catch (CodeAnalyzerPluginException ex) {
             LOG.error("Error executing code analysis \n" + ex);
         }
+         LOG.info("Finished indexing of repository: " + repository.getName());
     }
 
     /**
@@ -183,23 +181,24 @@ public class IndexingTask implements Task {
                         continue;
                     }
                 }
-                plugin.analyzeFile(new String(currentFile.getContent()));
-                List<AstNode> ast = plugin.getAstForCurrentFile();
+                
+                List<AstNode> ast = plugin.analyzeFile(new String(currentFile.getContent()));
                 List<String> typeDeclarations = plugin.getTypeDeclarations();
                 List<Usage> usages = plugin.getUsages();
                 currentFile.setImports(plugin.getImports());
                 previousFileType = currentFileType;
                 //add the externalLinks to the FileDto, so they can be parsed after the regular indexing is finished
                 currentFile.setExternalLinks(plugin.getExternalLinks());
-                
+
                 //write the AST information into the database
                 DBAccess.setAnalysisDataForFile(currentFile.getFilePath(), repository.getName(), ast, usages, typeDeclarations); //TODO work here
-                LOG.info("Finished code analysis");
+                LOG.debug("Analyzed file: " + currentFile.getFilePath());
             } catch (DatabaseAccessException ex) {
                 LOG.error("Error at DatabaseConnection \n" + ex);
             }
-            
+
         }
+        LOG.info("Finished code analysis");
     }
 
     /**
@@ -238,7 +237,7 @@ public class IndexingTask implements Task {
         //doc.add(new Field(IndexConstants.INDEX_FILED_REPOSITORY_GROUP, repository.getRepositoryGroupsAsString(), Field.Store.YES, Field.Index.ANALYZED));
         //doc.add(new Field(IndexConstants.INDEX_FIELD_TITLE_LC, extractFilename(path).toLowerCase(), Field.Store.YES, Field.Index.NOT_ANALYZED));
         doc.add(new Field(IndexConstants.INDEX_FIELD_FILEPATH_LC, file.getFilePath().toLowerCase(), Field.Store.YES, Field.Index.NOT_ANALYZED));
-      // doc.add(new Field(IndexConstants.INDEX_FIELD_FILE_TYPE, file.getMimeType(), Field.Store.YES, Field.Index.ANALYZED)); //TODO add mime type
+        // doc.add(new Field(IndexConstants.INDEX_FIELD_FILE_TYPE, file.getMimeType(), Field.Store.YES, Field.Index.ANALYZED)); //TODO add mime type
         return doc;
     }
 
@@ -268,7 +267,7 @@ public class IndexingTask implements Task {
         Document doc = new Document();
         try {
             int i = 0;
-            for(FileDto file : changedFiles) {
+            for (FileDto file : changedFiles) {
                 if (!(fileIsOnIgnoreList(file.getFilePath()))) {
                     // The lucene document containing all relevant indexing information
                     doc = new Document();

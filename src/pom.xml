@@ -17,19 +17,11 @@
 
     <!-- LIBRARY VERSIONS -->
     <properties>
-        <gwt.version>2.1.0</gwt.version>
+        <gwt.version>2.1.1</gwt.version>
         <spring.version>3.0.2.RELEASE</spring.version>
         <lucene.version>3.0.2</lucene.version>
     </properties>
 
-    <!-- REPOS -->
-    <!--<repositories>
-        <repository>
-            <id>gwt-repo</id>
-            <url>http://google-web-toolkit.googlecode.com/svn/2.1.0/gwt/maven/</url>
-            <name>Google Web Toolkit Repository</name>
-        </repository>
-    </repositories>-->
 
     <!-- DEFINES VERSIONS OF DEPENDENCIES FOR MODULES -->
     <dependencyManagement>
@@ -152,14 +144,9 @@
             <dependency>
                 <groupId>mysql</groupId>
                 <artifactId>mysql-connector-java</artifactId>
-                <version>5.1.9</version>
+                <version>5.1.14</version>
             </dependency>
-            <!-- GUESS ENCODING LIBRARY -->
-            <dependency>
-                <groupId>org.codehaus.guessencoding</groupId>
-                <artifactId>guessencoding</artifactId>
-                <version>1.4</version>
-            </dependency>
+
             <dependency>
                 <groupId>jmimemagic</groupId>
                 <artifactId>jmimemagic</artifactId>

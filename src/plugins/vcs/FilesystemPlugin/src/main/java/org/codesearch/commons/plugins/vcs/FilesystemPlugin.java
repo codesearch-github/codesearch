@@ -21,7 +21,6 @@
 
 package org.codesearch.commons.plugins.vcs;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;

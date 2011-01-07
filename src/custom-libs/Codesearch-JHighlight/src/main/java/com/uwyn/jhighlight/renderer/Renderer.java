@@ -22,51 +22,20 @@
 package com.uwyn.jhighlight.renderer;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 
 /**
  * Provides interface to render the source code highlighting.
  *
  * @author Geert Bevin (gbevin[remove] at uwyn dot com)
- * @version $Revision: 3108 $
- * @since 1.0
+ * @author Samuel Kogler
  */
 public interface Renderer {
 
     /**
-     * Transforms source code that's provided through an
-     * <code>InputStream</code> to highlighted syntax and writes it back to
-     * an <code>OutputStream</code>.
-     *
-     * @param name The name of the source file.
-     * @param in The input stream that provides the source code that needs to
-     * be transformed.
-     * @param out The output stream to which to result should be written.
-     * @param encoding The encoding that will be used to read and write the
-     * text.
-     * @param fragment <code>true</code> if the result should be a fragment;
-     * or <code>false</code> if it should be a complete document
-     * @see #highlight(String, String, String, boolean)
-     * @since 1.0
+     * Highlights the given source code.
+     * @param input The given source code
+     * @return The highlighted source code
+     * @throws IOException
      */
-    public void highlight(String name, InputStream in, OutputStream out, String encoding, boolean fragment) throws IOException;
-
-    /**
-     * Transforms source code that's provided through a
-     * <code>String</code> to highlighted syntax and returns it as a
-     * <code>String</code>.
-     *
-     * @param name The name of the source file.
-     * @param in The input string that provides the source code that needs to
-     * be transformed.
-     * @param encoding The encoding that will be used to read and write the
-     * text.
-     * @param fragment <code>true</code> if the result should be a fragment;
-     * or <code>false</code> if it should be a complete document
-     * @return the highlighted source code as a string
-     * @see #highlight(String, InputStream, OutputStream, String, boolean)
-     * @since 1.0
-     */
-    public String highlight(String name, String in, String encoding, boolean fragment) throws IOException;
+    public String highlight(String input) throws IOException;
 }

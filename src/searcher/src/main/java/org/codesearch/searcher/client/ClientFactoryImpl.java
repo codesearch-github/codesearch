@@ -40,21 +40,25 @@ public class ClientFactoryImpl implements ClientFactory {
     private final SearchView searchView = new SearchViewImpl();
     private final FileView fileView = FileViewImpl.getInstance();
 
+    /** {@inheritDoc} */
     @Override
     public EventBus getEventBus() {
         return eventBus;
     }
 
+    /** {@inheritDoc} */
     @Override
     public PlaceController getPlaceController() {
         return placeController;
     }
 
+    /** {@inheritDoc} */
     @Override
     public SearchView getSearchView() {
         return searchView;
     }
 
+    /** {@inheritDoc} */
     @Override
     public FileView getFileView() {
         return fileView;

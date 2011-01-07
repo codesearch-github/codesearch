@@ -103,16 +103,19 @@ public class SearchViewImpl extends Composite implements SearchView {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public void setPresenter(Presenter presenter) {
         this.presenter = presenter;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void setSearchResults(List<SearchResultDto> results) {
         searchResultDataProvider.setList(results);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void setAvailableRepositories(List<String> repositories) {
         repositoryList.clear();
@@ -121,6 +124,7 @@ public class SearchViewImpl extends Composite implements SearchView {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public void setAvailableRepositoryGroups(List<String> repositoryGroups) {
         repositoryGroupList.clear();
@@ -129,31 +133,37 @@ public class SearchViewImpl extends Composite implements SearchView {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public HasValue<Boolean> getCaseSensitive() {
         return caseSensitive;
     }
 
+    /** {@inheritDoc} */
     @Override
     public ListBox getRepositoryList() {
         return repositoryList;
     }
 
+    /** {@inheritDoc} */
     @Override
     public ListBox getRepositoryGroupList() {
         return repositoryGroupList;
     }
 
+    /** {@inheritDoc} */
     @Override
     public HasValue<String> getSearchBox() {
         return searchBox;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Panel getResultsView() {
         return resultView;
     }
 
+    /** {@inheritDoc} */
     @Override
     public RepositorySearchType getRepositorySearchType() {
         if (repositoryTabPanel.getSelectedIndex() == 0) {
@@ -172,6 +182,7 @@ public class SearchViewImpl extends Composite implements SearchView {
         resultTable = new CellTable<SearchResultDto>(30);
         resultTable.addColumn(new TextColumn<SearchResultDto>() {
 
+            /** {@inheritDoc} */
             @Override
             public String getValue(SearchResultDto dto) {
                 return String.valueOf(dto.getRelevance());
@@ -180,6 +191,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 
         resultTable.addColumn(new TextColumn<SearchResultDto>() {
 
+            /** {@inheritDoc} */
             @Override
             public String getValue(SearchResultDto object) {
                 return object.getFilePath();
@@ -187,6 +199,7 @@ public class SearchViewImpl extends Composite implements SearchView {
         }, "Path");
         resultTable.addColumn(new TextColumn<SearchResultDto>() {
 
+            /** {@inheritDoc} */
             @Override
             public String getValue(SearchResultDto dto) {
                 return dto.getRepository();
@@ -196,6 +209,7 @@ public class SearchViewImpl extends Composite implements SearchView {
         final NoSelectionModel<SearchResultDto> selectionModel = new NoSelectionModel<SearchResultDto>();
         resultTable.setSelectionModel(selectionModel);
         selectionModel.addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
+            /** {@inheritDoc} */
             @Override
             public void onSelectionChange(SelectionChangeEvent event) {
                 SearchResultDto selected = selectionModel.getLastSelectedObject();

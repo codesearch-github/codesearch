@@ -1,0 +1,22 @@
+
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui">
+    <ui:style>
+            .sidebar-tree
+            {
+
+            }
+            
+            .title
+            {
+                font-weight: bold;
+                font-size: large;
+            }
+    </ui:style>
+    <g:FlowPanel height="100%">
+        <g:Label ui:field="titleLabel" addStyleNames="{style.title}" />
+        <g:ScrollPanel height="100%">
+            <g:Tree ui:field="sidebarTree" addStyleNames="{style.sidebar-tree}" />
+        </g:ScrollPanel>
+    </g:FlowPanel>
+</ui:UiBinder>

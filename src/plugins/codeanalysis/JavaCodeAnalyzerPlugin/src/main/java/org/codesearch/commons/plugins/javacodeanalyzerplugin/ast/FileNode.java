@@ -19,15 +19,12 @@
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package org.codesearch.commons.plugins.javacodeanalyzerplugin.ast;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import org.apache.commons.collections.CollectionUtils;
 import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
 import org.codesearch.commons.plugins.codeanalyzing.ast.CompoundNode;
 
@@ -45,14 +42,6 @@ public class FileNode extends CompoundNode {
     public void setClasses(List<ClassNode> classes) {
         this.classes = classes;
     }
-    
-    public String getOutlineForChildElements(){
-        String outlineString = "File: "+this.getName()+" from: "+this.getStartPositionInLine() + ", length: "+this.getNodeLength()+"\n";
-        for(ClassNode currentClass : classes){
-            outlineString += currentClass.getOutlineForChildElements();
-        }
-        return outlineString;
-    }
 
     @Override
     public String getOutlineName() {
@@ -60,20 +49,15 @@ public class FileNode extends CompoundNode {
     }
 
     @Override
-    public void addCompoundNodesToList(List<AstNode> nodes) {
-        for(ClassNode clazz : classes){
-            nodes.add(clazz);
-            clazz.addCompoundNodesToList(nodes);
-        }
+    public List<AstNode> getChildNodes() {
+        LinkedList<AstNode> childs = new LinkedList<AstNode>();
+        childs.addAll(classes);
+        return childs;
     }
 
     @Override
-    public List<AstNode> getChildNodes() {
-        List<AstNode> childNodes = new LinkedList<AstNode>();
-        for(ClassNode currentClass : classes){
-            childNodes.add(currentClass);
-            childNodes.addAll(currentClass.getChildNodes());
-        }
-        return childNodes;
+    public boolean showInOutline() {
+        return false;
     }
+
 }

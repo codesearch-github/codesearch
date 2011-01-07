@@ -22,14 +22,25 @@
 package org.codesearch.searcher.shared;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Represents a file.
  * @author Samuel Kogler
  */
 public class FileDto implements Serializable {
-    String fileContent;
-    boolean binary;
+    
+    private String fileContent;
+    private boolean binary;
+    private List<OutlineNode> outline;
+
+    public List<OutlineNode> getOutline() {
+        return outline;
+    }
+
+    public void setOutline(List<OutlineNode> outline) {
+        this.outline = outline;
+    }
 
     public boolean isBinary() {
         return binary;

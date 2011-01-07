@@ -31,10 +31,17 @@ Without this configuration present, some functionality in the IDE may be limited
     <spellchecker-wordlist xmlns="http://www.netbeans.org/ns/spellchecker-wordlist/1">
         <word>lucene</word>
     </spellchecker-wordlist>
+    <properties xmlns="http://www.netbeans.org/ns/maven-properties-data/1">
+        <!--
+Properties that influence various parts of the IDE, especially code formatting and the like. 
+You can copy and paste the single properties, into the pom.xml file and the IDE will pick them up.
+That way multiple projects can share the same settings (useful for formatting rules for example).
+Any value defined here will override the pom.xml file value but is only applicable to the current project.
+-->
+        <netbeans.checkstyle.format>true</netbeans.checkstyle.format>
+    </properties>
     <spring-data xmlns="http://www.netbeans.org/ns/spring-data/1">
-        <config-files>
-            <config-file>src/main/resources/SearcherBeans.xml</config-file>
-        </config-files>
+        <config-files/>
         <config-file-groups/>
     </spring-data>
 </project-shared-configuration>

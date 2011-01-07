@@ -23,6 +23,8 @@ package org.codesearch.searcher.client.ui.fileview;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.IsWidget;
+import java.util.List;
+import org.codesearch.searcher.shared.OutlineNode;
 
 /**
  * View that can display a file.
@@ -30,36 +32,46 @@ import com.google.gwt.user.client.ui.IsWidget;
  */
 public interface FileView extends IsWidget {
 
+    void cleanup();
+
     /**
      * Sets the file content to be displayed.
      * This should be already-highlighted HTML code.
      * @param fileContent The file content
      * @param binary
      */
-    public void setFileContent(String fileContent, boolean binary);
+    void setFileContent(String fileContent, boolean binary);
 
     /**
      * Sets the path of the file to be displayed.
      * @param filePath The file path
      */
-    public void setFilePath(String filePath);
+    void setFilePath(String filePath);
 
     /**
      * Sets the repository-name of the file to be displayed.
      * @param repository The repository name
      */
-    public void setRepository(String repository);
+    void setRepository(String repository);
+
+    /**
+     * Sets the outline to be displayed.
+     * @param outline The outline
+     */
+    void setOutline(List<OutlineNode> outline);
 
     /**
      * Sets the presenter for this view.
      * @param presenter The presenter
      */
-    public void setPresenter(FileView.Presenter presenter);
+    void setPresenter(FileView.Presenter presenter);
     
-    public void connectEventHandlers();
+    void connectEventHandlers();
 
-    public void disconnectEventHandlers();
-    public interface Presenter {
+    void disconnectEventHandlers();
+
+    
+    interface Presenter {
         void goTo(Place place);
     }
 }

@@ -43,6 +43,7 @@ public class SearcherActivityMapper implements ActivityMapper {
         this.clientFactory = clientFactory;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Activity getActivity(Place place) {
         if(place instanceof SearchPlace) {

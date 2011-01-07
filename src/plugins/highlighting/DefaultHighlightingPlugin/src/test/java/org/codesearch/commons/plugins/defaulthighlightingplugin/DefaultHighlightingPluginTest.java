@@ -60,14 +60,6 @@ public class DefaultHighlightingPluginTest extends TestCase {
      * Test of parseToHtml method, of class JavaHighlightingPlugin.
      */
     public void testParseToHtml() throws Exception {
-        
-        Map cssStyles = XmlXhtmlRenderer.DEFAULT_CSS;
-        Iterator iter = cssStyles.keySet().iterator();
-        String key = (String) iter.next();
-        for(; iter.hasNext(); key = (String) iter.next()){
-            String value = (String) cssStyles.get(key);
-            System.out.println(key + "{\n"+value+"\n}");
-        }
         BufferedReader br = new BufferedReader(new FileReader("/home/david/workspace/svnsearch/WakMusic/src/java/servlets/AddEvent.java"));
         String input = "";
         while(br.ready()){

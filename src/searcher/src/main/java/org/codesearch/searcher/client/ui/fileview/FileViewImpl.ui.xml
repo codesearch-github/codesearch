@@ -21,14 +21,35 @@
 
 -->
 
-<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui">
     <ui:style type="org.codesearch.searcher.client.ui.fileview.FileViewImpl.MyStyle">
-        .fileinfo
+
+        .header div
         {
-            padding: 0px;
-            background-color: #EEE;
+            margin-top: 3px;
+        }
+
+        .fileinfo *
+        {
+            font-size: 12pt;
+            float: left;
+            margin-right: 3px;
+            padding: 4px 3px 4px 3px;
+        }
+
+        .controlbar button
+        {
+            float: left;
+            margin-right: 3px;
+        }
+
+        .repositoryLabel
+        {
+            border: 1px solid black;
+            border-left: 0px solid black;
+            padding: 3px 3px 3px 3px;
+            font-weight: bold;
         }
         
         .lineNumbersPanel
@@ -50,7 +71,6 @@
         {
             border-top: 3px solid #0081ff;
             padding-top: 0px;
-            line-height: 15px;
         }
         
         .focus
@@ -62,50 +82,50 @@
             height: 15px;
 	}
 
-        .controlbar button
-        {
-            float: left;
-            margin-right: 3px;
-        }
-
         .hidden
         {
             display: none;
         }
+
+        .clearfix
+        {
+            clear: both;
+        }
+
+        pre
+        {
+            font-family: monospace;
+            line-height: 15px;
+            font-size: medium;
+        }
     </ui:style>
-    <g:DockLayoutPanel unit="EM">
-        <g:north size="5">
-            <g:HTMLPanel>
+    <g:DockLayoutPanel unit="PX">
+        <g:north size="65">
+            <g:HTMLPanel addStyleNames="{style.header}">
                 <div class="{style.controlbar}">
                     <g:Button ui:field="backButton" text="Back" />
                     <g:Button ui:field="goToLineButton" text="Go to line" />
+                    <div class="{style.clearfix}"/>
                 </div>
-                <table class="{style.fileinfo}" width="100%">
-                    <tbody>
-                        <tr>
-                            <td>Repository</td>
-                            <td>
-                                <g:Label ui:field="repositoryField" />
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Path</td>
-                            <td>
-                                <g:Label ui:field="pathField" />
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div class="{style.fileinfo}">
+                    <g:Label ui:field="repositoryField" addStyleNames="{style.repositoryLabel}" />
+                    <g:Label ui:field="pathField" />
+                    <div class="{style.clearfix}"/>
+                </div>
             </g:HTMLPanel>
         </g:north>
         <g:center>
-            <g:ScrollPanel ui:field="scrollWrapper" addStyleNames="{style.fileDisplay}">
-                <g:HTMLPanel>
-                    <g:FlowPanel ui:field="lineNumbersContainer" addStyleNames="{style.lineNumbersPanel}"/>
-                    <g:FlowPanel ui:field="fileContentContainer" />
-                    <div ui:field="focusDiv" class="{style.focus}" />
-                </g:HTMLPanel>
-            </g:ScrollPanel>
+            <g:SplitLayoutPanel ui:field="splitWrapper" addStyleNames="{style.fileDisplay}" >
+                <g:center>
+                    <g:ScrollPanel ui:field="scrollWrapper">
+                        <g:HTMLPanel>
+                            <g:FlowPanel ui:field="lineNumbersContainer" addStyleNames="{style.lineNumbersPanel}"/>
+                            <g:FlowPanel ui:field="fileContentContainer" />
+                            <div ui:field="focusDiv" class="{style.focus}" />
+                        </g:HTMLPanel>
+                    </g:ScrollPanel>
+                </g:center>
+            </g:SplitLayoutPanel>
         </g:center>
     </g:DockLayoutPanel>
 

@@ -18,19 +18,13 @@
  * You should have received a copy of the GNU General Public License
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.codesearch.commons.database;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.LinkedList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -39,6 +33,7 @@ import java.util.logging.Logger;
 public class ConnectionPool {
 
     private static ConnectionPool theInstance = null;
+    private static Logger LOG = Logger.getLogger(ConnectionPool.class);
     private LinkedList<Connection> connections = new LinkedList<Connection>();
     private int remainingConnections = 150;
     private String username;
@@ -76,12 +71,15 @@ public class ConnectionPool {
             if (connections.isEmpty()) {
                 try {
                     Class.forName(driver);
-                    Connection conn = DriverManager.getConnection("jdbc:" + dbms + "://" + url + ":" + portNumber + "/" + dbName, "root", "");
+                    String connStr = "jdbc:" + dbms + "://" + url + ":" + portNumber + "/" + dbName;
+                    LOG.debug("Connecting to database: " + connStr);
+
+                    Connection conn = DriverManager.getConnection("jdbc:" + dbms + "://" + url + ":" + portNumber + "/" + dbName, username, password);
                     return conn;
                 } catch (SQLException ex) {
-                    throw new DatabaseAccessException("SQLException while trying to poll new connection\n"+ex);
+                    throw new DatabaseAccessException("SQLException while trying to poll new connection\n" + ex);
                 } catch (ClassNotFoundException ex) {
-                    throw new DatabaseAccessException("Specified driver could not be found\n"+ex);
+                    throw new DatabaseAccessException("Specified driver could not be found\n" + ex);
                 }
             } else {
                 return connections.pollFirst();

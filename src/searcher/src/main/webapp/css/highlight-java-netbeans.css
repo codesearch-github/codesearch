@@ -1,0 +1,28 @@
+.java_type{
+    color: #000000; font-weight: bold;
+}
+.java_keyword{
+    color: rgb(0,33,255);
+}
+.java_javadoc_comment{
+    color: rgb(147,147,147); font-style: italic;
+}
+.java_comment{
+    color: rgb(147,147,147);
+}
+.java_operator{
+    color: #000000;
+}
+.java_plain{
+    color: #000000;
+}
+.java_literal{
+    color: #DF7401;
+}
+
+.java_javadoc_tag{
+    color: #848484; font-style: italic; font-weight: bold;
+}
+.java_separator{
+    color: rgb(0,33,255);
+}

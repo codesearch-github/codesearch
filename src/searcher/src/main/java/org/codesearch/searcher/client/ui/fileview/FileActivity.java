@@ -56,10 +56,12 @@ public class FileActivity extends AbstractActivity implements Presenter {
      * @param panel
      * @param eventBus
      */
+    /** {@inheritDoc} */
     @Override
     public void start(AcceptsOneWidget panel, EventBus eventBus) {
         fileView = clientFactory.getFileView();
         fileView.setPresenter(this);
+        fileView.cleanup();
         fileView.setFilePath(filePath);
         fileView.setRepository(repository);
         fileView.connectEventHandlers();
@@ -72,6 +74,7 @@ public class FileActivity extends AbstractActivity implements Presenter {
      * Navigate to a new place.
      * @param place
      */
+    /** {@inheritDoc} */
     @Override
     public void goTo(Place place) {
         fileView.disconnectEventHandlers();
@@ -80,14 +83,18 @@ public class FileActivity extends AbstractActivity implements Presenter {
 
     private class GetFileCallback implements AsyncCallback<FileDto>  {
 
+        /** {@inheritDoc} */
         @Override
         public void onFailure(Throwable caught) {
             fileView.setFileContent("Error getting file:\n" + caught.toString(), true);
         }
 
+        /** {@inheritDoc} */
         @Override
         public void onSuccess(FileDto result) {
+            fileView.cleanup();
             fileView.setFileContent(result.getFileContent(), result.isBinary());
+            fileView.setOutline(result.getOutline());
         }
 
     }

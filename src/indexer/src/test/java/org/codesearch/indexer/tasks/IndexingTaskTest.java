@@ -19,10 +19,6 @@
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.codesearch.indexer.tasks;
 
 import org.apache.commons.configuration.ConfigurationException;
@@ -66,22 +62,6 @@ public class IndexingTaskTest {
     public IndexingTaskTest() {
     }
 
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
-
-    @Before
-    public void setUp() throws ConfigurationException {
-    }
-
-    @After
-    public void tearDown() {
-    }
-
     @Test
     public void testFileIsOnIgnoreList() {
         List<String> ignoredFileNames = new LinkedList<String>();
@@ -114,12 +94,12 @@ public class IndexingTaskTest {
 
     @Test
     public void testCodeAnalysis() throws Exception {
-//        RepositoryDto repo = new RepositoryDto();
-//        repo.setVersionControlSystem("FILESYSTEM");
-//        CodeAnalyzerPlugin codeAnalyzerPlugin = pluginLoader.getPlugin(CodeAnalyzerPlugin.class, "java");
-//        VersionControlPlugin versionControlPlugin = pluginLoader.getPlugin(VersionControlPlugin.class, "FILESYSTEM");
-//        FileDto fileDto = versionControlPlugin.getFileForFilePath("/home/david/wakmusic/trunk/Wakmusic/src/java/beans/Band.java");
-//        codeAnalyzerPlugin.analyzeFile(new String(fileDto.getContent()), repo);
+        RepositoryDto repo = new RepositoryDto();
+        repo.setVersionControlSystem("FILESYSTEM");
+        CodeAnalyzerPlugin codeAnalyzerPlugin = pluginLoader.getPlugin(CodeAnalyzerPlugin.class, "java");
+        VersionControlPlugin versionControlPlugin = pluginLoader.getPlugin(VersionControlPlugin.class, "FILESYSTEM");
+        FileDto fileDto = versionControlPlugin.getFileForFilePath("/home/daasdingo/workspace/codesearch/src/commons/src/main/java/org/codesearch/commons/plugins/PluginLoader.java");
+        codeAnalyzerPlugin.analyzeFile(new String(fileDto.getContent()));
     }
 
     @Test

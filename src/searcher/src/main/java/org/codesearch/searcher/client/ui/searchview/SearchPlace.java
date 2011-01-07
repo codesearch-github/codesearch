@@ -32,11 +32,13 @@ public class SearchPlace extends Place {
 
     public static class Tokenizer implements PlaceTokenizer<SearchPlace> {
 
+        /** {@inheritDoc} */
         @Override
         public String getToken(SearchPlace place) {
             return null;
         }
 
+        /** {@inheritDoc} */
         @Override
         public SearchPlace getPlace(String token) {
             return new SearchPlace();

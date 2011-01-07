@@ -18,11 +18,6 @@
  * You should have received a copy of the GNU General Public License
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.codesearch.commons.database;
 
 import com.mysql.jdbc.Statement;
@@ -34,7 +29,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.logging.Level;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
 import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
@@ -78,12 +72,15 @@ public class DBAccess {
             ps.setString(1, filePath);
             ps.setInt(2, repo_id);
             ResultSet rs = ps.executeQuery();
-            if(rs.first()){
+            if (rs.first()) {
                 byte[] regBytes = rs.getBytes("usages");
-            ByteArrayInputStream regArrayStream = new ByteArrayInputStream(regBytes);
-            regObjectStream = new ObjectInputStream(regArrayStream);
-            return (List<Usage>) regObjectStream.readObject();
-                
+                if (regBytes == null) {
+                    return null;
+                }
+                ByteArrayInputStream regArrayStream = new ByteArrayInputStream(regBytes);
+                regObjectStream = new ObjectInputStream(regArrayStream);
+                return (List<Usage>) regObjectStream.readObject();
+
             }
             return null;
         } catch (IOException ex) {
@@ -191,6 +188,9 @@ public class DBAccess {
             ResultSet rs = ps.executeQuery();
             rs.first();
             byte[] regBytes = rs.getBytes("binary_index");
+            if (regBytes == null) {
+                return null;
+            }
             ByteArrayInputStream regArrayStream = new ByteArrayInputStream(regBytes);
             regObjectStream = new ObjectInputStream(regArrayStream);
             return (List<AstNode>) regObjectStream.readObject();
@@ -202,7 +202,9 @@ public class DBAccess {
             throw new DatabaseAccessException("SQLException while accessing the DB\n" + ex);
         } finally {
             try {
-                regObjectStream.close();
+                if (regObjectStream != null) {
+                    regObjectStream.close();
+                }
             } catch (IOException ex) {
                 throw new DatabaseAccessException("Could not close the stream used to retrieve the content of the binary-index field\n" + ex);
             }

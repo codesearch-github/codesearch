@@ -42,6 +42,7 @@ public class SearcherEntryPoint implements EntryPoint {
     private Place defaultPlace = new SearchPlace();
     private RootContainer rootContainer = new RootContainer();
 
+    /** {@inheritDoc} */
     @Override
     public void onModuleLoad() {
         ClientFactory clientFactory = new ClientFactoryImpl();

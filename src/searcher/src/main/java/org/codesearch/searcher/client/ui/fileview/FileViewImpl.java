@@ -22,13 +22,9 @@ package org.codesearch.searcher.client.ui.fileview;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.DivElement;
-import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
-import com.google.gwt.event.dom.client.KeyPressEvent;
-import com.google.gwt.event.dom.client.KeyPressHandler;
-import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.resources.client.CssResource;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -39,24 +35,27 @@ import com.google.gwt.user.client.Event.NativePreviewEvent;
 import com.google.gwt.user.client.Event.NativePreviewHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.RootLayoutPanel;
-import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.ScrollPanel;
+import com.google.gwt.user.client.ui.SplitLayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
+import java.util.List;
+import org.codesearch.searcher.client.ui.fileview.sidebar.Sidebar;
+import org.codesearch.searcher.client.ui.fileview.sidebar.SidebarImpl;
 
 import org.codesearch.searcher.client.ui.searchview.SearchPlace;
+import org.codesearch.searcher.shared.OutlineNode;
+import org.codesearch.searcher.shared.SidebarNode;
 
 /**
  * Implementation of the File View.
- * TODO clean this class up a bit
+ * TODO cleanup this class
  * @author Samuel Kogler
  */
 public class FileViewImpl extends Composite implements FileView {
-
-    private static FileViewImpl instance;
 
     interface FileViewUiBinder extends UiBinder<Widget, FileViewImpl> {
     }
@@ -67,12 +66,12 @@ public class FileViewImpl extends Composite implements FileView {
     }
     @UiField
     MyStyle style;
-    private static FileViewUiBinder uiBinder = GWT.create(FileViewUiBinder.class);
-    private Presenter presenter;
     @UiField
     FlowPanel fileContentContainer;
     @UiField
     FlowPanel lineNumbersContainer;
+    @UiField
+    SplitLayoutPanel splitWrapper;
     @UiField
     ScrollPanel scrollWrapper;
     @UiField
@@ -83,16 +82,22 @@ public class FileViewImpl extends Composite implements FileView {
     HasClickHandlers backButton;
     @UiField
     DivElement focusDiv;
+    /** Singleton instance */
+    private static FileViewImpl instance;
+    /** UiBinder template. */
+    private static FileViewUiBinder uiBinder = GWT.create(FileViewUiBinder.class);
+    /** The presenter for this view. */
+    private Presenter presenter;
     /** Handler for keyboard shortcuts. */
-    private HandlerRegistration goToLineHandlerRegistration;
-
-    int lineCount = 0;
+    private HandlerRegistration keyboardShortcutHandlerRegistration;
+    /** Number of lines of the displayed file */
+    private int lineCount = 0;
 
     private FileViewImpl() {
         initWidget(uiBinder.createAndBindUi(this));
     }
 
-    public static FileView getInstance() {
+    public static FileViewImpl getInstance() {
         if (instance == null) {
             instance = new FileViewImpl();
             exportGoToLine();
@@ -110,15 +115,23 @@ public class FileViewImpl extends Composite implements FileView {
         goToLineWithDialog();
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public void cleanup() {
+        fileContentContainer.clear();
+        lineNumbersContainer.clear();
+        splitWrapper.clear();
+    }
+
+    /** {@inheritDoc} */
     @Override
     public void setPresenter(FileView.Presenter presenter) {
         this.presenter = presenter;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void setFileContent(String fileContent, boolean binary) {
-        fileContentContainer.clear();
-        lineNumbersContainer.clear();
         lineNumbersContainer.setVisible(!binary);
         showFocusDiv(!binary);
         lineCount = 0;
@@ -137,14 +150,32 @@ public class FileViewImpl extends Composite implements FileView {
         fileContent = "<pre>" + fileContent + "</pre>";
 
         fileContentContainer.add(new HTML(fileContent));
-        scrollWrapper.onResize();
+        splitWrapper.add(scrollWrapper);
     }
 
+    @Override
+    public void setOutline(List<OutlineNode> outline) {
+        if (outline != null) {
+            Sidebar sidebar = new SidebarImpl();
+            sidebar.setSidebarTitle("Outline");
+            for (SidebarNode s : outline) {
+                sidebar.add(s);
+            }
+            //TODO this is a workaround
+            splitWrapper.clear();
+            splitWrapper.addWest(sidebar, 300);
+            splitWrapper.add(scrollWrapper);
+            sidebar.expandAll();
+        }
+    }
+
+    /** {@inheritDoc} */
     @Override
     public void setFilePath(String filePath) {
         pathField.setText(filePath);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void setRepository(String repository) {
         repositoryField.setText(repository);
@@ -165,56 +196,50 @@ public class FileViewImpl extends Composite implements FileView {
         focusDiv.scrollIntoView();
     }
 
-    private class LineNumberClickHandler implements ClickHandler {
-
-        private int targetLine;
-
-        public LineNumberClickHandler(int targetLine) {
-            this.targetLine = targetLine;
-        }
-
-        @Override
-        public void onClick(ClickEvent event) {
-            goToLine(targetLine);
-        }
-    }
-
+    /**
+     * Provides a dialog to enter desired line number and jumps to the specified line.
+     */
     private void goToLineWithDialog() {
         String input = Window.prompt("Go to line:", "");
         try {
             int lineNumber = Integer.parseInt(input);
             goToLine(lineNumber);
         } catch (NumberFormatException ex) {
-            // TODO insert error handling
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public void connectEventHandlers() {
-        goToLineHandlerRegistration = Event.addNativePreviewHandler(new NativePreviewHandlerImpl());
+        keyboardShortcutHandlerRegistration = Event.addNativePreviewHandler(new NativePreviewHandlerImpl());
     }
 
+    /** {@inheritDoc} */
     @Override
     public void disconnectEventHandlers() {
-        goToLineHandlerRegistration.removeHandler();
+        keyboardShortcutHandlerRegistration.removeHandler();
     }
 
     public static void staticGoToLine(int lineNumber) {
-        if (instance == null) {
-            instance = new FileViewImpl();
-        }
-        instance.goToLine(lineNumber);
+        FileViewImpl.getInstance().goToLine(lineNumber);
     }
 
+    /**
+     * Exports the goToLine function to JavaScript so it can be used from HTML code.
+     */
     public static native void exportGoToLine()/*-{
     $wnd.goToLine = $entry(@org.codesearch.searcher.client.ui.fileview.FileViewImpl::staticGoToLine(I));
     }-*/;
 
+    /**
+     * Handler class that intercepts native javascript events. Used for global hotkeys.
+     */
     private class NativePreviewHandlerImpl implements NativePreviewHandler {
 
         public NativePreviewHandlerImpl() {
         }
 
+        /** {@inheritDoc} */
         @Override
         public void onPreviewNativeEvent(NativePreviewEvent event) {
             switch (event.getNativeEvent().getCharCode()) {
@@ -225,6 +250,24 @@ public class FileViewImpl extends Composite implements FileView {
                     onBack(null);
                     break;
             }
+        }
+    }
+
+    /**
+     * Click handler that is used by line numbers to call the goToLine function.
+     */
+    private class LineNumberClickHandler implements ClickHandler {
+
+        private int targetLine;
+
+        public LineNumberClickHandler(int targetLine) {
+            this.targetLine = targetLine;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public void onClick(ClickEvent event) {
+            goToLine(targetLine);
         }
     }
 }

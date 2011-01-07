@@ -39,6 +39,7 @@ public class LowerCaseWhiteSpaceAnalyzer extends Analyzer {
 
     private static final Analyzer STANDARD = new WhitespaceAnalyzer();
 
+    /** {@inheritDoc} */
     @Override
     public TokenStream tokenStream(String fieldName, Reader reader) {
         return new LowerCaseFilter(STANDARD.tokenStream(fieldName, reader));

@@ -43,9 +43,7 @@ import japa.parser.ast.expr.EnclosedExpr;
 import japa.parser.ast.expr.Expression;
 import japa.parser.ast.expr.FieldAccessExpr;
 import japa.parser.ast.expr.InstanceOfExpr;
-import japa.parser.ast.expr.MemberValuePair;
 import japa.parser.ast.expr.MethodCallExpr;
-import japa.parser.ast.expr.NameExpr;
 import japa.parser.ast.expr.ObjectCreationExpr;
 import japa.parser.ast.expr.SingleMemberAnnotationExpr;
 import japa.parser.ast.expr.SuperExpr;
@@ -71,7 +69,6 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 import org.codesearch.commons.database.DBAccess;
 import org.codesearch.commons.database.DatabaseAccessException;
 import org.codesearch.commons.plugins.codeanalyzing.CodeAnalyzerPlugin;
@@ -108,16 +105,7 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
 
     /** {@inheritDoc} */
     @Override
-    public List<AstNode> getAstForCurrentFile() throws CodeAnalyzerPluginException {
-        if (ast == null) {
-            throw new CodeAnalyzerPluginException("No AST information available, you must first analyze a file");
-        }
-        return ast;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void analyzeFile(final String fileContent) throws CodeAnalyzerPluginException {
+    public List<AstNode> analyzeFile(final String fileContent) throws CodeAnalyzerPluginException {
         CompilationUnit cu = null;
         ast = new LinkedList<AstNode>();
         fileNode = new FileNode();
@@ -128,7 +116,7 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
             bais = new ByteArrayInputStream(fileContent.getBytes()); //TODO maybe change specification of analyzeFile to take an inputStream as parameter
             cu = JavaParser.parse(bais);
             buildAST(cu);
-            fileNode.addCompoundNodesToList(ast);
+            ast.addAll(fileNode.getChildNodes());
             //parse usages via UsageVisitor
             String packageName = null;
             try {
@@ -144,7 +132,6 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
             externalLinks = util.getExternalLinks();
             imports = uv.getImports();
             Collections.sort(usages);
-            Collections.sort(ast);
             parseAbsoluteCharPositions();
 
         } catch (ParseException ex) {
@@ -156,10 +143,11 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
             } catch (IOException ex) {
             }
         }
+        return ast;
     }
 
     private void buildAST(CompilationUnit cu) {
-        //iterate all types (classes) from the compound node
+        //iterate all types (classes) from the compilation unit
         for (TypeDeclaration type : cu.getTypes()) {
             parseContentOfClass(type);
         }
@@ -167,25 +155,25 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
 
     private void parseContentOfClass(TypeDeclaration type) {
         //create ClassNode and extract required info from TypeDeclaration
-        ClassNode newClazz = new ClassNode();
+        ClassNode newClass = new ClassNode();
         int startLine = type.getBeginLine();
         //    int endLine = n.getEndLine();
         String clazzName = type.getName();
         int nodeLength = type.getEndLine() - type.getBeginLine();
-        newClazz.setName(clazzName);
-        newClazz.setStartLine(startLine);
-        newClazz.setStartPositionInLine(type.getBeginColumn());
-        newClazz.setNodeLength(nodeLength);
-        fileNode.getClasses().add(newClazz);
+        newClass.setName(clazzName);
+        newClass.setStartLine(startLine);
+        newClass.setStartPositionInLine(type.getBeginColumn());
+        newClass.setNodeLength(nodeLength);
+        fileNode.getClasses().add(newClass);
         //iterate all methods and attributes in class
         if (type.getMembers() != null) {
             for (BodyDeclaration member : type.getMembers()) {
                 if (member instanceof ClassOrInterfaceDeclaration) {
                     parseContentOfClass((TypeDeclaration) member);
                 } else if (member instanceof MethodDeclaration) {
-                    parseContentOfMethod(newClazz, (MethodDeclaration) member);
+                    parseContentOfMethod(newClass, (MethodDeclaration) member);
                 } else if (member instanceof ConstructorDeclaration) {
-                    parseContentOfConstructor(newClazz, (ConstructorDeclaration) member);
+                    parseContentOfConstructor(newClass, (ConstructorDeclaration) member);
                 } else if (member instanceof FieldDeclaration) {
                     FieldDeclaration fieldDeclaration = (FieldDeclaration) member;
                     for (VariableDeclarator v : fieldDeclaration.getVariables()) {
@@ -195,7 +183,7 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
                         newVariable.setStartLine(fieldDeclaration.getBeginLine());
                         newVariable.setStartPositionInLine(fieldDeclaration.getBeginColumn());
                         newVariable.setAttribute(true);
-                        newClazz.getAttributes().add(newVariable);
+                        newClass.getAttributes().add(newVariable);
                     }
                 }
             }

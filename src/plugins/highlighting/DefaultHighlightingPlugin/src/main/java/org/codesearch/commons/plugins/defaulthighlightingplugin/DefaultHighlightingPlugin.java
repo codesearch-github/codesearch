@@ -62,7 +62,7 @@ public class DefaultHighlightingPlugin implements HighlightingPlugin {
             } else {
                 renderer = new XmlXhtmlRenderer();
             }
-            return renderer.highlight(null, new String(content), "UTF-8", true);
+            return renderer.highlight(new String(content, "UTF-8"));
         } catch (IOException ex) {
             throw new HighlightingPluginException("Parsing was not successful\n" + ex);
         } catch (NullPointerException ex) {

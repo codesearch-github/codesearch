@@ -55,6 +55,7 @@ public class RootContainer extends Composite implements AcceptsOneWidget {
         errorPanel.setVisible(false);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void setWidget(IsWidget w) {
         contentPanel.clear();

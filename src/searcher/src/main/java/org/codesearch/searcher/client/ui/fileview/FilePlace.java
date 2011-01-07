@@ -50,11 +50,13 @@ public class FilePlace extends Place {
 
     public static class Tokenizer implements PlaceTokenizer<FilePlace> {
 
+        /** {@inheritDoc} */
         @Override
         public String getToken(FilePlace place) {
             return place.getFilePath() + "@" + place.getRepository();
         }
 
+        /** {@inheritDoc} */
         @Override
         public FilePlace getPlace(String token) {
             String[] parts = token.split("@");

@@ -101,7 +101,8 @@
         </plugins>
         <outputDirectory>${project.build.directory}/${project.build.finalName}/WEB-INF/classes</outputDirectory>
     </build>
-    <properties></properties>
+    <properties>
+    </properties>
 </project>
 
 

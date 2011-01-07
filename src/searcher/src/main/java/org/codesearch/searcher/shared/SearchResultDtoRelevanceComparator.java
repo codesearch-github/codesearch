@@ -29,6 +29,7 @@ import java.util.Comparator;
  */
 public class SearchResultDtoRelevanceComparator implements Comparator<SearchResultDto> {
 
+    /** {@inheritDoc} */
     @Override
     public int compare(SearchResultDto t, SearchResultDto t1) {
         return (int) (t.getRelevance() - t1.getRelevance());

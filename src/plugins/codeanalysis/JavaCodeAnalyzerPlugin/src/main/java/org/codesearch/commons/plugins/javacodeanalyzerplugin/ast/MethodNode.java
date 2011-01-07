@@ -18,14 +18,8 @@
  * You should have received a copy of the GNU General Public License
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.codesearch.commons.plugins.javacodeanalyzerplugin.ast;
 
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
@@ -73,28 +67,6 @@ public class MethodNode extends CompoundNode {
         this.parameters = parameters;
     }
 
-//TODO probably remove method
-    public String getOutlineForChildElements() {
-        String parameterString = "";
-        String returnString = "";
-        for (VariableNode v : parameters) {
-            parameterString += v.getType() + " " + v.getName() + ",";
-        }
-        if (parameterString.length() > 0) {
-            parameterString = parameterString.substring(0, parameterString.length() - 1);
-        }
-        if (returnType != null) {
-            returnString = ": " + returnType;
-        }
-        String outlineString = "";
-        if (constructor) {
-            outlineString = "    Constructor declaration " + this.getName() + "(" + parameterString + ") from " + this.getStartPositionAbsolute() + ", length: " + this.getNodeLength() + "\n";
-        } else {
-            outlineString = "    Method declaration " + this.getName() + "(" + parameterString + ")" + returnString + " from " + super.getStartPositionAbsolute() + ", length: " + super.getNodeLength() + "\n";
-        }
-        return outlineString;
-    }
-
     @Override
     public String getOutlineName() {
         String parameterString = "";
@@ -118,14 +90,17 @@ public class MethodNode extends CompoundNode {
     }
 
     @Override
-    public void addCompoundNodesToList(List<AstNode> nodes) {
-    }
-
-    @Override
     public List<AstNode> getChildNodes() {
         List<AstNode> childNodes = new LinkedList<AstNode>();
         childNodes.addAll(localVariables);
         childNodes.addAll(parameters);
         return childNodes;
     }
+
+    @Override
+    public boolean showInOutline() {
+        return true;
+    }
+
+
 }

@@ -19,17 +19,12 @@
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.codesearch.commons.plugins.javacodeanalyzerplugin.ast;
 
 import java.util.LinkedList;
 import java.util.List;
 import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
 import org.codesearch.commons.plugins.codeanalyzing.ast.CompoundNode;
-import org.codesearch.commons.plugins.codeanalyzing.ast.Visibility;
 
 /**
  * ASTNode that represents a class in the source code
@@ -56,43 +51,36 @@ public class ClassNode extends CompoundNode {
         this.methods = methods;
     }
 
-    public String getOutlineForChildElements() {
-        //String outlineString = "  Class definition: "+ this.getName() + " from: "+this.getStartPositionInLin() + ", length: "+this.getNodeLength()+"\n";
-
-        //TODo add useful outlineName for class
-        String outlineString = "";
-        for (MethodNode method : methods) {
-            outlineString += method.getOutlineForChildElements();
-        }
-        return outlineString;
-    }
-
     @Override
     public String getOutlineName() {
         return name;
     }
 
-    @Override
-    public void addCompoundNodesToList(List<AstNode> nodes) {
-        for (MethodNode method : methods) {
-            nodes.add(method);
-            method.addCompoundNodesToList(nodes);
-        }
-        for (VariableNode var : attributes){
-            if(var.getVisibility() == Visibility.PUBLIC || var.getVisibility() == Visibility.PROTECTED){
-                nodes.add(var);
-            }
-        }
-    }
+//    @Override
+//    public void addNodesToList(List<AstNode> nodes) {
+//        for (MethodNode method : methods) {
+//            nodes.add(method);
+//            method.addNodesToList(nodes);
+//        }
+//        for (VariableNode var : attributes){
+//            if(var.getVisibility() == Visibility.PUBLIC || var.getVisibility() == Visibility.PROTECTED){
+//                nodes.add(var);
+//            }
+//        }
+//    }
 
     @Override
     public List<AstNode> getChildNodes() {
         List<AstNode> childNodes = new LinkedList<AstNode>();
-        childNodes.addAll(this.attributes);
-        for(MethodNode currentMethod : methods){
-            childNodes.add(currentMethod);
-            childNodes.addAll(currentMethod.getChildNodes());
-        }
+        childNodes.addAll(attributes);
+        childNodes.addAll(methods);
         return childNodes;
     }
+
+    @Override
+    public boolean showInOutline() {
+        return true;
+    }
+
+
 }

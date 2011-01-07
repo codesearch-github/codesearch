@@ -34,6 +34,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 public abstract class AutowiringRemoteServiceServlet extends RemoteServiceServlet {
 
+    /** {@inheritDoc} */
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);

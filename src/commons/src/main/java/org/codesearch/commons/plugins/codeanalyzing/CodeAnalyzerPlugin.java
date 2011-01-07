@@ -19,13 +19,7 @@
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package org.codesearch.commons.plugins.codeanalyzing;
-
 
 import java.util.List;
 import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
@@ -41,13 +35,7 @@ import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
  * @author David Froehlich
  */
 public interface CodeAnalyzerPlugin extends Plugin {
-    /**
-     * returns the simplified AST created by the analyzeFile method
-     * @return the simplified AST of the currently set file
-     * @throws CodeAnalyzerPluginException if the analyzeFile method was not executed before
-     */
-    List<AstNode> getAstForCurrentFile() throws CodeAnalyzerPluginException;
-
+    
     /**
      * returns all a list of all type declarations created in the file
      * @return the type declarations
@@ -74,7 +62,7 @@ public interface CodeAnalyzerPlugin extends Plugin {
      * @param fileContent the content of the file
      * @throws CodeAnalyzerPluginException if the analysis failed
      */
-    void analyzeFile(String fileContent) throws CodeAnalyzerPluginException;
+     List<AstNode> analyzeFile(String fileContent) throws CodeAnalyzerPluginException;
 
     /**
      * parses the external links to external usages
