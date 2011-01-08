@@ -24,13 +24,14 @@
  * and open the template in the editor.
  */
 package org.codesearch.commons.plugins.javacodeanalyzerplugin;
-//TODO implement ArrayCreationExpr
+
 import japa.parser.ast.ImportDeclaration;
 import japa.parser.ast.body.ClassOrInterfaceDeclaration;
 import japa.parser.ast.expr.ArrayAccessExpr;
 import japa.parser.ast.expr.AssignExpr;
 import japa.parser.ast.expr.BinaryExpr;
 import japa.parser.ast.expr.ConditionalExpr;
+import japa.parser.ast.expr.DoubleLiteralExpr;
 import japa.parser.ast.expr.Expression;
 import japa.parser.ast.expr.FieldAccessExpr;
 import japa.parser.ast.expr.MethodCallExpr;
@@ -38,6 +39,7 @@ import japa.parser.ast.expr.NameExpr;
 import japa.parser.ast.expr.ObjectCreationExpr;
 import japa.parser.ast.expr.UnaryExpr;
 import japa.parser.ast.stmt.ExplicitConstructorInvocationStmt;
+import japa.parser.ast.stmt.IfStmt;
 import japa.parser.ast.stmt.ReturnStmt;
 import japa.parser.ast.visitor.VoidVisitorAdapter;
 import java.util.LinkedList;
@@ -108,6 +110,9 @@ public class UsageVisitor extends VoidVisitorAdapter {
     @Override
     public void visit(MethodCallExpr n, Object arg) {
         super.visit(n, arg);
+//        if(n.getBeginLine() == 76 || n.getBeginLine() == 77) {
+//            getImports();
+//        }
         List<Expression> parameterList = n.getArgs();
         if (parameterList != null) {
             for (Expression currentParameter : parameterList) {
@@ -128,7 +133,6 @@ public class UsageVisitor extends VoidVisitorAdapter {
 
     @Override
     public void visit(ReturnStmt n, Object arg) {
-        
         super.visit(n, arg);
         try {
             if (n.getExpr() instanceof NameExpr) {
@@ -177,8 +181,6 @@ public class UsageVisitor extends VoidVisitorAdapter {
         }
     }
 
-
-
     @Override
     public void visit(UnaryExpr n, Object arg) {
         super.visit(n, arg);
@@ -191,10 +193,20 @@ public class UsageVisitor extends VoidVisitorAdapter {
     @Override
     public void visit(ConditionalExpr n, Object arg) {
         super.visit(n, arg);
-        Expression expr = n.getCondition();
-        if (expr instanceof NameExpr) {
-            String varName = expr.toString();
-            util.addLinkToVariableDeclaration(expr.getBeginLine(), expr.getBeginColumn(), varName, expr);
+        Expression conditionExpr = n.getCondition();
+        if (conditionExpr instanceof NameExpr) {
+            String varName = conditionExpr.toString();
+            util.addLinkToVariableDeclaration(conditionExpr.getBeginLine(), conditionExpr.getBeginColumn(), varName, conditionExpr);
+        }
+        Expression thenExpr = n.getThenExpr();
+        if (thenExpr instanceof NameExpr) {
+            String varName = thenExpr.toString();
+            util.addLinkToVariableDeclaration(thenExpr.getBeginLine(), thenExpr.getBeginColumn(), varName, n);
+        }
+        Expression elseExpr = n.getElseExpr();
+        if(elseExpr instanceof NameExpr){
+            String varName = elseExpr.toString();
+            util.addLinkToVariableDeclaration(elseExpr.getBeginLine(), elseExpr.getBeginColumn(), varName, n);
         }
     }
 
@@ -203,6 +215,11 @@ public class UsageVisitor extends VoidVisitorAdapter {
         super.visit(n, arg);
         if (n.getScope().toString().equals("this")) {
             util.addLinkToVariableDeclaration(n.getBeginLine(), n.getBeginColumn() + 5, n.toString(), n);
+        } else {
+            String varName = n.getScope().toString();
+            if(!util.addLinkToVariableDeclaration(n.getBeginLine(), n.getBeginColumn(), varName, n)){
+                util.addLinkToExternalClassDeclaration(n.getBeginLine(), n.getBeginColumn(), n.getScope().toString());
+            }
         }
         //  util.addLinkToExternalVariableDeclaration(n.getBeginLine(), n.getBeginColumn(), n.getField(), n, n.getScope().toString());
     }

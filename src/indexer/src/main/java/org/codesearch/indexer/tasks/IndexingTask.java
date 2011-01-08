@@ -105,7 +105,7 @@ public class IndexingTask implements Task {
             LOG.info("Starting indexing of repository: " + repository.getName());
             // Read the index status file
             indexLocation = configReader.getSingleLinePropertyValue("index-location");
-            propertiesManager = new PropertiesManager("/tmp/test/revisions.properties");
+            propertiesManager = new PropertiesManager(indexLocation + File.separator +"revisions.properties");
             // Get the version control plugins
             versionControlPlugin = pluginLoader.getPlugin(VersionControlPlugin.class, repository.getVersionControlSystem());
             versionControlPlugin.setRepository(new URI(repository.getUrl()), repository.getUsername(), repository.getPassword());
@@ -113,7 +113,7 @@ public class IndexingTask implements Task {
             changedFiles = versionControlPlugin.getChangedFilesSinceRevision(lastIndexedRevision);
 
             boolean retrieveNewFileList = false;
-            executeIndexing();
+       //FIXME this.executeIndexing();
             if (codeAnalysisEnabled) {
                 String lastAnalysisRevision = DBAccess.getLastAnalyzedRevisionOfRepository(repository.getName());
                 if (!lastAnalysisRevision.equals(lastIndexedRevision)) {
@@ -161,7 +161,6 @@ public class IndexingTask implements Task {
         //the code analyzer plugin used to analyze the entire repository
         CodeAnalyzerPlugin plugin = null;
         //in case a file has the same filetype (and needs the same analyzer) as the file before the plugin will not be loaded a second time
-        //TODO probably replace with a factory pattern
         String currentFileType = null;
         String previousFileType = null;
         for (FileDto currentFile : changedFiles) {
@@ -181,8 +180,9 @@ public class IndexingTask implements Task {
                         continue;
                     }
                 }
-                
-                List<AstNode> ast = plugin.analyzeFile(new String(currentFile.getContent()));
+
+                plugin.analyzeFile(new String(currentFile.getContent()));
+                AstNode ast = plugin.getAst();
                 List<String> typeDeclarations = plugin.getTypeDeclarations();
                 List<Usage> usages = plugin.getUsages();
                 currentFile.setImports(plugin.getImports());
@@ -196,7 +196,6 @@ public class IndexingTask implements Task {
             } catch (DatabaseAccessException ex) {
                 LOG.error("Error at DatabaseConnection \n" + ex);
             }
-
         }
         LOG.info("Finished code analysis");
     }

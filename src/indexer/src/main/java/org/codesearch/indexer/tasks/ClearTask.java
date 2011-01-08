@@ -22,6 +22,7 @@ package org.codesearch.indexer.tasks;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Level;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -31,8 +32,12 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.store.FSDirectory;
 import org.codesearch.commons.configuration.xml.XmlConfigurationReaderConstants;
 import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
+import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 import org.codesearch.commons.constants.IndexConstants;
+import org.codesearch.commons.database.DBAccess;
+import org.codesearch.commons.database.DatabaseAccessException;
 import org.codesearch.indexer.exceptions.TaskExecutionException;
+import org.quartz.impl.jdbcjobstore.DB2v6Delegate;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -58,20 +63,42 @@ public class ClearTask implements Task {
         try {
             indexLocation = configReader.getSingleLinePropertyValue(XmlConfigurationReaderConstants.INDEX_LOCATION);
 
-            if (StringUtils.isEmpty(repositoryName)) { // Clear the whole index
+            if (repositoryName.isEmpty()) { // Clear the whole index
                 File indexDir = new File(indexLocation);
+                boolean indexSuccess = true;
                 for (File f : indexDir.listFiles()) {
                     if (!f.delete()) {
                         LOG.error("Could not delete file: " + f.getName());
+                        indexSuccess = false;
                     }
+                }
+                if (indexSuccess) {
+                    LOG.debug("Deleted all index files");
+                }
+                boolean dbSuccess = true;
+                try {
+                    for (RepositoryDto currentRepo : configReader.getRepositories()) {
+                        DBAccess.clearTablesForRepository(currentRepo.getName());
+                    }
+                } catch (DatabaseAccessException ex) {
+                    dbSuccess = false;
+                    LOG.debug("Could not delete rows from database, if codesearch is configured not to use code analysis this is perfectly normal, otherwise, check your database connection\n" + ex);
+                }
+                if (dbSuccess) {
+                    LOG.debug("Deleted all rows in the database associated to code analysis");
                 }
             } else { // Clear specific repository from the index
                 IndexSearcher searcher = new IndexSearcher(FSDirectory.open(new File(indexLocation)), false);
                 Term term = new Term(IndexConstants.INDEX_FIELD_REPOSITORY, repositoryName);
                 deleteDocumentsFromIndexUsingTerm(term, searcher);
                 searcher.close();
-
                 LOG.debug("Deleted " + searcher.getIndexReader().deleteDocuments(term) + " documents with repository " + repositoryName);
+                try {
+                    DBAccess.clearTablesForRepository(repositoryName);
+                    LOG.debug("Deleted all rows from database associated to the repository "+repositoryName);
+                } catch (DatabaseAccessException ex) {
+                    LOG.debug("Could not delete rows from database, if codesearch is configured not to use code analysis this is perfectly normal, otherwise, check your database connection\n" + ex);
+                }
             }
         } catch (ConfigurationException ex) {
             throw new TaskExecutionException("Could not read index location: \n" + ex);

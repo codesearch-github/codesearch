@@ -59,13 +59,24 @@ public class AnalyzerUtil {
      * @param varName the name of the variable
      * @param parent the parent element that contains the usage
      */
-    public void addLinkToVariableDeclaration(int lineNumber, int startColumn, String varName, Node parent) {
+    public boolean addLinkToVariableDeclaration(int lineNumber, int startColumn, String varName, Node parent) {
         VariableNode refVar = getVariableDeclarationForUsage(lineNumber, varName, parent);
         if (refVar == null) {
             //System.out.println("variableName " + varName);
-            return;
+            return false;
         }
         usages.add(new Usage(startColumn, lineNumber, refVar.getName().length(), refVar.getStartLine(), refVar.getName()));
+        return true;
+    }
+
+    /**
+     * adds a link to the external links list
+     * @param lineNumber the lineNumber of the usage
+     * @param startColumn the startColumn of the usage
+     * @param className the name of the class that is used
+     */
+    public void addLinkToExternalClassDeclaration(int lineNumber, int startColumn, String className){
+        externalLinks.add(new ExternalLink(lineNumber, startColumn, lineNumber, className));
     }
 
     /**

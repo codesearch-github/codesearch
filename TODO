@@ -20,6 +20,7 @@ Important TODOs
  - Fix exception handling; quite often, 
    problems are just caught and ignored 
    See that exception handling is consistent throughout the program
+ - Find out why some files won't show up in the index
 
 Minor Bugs
 ===============
@@ -28,6 +29,7 @@ Minor Bugs
  - PropertyManager constantly assumes that the property file does not exist, therefor creates a new one
  - execution of code analysis sometimes causes an exception at databse access -> try with empty database
  - when looking at a file and hitting the back button, the search result retrieved in the search before is not displayed, so you have to enter the search information again
+ - make the release of the connection in each DBAccess method finally
 
 Unsolveable bugs
 ===============

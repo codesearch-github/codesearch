@@ -59,14 +59,19 @@ public class DBAccess {
     private static final String STMT_GET_FILE_PATH_FOR_TYPE_DECLARATION = "SELECT f.file_path FROM file f JOIN type t ON f.file_id = t.file_id WHERE f.repository_id = ? AND t.full_name LIKE ?";
     private static final String STMT_GET_FILE_PATH_FOR_TYPE_DECLARATION_WITH_PACKAGES = "SELECT f.file_path FROM file f JOIN type t ON f.file_id = t.file_id WHERE f.repository_id = ? AND t.full_name IN (";
     private static final String STMT_GET_USAGES_FOR_FILE = "SELECT usages FROM file WHERE file_path = ? AND repository_id = ?";
+    private static final String STMT_CLEAR_TYPES_FOR_REPOSITORY = "DELETE FROM type WHERE repo_id = ?";
+    private static final String STMT_CLEAR_FILES_FOR_REPOSITORY = "DELETE FROM file WHERE repository_id = ?";
+
 
     public static List<Usage> getUsagesForFile(String filePath, String repository) throws DatabaseAccessException {
-        ObjectInputStream regObjectStream = null;
+        if (connectionPool == null) {
+            setupConnections();
+        }
+        List<Usage> usages = null;
+        Connection conn = connectionPool.getConnection();
         try {
-            if (connectionPool == null) {
-                setupConnections();
-            }
-            Connection conn = connectionPool.getConnection();
+            ObjectInputStream regObjectStream = null;
+
             int repo_id = getRepoIdForRepoName(repository);
             PreparedStatement ps = conn.prepareStatement(STMT_GET_USAGES_FOR_FILE);
             ps.setString(1, filePath);
@@ -74,30 +79,32 @@ public class DBAccess {
             ResultSet rs = ps.executeQuery();
             if (rs.first()) {
                 byte[] regBytes = rs.getBytes("usages");
-                if (regBytes == null) {
-                    return null;
+                if (regBytes != null) {
+                    ByteArrayInputStream regArrayStream = new ByteArrayInputStream(regBytes);
+                    regObjectStream = new ObjectInputStream(regArrayStream);
+                    usages = (List<Usage>) regObjectStream.readObject();
                 }
-                ByteArrayInputStream regArrayStream = new ByteArrayInputStream(regBytes);
-                regObjectStream = new ObjectInputStream(regArrayStream);
-                return (List<Usage>) regObjectStream.readObject();
-
             }
-            return null;
         } catch (IOException ex) {
             throw new DatabaseAccessException("The content of the blob storing the usages of file " + filePath + " repository " + repository + " could not be parsed to an Object, the database content is probably corrupt");
         } catch (ClassNotFoundException ex) {
             throw new DatabaseAccessException("The content of the blob storing the usages of file " + filePath + " repository " + repository + " could not be parsed to an Object, the database content is probably corrupt");
         } catch (SQLException ex) {
             throw new DatabaseAccessException("SQLException while trying to access the database\n" + ex);
+        } finally {
+            connectionPool.releaseConnection(conn);
         }
+        return usages;
     }
 
     public static String getFilePathForTypeDeclaration(String fullyQualifiedName, String repository) throws DatabaseAccessException {
+        if (connectionPool == null) {
+            setupConnections();
+        }
+
+        Connection conn = connectionPool.getConnection();
+        String filePath = null;
         try {
-            if (connectionPool == null) {
-                setupConnections();
-            }
-            Connection conn = connectionPool.getConnection();
             int repo_id = getRepoIdForRepoName(repository);
             PreparedStatement ps = conn.prepareStatement(STMT_GET_FILE_PATH_FOR_TYPE_DECLARATION);
             ps.setInt(1, repo_id);
@@ -105,20 +112,42 @@ public class DBAccess {
             ResultSet rs = ps.executeQuery();
             rs = ps.getResultSet();
             if (rs.first()) {
-                return rs.getString("file_path");
+                filePath = rs.getString("file_path");
             }
-            return null;
+        } catch (SQLException ex) {
+            connectionPool.releaseConnection(conn);
+            throw new DatabaseAccessException("SQLException while trying to access the database\n" + ex);
+        }
+        return filePath;
+    }
+
+    public static void clearTablesForRepository(String repoName) throws DatabaseAccessException{
+        if (connectionPool == null) {
+            setupConnections();
+        }
+        Connection conn = connectionPool.getConnection();
+        try {
+            int repoId = getRepoIdForRepoName(repoName);
+            PreparedStatement ps = conn.prepareStatement(STMT_CLEAR_FILES_FOR_REPOSITORY);
+            ps.setInt(1, repoId);
+            ps.execute();
+            ps = conn.prepareStatement(STMT_CLEAR_TYPES_FOR_REPOSITORY);
+            ps.setInt(1, repoId);
+            ps.execute();
         } catch (SQLException ex) {
             throw new DatabaseAccessException("SQLException while trying to access the database\n" + ex);
+        } finally {
+            connectionPool.releaseConnection(conn);
         }
     }
 
     public static String getFilePathForTypeDeclaration(String fullyQualifiedName, String repository, List<String> asteriskImports) throws DatabaseAccessException {
+        if (connectionPool == null) {
+            setupConnections();
+        }
+        String filePath = null;
+        Connection conn = connectionPool.getConnection();
         try {
-            if (connectionPool == null) {
-                setupConnections();
-            }
-            Connection conn = connectionPool.getConnection();
             int repo_id = getRepoIdForRepoName(repository);
             String importString = "";
             for (String currentImport : asteriskImports) {
@@ -129,10 +158,12 @@ public class DBAccess {
             ps.setInt(1, repo_id);
             ResultSet rs = ps.executeQuery();
             rs.first();
-            return rs.getString("file_path");
+            filePath = rs.getString("file_path");
         } catch (SQLException ex) {
+            connectionPool.releaseConnection(conn);
             throw new DatabaseAccessException("SQLException while trying to access the database\n" + ex);
         }
+        return filePath;
     }
 
     public static void setupConnections() {
@@ -153,35 +184,38 @@ public class DBAccess {
     }
 
     public static String getLastAnalyzedRevisionOfRepository(String repositoryName) throws DatabaseAccessException {
+        if (connectionPool == null) {
+            setupConnections();
+        }
+        String lastAnalyzedRevision = null;
+        Connection conn = connectionPool.getConnection();
         try {
-            if (connectionPool == null) {
-                setupConnections();
-            }
-            Connection conn = connectionPool.getConnection();
             PreparedStatement ps = conn.prepareStatement(STMT_GET_LAST_ANALYZED_REVISION_OF_REPOSITORY);
             ps.setString(1, repositoryName);
             ResultSet rs = ps.executeQuery();
-            connectionPool.releaseConnection(conn);
             if (!rs.first()) {
                 createRepositoryEntry(repositoryName);
-                return "0";
+                lastAnalyzedRevision = "0";
             } else {
-                return rs.getString("last_analyzed_revision");
+                lastAnalyzedRevision = rs.getString("last_analyzed_revision");
             }
         } catch (SQLException ex) {
+            connectionPool.releaseConnection(conn);
             throw new DatabaseAccessException("Could not close the stream used to retrieve the content of the binary-index field\n" + ex);
         }
+        return lastAnalyzedRevision;
     }
 
     //TODO replace Object
     //the return type object is gonna be changed to a more fitting one as soon as it is clear which information is being stored in the database
-    public static List<AstNode> getBinaryIndexForFile(String filePath, String repository) throws DatabaseAccessException {
+    public static AstNode getBinaryIndexForFile(String filePath, String repository) throws DatabaseAccessException {
         if (connectionPool == null) {
             setupConnections();
         }
         ObjectInputStream regObjectStream = null;
+        AstNode binaryIndex = null;
+        Connection conn = connectionPool.getConnection();
         try {
-            Connection conn = connectionPool.getConnection();
             PreparedStatement ps = conn.prepareStatement(STMT_GET_BINARY_INDEX_FOR_FILE);
             ps.setString(1, filePath);
             ps.setString(2, repository);
@@ -193,7 +227,7 @@ public class DBAccess {
             }
             ByteArrayInputStream regArrayStream = new ByteArrayInputStream(regBytes);
             regObjectStream = new ObjectInputStream(regArrayStream);
-            return (List<AstNode>) regObjectStream.readObject();
+            binaryIndex = (AstNode) regObjectStream.readObject();
         } catch (ClassNotFoundException ex) {
             throw new DatabaseAccessException("The content of the blob storing the binary index of file " + filePath + " repository " + repository + " could not be parsed to an Object, the database content is probably corrupt");
         } catch (IOException ex) {
@@ -201,6 +235,7 @@ public class DBAccess {
         } catch (SQLException ex) {
             throw new DatabaseAccessException("SQLException while accessing the DB\n" + ex);
         } finally {
+            connectionPool.releaseConnection(conn);
             try {
                 if (regObjectStream != null) {
                     regObjectStream.close();
@@ -209,20 +244,22 @@ public class DBAccess {
                 throw new DatabaseAccessException("Could not close the stream used to retrieve the content of the binary-index field\n" + ex);
             }
         }
+        return binaryIndex;
     }
 
     public static void createRepositoryEntry(String repositoryName) throws DatabaseAccessException {
         if (connectionPool == null) {
             setupConnections();
         }
+        Connection conn = connectionPool.getConnection();
         try {
-            Connection conn = connectionPool.getConnection();
             PreparedStatement ps = conn.prepareStatement(STMT_CREATE_REPOSITORY_ENTRY);
             ps.setString(1, repositoryName);
             ps.execute();
-            connectionPool.releaseConnection(conn);
         } catch (SQLException ex) {
             throw new DatabaseAccessException("SQLException while trying to access the database\n" + ex);
+        } finally {
+            connectionPool.releaseConnection(conn);
         }
     }
 
@@ -230,15 +267,16 @@ public class DBAccess {
         if (connectionPool == null) {
             setupConnections();
         }
+        Connection conn = connectionPool.getConnection();
         try {
-            Connection conn = connectionPool.getConnection();
             PreparedStatement ps = conn.prepareStatement(STMT_SET_LAST_ANALYZED_REVISION_OF_REPOSITORY);
             ps.setString(1, revision);
             ps.setString(2, repositoryName);
             ps.execute();
-            connectionPool.releaseConnection(conn);
         } catch (SQLException ex) {
             throw new DatabaseAccessException("SQLException while trying to access the database\n" + ex);
+        } finally {
+            connectionPool.releaseConnection(conn);
         }
     }
 
@@ -246,28 +284,32 @@ public class DBAccess {
         if (connectionPool == null) {
             setupConnections();
         }
+        int repoId = 0;
+
+        Connection conn = connectionPool.getConnection();
         try {
-            Connection conn = connectionPool.getConnection();
             PreparedStatement ps = conn.prepareStatement(STMT_GET_REPO_ID_FOR_NAME);
             ps.setString(1, repoName);
             ps.execute();
             ResultSet rs = ps.getResultSet();
             rs.first();
-            connectionPool.releaseConnection(conn);
-            return rs.getInt("repository_id");
+            repoId = rs.getInt("repository_id");
         } catch (SQLException ex) {
             throw new DatabaseAccessException("SQLException while trying to access the database\n" + ex);
+        } finally {
+            connectionPool.releaseConnection(conn);
         }
+        return repoId;
     }
 
     public static void setAnalysisDataForFile(String filePath, String repository, Object binaryIndex, Object usages, List<String> types) throws DatabaseAccessException {
         if (connectionPool == null) {
             setupConnections();
         }
+        int fileId = ensureThatRecordExists(filePath, repository);
+        int repoId = getRepoIdForRepoName(repository);
+        Connection conn = connectionPool.getConnection();
         try {
-            int fileId = ensureThatRecordExists(filePath, repository);
-            int repoId = getRepoIdForRepoName(repository);
-            Connection conn = connectionPool.getConnection();
             PreparedStatement ps = conn.prepareStatement(STMT_CLEAR_TYPES_FOR_FILE);
             ps.setInt(1, fileId);
             ps.execute();
@@ -286,11 +328,12 @@ public class DBAccess {
                 for (int i = 0; i < types.size(); i++) {
                     ps.setString(i + 1, types.get(i));
                 }
+                ps.execute(); //FIXME
             }
-            ps.execute(); //FIXME
-            connectionPool.releaseConnection(conn);
         } catch (SQLException ex) {
             throw new DatabaseAccessException("SQLException while trying to access the database\n" + ex);
+        } finally {
+            connectionPool.releaseConnection(conn);
         }
     }
 
@@ -298,9 +341,10 @@ public class DBAccess {
         if (connectionPool == null) {
             setupConnections();
         }
+        int recordId = 0;
+        Connection conn = connectionPool.getConnection();
         try {
             ResultSet rs = null;
-            Connection conn = connectionPool.getConnection();
             PreparedStatement ps = conn.prepareStatement(STMT_GET_FILE_RECORD, Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, filePath);
             ps.setString(2, repository);
@@ -312,13 +356,17 @@ public class DBAccess {
                 ps.setString(1, filePath);
                 ps.setString(2, repository);
                 ps.execute();
-                ps.getGeneratedKeys().first();
-                return rs.getInt(1);
+                ResultSet generatedKeys = ps.getGeneratedKeys();
+                generatedKeys.first();
+                recordId = generatedKeys.getInt(1);
+            } else {
+                recordId = rs.getInt("file_id");
             }
-            connectionPool.releaseConnection(conn);
-            return rs.getInt("file_id");
         } catch (SQLException ex) {
             throw new DatabaseAccessException("SQLException while trying to access the database\n" + ex);
+        } finally {
+            connectionPool.releaseConnection(conn);
         }
+        return recordId;
     }
 }

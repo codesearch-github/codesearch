@@ -95,7 +95,6 @@ import org.springframework.stereotype.Component;
 public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
 
     private FileNode fileNode = new FileNode();
-    private List<AstNode> ast = new LinkedList<AstNode>();
     private List<Usage> usages;
     private String fileContent;
     private List<String> typeDeclarations;
@@ -103,11 +102,14 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
     private List<String> imports;
     AnalyzerUtil util;
 
+    public FileNode getFileNode() {
+        return fileNode;
+    }
+
     /** {@inheritDoc} */
     @Override
-    public List<AstNode> analyzeFile(final String fileContent) throws CodeAnalyzerPluginException {
+    public void analyzeFile(final String fileContent) throws CodeAnalyzerPluginException {
         CompilationUnit cu = null;
-        ast = new LinkedList<AstNode>();
         fileNode = new FileNode();
         util = new AnalyzerUtil(fileNode);
         this.fileContent = fileContent;
@@ -116,7 +118,6 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
             bais = new ByteArrayInputStream(fileContent.getBytes()); //TODO maybe change specification of analyzeFile to take an inputStream as parameter
             cu = JavaParser.parse(bais);
             buildAST(cu);
-            ast.addAll(fileNode.getChildNodes());
             //parse usages via UsageVisitor
             String packageName = null;
             try {
@@ -143,7 +144,6 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
             } catch (IOException ex) {
             }
         }
-        return ast;
     }
 
     private void buildAST(CompilationUnit cu) {
@@ -178,10 +178,11 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
                     FieldDeclaration fieldDeclaration = (FieldDeclaration) member;
                     for (VariableDeclarator v : fieldDeclaration.getVariables()) {
                         VariableNode newVariable = new VariableNode();
+                        
                         newVariable.setName(v.getId().getName());
                         newVariable.setType(fieldDeclaration.getType().toString());
-                        newVariable.setStartLine(fieldDeclaration.getBeginLine());
-                        newVariable.setStartPositionInLine(fieldDeclaration.getBeginColumn());
+                        newVariable.setStartLine(v.getBeginLine());
+                        newVariable.setStartPositionInLine(v.getBeginColumn());
                         newVariable.setAttribute(true);
                         newClass.getAttributes().add(newVariable);
                     }
@@ -199,8 +200,17 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
         newMethod.setName(methodName);
         newMethod.setReturnType(returnType);
         newMethod.setConstructor(false);
-        newMethod.setStartPositionInLine(method.getBeginColumn());//TODO replace with line number
-        newMethod.setStartLine(method.getBeginLine());
+        newMethod.setStartPositionInLine(method.getBeginColumn());
+
+        int startLine = method.getBeginLine();
+        String stringUntilName = method.toString().substring(0, method.toString().indexOf(method.getName() + "("));
+        int linesUntilName = stringUntilName.split("\n").length -1;
+        if(method.getJavaDoc() != null){
+            linesUntilName -= method.getJavaDoc().getEndLine() - method.getJavaDoc().getBeginLine() + 1;
+        }
+        startLine += linesUntilName;
+
+        newMethod.setStartLine(startLine);
 
         //parse all parameters to VariableNodes
         try {
@@ -231,71 +241,75 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
 
     private void parseStatement(Statement stmt, Node parent) {
         stmt.setData(parent);
-        try {
-            if (stmt instanceof IfStmt) {
-                parseIfStmt((IfStmt) stmt, parent);
-            } else if (stmt instanceof BlockStmt) {
-                parseBlockStmt((BlockStmt) stmt, parent);
-            } else if (stmt instanceof ExpressionStmt) {
-                parseExpression(((ExpressionStmt) stmt).getExpression(), stmt);
-            } else if (stmt instanceof DoStmt) {
-                DoStmt doStmt = (DoStmt) stmt;
-                parseExpression(doStmt.getCondition(), stmt);
-                parseStatement(doStmt.getBody(), stmt);
-            } else if (stmt instanceof ForStmt) {
-                ForStmt forStmt = (ForStmt) stmt;
-                parseStatement(forStmt.getBody(), stmt);
+        if (stmt instanceof IfStmt) {
+            parseIfStmt((IfStmt) stmt, parent);
+        } else if (stmt instanceof BlockStmt) {
+            parseBlockStmt((BlockStmt) stmt, parent);
+        } else if (stmt instanceof ExpressionStmt) {
+            parseExpression(((ExpressionStmt) stmt).getExpression(), stmt);
+        } else if (stmt instanceof DoStmt) {
+            DoStmt doStmt = (DoStmt) stmt;
+            parseExpression(doStmt.getCondition(), stmt);
+            parseStatement(doStmt.getBody(), stmt);
+        } else if (stmt instanceof ForStmt) {
+            ForStmt forStmt = (ForStmt) stmt;
+            parseStatement(forStmt.getBody(), stmt);
+            if (forStmt.getInit() != null) {
                 for (Expression expr : forStmt.getInit()) {
                     parseExpression(expr, stmt);
                 }
-            } else if (stmt instanceof ForeachStmt) {
-                ForeachStmt foreachStmt = (ForeachStmt) stmt;
-                parseStatement(foreachStmt.getBody(), stmt);
-                parseExpression(foreachStmt.getVariable(), stmt);
-                parseExpression(foreachStmt.getIterable(), stmt);
-            } else if (stmt instanceof SwitchStmt) {
-                SwitchStmt switchStmt = (SwitchStmt) stmt;
-                parseExpression(switchStmt.getSelector(), stmt);
-                for (SwitchEntryStmt switchEntry : switchStmt.getEntries()) {
+            }
+        } else if (stmt instanceof ForeachStmt) {
+            ForeachStmt foreachStmt = (ForeachStmt) stmt;
+            parseStatement(foreachStmt.getBody(), stmt);
+            parseExpression(foreachStmt.getVariable(), stmt);
+            parseExpression(foreachStmt.getIterable(), stmt);
+        } else if (stmt instanceof SwitchStmt) {
+            SwitchStmt switchStmt = (SwitchStmt) stmt;
+            parseExpression(switchStmt.getSelector(), stmt);
+            for (SwitchEntryStmt switchEntry : switchStmt.getEntries()) {
+                if (switchEntry.getStmts() != null) {
                     for (Statement switchEntryStatement : switchEntry.getStmts()) {
                         parseStatement(switchEntryStatement, stmt);
                     }
                 }
-            } else if (stmt instanceof TryStmt) {
-                TryStmt tryStmt = (TryStmt) stmt;
-                parseStatement(tryStmt.getTryBlock(), stmt);
-                if (tryStmt.getFinallyBlock() != null) {
-                    parseStatement(tryStmt.getFinallyBlock(), stmt);
-                }
-                if (tryStmt.getCatchs() == null) {
-                    return;
-                }
-                for (CatchClause catchClause : tryStmt.getCatchs()) {
-                    MethodNode parentMethod = util.getMethodAtLine(catchClause.getBeginLine());
-                    Parameter param = catchClause.getExcept();
-                    VariableNode var = new VariableNode();
-                    var.setParentLineDeclaration(parent.getBeginLine());
-                    var.setAttribute(false);
-                    var.setStartLine(param.getBeginLine());
-                    var.setStartPositionInLine(param.getBeginColumn());
-                    var.setType(param.getType().toString());
-                    var.setName(param.getId().getName());
-                    parentMethod.getLocalVariables().add(var);
-                    parseStatement(catchClause.getCatchBlock(), stmt);
-                }
-            } else if (stmt instanceof WhileStmt) {
-                WhileStmt whileStmt = (WhileStmt) stmt;
-                parseExpression(whileStmt.getCondition(), stmt);
-                parseStatement(whileStmt.getBody(), stmt);
-            } else if (stmt instanceof ReturnStmt) {
-                ReturnStmt returnStmt = (ReturnStmt) stmt;
-                parseExpression(returnStmt.getExpr(), stmt);
-            } else if (stmt instanceof ExplicitConstructorInvocationStmt) {
-                ExplicitConstructorInvocationStmt ecis = (ExplicitConstructorInvocationStmt) stmt;
-                parseExpression(ecis.getExpr(), ecis);
             }
-        } catch (NullPointerException ex) {
-            //FIXME
+        } else if (stmt instanceof TryStmt) {
+            TryStmt tryStmt = (TryStmt) stmt;
+            parseStatement(tryStmt.getTryBlock(), stmt);
+            if (tryStmt.getFinallyBlock() != null) {
+                parseStatement(tryStmt.getFinallyBlock(), stmt);
+            }
+            if (tryStmt.getCatchs() == null) {
+                return;
+            }
+            for (CatchClause catchClause : tryStmt.getCatchs()) {
+                MethodNode parentMethod = util.getMethodAtLine(catchClause.getBeginLine());
+                Parameter param = catchClause.getExcept();
+                VariableNode var = new VariableNode();
+                var.setParentLineDeclaration(parent.getBeginLine());
+                var.setAttribute(false);
+                var.setStartLine(param.getBeginLine());
+                var.setStartPositionInLine(param.getBeginColumn());
+                var.setType(param.getType().toString());
+                var.setName(param.getId().getName());
+                try {
+                    parentMethod.getLocalVariables().add(var);
+                } catch (NullPointerException ex) {
+                    getClass();
+                }
+                parseStatement(catchClause.getCatchBlock(), stmt);
+            }
+        } else if (stmt instanceof WhileStmt) {
+            WhileStmt whileStmt = (WhileStmt) stmt;
+            parseExpression(whileStmt.getCondition(), stmt);
+            parseStatement(whileStmt.getBody(), stmt);
+        } else if (stmt instanceof ReturnStmt) {
+            ReturnStmt returnStmt = (ReturnStmt) stmt;
+            parseExpression(returnStmt.getExpr(), stmt);
+        } else if (stmt instanceof ExplicitConstructorInvocationStmt) {
+            ExplicitConstructorInvocationStmt ecis = (ExplicitConstructorInvocationStmt) stmt;
+            parseExpression(ecis.getExpr(), ecis);
         }
     }
 
@@ -351,14 +365,18 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
             parseExpression(aae.getName(), expr);
         } else if (expr instanceof ArrayCreationExpr) {
             ArrayCreationExpr ace = (ArrayCreationExpr) expr;
-            for (Expression currentExpr : ace.getDimensions()) {
-                parseExpression(currentExpr, expr);
+            if (ace.getDimensions() != null) {
+                for (Expression currentExpr : ace.getDimensions()) {
+                    parseExpression(currentExpr, expr);
+                }
             }
             parseExpression(ace.getInitializer(), expr);
         } else if (expr instanceof ArrayInitializerExpr) {
             ArrayInitializerExpr aie = (ArrayInitializerExpr) expr;
-            for (Expression currentExpr : aie.getValues()) {
-                parseExpression(currentExpr, expr);
+            if (aie.getValues() != null) {
+                for (Expression currentExpr : aie.getValues()) {
+                    parseExpression(currentExpr, expr);
+                }
             }
         } else if (expr instanceof AssignExpr) {
             AssignExpr ae = (AssignExpr) expr;
@@ -387,8 +405,10 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
             parseExpression(ioe.getExpr(), parent);
         } else if (expr instanceof ObjectCreationExpr) {
             ObjectCreationExpr oje = (ObjectCreationExpr) expr;
-            for (Expression arg : oje.getArgs()) {
-                parseExpression(arg, expr);
+            if (oje.getArgs() != null) {
+                for (Expression arg : oje.getArgs()) {
+                    parseExpression(arg, expr);
+                }
             }
             parseExpression(oje.getScope(), expr);
         } else if (expr instanceof SingleMemberAnnotationExpr) {
@@ -442,7 +462,9 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
         parseConditionExpr(stmt.getCondition(), stmt);
         //TODO add usage handling for condition expressions
         parseStatement(stmt.getThenStmt(), stmt);
-        parseStatement(stmt.getElseStmt(), stmt);
+        if (stmt.getElseStmt() != null) {
+            parseStatement(stmt.getElseStmt(), stmt);
+        }
     }
 
     private void parseContentOfConstructor(ClassNode parentClass, ConstructorDeclaration constructor) {
@@ -455,7 +477,15 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
         newMethod.setReturnType(returnType);
         newMethod.setConstructor(true);
         newMethod.setStartPositionInLine(constructor.getBeginColumn());//TODO replace with line number
-        newMethod.setStartLine(constructor.getBeginLine());
+        int startLine = constructor.getBeginLine();
+        String stringUntilName = constructor.toString().substring(0, constructor.toString().indexOf(constructor.getName() + "("));
+        int linesUntilName = stringUntilName.split("\n").length -1;
+        if(constructor.getJavaDoc() != null){
+            linesUntilName -= constructor.getJavaDoc().getEndLine() - constructor.getJavaDoc().getBeginLine() + 1;
+        }
+        startLine += linesUntilName;
+
+        newMethod.setStartLine(startLine);
         //parse all parameters to VariableNodes
         try {
             for (Parameter param : constructor.getParameters()) {
@@ -480,7 +510,7 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
         int lineNumber = 0;
         int absoluteChars = 0;
         String[] lines = fileContent.split("\n");
-        for (AstNode currentNode : ast) {
+        for (AstNode currentNode : fileNode.getChildNodes()) {
             boolean elementFoundOnLine = false;
             while (!elementFoundOnLine && lineNumber < lines.length) {
                 if (currentNode.getStartLine() == lineNumber) {
@@ -537,7 +567,7 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
     /** {@inheritDoc} */
     @Override
     public List<ExternalUsage> parseExternalLinks(String fileContent, List<String> imports, List<ExternalLink> externalLinks, String repository) {
-        List<ExternalUsage> usages = new LinkedList<ExternalUsage>(); //TODO rename
+        List<ExternalUsage> extUsages = new LinkedList<ExternalUsage>();
         try {
             for (ExternalLink el : externalLinks) {
                 String fullyQualifiedName = null;
@@ -562,29 +592,35 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
                     //In case the file is importet through an asterisk import
                 }
                 if (el instanceof ExternalMethodLink) {
-                    List<AstNode> ast = DBAccess.getBinaryIndexForFile(filePath, repository); //TODO rename
+                    AstNode fileAst = DBAccess.getBinaryIndexForFile(filePath, repository); //TODO rename
                 } else if (el instanceof ExternalVariableLink) {
                     ExternalVariableLink extVarLink = (ExternalVariableLink) el;
-                    List<AstNode> fileAst = (List<AstNode>) DBAccess.getBinaryIndexForFile(filePath, repository);
-                    for (AstNode currentNode : fileAst) {
+                    AstNode fileAst = (AstNode) DBAccess.getBinaryIndexForFile(filePath, repository);
+                    for (AstNode currentNode : fileAst.getChildNodes()) {
                         if (currentNode instanceof VariableNode && currentNode.getName().equals(extVarLink.getVariableName())) {
                             referenceLineNumber = currentNode.getStartLine();
                         }
                     }
                 }
-                usages.add(new ExternalUsage(column, startLine, length, referenceLineNumber, replacedString, filePath));
+                extUsages.add(new ExternalUsage(column, startLine, length, referenceLineNumber, replacedString, filePath));
             }
         } catch (DatabaseAccessException ex) {
             System.out.println(ex);
             //FIXME
         }
 
-        return usages;
+        return extUsages;
     }
 
     /** {@inheritDoc} */
     @Override
     public List<String> getImports() {
         return imports;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public AstNode getAst() {
+        return fileNode;
     }
 }

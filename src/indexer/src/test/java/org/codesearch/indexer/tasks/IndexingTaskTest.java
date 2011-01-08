@@ -21,22 +21,14 @@
 
 package org.codesearch.indexer.tasks;
 
-import org.apache.commons.configuration.ConfigurationException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 import java.util.LinkedList;
-import org.codesearch.commons.configuration.properties.PropertiesManager;
 import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
 import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
+import org.codesearch.commons.database.DBAccess;
 import org.codesearch.commons.plugins.PluginLoader;
-import org.codesearch.commons.plugins.codeanalyzing.CodeAnalyzerPlugin;
-import org.codesearch.commons.plugins.vcs.FileDto;
-import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import org.junit.runner.RunWith;
@@ -93,25 +85,16 @@ public class IndexingTaskTest {
     }
 
     @Test
-    public void testCodeAnalysis() throws Exception {
-        RepositoryDto repo = new RepositoryDto();
-        repo.setVersionControlSystem("FILESYSTEM");
-        CodeAnalyzerPlugin codeAnalyzerPlugin = pluginLoader.getPlugin(CodeAnalyzerPlugin.class, "java");
-        VersionControlPlugin versionControlPlugin = pluginLoader.getPlugin(VersionControlPlugin.class, "FILESYSTEM");
-        FileDto fileDto = versionControlPlugin.getFileForFilePath("/home/daasdingo/workspace/codesearch/src/commons/src/main/java/org/codesearch/commons/plugins/PluginLoader.java");
-        codeAnalyzerPlugin.analyzeFile(new String(fileDto.getContent()));
-    }
-
-    @Test
     public void testExecuteLocal() throws Exception {
         XmlConfigurationReader pm = new XmlConfigurationReader();
         List<RepositoryDto> repos = pm.getRepositories();
 
         ClearTask clear = (ClearTask) applicationContext.getBean("clearTask");
-        clear.execute();
+       // clear.execute();
         
         for (RepositoryDto repo : repos) {
             if (repo.getVersionControlSystem().equals("FILESYSTEM")) {
+                DBAccess.setLastAnalyzedRevisionOfRepository(repo.getName(), "0");
                 repo.setUrl(repo.getUrl().replace("$home", System.getProperty("user.home")));
                 IndexingTask t = (IndexingTask) applicationContext.getBean("indexingTask");
            //     pr.setPropertyFileValue(repo.getName(), "0");

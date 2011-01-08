@@ -22,7 +22,6 @@
 package org.codesearch.commons.plugins.codeanalyzing;
 
 import java.util.List;
-import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 import org.codesearch.commons.plugins.Plugin;
 import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
 import org.codesearch.commons.plugins.codeanalyzing.ast.ExternalLink;
@@ -59,10 +58,13 @@ public interface CodeAnalyzerPlugin extends Plugin {
 
     /**
      * analyzes the file and extracts information about the type declarations, usages, external links and the ast
+     * @return the AstNode of the file
      * @param fileContent the content of the file
      * @throws CodeAnalyzerPluginException if the analysis failed
      */
-     List<AstNode> analyzeFile(String fileContent) throws CodeAnalyzerPluginException;
+     void analyzeFile(String fileContent) throws CodeAnalyzerPluginException;
+     
+     AstNode getAst();
 
     /**
      * parses the external links to external usages

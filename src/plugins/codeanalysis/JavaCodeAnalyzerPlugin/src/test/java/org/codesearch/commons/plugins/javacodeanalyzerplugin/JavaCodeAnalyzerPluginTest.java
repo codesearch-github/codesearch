@@ -104,26 +104,9 @@ public class JavaCodeAnalyzerPluginTest extends TestCase {
 //        List<ExternalUsage> usages = plugin.parseExternalLinks(fileContent, imports, externalLinks, "svn_local");
     }
 
-    public void testCodeCommentCompletion() {
-//        try {
-//            try {
-//                try {
-//                    checkContentOfFile(new File("/home/david/codesearch/"));
-//                } catch (ParseException ex) {
-//
-//                }
-//            } catch (CodeAnalyzerPluginException ex) {
-//
-//            }
-//        } catch (FileNotFoundException ex) {
-//
-//        } catch (IOException ex) {
-//        }
-    }
-
     public void testIntegrationOfUsages() throws Exception {
         String fileContent = "";
-        BufferedReader br = new BufferedReader(new FileReader("/home/david/workspace/svnsearch/codesearch/src/plugins/vcs/BazaarPlugin/src/main/java/org/commons/codesearch/utils/bazaar/BazaarUtils.java"));
+        BufferedReader br = new BufferedReader(new FileReader("/home/david/codesearch/src/custom-libs/Codesearch-JHighlight/src/main/java/com/uwyn/jhighlight/renderer/XhtmlRendererFactory.java"));
         while (br.ready()) {
             fileContent += br.readLine() + "\n";
         }
@@ -162,6 +145,37 @@ public class JavaCodeAnalyzerPluginTest extends TestCase {
         resultString = resultString.substring(0, resultString.length()-1);
         System.out.println(resultString);
     }
+    
+    public void testCodeCommentCompletion() {
+//        try {
+//            try {
+//                try {
+//                    checkContentOfFile(new File("/home/david/codesearch/"));
+//                } catch (ParseException ex) {
+//
+//                }
+//            } catch (CodeAnalyzerPluginException ex) {
+//
+//            }
+//        } catch (FileNotFoundException ex) {
+//
+//        } catch (IOException ex) {
+//        }
+    }
+
+
+
+//            for (File child : file.listFiles()) {
+//                checkContentOfFile(child);
+//            }
+//        } else {
+//            String truncFileName = file.getAbsolutePath().replaceAll("/home/david/codesearch/", "");
+//            if (file.getAbsolutePath().endsWith(".java") && !file.getAbsolutePath().contains("searcher") && !file.getAbsolutePath().contains("/test/") && !file.getAbsolutePath().contains("jhighlight") && !file.getAbsolutePath().contains("resources")) {
+//                CompletionVisitor cv = new CompletionVisitor();
+//                CompilationUnit cu = JavaParser.parse(file);
+//                cu.accept(cv, truncFileName);
+//            }
+//        }
 
     private void checkContentOfFile(File file) throws FileNotFoundException, IOException, CodeAnalyzerPluginException, ParseException {
         if (file.isDirectory()) {
@@ -169,11 +183,16 @@ public class JavaCodeAnalyzerPluginTest extends TestCase {
                 checkContentOfFile(child);
             }
         } else {
-            String truncFileName = file.getAbsolutePath().replaceAll("/home/david/codesearch/", "");
-            if (file.getAbsolutePath().endsWith(".java") && !file.getAbsolutePath().contains("searcher") && !file.getAbsolutePath().contains("/test/") && !file.getAbsolutePath().contains("jhighlight") && !file.getAbsolutePath().contains("resources")) {
-                CompletionVisitor cv = new CompletionVisitor();
-                CompilationUnit cu = JavaParser.parse(file);
-                cu.accept(cv, truncFileName);
+            if (file.getAbsolutePath().endsWith(".java") && !file.getAbsolutePath().contains("jhighlight") && !file.getAbsolutePath().contains("google")) {
+                System.out.println(file.getAbsolutePath());
+                String fileContent = "";
+                BufferedReader br = new BufferedReader(new FileReader(file));
+                while(br.ready()){
+                    fileContent += br.readLine() + "\n";
+                }
+                fileContent = fileContent.substring(0, fileContent.length() -1);
+
+                plugin.analyzeFile(fileContent);
             }
         }
 

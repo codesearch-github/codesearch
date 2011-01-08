@@ -154,10 +154,10 @@ public class SearcherServiceImpl extends AutowiringRemoteServiceServlet implemen
 
             // GET OUTLINE IF EXISTING
             try {
-                List<AstNode> ast = DBAccess.getBinaryIndexForFile(filePath, repository);
-                if (ast != null) {
+                AstNode fileNode = DBAccess.getBinaryIndexForFile(filePath, repository);
+                if (fileNode != null) {
                     List<OutlineNode> outline = new LinkedList<OutlineNode>();
-                    for (AstNode a : ast) {
+                    for (AstNode a : fileNode.getChildNodes()) {
                         if (a == null) {
                             continue;
                         }
