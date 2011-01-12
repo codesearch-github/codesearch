@@ -24,8 +24,6 @@ package org.codesearch.commons.plugins.codeanalyzing;
 import java.util.List;
 import org.codesearch.commons.plugins.Plugin;
 import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
-import org.codesearch.commons.plugins.codeanalyzing.ast.ExternalLink;
-import org.codesearch.commons.plugins.codeanalyzing.ast.ExternalUsage;
 import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
 
 /**
@@ -50,13 +48,6 @@ public interface CodeAnalyzerPlugin extends Plugin {
     List<Usage> getUsages() throws CodeAnalyzerPluginException;
 
     /**
-     * returns a list of all external links that can later be parsed to ExternalUsages
-     * @return the external links
-     * @throws CodeAnalyzerPluginException if the analyzeFile method was not executed before
-     */
-    List<ExternalLink> getExternalLinks() throws CodeAnalyzerPluginException;
-
-    /**
      * analyzes the file and extracts information about the type declarations, usages, external links and the ast
      * @return the AstNode of the file
      * @param fileContent the content of the file
@@ -65,17 +56,6 @@ public interface CodeAnalyzerPlugin extends Plugin {
      void analyzeFile(String fileContent) throws CodeAnalyzerPluginException;
      
      AstNode getAst();
-
-    /**
-     * parses the external links to external usages
-     * after the entire repository was analyzed the reference line number can be extracted from the corresponding declarations
-     * @param fileContent the content of the file
-     * @param imports all imports declared in the file
-     * @param externalLinks the external links parsed by the analyzeFile() method
-     * @param repository the repository holding the file
-     * @return all external usages
-     */
-    List<ExternalUsage> parseExternalLinks(String fileContent, List<String> imports, List<ExternalLink> externalLinks, String repository);
 
     /**
      * returns all imports declared in the file

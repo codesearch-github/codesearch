@@ -34,6 +34,7 @@ import org.apache.log4j.Logger;
 import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
 import org.codesearch.commons.configuration.xml.XmlConfigurationReaderConstants;
 import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
+import org.codesearch.commons.plugins.codeanalyzing.ast.ExternalUsage;
 import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
 
 /**
@@ -48,7 +49,7 @@ public class DBAccess {
     private static final String STMT_GET_LAST_ANALYZED_REVISION_OF_REPOSITORY = "SELECT last_analyzed_revision FROM repository WHERE repository_name = ?";
     private static final String STMT_CREATE_REPOSITORY_ENTRY = "INSERT INTO repository (repository_name) VALUES (?)";
     private static final String STMT_SET_LAST_ANALYZED_REVISION_OF_REPOSITORY = "UPDATE repository SET last_analyzed_revision = ? WHERE repository_name = ?";
-    private static final String STMT_SET_BINARY_INDEX_FOR_FILE = "UPDATE file SET binary_index = ?, usages = ? WHERE file_id = ?";
+    private static final String STMT_SET_BINARY_INDEX_FOR_FILE = "UPDATE file SET binary_index = ?, usages = ?, imports = ? WHERE file_id = ?";
     private static final String STMT_CLEAR_TYPES_FOR_FILE = "DELETE FROM type WHERE file_id = ?";
     //private static final String STMT_SET_TYPES_FOR_FILE = "INSERT INTO type (full_name, file_id, repo_id) VALUES (?, (SELECT file_id FROM file WHERE file_path = ? AND repository = (SELECT repository_id FROM repository WHERE repository_name = ?)), (SELECT repository_id FROM repository WHERE repository_name = ?))";
     private static final String STMT_GET_BINARY_INDEX_FOR_FILE = "SELECT binary_index FROM file where file_path = ? AND repository_id = (SELECT repository_id FROM repository WHERE repository_name = ?)";
@@ -61,7 +62,41 @@ public class DBAccess {
     private static final String STMT_GET_USAGES_FOR_FILE = "SELECT usages FROM file WHERE file_path = ? AND repository_id = ?";
     private static final String STMT_CLEAR_TYPES_FOR_REPOSITORY = "DELETE FROM type WHERE repo_id = ?";
     private static final String STMT_CLEAR_FILES_FOR_REPOSITORY = "DELETE FROM file WHERE repository_id = ?";
+    private static final String STMT_GET_IMPORTS_FOR_FILE = "SELECT imports FROM file WHERE file_path = ? AND repository_id = ?";
 
+    public static List<String> getImportsForFile(String filePath, String repository) throws DatabaseAccessException {
+        if (connectionPool == null) {
+            setupConnections();
+        }
+        List<String> imports = null;
+        Connection conn = connectionPool.getConnection();
+        try {
+            ObjectInputStream regObjectStream = null;
+
+            int repo_id = getRepoIdForRepoName(repository);
+            PreparedStatement ps = conn.prepareStatement(STMT_GET_IMPORTS_FOR_FILE);
+            ps.setString(1, filePath);
+            ps.setInt(2, repo_id);
+            ResultSet rs = ps.executeQuery();
+            if (rs.first()) {
+                byte[] regBytes = rs.getBytes("imports");
+                if (regBytes != null) {
+                    ByteArrayInputStream regArrayStream = new ByteArrayInputStream(regBytes);
+                    regObjectStream = new ObjectInputStream(regArrayStream);
+                    imports = (List<String>) regObjectStream.readObject();
+                }
+            }
+        } catch (IOException ex) {
+            throw new DatabaseAccessException("The content of the blob storing the imports of file " + filePath + " repository " + repository + " could not be parsed to an Object, the database content is probably corrupt");
+        } catch (ClassNotFoundException ex) {
+            throw new DatabaseAccessException("The content of the blob storing the imports of file " + filePath + " repository " + repository + " could not be parsed to an Object, the database content is probably corrupt");
+        } catch (SQLException ex) {
+            throw new DatabaseAccessException("SQLException while trying to access the database\n" + ex);
+        } finally {
+            connectionPool.releaseConnection(conn);
+        }
+        return imports;
+    }
 
     public static List<Usage> getUsagesForFile(String filePath, String repository) throws DatabaseAccessException {
         if (connectionPool == null) {
@@ -86,9 +121,9 @@ public class DBAccess {
                 }
             }
         } catch (IOException ex) {
-            throw new DatabaseAccessException("The content of the blob storing the usages of file " + filePath + " repository " + repository + " could not be parsed to an Object, the database content is probably corrupt");
+            throw new DatabaseAccessException("The content of the blob storing the usages of the file " + filePath + " repository " + repository + " could not be parsed to an Object, the database content is probably corrupt");
         } catch (ClassNotFoundException ex) {
-            throw new DatabaseAccessException("The content of the blob storing the usages of file " + filePath + " repository " + repository + " could not be parsed to an Object, the database content is probably corrupt");
+            throw new DatabaseAccessException("The content of the blob storing the usages of the file " + filePath + " repository " + repository + " could not be parsed to an Object, the database content is probably corrupt");
         } catch (SQLException ex) {
             throw new DatabaseAccessException("SQLException while trying to access the database\n" + ex);
         } finally {
@@ -115,13 +150,14 @@ public class DBAccess {
                 filePath = rs.getString("file_path");
             }
         } catch (SQLException ex) {
-            connectionPool.releaseConnection(conn);
             throw new DatabaseAccessException("SQLException while trying to access the database\n" + ex);
+        } finally {
+            connectionPool.releaseConnection(conn);
         }
         return filePath;
     }
 
-    public static void clearTablesForRepository(String repoName) throws DatabaseAccessException{
+    public static void clearTablesForRepository(String repoName) throws DatabaseAccessException {
         if (connectionPool == null) {
             setupConnections();
         }
@@ -141,7 +177,10 @@ public class DBAccess {
         }
     }
 
-    public static String getFilePathForTypeDeclaration(String fullyQualifiedName, String repository, List<String> asteriskImports) throws DatabaseAccessException {
+    public static String getFilePathForTypeDeclaration(String className, String repository, List<String> asteriskImports) throws DatabaseAccessException {
+        if (asteriskImports.isEmpty()) {
+            return null;
+        }
         if (connectionPool == null) {
             setupConnections();
         }
@@ -151,17 +190,19 @@ public class DBAccess {
             int repo_id = getRepoIdForRepoName(repository);
             String importString = "";
             for (String currentImport : asteriskImports) {
-                importString += currentImport + "." + fullyQualifiedName + ", ";
+                importString += "'" + currentImport.substring(0, currentImport.length() - 1) + className + "', ";
             }
             importString = importString.substring(0, importString.length() - 2) + ")";
             PreparedStatement ps = conn.prepareStatement(STMT_GET_FILE_PATH_FOR_TYPE_DECLARATION_WITH_PACKAGES + importString);
             ps.setInt(1, repo_id);
             ResultSet rs = ps.executeQuery();
-            rs.first();
-            filePath = rs.getString("file_path");
+            if (rs.first()) {
+                filePath = rs.getString("file_path");
+            }
         } catch (SQLException ex) {
-            connectionPool.releaseConnection(conn);
             throw new DatabaseAccessException("SQLException while trying to access the database\n" + ex);
+        } finally {
+            connectionPool.releaseConnection(conn);
         }
         return filePath;
     }
@@ -200,14 +241,13 @@ public class DBAccess {
                 lastAnalyzedRevision = rs.getString("last_analyzed_revision");
             }
         } catch (SQLException ex) {
-            connectionPool.releaseConnection(conn);
             throw new DatabaseAccessException("Could not close the stream used to retrieve the content of the binary-index field\n" + ex);
+        } finally {
+            connectionPool.releaseConnection(conn);
         }
         return lastAnalyzedRevision;
     }
 
-    //TODO replace Object
-    //the return type object is gonna be changed to a more fitting one as soon as it is clear which information is being stored in the database
     public static AstNode getBinaryIndexForFile(String filePath, String repository) throws DatabaseAccessException {
         if (connectionPool == null) {
             setupConnections();
@@ -302,7 +342,7 @@ public class DBAccess {
         return repoId;
     }
 
-    public static void setAnalysisDataForFile(String filePath, String repository, Object binaryIndex, Object usages, List<String> types) throws DatabaseAccessException {
+    public static void setAnalysisDataForFile(String filePath, String repository, AstNode binaryIndex, List<Usage> usages, List<String> types, List<String> imports) throws DatabaseAccessException {
         if (connectionPool == null) {
             setupConnections();
         }
@@ -316,7 +356,8 @@ public class DBAccess {
             ps = conn.prepareStatement(STMT_SET_BINARY_INDEX_FOR_FILE);
             ps.setObject(1, binaryIndex);
             ps.setObject(2, usages);
-            ps.setInt(3, fileId);
+            ps.setObject(3, imports);
+            ps.setInt(4, fileId);
             ps.executeUpdate();
             if (!(types.isEmpty())) {
                 //extends the insert into statement by one line for each type in the list of types

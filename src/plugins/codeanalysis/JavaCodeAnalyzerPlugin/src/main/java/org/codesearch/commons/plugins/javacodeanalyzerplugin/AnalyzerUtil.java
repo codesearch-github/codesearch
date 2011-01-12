@@ -13,12 +13,11 @@ import japa.parser.ast.expr.NameExpr;
 import japa.parser.ast.expr.StringLiteralExpr;
 import java.util.LinkedList;
 import java.util.List;
-import org.codesearch.commons.plugins.codeanalyzing.ast.ExternalLink;
-import org.codesearch.commons.plugins.codeanalyzing.ast.ExternalMethodLink;
-import org.codesearch.commons.plugins.codeanalyzing.ast.ExternalVariableLink;
 import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
 import org.codesearch.commons.plugins.codeanalyzing.ast.Visibility;
 import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.ClassNode;
+import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.ExternalClassUsage;
+import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.ExternalVariableUsage;
 import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.FileNode;
 import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.MethodNode;
 import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.VariableNode;
@@ -33,12 +32,6 @@ public class AnalyzerUtil {
     private FileNode fileNode;
     /** the list of all usages that are created with the util methods */
     private List<Usage> usages = new LinkedList<Usage>();
-    /** the list of external links to other files, have to be parsed later in the analysis */
-    private List<ExternalLink> externalLinks = new LinkedList<ExternalLink>();
-
-    public List<ExternalLink> getExternalLinks() {
-        return externalLinks;
-    }
 
     public List<Usage> getUsages() {
         return usages;
@@ -75,8 +68,8 @@ public class AnalyzerUtil {
      * @param startColumn the startColumn of the usage
      * @param className the name of the class that is used
      */
-    public void addLinkToExternalClassDeclaration(int lineNumber, int startColumn, String className){
-        externalLinks.add(new ExternalLink(lineNumber, startColumn, lineNumber, className));
+    public void addLinkToExternalClassDeclaration(int lineNumber, int startColumn, String className) {
+        usages.add(new ExternalClassUsage(startColumn, lineNumber, className.length(), className, className));
     }
 
     /**
@@ -89,9 +82,7 @@ public class AnalyzerUtil {
      */
     public void addLinkToExternalVariableDeclaration(int lineNumber, int startColumn, String varName, Node parent, String className) {
         //add a link to the variable
-        this.externalLinks.add(new ExternalVariableLink(lineNumber, startColumn + className.length() + 1, varName.length(), className, varName));
-        //add link for the class
-        this.externalLinks.add(new ExternalLink(lineNumber, startColumn, className.length(), className));
+        usages.add(new ExternalVariableUsage(startColumn, lineNumber, className.length(), varName, className));
     }
 
     /**
@@ -128,10 +119,10 @@ public class AnalyzerUtil {
         VariableNode scopeObject = getVariableDeclarationForUsage(n.getBeginLine(), scopeName, n);
         if (scopeObject == null) { //the method is a static method from another class
             className = scopeName;
-            externalLinks.add(new ExternalLink(lineNumber, scopeColumn, scopeName.length(), className));
+            usages.add(new ExternalClassUsage(scopeColumn, lineNumber, className.length(), className, className));
         } else { //the method is called from an object in the class
             className = scopeObject.getType();
-            usages.add(new Usage(n.getBeginColumn(), lineNumber, scopeName.length(), scopeObject.getStartLine(), scopeName));
+            //       usages.add(new Usage(n.getBeginColumn(), lineNumber, scopeName.length(), scopeObject.getStartLine(), scopeName));
         }
         if (n.getArgs() != null) {
             for (Expression ex : n.getArgs()) {
@@ -139,8 +130,21 @@ public class AnalyzerUtil {
                 paramTypes.add(paramType);
             }
         }
-        ExternalMethodLink methodLink = new ExternalMethodLink(lineNumber, methodCallColumn, methodName.length(), className, methodName, paramTypes);
-        externalLinks.add(methodLink);
+        //FIXME
+        //ExternalMethodLink methodLink = new ExternalMethodLink(lineNumber, methodCallColumn, methodName.length(), className, methodName, paramTypes);
+        //externalLinks.add(methodLink);
+    }
+
+    public void addLinkToExternalField(FieldAccessExpr ex, Node parent) {
+        String scope = ex.getScope().toString();
+        String className;
+        if (!addLinkToVariableDeclaration(ex.getBeginLine(), ex.getBeginColumn(), scope, parent)) {
+            addLinkToExternalClassDeclaration(ex.getBeginLine(), ex.getBeginColumn(), ex.getScope().toString());
+            className = scope;
+        } else {
+            className = getVariableDeclarationForUsage(ex.getBeginLine(), scope, parent).getType();
+        }
+        addLinkToExternalVariableDeclaration(ex.getBeginLine(), ex.getBeginColumn(), ex.getField(), parent, className);
     }
 
     /**
@@ -176,7 +180,7 @@ public class AnalyzerUtil {
             paramType = "char";
         } else if (ex instanceof IntegerLiteralExpr) {
             paramType = "int";
-        } else if (ex instanceof LongLiteralExpr){
+        } else if (ex instanceof LongLiteralExpr) {
             paramType = "long";
         } else if (ex instanceof DoubleLiteralExpr) {
             paramType = "double";
@@ -277,14 +281,14 @@ public class AnalyzerUtil {
                 }
                 //in case no variable is found an attribute with the correct name will be searched (after the other else blocks)
             }
-            for(ClassNode clazz : fileNode.getClasses()){
+            for (ClassNode clazz : fileNode.getClasses()) {
                 for (VariableNode var : clazz.getAttributes()) {
-                if (var.getName().equals(name)) {
-                    return var;
+                    if (var.getName().equals(name)) {
+                        return var;
+                    }
                 }
             }
-            }
-            
+
         } catch (NullPointerException ex) {
             return null;
         }

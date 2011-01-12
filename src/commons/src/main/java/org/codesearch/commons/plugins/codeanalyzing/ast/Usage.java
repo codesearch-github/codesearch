@@ -34,6 +34,10 @@ public class Usage implements Comparable<Usage>, Serializable {
     protected int referenceLine;
     protected String replacedString;
 
+    public Usage(){
+        
+    }
+
     public int getLength() {
         return length;
     }

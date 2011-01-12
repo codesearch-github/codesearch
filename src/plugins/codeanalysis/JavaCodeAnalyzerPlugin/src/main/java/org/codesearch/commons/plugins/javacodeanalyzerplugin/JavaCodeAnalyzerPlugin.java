@@ -74,14 +74,13 @@ import org.codesearch.commons.database.DatabaseAccessException;
 import org.codesearch.commons.plugins.codeanalyzing.CodeAnalyzerPlugin;
 import org.codesearch.commons.plugins.codeanalyzing.CodeAnalyzerPluginException;
 import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
-import org.codesearch.commons.plugins.codeanalyzing.ast.ExternalLink;
-import org.codesearch.commons.plugins.codeanalyzing.ast.ExternalMethodLink;
 import org.codesearch.commons.plugins.codeanalyzing.ast.ExternalUsage;
-import org.codesearch.commons.plugins.codeanalyzing.ast.ExternalVariableLink;
 
 import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
 import org.codesearch.commons.plugins.codeanalyzing.ast.Visibility;
 import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.ClassNode;
+import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.ExternalMethodUsage;
+import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.ExternalVariableUsage;
 import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.FileNode;
 import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.MethodNode;
 import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.VariableNode;
@@ -98,10 +97,62 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
     private List<Usage> usages;
     private String fileContent;
     private List<String> typeDeclarations;
-    private List<ExternalLink> externalLinks;
     private List<String> imports;
     AnalyzerUtil util;
 
+    public void parseLineNumberAndFileNameOfUsage(ExternalUsage usage, String repository, List<String> fileImports, String originFilePath) throws DatabaseAccessException {
+//        if(usage.getTargetClassName().equals("DBAccess"));
+        String className = usage.getTargetClassName();
+        String targetFilePath = null;
+        List<String> asteriskImports = new LinkedList<String>();
+        boolean importMatch = false;
+        for (String currentImport : fileImports) {
+            if (currentImport.endsWith(className)) {
+                className = currentImport;
+                importMatch = true;
+            } else if (currentImport.endsWith("*")) {
+                asteriskImports.add(currentImport);
+            }
+        }
+
+        if (!importMatch) {
+            targetFilePath = DBAccess.getFilePathForTypeDeclaration(className, repository, asteriskImports);
+        } else {
+            targetFilePath = DBAccess.getFilePathForTypeDeclaration(className, repository);
+        }
+        usage.setTargetFilePath(targetFilePath);
+        if(targetFilePath== null){
+            return;
+        }
+        if (usage instanceof ExternalMethodUsage) {
+            ExternalMethodUsage extMethodUsage = (ExternalMethodUsage) usage;
+            AstNode currentFileNode = DBAccess.getBinaryIndexForFile(originFilePath, repository);
+            for (AstNode currentNode : currentFileNode.getChildNodes()) {
+                if (currentNode instanceof MethodNode) {
+                    MethodNode currentMethodNode = (MethodNode) currentNode;
+                    if (currentNode.getName().equals(usage.getReplacedString()) && currentMethodNode.getParameters().size() == extMethodUsage.getParameters().size()) {
+                        //TODO make parameter check
+                        usage.setReferenceLine(currentMethodNode.getStartLine());
+                        return;
+                    }
+                }
+            }
+        } else if (usage instanceof ExternalVariableUsage) {
+            AstNode currentFileNode = DBAccess.getBinaryIndexForFile(originFilePath, repository);
+            for (AstNode currentNode : currentFileNode.getChildNodes()) {
+                if (currentNode instanceof VariableNode) {
+                    VariableNode currentVariable = (VariableNode) currentNode;
+                    if (currentVariable.getName().equals(usage.getReplacedString()) && currentVariable.getVisibility() != Visibility.DEFAULT) { //FIXME
+                        usage.setReferenceLine(currentVariable.getStartLine());
+                        return;
+                    }
+                }
+            }
+        }
+        usage.setReferenceLine(-1);
+    }
+
+    /** {@inheritDoc} */
     public FileNode getFileNode() {
         return fileNode;
     }
@@ -130,7 +181,6 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
             cu.accept(uv, null);
             usages = util.getUsages();
             typeDeclarations = uv.getTypeDeclarations();
-            externalLinks = util.getExternalLinks();
             imports = uv.getImports();
             Collections.sort(usages);
             parseAbsoluteCharPositions();
@@ -178,7 +228,7 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
                     FieldDeclaration fieldDeclaration = (FieldDeclaration) member;
                     for (VariableDeclarator v : fieldDeclaration.getVariables()) {
                         VariableNode newVariable = new VariableNode();
-                        
+
                         newVariable.setName(v.getId().getName());
                         newVariable.setType(fieldDeclaration.getType().toString());
                         newVariable.setStartLine(v.getBeginLine());
@@ -204,8 +254,8 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
 
         int startLine = method.getBeginLine();
         String stringUntilName = method.toString().substring(0, method.toString().indexOf(method.getName() + "("));
-        int linesUntilName = stringUntilName.split("\n").length -1;
-        if(method.getJavaDoc() != null){
+        int linesUntilName = stringUntilName.split("\n").length - 1;
+        if (method.getJavaDoc() != null) {
             linesUntilName -= method.getJavaDoc().getEndLine() - method.getJavaDoc().getBeginLine() + 1;
         }
         startLine += linesUntilName;
@@ -479,8 +529,8 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
         newMethod.setStartPositionInLine(constructor.getBeginColumn());//TODO replace with line number
         int startLine = constructor.getBeginLine();
         String stringUntilName = constructor.toString().substring(0, constructor.toString().indexOf(constructor.getName() + "("));
-        int linesUntilName = stringUntilName.split("\n").length -1;
-        if(constructor.getJavaDoc() != null){
+        int linesUntilName = stringUntilName.split("\n").length - 1;
+        if (constructor.getJavaDoc() != null) {
             linesUntilName -= constructor.getJavaDoc().getEndLine() - constructor.getJavaDoc().getBeginLine() + 1;
         }
         startLine += linesUntilName;
@@ -553,63 +603,6 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
             throw new CodeAnalyzerPluginException("No usage information available, you must first analyze a file");
         }
         return usages;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public List<ExternalLink> getExternalLinks() throws CodeAnalyzerPluginException {
-        if (externalLinks == null) {
-            throw new CodeAnalyzerPluginException("No external link information available, you must first analyze a file");
-        }
-        return externalLinks;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public List<ExternalUsage> parseExternalLinks(String fileContent, List<String> imports, List<ExternalLink> externalLinks, String repository) {
-        List<ExternalUsage> extUsages = new LinkedList<ExternalUsage>();
-        try {
-            for (ExternalLink el : externalLinks) {
-                String fullyQualifiedName = null;
-                String filePath = "";
-                int referenceLineNumber = 0;
-                int startLine = el.getLineNumber();
-                int column = el.getColumn();
-                int length = el.getLength();
-                String replacedString = el.getClassName();
-                for (String currentImport : imports) {
-                    if (currentImport.endsWith(el.getClassName())) {
-                        fullyQualifiedName = currentImport;
-                    }
-                }
-                if (fullyQualifiedName != null) {
-                    filePath = DBAccess.getFilePathForTypeDeclaration(fullyQualifiedName, repository);
-                    if (filePath == null) {
-                        continue;
-                    }
-                } else {
-//                    throw new NotImplementedException();
-                    //In case the file is importet through an asterisk import
-                }
-                if (el instanceof ExternalMethodLink) {
-                    AstNode fileAst = DBAccess.getBinaryIndexForFile(filePath, repository); //TODO rename
-                } else if (el instanceof ExternalVariableLink) {
-                    ExternalVariableLink extVarLink = (ExternalVariableLink) el;
-                    AstNode fileAst = (AstNode) DBAccess.getBinaryIndexForFile(filePath, repository);
-                    for (AstNode currentNode : fileAst.getChildNodes()) {
-                        if (currentNode instanceof VariableNode && currentNode.getName().equals(extVarLink.getVariableName())) {
-                            referenceLineNumber = currentNode.getStartLine();
-                        }
-                    }
-                }
-                extUsages.add(new ExternalUsage(column, startLine, length, referenceLineNumber, replacedString, filePath));
-            }
-        } catch (DatabaseAccessException ex) {
-            System.out.println(ex);
-            //FIXME
-        }
-
-        return extUsages;
     }
 
     /** {@inheritDoc} */

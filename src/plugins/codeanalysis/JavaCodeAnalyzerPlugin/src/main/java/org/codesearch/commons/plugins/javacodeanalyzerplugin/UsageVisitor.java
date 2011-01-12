@@ -19,19 +19,15 @@
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.codesearch.commons.plugins.javacodeanalyzerplugin;
 
 import japa.parser.ast.ImportDeclaration;
+import japa.parser.ast.Node;
 import japa.parser.ast.body.ClassOrInterfaceDeclaration;
 import japa.parser.ast.expr.ArrayAccessExpr;
 import japa.parser.ast.expr.AssignExpr;
 import japa.parser.ast.expr.BinaryExpr;
 import japa.parser.ast.expr.ConditionalExpr;
-import japa.parser.ast.expr.DoubleLiteralExpr;
 import japa.parser.ast.expr.Expression;
 import japa.parser.ast.expr.FieldAccessExpr;
 import japa.parser.ast.expr.MethodCallExpr;
@@ -39,8 +35,8 @@ import japa.parser.ast.expr.NameExpr;
 import japa.parser.ast.expr.ObjectCreationExpr;
 import japa.parser.ast.expr.UnaryExpr;
 import japa.parser.ast.stmt.ExplicitConstructorInvocationStmt;
-import japa.parser.ast.stmt.IfStmt;
 import japa.parser.ast.stmt.ReturnStmt;
+import japa.parser.ast.type.ClassOrInterfaceType;
 import japa.parser.ast.visitor.VoidVisitorAdapter;
 import java.util.LinkedList;
 import java.util.List;
@@ -110,9 +106,6 @@ public class UsageVisitor extends VoidVisitorAdapter {
     @Override
     public void visit(MethodCallExpr n, Object arg) {
         super.visit(n, arg);
-//        if(n.getBeginLine() == 76 || n.getBeginLine() == 77) {
-//            getImports();
-//        }
         List<Expression> parameterList = n.getArgs();
         if (parameterList != null) {
             for (Expression currentParameter : parameterList) {
@@ -121,12 +114,17 @@ public class UsageVisitor extends VoidVisitorAdapter {
                 }
             }
         }
-        if (n.getScope() == null || n.getScope().toString().equals("this")) {
+        String currentClassName = util.getClassAtLine(n.getBeginColumn()).getName();
+        if (n.getScope() == null || n.getScope().toString().equals("this") || n.getScope().toString().equals(currentClassName)) {
             //in case the method is a method from the current class
             //first add a link to the method declaration
             util.addLinkToMethodDeclaration(n);
         } else {
-            util.addLinkToVariableDeclaration(n.getBeginLine(), n.getBeginColumn(), n.getScope().toString(), n);
+            if (n.getScope() instanceof NameExpr) {
+                if (!util.addLinkToVariableDeclaration(n.getBeginLine(), n.getBeginColumn(), n.getScope().toString(), n)) {
+                    util.addLinkToExternalClassDeclaration(n.getBeginLine(), n.getBeginColumn(), n.getScope().toString());
+                }
+            }
             //         util.addLinkToExternalMethodDeclaration(n);
         }
     }
@@ -154,6 +152,12 @@ public class UsageVisitor extends VoidVisitorAdapter {
         if (n.getIndex() instanceof NameExpr) {
             util.addLinkToVariableDeclaration(startLine, n.getIndex().getBeginColumn(), n.getIndex().toString(), n);
         }
+    }
+
+    @Override
+    public void visit(ClassOrInterfaceType n, Object arg) {
+        super.visit(n, arg);
+        util.addLinkToExternalClassDeclaration(n.getBeginLine(), n.getBeginColumn(), n.getName());
     }
 
     @Override
@@ -204,7 +208,7 @@ public class UsageVisitor extends VoidVisitorAdapter {
             util.addLinkToVariableDeclaration(thenExpr.getBeginLine(), thenExpr.getBeginColumn(), varName, n);
         }
         Expression elseExpr = n.getElseExpr();
-        if(elseExpr instanceof NameExpr){
+        if (elseExpr instanceof NameExpr) {
             String varName = elseExpr.toString();
             util.addLinkToVariableDeclaration(elseExpr.getBeginLine(), elseExpr.getBeginColumn(), varName, n);
         }
@@ -216,10 +220,7 @@ public class UsageVisitor extends VoidVisitorAdapter {
         if (n.getScope().toString().equals("this")) {
             util.addLinkToVariableDeclaration(n.getBeginLine(), n.getBeginColumn() + 5, n.toString(), n);
         } else {
-            String varName = n.getScope().toString();
-            if(!util.addLinkToVariableDeclaration(n.getBeginLine(), n.getBeginColumn(), varName, n)){
-                util.addLinkToExternalClassDeclaration(n.getBeginLine(), n.getBeginColumn(), n.getScope().toString());
-            }
+            util.addLinkToExternalField(n, (Node) n.getData());
         }
         //  util.addLinkToExternalVariableDeclaration(n.getBeginLine(), n.getBeginColumn(), n.getField(), n, n.getScope().toString());
     }

@@ -20,10 +20,7 @@
  */
 package org.codesearch.commons.plugins.javacodeanalyzerplugin;
 
-import japa.parser.JavaParser;
 import japa.parser.ParseException;
-import japa.parser.ast.CompilationUnit;
-import japa.parser.ast.body.ClassOrInterfaceDeclaration;
 import japa.parser.ast.body.MethodDeclaration;
 import japa.parser.ast.visitor.VoidVisitorAdapter;
 import java.io.BufferedReader;
@@ -32,12 +29,9 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import junit.framework.TestCase;
-import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
+import org.codesearch.commons.database.DatabaseAccessException;
 import org.codesearch.commons.plugins.codeanalyzing.CodeAnalyzerPluginException;
-import org.codesearch.commons.plugins.codeanalyzing.ast.ExternalLink;
 import org.codesearch.commons.plugins.codeanalyzing.ast.ExternalUsage;
 import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
 
@@ -106,15 +100,12 @@ public class JavaCodeAnalyzerPluginTest extends TestCase {
 
     public void testIntegrationOfUsages() throws Exception {
         String fileContent = "";
-        BufferedReader br = new BufferedReader(new FileReader("/home/david/codesearch/src/custom-libs/Codesearch-JHighlight/src/main/java/com/uwyn/jhighlight/renderer/XhtmlRendererFactory.java"));
+        BufferedReader br = new BufferedReader(new FileReader("/home/david/workspace/svnsearch/codesearch/src/indexer/src/main/java/org/codesearch/indexer/core/IndexerMain.java"));
         while (br.ready()) {
             fileContent += br.readLine() + "\n";
         }
         plugin = new JavaCodeAnalyzerPlugin();
         plugin.analyzeFile(fileContent);
-        List<ExternalLink> externalLinks = plugin.getExternalLinks();
-        List<String> imports = plugin.getImports();
-        //  List<ExternalUsage> usages = plugin.parseExternalLinks(fileContent, imports, externalLinks, "svn_local");
         String resultString = "";
         String hlEscapeStartToken = "";
         String hlEscapeEndToken = "";
@@ -128,9 +119,15 @@ public class JavaCodeAnalyzerPluginTest extends TestCase {
                 Usage currentUsage = usages.get(usageIndex);
                 if (currentUsage.getStartLine() == lineNumber) {
                     int startColumn = currentUsage.getStartColumn();
-                    int referenceLine = currentUsage.getReferenceLine();
                     String preamble = currentLine.substring(0, startColumn - 1); //-1
-                    String anchorBegin = hlEscapeStartToken + "<a class='testLink' onclick='goToLine(" + (referenceLine + 1) + ");'>" + hlEscapeEndToken;
+                    String javaScriptEvent = "";
+                    if (currentUsage instanceof ExternalUsage) {
+                        javaScriptEvent = "goToUsage(" + usageIndex + ");";
+                    } else {
+                        int referenceLine = currentUsage.getReferenceLine();
+                        javaScriptEvent = "goToLine(" + (referenceLine + 1) + ");";
+                    }
+                    String anchorBegin = hlEscapeStartToken + "<a class='testLink' onclick='" + javaScriptEvent + "'>" + hlEscapeEndToken;
                     String anchorEnd = hlEscapeStartToken + "</a>" + hlEscapeEndToken;
                     String remainingLine = currentLine.substring(startColumn - 1 + currentUsage.getReplacedString().length());
                     currentLine = preamble + anchorBegin + currentUsage.getReplacedString() + anchorEnd + remainingLine;
@@ -142,28 +139,23 @@ public class JavaCodeAnalyzerPluginTest extends TestCase {
             }
             resultString += currentLine + "\n";
         }
-        resultString = resultString.substring(0, resultString.length()-1);
+        resultString = resultString.substring(0, resultString.length() - 1);
         System.out.println(resultString);
     }
-    
-    public void testCodeCommentCompletion() {
-//        try {
-//            try {
-//                try {
-//                    checkContentOfFile(new File("/home/david/codesearch/"));
-//                } catch (ParseException ex) {
-//
-//                }
-//            } catch (CodeAnalyzerPluginException ex) {
-//
-//            }
-//        } catch (FileNotFoundException ex) {
-//
-//        } catch (IOException ex) {
-//        }
+
+    public void testCodeCommentCompletion() throws DatabaseAccessException {
+        try {
+            try {
+                try {
+                    checkContentOfFile(new File("/home/david/workspace/svnsearch"));
+                } catch (ParseException ex) {
+                }
+            } catch (CodeAnalyzerPluginException ex) {
+            }
+        } catch (FileNotFoundException ex) {
+        } catch (IOException ex) {
+        }
     }
-
-
 
 //            for (File child : file.listFiles()) {
 //                checkContentOfFile(child);
@@ -176,8 +168,7 @@ public class JavaCodeAnalyzerPluginTest extends TestCase {
 //                cu.accept(cv, truncFileName);
 //            }
 //        }
-
-    private void checkContentOfFile(File file) throws FileNotFoundException, IOException, CodeAnalyzerPluginException, ParseException {
+    private void checkContentOfFile(File file) throws FileNotFoundException, IOException, CodeAnalyzerPluginException, ParseException, DatabaseAccessException {
         if (file.isDirectory()) {
             for (File child : file.listFiles()) {
                 checkContentOfFile(child);
@@ -187,15 +178,19 @@ public class JavaCodeAnalyzerPluginTest extends TestCase {
                 System.out.println(file.getAbsolutePath());
                 String fileContent = "";
                 BufferedReader br = new BufferedReader(new FileReader(file));
-                while(br.ready()){
+                while (br.ready()) {
                     fileContent += br.readLine() + "\n";
                 }
-                fileContent = fileContent.substring(0, fileContent.length() -1);
+                fileContent = fileContent.substring(0, fileContent.length() - 1);
 
                 plugin.analyzeFile(fileContent);
+                for (Usage u : plugin.getUsages()) {
+                    if (u instanceof ExternalUsage) {
+                        ((ExternalUsage) u).resolveLink(file.getAbsolutePath(), "svn_local");
+                    }
+                }
             }
         }
-
     }
 
     class CompletionVisitor extends VoidVisitorAdapter {

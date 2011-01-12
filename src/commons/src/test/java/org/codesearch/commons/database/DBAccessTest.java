@@ -72,7 +72,7 @@ public class DBAccessTest {
         types.add("testType1");
         types.add("org.blargh.testType2");
         Object usages = new LinkedList();
-        DBAccess.setAnalysisDataForFile(filePath, repository, usages, usages, types);
+     //   DBAccess.setAnalysisDataForFile(filePath, repository, usages, usages, types);
     }
 
     /**

@@ -113,7 +113,7 @@ public class IndexingTask implements Task {
             changedFiles = versionControlPlugin.getChangedFilesSinceRevision(lastIndexedRevision);
 
             boolean retrieveNewFileList = false;
-       //FIXME this.executeIndexing();
+            this.executeIndexing();
             if (codeAnalysisEnabled) {
                 String lastAnalysisRevision = DBAccess.getLastAnalyzedRevisionOfRepository(repository.getName());
                 if (!lastAnalysisRevision.equals(lastIndexedRevision)) {
@@ -185,13 +185,12 @@ public class IndexingTask implements Task {
                 AstNode ast = plugin.getAst();
                 List<String> typeDeclarations = plugin.getTypeDeclarations();
                 List<Usage> usages = plugin.getUsages();
-                currentFile.setImports(plugin.getImports());
+                List<String> imports = plugin.getImports();
+                //List<ExternalUsage> externalUsages =
                 previousFileType = currentFileType;
                 //add the externalLinks to the FileDto, so they can be parsed after the regular indexing is finished
-                currentFile.setExternalLinks(plugin.getExternalLinks());
-
                 //write the AST information into the database
-                DBAccess.setAnalysisDataForFile(currentFile.getFilePath(), repository.getName(), ast, usages, typeDeclarations); //TODO work here
+                DBAccess.setAnalysisDataForFile(currentFile.getFilePath(), repository.getName(), ast, usages, typeDeclarations, imports);
                 LOG.debug("Analyzed file: " + currentFile.getFilePath());
             } catch (DatabaseAccessException ex) {
                 LOG.error("Error at DatabaseConnection \n" + ex);

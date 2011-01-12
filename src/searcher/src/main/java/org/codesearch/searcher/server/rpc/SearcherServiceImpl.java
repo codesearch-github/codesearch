@@ -40,6 +40,7 @@ import org.codesearch.commons.database.DatabaseAccessException;
 import org.codesearch.commons.plugins.PluginLoader;
 import org.codesearch.commons.plugins.PluginLoaderException;
 import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
+import org.codesearch.commons.plugins.codeanalyzing.ast.ExternalUsage;
 import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
 import org.codesearch.commons.plugins.highlighting.HighlightingPlugin;
 import org.codesearch.commons.plugins.highlighting.HighlightingPluginException;
@@ -87,8 +88,7 @@ public class SearcherServiceImpl extends AutowiringRemoteServiceServlet implemen
                     repositories.add(dto.getName());
                 }
             }
-        }
-        catch (ConfigurationException ex) {
+        } catch (ConfigurationException ex) {
             LOG.error(ex);
         }
     }
@@ -99,14 +99,11 @@ public class SearcherServiceImpl extends AutowiringRemoteServiceServlet implemen
         List<SearchResultDto> resultItems = new LinkedList<SearchResultDto>();
         try {
             resultItems = documentSearcher.search(query, caseSensitive, selectedRepositories, selectedRepositoryGroups);
-        }
-        catch (ParseException ex) {
+        } catch (ParseException ex) {
             LOG.error("Could not parse query: " + ex);
-        }
-        catch (IOException ex) {
+        } catch (IOException ex) {
             LOG.error(ex);
-        }
-        catch (ConfigurationException ex) {
+        } catch (ConfigurationException ex) {
             LOG.error(ex);
         }
         return resultItems;
@@ -166,8 +163,7 @@ public class SearcherServiceImpl extends AutowiringRemoteServiceServlet implemen
                     file.setOutline(outline);
                 }
 
-            }
-            catch (DatabaseAccessException ex) {
+            } catch (DatabaseAccessException ex) {
                 LOG.error("Could not access database " + ex);
             }
             if (MimeTypeUtil.UNKNOWN.equals(guessedMimeType)) {
@@ -178,14 +174,11 @@ public class SearcherServiceImpl extends AutowiringRemoteServiceServlet implemen
                     if (magicMatch.getMimeType().startsWith("text/")) {
                         file.setBinary(false);
                     }
-                }
-                catch (MagicParseException ex) {
+                } catch (MagicParseException ex) {
                     LOG.debug("NO MAGIC MATCH"); //TODO add a better log entry
-                }
-                catch (MagicMatchNotFoundException ex) {
+                } catch (MagicMatchNotFoundException ex) {
                     LOG.debug("NO MAGIC MATCH");
-                }
-                catch (MagicException ex) {
+                } catch (MagicException ex) {
                     LOG.debug("NO MAGIC MATCH");
                 }
             }
@@ -196,25 +189,19 @@ public class SearcherServiceImpl extends AutowiringRemoteServiceServlet implemen
                 String highlightingEscapeEndToken = hlPlugin.getEscapeEndToken();
                 byte[] parsedFileContent = addUsageLinksToFileContent(vcFile.getContent(), filePath, repository, highlightingEscapeStartToken, highlightingEscapeEndToken);
                 file.setFileContent(hlPlugin.parseToHtml(parsedFileContent, guessedMimeType));
-            }
-            catch (PluginLoaderException ex) {
+            } catch (PluginLoaderException ex) {
                 // No plugin found, just escape to HTML
                 file.setFileContent(HtmlUtils.htmlEscape(new String(vcFile.getContent())));
             }
-        }
-        catch (HighlightingPluginException ex) {
+        } catch (HighlightingPluginException ex) {
             LOG.error(ex);
-        }
-        catch (URISyntaxException ex) {
+        } catch (URISyntaxException ex) {
             LOG.error(ex);
-        }
-        catch (VersionControlPluginException ex) {
+        } catch (VersionControlPluginException ex) {
             LOG.error(ex);
-        }
-        catch (ConfigurationException ex) {
+        } catch (ConfigurationException ex) {
             LOG.error(ex);
-        }
-        catch (PluginLoaderException ex) {
+        } catch (PluginLoaderException ex) {
             LOG.error(ex);
         }
         LOG.debug("Finished retrieving file content for file: " + filePath + " @ " + repository);
@@ -257,9 +244,15 @@ public class SearcherServiceImpl extends AutowiringRemoteServiceServlet implemen
                     Usage currentUsage = usages.get(usageIndex);
                     if (currentUsage.getStartLine() == lineNumber) {
                         int startColumn = currentUsage.getStartColumn();
-                        int referenceLine = currentUsage.getReferenceLine();
                         String preamble = currentLine.substring(0, startColumn - 1); //-1
-                        String anchorBegin = hlEscapeStartToken + "<a class='testLink' onclick='goToLine(" + ( referenceLine ) + ");'>" + hlEscapeEndToken;
+                        String javaScriptEvent = "";
+                        if (currentUsage instanceof ExternalUsage) {
+                            javaScriptEvent = "goToUsage(" + usageIndex + ");";
+                        } else {
+                            int referenceLine = currentUsage.getReferenceLine();
+                            javaScriptEvent = "goToLine(" + (referenceLine + 1) + ");";
+                        }
+                        String anchorBegin = hlEscapeStartToken + "<a class='testLink' onclick='" + javaScriptEvent + "'>" + hlEscapeEndToken;
                         String anchorEnd = hlEscapeStartToken + "</a>" + hlEscapeEndToken;
                         String remainingLine = currentLine.substring(startColumn - 1 + currentUsage.getReplacedString().length());
                         currentLine = preamble + anchorBegin + currentUsage.getReplacedString() + anchorEnd + remainingLine;
@@ -273,8 +266,7 @@ public class SearcherServiceImpl extends AutowiringRemoteServiceServlet implemen
             }
             resultString = resultString.substring(0, resultString.length() - 1); //Truncates the last \n char
             return resultString.getBytes();
-        }
-        catch (DatabaseAccessException ex) {
+        } catch (DatabaseAccessException ex) {
             LOG.error(ex);
         }
         return fileContentBytes;
