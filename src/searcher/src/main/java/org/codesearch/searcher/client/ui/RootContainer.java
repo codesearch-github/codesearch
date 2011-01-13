@@ -38,6 +38,7 @@ import com.google.gwt.user.client.ui.Widget;
 /**
  * The container of all views. Allows to define UI that shows up everywhere.
  * @author Samuel Kogler
+ * @author Stiboller Stephan
  */
 public class RootContainer extends Composite implements AcceptsOneWidget {
 
@@ -52,7 +53,9 @@ public class RootContainer extends Composite implements AcceptsOneWidget {
 
     public RootContainer() {
         initWidget(uiBinder.createAndBindUi(this));
-        errorPanel.setVisible(false);
+        errorPanel.setVisible(true);
+        errorPanel.add(createErrorPanel("lololol"));
+
     }
 
     /** {@inheritDoc} */
@@ -66,26 +69,21 @@ public class RootContainer extends Composite implements AcceptsOneWidget {
     }
 
     /**
-     * Creates an erropanel displa for the given exception
-     * @param ex exception to be displayed
-     * @return VerticalPanel the error diplay
+     * Creates an error panel display for the given errorMessage
+     * @param String errorMessage to be displayed
+     * @return VerticalPanel the error display
      */
-    public VerticalPanel createErrorPanel(String errorMessage) {
-        //TODO: Add icon to horizontal panel
+    public HorizontalPanel createErrorPanel(String errorMessage) {
+        //Image icon = new Image("images/error_msg_close.png");
         Label label = new Label();
         label.setText(errorMessage);
         label.setVisible(true);
         HorizontalPanel horizontalPanel = new HorizontalPanel();
-        horizontalPanel.getElement().setId("errorMessage");
-        horizontalPanel.setSpacing(3);
-        horizontalPanel.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
+        horizontalPanel.getElement().setId("errorMessageContainer");
+        horizontalPanel.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
         horizontalPanel.add(label);
+        horizontalPanel.setSpacing(3);
         horizontalPanel.setVisible(true);
-        VerticalPanel verrorPanel = new VerticalPanel();
-        verrorPanel.getElement().setId("errorMessageContainer");
-        verrorPanel.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
-        verrorPanel.add(horizontalPanel);
-        verrorPanel.setVisible(true);
-        return verrorPanel;
+        return horizontalPanel;
     }
 }

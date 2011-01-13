@@ -21,7 +21,6 @@
 package org.codesearch.commons.plugins.bazaar;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URI;
@@ -51,10 +50,15 @@ public class BazaarPlugin implements VersionControlPlugin {
     private BranchLocation bl;
     private static final Logger LOG = Logger.getLogger(BazaarPlugin.class);
 
+    /**
+     * Creates a new instance of the BazaarPlugin
+     */
     public BazaarPlugin() {
         bzr_util = BazaarUtils.getInstance();
     }
 
+
+     /** {@inheritDoc} */
     @Override
     public void setRepository(URI url, String username, String password) throws VersionControlPluginException {
         try {
@@ -65,6 +69,7 @@ public class BazaarPlugin implements VersionControlPlugin {
         }
     }
 
+     /** {@inheritDoc} */
     @Override
     public FileDto getFileForFilePath(String filePath) throws VersionControlPluginException {
         try {
@@ -78,6 +83,7 @@ public class BazaarPlugin implements VersionControlPlugin {
         }
     }
 
+     /** {@inheritDoc} */
     @Override
     public Set<FileDto> getChangedFilesSinceRevision(String revision) throws VersionControlPluginException {
         Set<FileDto> files = new HashSet<FileDto>();
@@ -105,6 +111,7 @@ public class BazaarPlugin implements VersionControlPlugin {
         return files;
     }
 
+     /** {@inheritDoc} */
     @Override
     public String getRepositoryRevision() throws VersionControlPluginException {
         try {
@@ -114,11 +121,13 @@ public class BazaarPlugin implements VersionControlPlugin {
         }
     }
 
+     /** {@inheritDoc} */
     @Override
     public String getPurposes() {
         return "BRZ";
     }
 
+     /** {@inheritDoc} */
     @Override
     public String getVersion() {
         return "0.1";

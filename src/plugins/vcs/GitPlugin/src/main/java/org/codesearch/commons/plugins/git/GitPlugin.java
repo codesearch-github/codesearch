@@ -8,7 +8,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Set;
-import java.util.logging.Level;
 import org.apache.log4j.Logger;
 import org.codesearch.commons.plugins.vcs.FileDto;
 import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
@@ -16,14 +15,8 @@ import org.codesearch.commons.plugins.vcs.VersionControlPluginException;
 import org.codesearch.commons.utils.git.GitUtils;
 import org.eclipse.jgit.errors.AmbiguousObjectException;
 import org.eclipse.jgit.errors.MissingObjectException;
-import org.eclipse.jgit.lib.Constants;
-import org.eclipse.jgit.lib.ObjectId;
-import org.eclipse.jgit.lib.ObjectLoader;
-import org.eclipse.jgit.lib.ObjectStream;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.lib.RepositoryBuilder;
-import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
-import org.eclipse.jgit.util.Base64.InputStream;
 
 /**
  *
@@ -35,13 +28,18 @@ public class GitPlugin implements VersionControlPlugin {
     private GitUtils gitUtil;
     private static final Logger LOG = Logger.getLogger(GitPlugin.class);
 
+    /**
+     * Sets up a new Instance of the GitPlugin
+     */
     public GitPlugin() {
         gitUtil = GitUtils.getInstance();
     }
 
+    /** {@inheritDoc} */
     @Override
     public void setRepository(URI url, String username, String password) throws VersionControlPluginException {
         try {
+            LOG.debug("Git repository set to: " + repository);
             RepositoryBuilder builder = new RepositoryBuilder();
             builder.setGitDir(new File(url));
             builder.readEnvironment(); // scans environment GIT_* variables
@@ -55,6 +53,7 @@ public class GitPlugin implements VersionControlPlugin {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public Set<FileDto> getChangedFilesSinceRevision(String revision) throws VersionControlPluginException {
         try {
@@ -64,6 +63,7 @@ public class GitPlugin implements VersionControlPlugin {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public FileDto getFileForFilePath(String filePath) throws VersionControlPluginException {
         try {
@@ -77,6 +77,7 @@ public class GitPlugin implements VersionControlPlugin {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public String getRepositoryRevision() throws VersionControlPluginException {
         try {
@@ -88,11 +89,13 @@ public class GitPlugin implements VersionControlPlugin {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public String getPurposes() {
         return "GIT";
     }
 
+    /** {@inheritDoc} */
     @Override
     public String getVersion() {
         return "0.1";

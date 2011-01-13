@@ -23,7 +23,6 @@ package org.commons.codesearch.utils.bazaar;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.logging.Level;
 import org.vcs.bazaar.client.BazaarRevision;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -31,23 +30,13 @@ import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
-import org.vcs.bazaar.client.BazaarClient;
 import org.vcs.bazaar.client.BazaarClientFactory;
-import org.vcs.bazaar.client.BazaarClientPreferences;
-import org.vcs.bazaar.client.BazaarNotificationHandler;
-import org.vcs.bazaar.client.BazaarPreference;
-import org.vcs.bazaar.client.BazaarRevisionRange;
 import org.vcs.bazaar.client.IBazaarClient;
 import org.vcs.bazaar.client.IBazaarLogMessage;
-import org.vcs.bazaar.client.IBazaarNotifyListener;
-import org.vcs.bazaar.client.IBazaarRevisionSpec;
-import org.vcs.bazaar.client.commandline.CommandLineClient;
 import org.vcs.bazaar.client.commandline.CommandLineClientFactory;
 import org.vcs.bazaar.client.commandline.commands.options.Option;
 import org.vcs.bazaar.client.core.BazaarClientException;
 import org.vcs.bazaar.client.core.BranchLocation;
-import org.vcs.bazaar.client.utils.BazaarUtilities;
-import org.vcs.bazaar.client.xmlrpc.BzrXmlRpcError;
 
 /**
  * This class hold serveral methods that can be used to access
@@ -55,14 +44,12 @@ import org.vcs.bazaar.client.xmlrpc.BzrXmlRpcError;
  * @author zeheron
  */
 public class BazaarUtils {
-    //TODO: add ssh auth with external client
+    //TODO: use external shh auth client
    
-
     private static BazaarUtils instance;
     private IBazaarClient bazaarClient;
     private static final Logger LOG = Logger.getLogger(BazaarUtils.class);
 
-    
     /**
      * Contstructor
      */
