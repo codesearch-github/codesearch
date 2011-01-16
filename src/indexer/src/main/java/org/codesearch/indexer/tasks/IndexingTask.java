@@ -105,15 +105,25 @@ public class IndexingTask implements Task {
             LOG.info("Starting indexing of repository: " + repository.getName());
             // Read the index status file
             indexLocation = configReader.getSingleLinePropertyValue("index-location");
-            propertiesManager = new PropertiesManager(indexLocation + File.separator +"revisions.properties");
+            propertiesManager = new PropertiesManager(indexLocation + "revisions.properties");
+            String lastIndexedRevision = propertiesManager.getPropertyFileValue(repository.getName());
+            LOG.info("Last indexed revision is: " + lastIndexedRevision);
             // Get the version control plugins
             versionControlPlugin = pluginLoader.getPlugin(VersionControlPlugin.class, repository.getVersionControlSystem());
             versionControlPlugin.setRepository(new URI(repository.getUrl()), repository.getUsername(), repository.getPassword());
-            String lastIndexedRevision = propertiesManager.getPropertyFileValue(repository.getName());
+            LOG.info("Newest revision is      : " + versionControlPlugin.getRepositoryRevision());
             changedFiles = versionControlPlugin.getChangedFilesSinceRevision(lastIndexedRevision);
 
+            LOG.info("Changed files: ");
+            for(FileDto f : changedFiles) {
+                LOG.debug(f.getFilePath());
+            }
+
             boolean retrieveNewFileList = false;
-            this.executeIndexing();
+            
+            executeIndexing();
+            propertiesManager.setPropertyFileValue(repository.getName(), versionControlPlugin.getRepositoryRevision());
+            
             if (codeAnalysisEnabled) {
                 String lastAnalysisRevision = DBAccess.getLastAnalyzedRevisionOfRepository(repository.getName());
                 if (!lastAnalysisRevision.equals(lastIndexedRevision)) {
@@ -124,7 +134,6 @@ public class IndexingTask implements Task {
                 executeCodeAnalysis(retrieveNewFileList, lastAnalysisRevision);
                 DBAccess.setLastAnalyzedRevisionOfRepository(repository.getName(), versionControlPlugin.getRepositoryRevision());
             }
-            propertiesManager.setPropertyFileValue(repository.getName(), versionControlPlugin.getRepositoryRevision());
         } catch (org.apache.commons.configuration.ConfigurationException ex) {
             LOG.error("Error at DatabaseConnection \n" + ex);
         } catch (DatabaseAccessException ex) {

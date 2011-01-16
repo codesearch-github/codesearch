@@ -179,7 +179,7 @@ public class SearchViewImpl extends Composite implements SearchView {
     }
 
     private void initResultTable() {
-        resultTable = new CellTable<SearchResultDto>(30);
+        resultTable = new CellTable<SearchResultDto>(1000);
         resultTable.addColumn(new TextColumn<SearchResultDto>() {
 
             /** {@inheritDoc} */

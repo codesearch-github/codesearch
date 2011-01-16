@@ -36,7 +36,9 @@ public interface Resources extends ClientBundle {
     @Source("img/codesearch_header.png")
     ImageResource logo();
 
+    @Source("css/searcher-style.css")
+    CssResource searcherStyle();
+
     @Source("img/error_msg_close.png")
     ImageResource error_msg_close();
-
 }

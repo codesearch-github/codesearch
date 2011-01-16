@@ -18,7 +18,6 @@
  * You should have received a copy of the GNU General Public License
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.codesearch.commons.plugins.defaulthighlightingplugin;
 
 import com.uwyn.jhighlight.renderer.CppXhtmlRenderer;
@@ -29,7 +28,6 @@ import java.io.IOException;
 import org.apache.commons.codec.binary.Base64;
 import org.codesearch.commons.plugins.highlighting.HighlightingPlugin;
 import org.codesearch.commons.plugins.highlighting.HighlightingPluginException;
-import org.codesearch.commons.utils.MimeTypeUtil;
 import org.springframework.stereotype.Component;
 
 /**
@@ -40,24 +38,52 @@ import org.springframework.stereotype.Component;
 @Component
 public class DefaultHighlightingPlugin implements HighlightingPlugin {
 
-    XhtmlRenderer renderer;
+    private XhtmlRenderer renderer;
+    /** the mime type for JAVA files */
+    public static final String JAVA = "text/x-java-source";
+    /** the mime type for C header files */
+    public static final String C_HEADER = "text/x-chdr";
+    /** the mime type for CPP header files */
+    public static final String CPP_HEADER = "text/x-c++hdr";
+    /** the mime type for C files */
+    public static final String C = "text/x-csrc";
+    /** the mime type for CPP files */
+    public static final String CPP = "text/x-c++src";
+    /** the mime type for XML files */
+    public static final String XML = "application/xml";
+    /** the mime type for HTML files */
+    public static final String HTML = "text/html";
+    /** the mime type for PNG files */
+    public static final String PNG = "image/png";
+    /** the mime type for JPEG files */
+    public static final String JPEG = "image/jpeg";
+    /** the mime type for TIFF files */
+    public static final String TIFF = "image/tiff";
+    /** the mime type for GIF files */
+    public static final String GIF = "image/gif";
+    /** the mime type for BMP files */
+    public static final String BMP = "image/bmp";
 
     /** {@inheritDoc} */
     @Override
     public String parseToHtml(byte[] content, String mimeType) throws HighlightingPluginException {
         try {
-            if (mimeType.equals(MimeTypeUtil.JAVA)) {
+            if (mimeType.equals(JAVA)) {
                 renderer = new JavaXhtmlRenderer();
-            } else if (mimeType.equals(MimeTypeUtil.CPP)) {
+            } else if (mimeType.equals(C) || 
+                       mimeType.equals(CPP) ||
+                       mimeType.equals(C_HEADER) ||
+                       mimeType.equals(CPP_HEADER)) {
                 renderer = new CppXhtmlRenderer();
-            } else if (mimeType.equals(MimeTypeUtil.HTML)) {
+            } else if (mimeType.equals(HTML)) {
                 renderer = new XmlXhtmlRenderer();
-            } else if (mimeType.equals(MimeTypeUtil.XML)) {
+            } else if (mimeType.equals(XML)) {
                 renderer = new XmlXhtmlRenderer();
-            } else if (mimeType.equals(MimeTypeUtil.PNG)  ||
-                       mimeType.equals(MimeTypeUtil.JPEG) ||
-                       mimeType.equals(MimeTypeUtil.BMP)  ||
-                       mimeType.equals(MimeTypeUtil.TIFF)) {
+            } else if (mimeType.equals(PNG)
+                    || mimeType.equals(JPEG)
+                    || mimeType.equals(BMP)
+                    || mimeType.equals(GIF)
+                    || mimeType.equals(TIFF)) {
                 return escapeImage(content, mimeType);
             } else {
                 renderer = new XmlXhtmlRenderer();
@@ -84,14 +110,18 @@ public class DefaultHighlightingPlugin implements HighlightingPlugin {
     /** {@inheritDoc} */
     @Override
     public String getPurposes() {
-        String result = MimeTypeUtil.JAVA + " "
-                      + MimeTypeUtil.CPP + " "
-                      + MimeTypeUtil.XML + " "
-                      + MimeTypeUtil.HTML + " "
-                      + MimeTypeUtil.PNG + " "
-                      + MimeTypeUtil.JPEG + " "
-                      + MimeTypeUtil.TIFF + " "
-                      + MimeTypeUtil.BMP;
+        String result = JAVA + " "
+                + C + " "
+                + CPP + " "
+                + C_HEADER + " "
+                + CPP_HEADER + " "
+                + XML + " "
+                + HTML + " "
+                + PNG + " "
+                + JPEG + " "
+                + GIF + " "
+                + TIFF + " "
+                + BMP;
         return result;
     }
 

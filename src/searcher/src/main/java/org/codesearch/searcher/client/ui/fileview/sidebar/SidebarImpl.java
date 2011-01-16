@@ -6,6 +6,7 @@ import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.Tree;
 import com.google.gwt.user.client.ui.TreeItem;
 import com.google.gwt.user.client.ui.Widget;
@@ -25,6 +26,8 @@ public class SidebarImpl extends Sidebar {
     Tree sidebarTree;
     @UiField
     Label titleLabel;
+    @UiField
+    ScrollPanel scrollWrapper;
 
     public SidebarImpl() {
         initWidget(uiBinder.createAndBindUi(this));

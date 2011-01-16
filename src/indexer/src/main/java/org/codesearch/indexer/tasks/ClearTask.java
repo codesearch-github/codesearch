@@ -30,6 +30,7 @@ import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.store.FSDirectory;
+import org.codesearch.commons.configuration.properties.PropertiesManager;
 import org.codesearch.commons.configuration.xml.XmlConfigurationReaderConstants;
 import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
 import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
@@ -92,6 +93,10 @@ public class ClearTask implements Task {
                 Term term = new Term(IndexConstants.INDEX_FIELD_REPOSITORY, repositoryName);
                 deleteDocumentsFromIndexUsingTerm(term, searcher);
                 searcher.close();
+                
+                PropertiesManager propertiesManager = new PropertiesManager("revisions.properties");
+                propertiesManager.setPropertyFileValue(repositoryName, "0");
+
                 LOG.debug("Deleted " + searcher.getIndexReader().deleteDocuments(term) + " documents with repository " + repositoryName);
                 try {
                     DBAccess.clearTablesForRepository(repositoryName);

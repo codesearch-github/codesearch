@@ -26,6 +26,7 @@ package org.codesearch.commons.plugins.codeanalyzing.ast;
  * @author David Froehlich
  */
 public abstract class CompoundNode extends AstNode {
+    /** amount of lines in the node. */
     protected int nodeLength;
 
     public int getNodeLength() {

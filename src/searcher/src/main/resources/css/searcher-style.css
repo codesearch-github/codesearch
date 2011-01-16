@@ -19,6 +19,13 @@
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+
+@external .cpp_*, .xml_*, .test*, .gwt-*;
+
+.gwt-SplitLayoutPanel-HDragger {
+    background: #0081FF;
+}
+
 .testLink {
     color: #0B610B;
 }

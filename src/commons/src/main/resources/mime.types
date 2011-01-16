@@ -8,8 +8,6 @@ text/x-c++hdr               text   h++ hpp hxx hh
 text/x-c++src               text   c++ cpp cxx cc
 text/x-csrc                 text   c
 text/x-chdr                 text   h
-text/x-c                    text   cpp cxx cc
-text/x-h                    text   h
 text/x-java-source          text   java
 text/css                    text   css
 text/csv                    text   csv

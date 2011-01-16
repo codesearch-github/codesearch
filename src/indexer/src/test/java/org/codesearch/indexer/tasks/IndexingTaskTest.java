@@ -94,7 +94,7 @@ public class IndexingTaskTest {
         
         for (RepositoryDto repo : repos) {
             if (repo.getVersionControlSystem().equals("FILESYSTEM")) {
-                DBAccess.setLastAnalyzedRevisionOfRepository(repo.getName(), "0");
+//1                DBAccess.setLastAnalyzedRevisionOfRepository(repo.getName(), "0");
                 repo.setUrl(repo.getUrl().replace("$home", System.getProperty("user.home")));
                 IndexingTask t = (IndexingTask) applicationContext.getBean("indexingTask");
            //     pr.setPropertyFileValue(repo.getName(), "0");

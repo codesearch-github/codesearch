@@ -26,12 +26,8 @@
 
 package org.codesearch.commons.plugins.defaulthighlightingplugin;
 
-import com.uwyn.jhighlight.renderer.XmlXhtmlRenderer;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
-import java.util.Iterator;
-import java.util.Map;
 import junit.framework.TestCase;
 import org.codesearch.commons.utils.MimeTypeUtil;
 
@@ -66,7 +62,7 @@ public class DefaultHighlightingPluginTest extends TestCase {
             input += br.readLine() + "\n";
         }
 
-        String result = plugin.parseToHtml(input.getBytes(), MimeTypeUtil.JAVA);
+        String result = plugin.parseToHtml(input.getBytes(), "text/x-java-source");
         System.out.println(result);
     }
 }

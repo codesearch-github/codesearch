@@ -7,7 +7,6 @@ Missing features
  - Highlight search term
  - Jump between found results
  - Repository file browsing
- - Code navigation side panel
  - Raw file button
  - Extended file information: e.g Author, Commit date etc
  - Enum Handling for Code Navigation

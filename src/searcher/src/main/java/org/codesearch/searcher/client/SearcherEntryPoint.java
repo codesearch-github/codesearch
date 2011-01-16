@@ -45,6 +45,8 @@ public class SearcherEntryPoint implements EntryPoint {
     /** {@inheritDoc} */
     @Override
     public void onModuleLoad() {
+        Resources.INSTANCE.searcherStyle().ensureInjected();
+        
         ClientFactory clientFactory = new ClientFactoryImpl();
         EventBus eventBus = clientFactory.getEventBus();
         PlaceController placeController = clientFactory.getPlaceController();

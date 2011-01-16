@@ -39,26 +39,7 @@ public class MimeTypeUtil {
 
     private static final Logger LOG = Logger.getLogger(MimeTypeUtil.class);
     private static final Set<FileType> knownFileTypes = new HashSet<FileType>();
-    /** the mime type for JAVA files */
-    public static final String JAVA = "text/x-java-source";
-    /** the mime type for CPP header files */
-    public static final String CPP_HEADER = "text/x-h";
-    /** the mime type for CPP files */
-    public static final String CPP = "text/x-c";
-    /** the mime type for XML files */
-    public static final String XML = "text/xml";
-    /** the mime type for HTML files */
-    public static final String HTML = "text/html";
-    /** the mime type for PNG files */
-    public static final String PNG = "image/png";
-    /** the mime type for JPEG files */
-    public static final String JPEG = "image/jpeg";
-    /** the mime type for TIFF files */
-    public static final String TIFF = "image/tiff";
-    /** the mime type for GIF files */
-    public static final String GIF = "image/gif";
-    /** the mime type for BMP files */
-    public static final String BMP = "image/bmp";
+
     /** the mime type for UNKNOWN files */
     public static final String UNKNOWN = "UNKNOWN_MIME_TYPE";
 

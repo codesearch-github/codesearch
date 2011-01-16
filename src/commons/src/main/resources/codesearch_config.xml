@@ -24,8 +24,8 @@
 
 <root>
     <dbms>mysql</dbms>
-    <db-username>root</db-username>
-    <db-password></db-password>
+    <db-username>codesearch</db-username>
+    <db-password>dota!123</db-password>
     <db-driver>com.mysql.jdbc.Driver</db-driver>
     <db-url>127.0.0.1</db-url>
     <db-port-number>3306</db-port-number>
@@ -39,7 +39,7 @@
         <filename>*.svn*</filename>
         <filename>*.class*</filename>
     </global-blacklist-filenames>
-    <index-location>/tmp/test</index-location>
+    <index-location>/tmp/test/</index-location>
     <index-jobs>
        <index-job>
             <tasks>
