@@ -31,7 +31,9 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map.Entry;
 import junit.framework.TestCase;
+import org.codesearch.commons.database.DBAccess;
 import org.codesearch.commons.database.DatabaseAccessException;
 import org.codesearch.commons.plugins.codeanalyzing.CodeAnalyzerPluginException;
 import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
@@ -85,6 +87,13 @@ public class JavaCodeAnalyzerPluginTest extends TestCase {
 ////        System.out.println(fileContent);
 //        RepositoryDto repo = new RepositoryDto("test", "test", "test", "test", true, "SVN", null, null);
 //        new JavaCodeAnalyzerPlugin().analyzeFile(fileContent, repo);
+    }
+
+    public void testTEST() throws DatabaseAccessException{ //FIXME remove
+        for(Entry<String, AstNode> currEntry : DBAccess.getFilesImportingTargetFile("database.DBAccess", "svn-local").entrySet()){
+            System.out.println(currEntry.getKey());
+        }
+
     }
 
     public void testParseExternalLinks() throws Exception {

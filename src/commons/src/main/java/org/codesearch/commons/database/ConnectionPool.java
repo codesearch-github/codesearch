@@ -73,7 +73,7 @@ public class ConnectionPool {
      * returns the singleton instance of the ConnectionPool
      * @return the instance
      */
-    public static ConnectionPool getInstance() {
+    public static synchronized ConnectionPool getInstance() {
         if (theInstance == null) {
             theInstance = new ConnectionPool();
         }
