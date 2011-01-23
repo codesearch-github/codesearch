@@ -16,7 +16,6 @@ import org.codesearch.commons.plugins.javacodeanalyzerplugin.JavaCodeAnalyzerPlu
  */
 public class ExternalMethodUsage extends ExternalUsage {
     private List<String> parameters;
-    private String methodName; //FIXME
     
     public ExternalMethodUsage(int startPositionInLine, int startLine, int length, String replacedString, String targetClassName, List<String> parameters) {
         super(startPositionInLine, startLine, length, replacedString, targetClassName);
@@ -32,6 +31,7 @@ public class ExternalMethodUsage extends ExternalUsage {
         return parameters;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void resolveLink(String originFilePath, String repository) throws DatabaseAccessException{
         JavaCodeAnalyzerPlugin plugin = new JavaCodeAnalyzerPlugin();

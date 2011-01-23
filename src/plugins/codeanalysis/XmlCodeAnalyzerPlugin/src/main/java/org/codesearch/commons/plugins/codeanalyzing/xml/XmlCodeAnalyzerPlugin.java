@@ -2,6 +2,7 @@ package org.codesearch.commons.plugins.codeanalyzing.xml;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Stack;
@@ -33,16 +34,19 @@ public class XmlCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
     private XmlNode ast = new XmlNode();
     private Stack<XmlNode> nodes = new Stack<XmlNode>();
 
+    /** {@inheritDoc} */
     @Override
     public List<String> getTypeDeclarations() throws CodeAnalyzerPluginException {
         return Collections.EMPTY_LIST;
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<Usage> getUsages() throws CodeAnalyzerPluginException {
         return Collections.EMPTY_LIST;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void analyzeFile(String fileContent) throws CodeAnalyzerPluginException {
         ByteArrayInputStream bais = new ByteArrayInputStream(fileContent.getBytes());
@@ -55,26 +59,35 @@ public class XmlCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
             XMLReader xmlReader = saxParser.getXMLReader();
             xmlReader.setContentHandler(new LocationDefaultHandler());
             xmlReader.parse(new InputSource(bais));
+        } catch (UnknownHostException ex) {
         } catch (IOException ex) {
-            //TODO add exception handling
-            Logger.getLogger(XmlCodeAnalyzerPlugin.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ParserConfigurationException ex) {
-            Logger.getLogger(XmlCodeAnalyzerPlugin.class.getName()).log(Level.SEVERE, null, ex);
+            throw new CodeAnalyzerPluginException("Exception while trying to analyzer the file\n" + ex);
         } catch (SAXException ex) {
-            Logger.getLogger(XmlCodeAnalyzerPlugin.class.getName()).log(Level.SEVERE, null, ex);
+            throw new CodeAnalyzerPluginException("Exception while trying to analyzer the file\n" + ex);
         }
 
     }
 
+    /**
+     * DefaultHandler that parses elements in an XML file to XmlNodes and adds the line number of creation via a Locator
+     */
     class LocationDefaultHandler extends DefaultHandler {
         Locator locator;
 
+        /** {@inheritDoc} */
         @Override
         public void setDocumentLocator(Locator locator) {
             this.locator = locator;
         }
-        // This method is called when an element is encountered
 
+        /**
+         * creates a new XmlNode with the name and line number of the element from the xml files
+         * @param namespaceURI dummy parameter
+         * @param localName dummy parameter
+         * @param qName name of the node
+         * @param atts dummy parameter
+         */
         @Override
         public void startElement(String namespaceURI, String localName, String qName, Attributes atts) {
             XmlNode newNode = new XmlNode();
@@ -84,31 +97,44 @@ public class XmlCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
             nodes.add(newNode);
         }
 
+        /**
+         * pops the node from the node stack so the XmlNode tree can be parsed correctly
+         * @param string dummy parameter
+         * @param string1 dummy parameter
+         * @param string2 dummy parameter
+         * @throws SAXException
+         */
         @Override
         public void endElement(String string, String string1, String string2) throws SAXException {
             nodes.pop();
         }
-
-
     }
 
+    /** {@inheritDoc} */
     @Override
     public AstNode getAst() {
         return ast;
     }
 
+    /**
+     * returns an empty list, since an XML file can't have any imports
+     * @return Collections.Empty_List
+     * @throws CodeAnalyzerPluginException can't really happen
+     */
     @Override
     public List<String> getImports() throws CodeAnalyzerPluginException {
         return Collections.EMPTY_LIST;
     }
 
+    /** {@inheritDoc} */
     @Override
     public String getPurposes() {
         return "xml"; //FIXME
     }
 
+    /** {@inheritDoc} */
     @Override
     public String getVersion() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return "1.0";
     }
 }

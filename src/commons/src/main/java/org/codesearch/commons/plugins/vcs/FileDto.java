@@ -37,8 +37,26 @@ public class FileDto {
     private byte[] content;
     /** determines whether the file is binary */
     private boolean binary;
+    private String lastAuthor;
+    private String lastAlteration;
     private List<String> imports;
 
+    public String getLastAlteration() {
+        return lastAlteration;
+    }
+
+    public void setLastAlteration(String lastAlteration) {
+        this.lastAlteration = lastAlteration;
+    }
+
+    public String getLastAuthor() {
+        return lastAuthor;
+    }
+
+    public void setLastAuthor(String lastAuthor) {
+        this.lastAuthor = lastAuthor;
+    }
+    
     public List<String> getImports() {
         return imports;
     }

@@ -18,6 +18,14 @@ public abstract class ExternalUsage extends Usage {
     public ExternalUsage() {
     }
 
+    /**
+     * creates a new instance of ExternalUsage
+     * @param startPositionInLine the column where the usage starts in the line
+     * @param startLine the line of the usage
+     * @param length the length of the usage in chars
+     * @param replacedString the string that is replaced in the line
+     * @param targetClassName the name of the type that where the usage points to
+     */
     public ExternalUsage(int startPositionInLine, int startLine, int length, String replacedString, String targetClassName) {
         super.startColumn = startPositionInLine;
         super.startLine = startLine;
@@ -26,6 +34,12 @@ public abstract class ExternalUsage extends Usage {
         this.targetClassName = targetClassName;
     }
 
+    /**
+     * sets the targetFilePath and the reference line for the usage
+     * @param originFilePath the file containing the usage
+     * @param repository the repository holding the file
+     * @throws DatabaseAccessException
+     */
     public abstract void resolveLink(String originFilePath, String repository) throws DatabaseAccessException;
 
     public String getTargetClassName() {

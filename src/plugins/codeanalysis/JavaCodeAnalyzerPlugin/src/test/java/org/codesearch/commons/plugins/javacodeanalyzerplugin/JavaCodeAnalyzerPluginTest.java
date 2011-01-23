@@ -20,7 +20,9 @@
  */
 package org.codesearch.commons.plugins.javacodeanalyzerplugin;
 
+import japa.parser.JavaParser;
 import japa.parser.ParseException;
+import japa.parser.ast.CompilationUnit;
 import japa.parser.ast.body.MethodDeclaration;
 import japa.parser.ast.visitor.VoidVisitorAdapter;
 import java.io.BufferedReader;
@@ -32,6 +34,7 @@ import java.util.List;
 import junit.framework.TestCase;
 import org.codesearch.commons.database.DatabaseAccessException;
 import org.codesearch.commons.plugins.codeanalyzing.CodeAnalyzerPluginException;
+import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
 import org.codesearch.commons.plugins.codeanalyzing.ast.ExternalUsage;
 import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
 
@@ -98,19 +101,27 @@ public class JavaCodeAnalyzerPluginTest extends TestCase {
 //        List<ExternalUsage> usages = plugin.parseExternalLinks(fileContent, imports, externalLinks, "svn_local");
     }
 
+    public void iterateChildNodes(AstNode node) {
+        for (AstNode childNode : node.getChildNodes()) {
+            iterateChildNodes(childNode);
+        }
+        System.out.println(node.getModifiers());
+    }
+
     public void testIntegrationOfUsages() throws Exception {
         String fileContent = "";
-        BufferedReader br = new BufferedReader(new FileReader("/home/david/workspace/svnsearch/codesearch/src/indexer/src/main/java/org/codesearch/indexer/core/IndexerMain.java"));
+        BufferedReader br = new BufferedReader(new FileReader("/home/david/workspace/svnsearch/codesearch/src/searcher/src/main/java/org/codesearch/searcher/server/DocumentSearcher.java"));
         while (br.ready()) {
             fileContent += br.readLine() + "\n";
         }
         plugin = new JavaCodeAnalyzerPlugin();
         plugin.analyzeFile(fileContent);
+//        iterateChildNodes(plugin.getAst());
         String resultString = "";
         String hlEscapeStartToken = "";
+        List<Usage> usages = plugin.getUsages();
         String hlEscapeEndToken = "";
         String[] contentLines = fileContent.split("\n");
-        List<Usage> usages = plugin.getUsages();
         int usageIndex = 0;
         outer:
         for (int lineNumber = 1; lineNumber <= contentLines.length; lineNumber++) {
@@ -119,7 +130,7 @@ public class JavaCodeAnalyzerPluginTest extends TestCase {
                 Usage currentUsage = usages.get(usageIndex);
                 if (currentUsage.getStartLine() == lineNumber) {
                     int startColumn = currentUsage.getStartColumn();
-                    String preamble = currentLine.substring(0, startColumn - 1); //-1
+                    String preamble = currentLine.substring(0, startColumn - 1);
                     String javaScriptEvent = "";
                     if (currentUsage instanceof ExternalUsage) {
                         javaScriptEvent = "goToUsage(" + usageIndex + ");";
@@ -131,6 +142,7 @@ public class JavaCodeAnalyzerPluginTest extends TestCase {
                     String anchorEnd = hlEscapeStartToken + "</a>" + hlEscapeEndToken;
                     String remainingLine = currentLine.substring(startColumn - 1 + currentUsage.getReplacedString().length());
                     currentLine = preamble + anchorBegin + currentUsage.getReplacedString() + anchorEnd + remainingLine;
+
                     usageIndex++;
                 } else {
                     resultString += currentLine + "\n";
@@ -141,21 +153,29 @@ public class JavaCodeAnalyzerPluginTest extends TestCase {
         }
         resultString = resultString.substring(0, resultString.length() - 1);
         System.out.println(resultString);
+//        for (Usage currentUsage : usages) {
+//            if (currentUsage instanceof ExternalUsage) {
+//                ExternalUsage extUsage = (ExternalUsage) currentUsage;
+//                extUsage.resolveLink("/home/david/workspace/svnsearch/codesearch/src/indexer/src/main/java/org/codesearch/indexer/tasks/IndexingTask.java", "svn_local");
+//                System.out.println(extUsage.getStartLine() + ": " + extUsage.getReplacedString() + " -> " + extUsage.getTargetFilePath());
+//            }
+//        }
+        //   System.out.println(resultString);
     }
-
-    public void testCodeCommentCompletion() throws DatabaseAccessException {
-        try {
-            try {
-                try {
-                    checkContentOfFile(new File("/home/david/workspace/svnsearch"));
-                } catch (ParseException ex) {
-                }
-            } catch (CodeAnalyzerPluginException ex) {
-            }
-        } catch (FileNotFoundException ex) {
-        } catch (IOException ex) {
-        }
-    }
+//
+//    public void testCodeCommentCompletion() throws DatabaseAccessException {
+//        try {
+//            try {
+//                try {
+//                    checkContentOfFile(new File("/home/david/codesearch/src"));
+//                } catch (ParseException ex) {
+//                }
+//            } catch (CodeAnalyzerPluginException ex) {
+//            }
+//        } catch (FileNotFoundException ex) {
+//        } catch (IOException ex) {
+//        }
+//    }
 
 //            for (File child : file.listFiles()) {
 //                checkContentOfFile(child);
@@ -174,21 +194,24 @@ public class JavaCodeAnalyzerPluginTest extends TestCase {
                 checkContentOfFile(child);
             }
         } else {
-            if (file.getAbsolutePath().endsWith(".java") && !file.getAbsolutePath().contains("jhighlight") && !file.getAbsolutePath().contains("google")) {
-                System.out.println(file.getAbsolutePath());
-                String fileContent = "";
-                BufferedReader br = new BufferedReader(new FileReader(file));
-                while (br.ready()) {
-                    fileContent += br.readLine() + "\n";
-                }
-                fileContent = fileContent.substring(0, fileContent.length() - 1);
-
-                plugin.analyzeFile(fileContent);
-                for (Usage u : plugin.getUsages()) {
-                    if (u instanceof ExternalUsage) {
-                        ((ExternalUsage) u).resolveLink(file.getAbsolutePath(), "svn_local");
-                    }
-                }
+            if (file.getAbsolutePath().endsWith(".java") && !file.getAbsolutePath().contains("jhighlight") && !file.getAbsolutePath().contains("searcher") && !file.getAbsolutePath().contains("Test")) {
+//                System.out.println(file.getAbsolutePath());
+//                String fileContent = "";
+//                BufferedReader br = new BufferedReader(new FileReader(file));
+//                while (br.ready()) {
+//                    fileContent += br.readLine() + "\n";
+//                }
+//                fileContent = fileContent.substring(0, fileContent.length() - 1);
+//
+//                plugin.analyzeFile(fileContent);
+//                for (Usage u : plugin.getUsages()) {
+//                    if (u instanceof ExternalUsage) {
+//                        ((ExternalUsage) u).resolveLink(file.getAbsolutePath(), "svn_local");
+//                    }
+//                }
+                String fileName = file.getAbsolutePath();
+                CompilationUnit cu = JavaParser.parse(file);
+                cu.accept(new CompletionVisitor(), fileName);
             }
         }
     }

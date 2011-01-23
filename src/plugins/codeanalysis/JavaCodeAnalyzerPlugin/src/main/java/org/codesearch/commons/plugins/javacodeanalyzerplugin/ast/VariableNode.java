@@ -18,7 +18,6 @@
  * You should have received a copy of the GNU General Public License
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.codesearch.commons.plugins.javacodeanalyzerplugin.ast;
 
 import java.util.LinkedList;
@@ -31,6 +30,7 @@ import org.codesearch.commons.plugins.codeanalyzing.ast.Visibility;
  * @author David Froehlich
  */
 public class VariableNode extends AstNode {
+
     private String type;
     private boolean attribute;
 
@@ -54,19 +54,22 @@ public class VariableNode extends AstNode {
         this.type = type;
     }
 
+    /** {@inheritDoc} */
     @Override
     public String getOutlineName() {
-        if(attribute) {
-           return type + " " + name;
+        if (attribute) {
+            return type + " " + name;
         }
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<AstNode> getChildNodes() {
         return new LinkedList<AstNode>();
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean showInOutline() {
 //        if(visibility != Visibility.NONE) {
@@ -75,5 +78,10 @@ public class VariableNode extends AstNode {
 //            return false;
 //        }
         return attribute;
+    }
+
+    @Override
+    public String getModifiers() {
+        return "variable " + visibility.toString();
     }
 }

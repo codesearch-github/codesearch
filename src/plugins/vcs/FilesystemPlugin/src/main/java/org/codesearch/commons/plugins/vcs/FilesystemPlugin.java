@@ -25,7 +25,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import org.springframework.stereotype.Component;
 
@@ -93,6 +95,9 @@ public class FilesystemPlugin implements VersionControlPlugin {
             if (f.isDirectory()) {
                 addChangedFilesFromDirectoryToSet(files, f, lastModified);
             } else {
+                if(f.getAbsolutePath().contains("IndexingManager")){
+                    getClass();
+                }
                 if (f.lastModified() > lastModified) {
                     files.add(getFileForFilePath(f.getAbsolutePath()));
                 }
@@ -137,5 +142,11 @@ public class FilesystemPlugin implements VersionControlPlugin {
     @Override
     public String getVersion() {
         return "0.1";
+    }
+
+    @Override
+    public List<String> getFilesInDirectory(String directoryPath) throws VersionControlPluginException {
+        File f = new File(directoryPath);
+        return Arrays.asList(f.list());
     }
 }

@@ -26,9 +26,13 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
+import org.tmatesoft.svn.core.ISVNDirEntryHandler;
+import org.tmatesoft.svn.core.SVNDirEntry;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNLogEntry;
 import org.tmatesoft.svn.core.SVNNodeKind;
@@ -40,8 +44,11 @@ import org.tmatesoft.svn.core.auth.ISVNAuthenticationManager;
 import org.tmatesoft.svn.core.internal.io.dav.DAVRepositoryFactory;
 import org.tmatesoft.svn.core.internal.io.fs.FSRepositoryFactory;
 import org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryFactoryImpl;
+import org.tmatesoft.svn.core.internal.util.SVNURLUtil;
 import org.tmatesoft.svn.core.io.SVNRepository;
 import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
+import org.tmatesoft.svn.core.wc.SVNLogClient;
+import org.tmatesoft.svn.core.wc.SVNRevision;
 
 /**
  * A plugin used to access files stored in Subversion repositories.
@@ -55,6 +62,7 @@ public class SubversionPlugin implements VersionControlPlugin {
     /** The repository that is currently accessed. */
     private SVNRepository repository;
     private static final Logger LOG = Logger.getLogger(SubversionPlugin.class);
+    private ISVNAuthenticationManager authManager;
 
     /**
      * creates a new instance of SubversionPlugin and sets up all factories required for connections
@@ -84,7 +92,7 @@ public class SubversionPlugin implements VersionControlPlugin {
             SVNURL svnurl = SVNURL.parseURIDecoded(url.toString());
             repository = SVNRepositoryFactory.create(svnurl);
 
-            ISVNAuthenticationManager authManager = new BasicAuthenticationManager(username, password);
+            authManager = new BasicAuthenticationManager(username, password);
             repository.setAuthenticationManager(authManager);
         } catch (SVNException ex) {
             throw new VersionControlPluginException(ex.toString());
@@ -106,6 +114,10 @@ public class SubversionPlugin implements VersionControlPlugin {
             SVNProperties properties = new SVNProperties();
             repository.getFile(filePath, -1, properties, baos);
             boolean binary = !SVNProperty.isTextMimeType(properties.getStringValue(SVNProperty.MIME_TYPE));
+            String lastAuthor = properties.getStringValue(SVNProperty.LAST_AUTHOR);
+            String lastAlterationDate = properties.getStringValue(SVNProperty.COMMITTED_DATE); //TODO test this
+            fileDto.setLastAuthor(lastAuthor);
+            fileDto.setLastAlteration(lastAlterationDate);
             fileDto.setContent(baos.toByteArray());
             fileDto.setBinary(binary);
             return fileDto;
@@ -153,6 +165,32 @@ public class SubversionPlugin implements VersionControlPlugin {
             return Long.toString(repository.getLatestRevision());
         } catch (SVNException ex) {
             throw new VersionControlPluginException(ex.toString());
+        }
+    }
+
+    @Override
+    public List<String> getFilesInDirectory(String directoryPath) throws VersionControlPluginException {
+        List<String> fileNames = new LinkedList<String>();
+        try {
+            directoryPath = repository.getRepositoryRoot(true).getPath();
+            repository.getDir(directoryPath, -1, null, new ListDirectoryDirEntryHandler(fileNames));
+        } catch (SVNException ex) {
+            System.out.println(ex);
+        }
+        return fileNames;
+    }
+
+    class ListDirectoryDirEntryHandler implements ISVNDirEntryHandler {
+
+        List<String> fileNames;
+
+        public ListDirectoryDirEntryHandler(List<String> fileNames) {
+            this.fileNames = fileNames;
+        }
+
+        @Override
+        public void handleDirEntry(SVNDirEntry dirEntry) throws SVNException {
+            fileNames.add(dirEntry.getRelativePath());
         }
     }
 }

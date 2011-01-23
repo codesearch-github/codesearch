@@ -59,6 +59,11 @@ public class ClearTask implements Task {
     /** Logger */
     private static final Logger LOG = Logger.getLogger(ClearTask.class);
 
+    /**
+     * executes the task
+     * deletes all index files and resets the lastIndexingRevision of all repositories
+     * @throws TaskExecutionException
+     */
     @Override
     public void execute() throws TaskExecutionException {
         try {

@@ -22,6 +22,7 @@
 package org.codesearch.commons.plugins.vcs;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Set;
 import org.codesearch.commons.plugins.Plugin;
 
@@ -60,4 +61,12 @@ public interface VersionControlPlugin extends Plugin {
      * @return The revision number
      */
     String getRepositoryRevision() throws VersionControlPluginException;
+
+    /**
+     * returns a list of all files in the directory (not recursively)
+     * @param directoryPath the path of the directory
+     * @return the files as a list of Strings
+     * @throws VersionControlPluginException
+     */
+    List<String> getFilesInDirectory(String directoryPath) throws VersionControlPluginException;
 }

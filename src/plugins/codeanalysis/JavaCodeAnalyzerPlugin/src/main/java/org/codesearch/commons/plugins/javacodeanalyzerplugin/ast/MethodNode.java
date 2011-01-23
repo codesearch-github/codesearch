@@ -67,6 +67,7 @@ public class MethodNode extends CompoundNode {
         this.parameters = parameters;
     }
 
+    /** {@inheritDoc} */
     @Override
     public String getOutlineName() {
         String parameterString = "";
@@ -85,10 +86,10 @@ public class MethodNode extends CompoundNode {
         if (!constructor) {
             outlineString += returnString;
         }
-        outlineString += "</a>";
         return outlineString;
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<AstNode> getChildNodes() {
         List<AstNode> childNodes = new LinkedList<AstNode>();
@@ -97,9 +98,15 @@ public class MethodNode extends CompoundNode {
         return childNodes;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean showInOutline() {
         return true;
+    }
+
+    @Override
+    public String getModifiers() {
+        return "method " + visibility.toString();
     }
 
 

@@ -44,6 +44,17 @@ public class ConnectionPool {
     private String dbName;
     private String dbms;
 
+    /**
+     * sets the properties of the ConnectionPool
+     * @param username the username used for the database access
+     * @param password the password used for the database access
+     * @param driver the driver used for the database access
+     * @param url the url of the database
+     * @param portNumber the port used to access the database
+     * @param dbName the name of the database
+     * @param dbms the  //FIXMW
+     * @param remainingConnections the maximum amount of connections to the database
+     */
     public void setProperties(String username, String password, String driver, String url, String portNumber, String dbName, String dbms, int remainingConnections) {
         this.username = username;
         this.password = password;
@@ -58,6 +69,10 @@ public class ConnectionPool {
     private ConnectionPool() {
     }
 
+    /**
+     * returns the singleton instance of the ConnectionPool
+     * @return the instance
+     */
     public static ConnectionPool getInstance() {
         if (theInstance == null) {
             theInstance = new ConnectionPool();
@@ -65,6 +80,12 @@ public class ConnectionPool {
         return theInstance;
     }
 
+    /**
+     * returns a connection to the database from the connectionPool
+     * creates a new one in case no connections are available as long as the limit of connections is not exceeded
+     * @return a connection
+     * @throws DatabaseAccessException
+     */
     public Connection getConnection() throws DatabaseAccessException {
         if (remainingConnections > 0) {
             remainingConnections--;
@@ -89,6 +110,10 @@ public class ConnectionPool {
         }
     }
 
+    /**
+     * releases the connection back into the pool
+     * @param conn the connection that is not used anymore
+     */
     public void releaseConnection(Connection conn) {
         connections.offerLast(conn);
         remainingConnections++;

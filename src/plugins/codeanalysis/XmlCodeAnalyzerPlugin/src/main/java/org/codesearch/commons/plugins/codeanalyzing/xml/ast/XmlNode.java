@@ -13,20 +13,23 @@ public class XmlNode extends CompoundNode {
 
     private List<XmlNode> xmlNodes = new LinkedList<XmlNode>();
 
-    public List<XmlNode> getXmlNodes(){
+    public List<XmlNode> getXmlNodes() {
         return xmlNodes;
     }
 
+    /** {@inheritDoc} */
     @Override
     public String getOutlineName() {
         return name;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean showInOutline() {
         return true;
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<AstNode> getChildNodes() {
         List<AstNode> astNodes = new LinkedList<AstNode>();

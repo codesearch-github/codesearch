@@ -151,7 +151,7 @@ public class IndexingTask implements Task {
         } catch (CodeAnalyzerPluginException ex) {
             LOG.error("Error executing code analysis \n" + ex);
         }
-         LOG.info("Finished indexing of repository: " + repository.getName());
+        LOG.info("Finished indexing of repository: " + repository.getName());
     }
 
     /**
@@ -174,6 +174,9 @@ public class IndexingTask implements Task {
         String previousFileType = null;
         for (FileDto currentFile : changedFiles) {
             try {
+                if (currentFile.getFilePath().contains("IndexingManager")) {
+                    getClass();
+                }
                 try {
                     currentFileType = currentFile.getFilePath().substring(currentFile.getFilePath().lastIndexOf(".") + 1); //TODO add handling for files without file endings or hidden files
                 } catch (StringIndexOutOfBoundsException ex) {

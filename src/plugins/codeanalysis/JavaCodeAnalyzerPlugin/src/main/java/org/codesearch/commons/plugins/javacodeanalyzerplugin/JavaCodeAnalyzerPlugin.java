@@ -62,6 +62,7 @@ import japa.parser.ast.stmt.ReturnStmt;
 import japa.parser.ast.stmt.Statement;
 import japa.parser.ast.stmt.SwitchEntryStmt;
 import japa.parser.ast.stmt.SwitchStmt;
+import japa.parser.ast.stmt.ThrowStmt;
 import japa.parser.ast.stmt.TryStmt;
 import japa.parser.ast.stmt.WhileStmt;
 import java.io.ByteArrayInputStream;
@@ -79,6 +80,7 @@ import org.codesearch.commons.plugins.codeanalyzing.ast.ExternalUsage;
 import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
 import org.codesearch.commons.plugins.codeanalyzing.ast.Visibility;
 import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.ClassNode;
+import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.ExternalClassUsage;
 import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.ExternalMethodUsage;
 import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.ExternalVariableUsage;
 import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.FileNode;
@@ -100,57 +102,108 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
     private List<String> imports;
     AnalyzerUtil util;
 
-    public void parseLineNumberAndFileNameOfUsage(ExternalUsage usage, String repository, List<String> fileImports, String originFilePath) throws DatabaseAccessException {
-//        if(usage.getTargetClassName().equals("DBAccess"));
+    /**
+     * sets the lineNumber and the targetFilePath for the class usage
+     * @param usage the usage that is parsed
+     * @param repository the repository holding the files
+     * @param fileImports the imports in the file that holds the usage
+     * @param originFilePath the filePath of the file that holds the usage
+     * @throws DatabaseAccessException
+     */
+    public void parseLineNumberAndFileNameOfUsage(ExternalClassUsage usage, String repository, List<String> fileImports, String originFilePath) throws DatabaseAccessException {
         String className = usage.getTargetClassName();
-        String targetFilePath = null;
+        String targetFilePath = getFilePathOfDeclaration(repository, fileImports, className);
+        usage.setTargetFilePath(targetFilePath);
+        if (targetFilePath == null) {
+            return;
+        }
+
+        usage.setReferenceLine(-1);
+    }
+
+    /**
+     * sets the lineNumber and the targetFilePath for the variable usage
+     * @param usage the usage that is parsed
+     * @param repository the repository holding the files
+     * @param fileImports the imports in the file that holds the usage
+     * @param originFilePath the filePath of the file that holds the usage
+     * @throws DatabaseAccessException
+     */
+    public void parseLineNumberAndFileNameOfUsage(ExternalVariableUsage usage, String repository, List<String> fileImports, String originFilePath) throws DatabaseAccessException {
+        String className = usage.getTargetClassName();
+        String targetFilePath = getFilePathOfDeclaration(repository, fileImports, className);
+        usage.setTargetFilePath(targetFilePath);
+        if (targetFilePath == null) {
+            return;
+        }
+        AstNode currentFileNode = DBAccess.getBinaryIndexForFile(targetFilePath, repository);
+        checkChildNodesForVariable(currentFileNode, usage);
+    }
+
+    private void checkChildNodesForVariable(AstNode node, ExternalVariableUsage usage){
+        for (AstNode currentNode : node.getChildNodes()) {
+            if (currentNode instanceof VariableNode) {
+                VariableNode currentVariable = (VariableNode) currentNode;
+                if (currentVariable.getName().equals(usage.getReplacedString()) && currentVariable.getVisibility() != Visibility.DEFAULT) { //FIXME
+                    usage.setReferenceLine(currentVariable.getStartLine());
+                    return;
+                }
+            }
+            checkChildNodesForVariable(currentNode, usage);
+        }
+    }
+    
+    /**
+     * sets the lineNumber and the targetFilePath for the method usage
+     * @param usage the usage that is parsed
+     * @param repository the repository holding the files
+     * @param fileImports the imports in the file that holds the usage
+     * @param originFilePath the filePath of the file that holds the usage
+     * @throws DatabaseAccessException
+     */
+    public void parseLineNumberAndFileNameOfUsage(ExternalMethodUsage usage, String repository, List<String> fileImports, String originFilePath) throws DatabaseAccessException {
+        String className = usage.getTargetClassName();
+        String targetFilePath = getFilePathOfDeclaration(repository, fileImports, className);
+        usage.setTargetFilePath(targetFilePath);
+        if (targetFilePath == null) {
+            return;
+        }
+        AstNode currentFileNode = DBAccess.getBinaryIndexForFile(originFilePath, repository);
+        for (AstNode currentNode : currentFileNode.getChildNodes()) {
+            if (currentNode instanceof MethodNode) {
+                MethodNode currentMethodNode = (MethodNode) currentNode;
+                if (currentNode.getName().equals(usage.getReplacedString()) && currentMethodNode.getParameters().size() == usage.getParameters().size()) {
+                    //TODO make parameter check
+                    usage.setReferenceLine(currentMethodNode.getStartLine());
+                    return;
+                }
+            }
+        }
+    }
+
+    private String getFilePathOfDeclaration(String repository, List<String> fileImports, String className) throws DatabaseAccessException {
+        String targetFilePath;
         List<String> asteriskImports = new LinkedList<String>();
         boolean importMatch = false;
         for (String currentImport : fileImports) {
-            if (currentImport.endsWith(className)) {
+            if (currentImport.endsWith("." + className)) {
                 className = currentImport;
                 importMatch = true;
             } else if (currentImport.endsWith("*")) {
                 asteriskImports.add(currentImport);
             }
         }
-
         if (!importMatch) {
             targetFilePath = DBAccess.getFilePathForTypeDeclaration(className, repository, asteriskImports);
         } else {
             targetFilePath = DBAccess.getFilePathForTypeDeclaration(className, repository);
         }
-        usage.setTargetFilePath(targetFilePath);
-        if(targetFilePath== null){
-            return;
-        }
-        if (usage instanceof ExternalMethodUsage) {
-            ExternalMethodUsage extMethodUsage = (ExternalMethodUsage) usage;
-            AstNode currentFileNode = DBAccess.getBinaryIndexForFile(originFilePath, repository);
-            for (AstNode currentNode : currentFileNode.getChildNodes()) {
-                if (currentNode instanceof MethodNode) {
-                    MethodNode currentMethodNode = (MethodNode) currentNode;
-                    if (currentNode.getName().equals(usage.getReplacedString()) && currentMethodNode.getParameters().size() == extMethodUsage.getParameters().size()) {
-                        //TODO make parameter check
-                        usage.setReferenceLine(currentMethodNode.getStartLine());
-                        return;
-                    }
-                }
-            }
-        } else if (usage instanceof ExternalVariableUsage) {
-            AstNode currentFileNode = DBAccess.getBinaryIndexForFile(originFilePath, repository);
-            for (AstNode currentNode : currentFileNode.getChildNodes()) {
-                if (currentNode instanceof VariableNode) {
-                    VariableNode currentVariable = (VariableNode) currentNode;
-                    if (currentVariable.getName().equals(usage.getReplacedString()) && currentVariable.getVisibility() != Visibility.DEFAULT) { //FIXME
-                        usage.setReferenceLine(currentVariable.getStartLine());
-                        return;
-                    }
-                }
-            }
-        }
-        usage.setReferenceLine(-1);
+        
+        return targetFilePath;
     }
+
+    
+    
 
     /** {@inheritDoc} */
     public FileNode getFileNode() {
@@ -196,6 +249,10 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
         }
     }
 
+    /**
+     * parses all declarations from the CompilationUnit into the fileNode
+     * @param cu
+     */
     private void buildAST(CompilationUnit cu) {
         //iterate all types (classes) from the compilation unit
         for (TypeDeclaration type : cu.getTypes()) {
@@ -203,6 +260,11 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
         }
     }
 
+    /**
+     * creates a new ClassNode and attaches it to the fileNode
+     * parses all methods and statements in the class
+     * @param type the TypeDeclaration node
+     */
     private void parseContentOfClass(TypeDeclaration type) {
         //create ClassNode and extract required info from TypeDeclaration
         ClassNode newClass = new ClassNode();
@@ -241,6 +303,12 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
         }
     }
 
+    /**
+     * adds the method to the parentClass
+     * parses all statements in the method
+     * @param parentClass the class containing the method
+     * @param method the MethodDeclaration node
+     */
     private void parseContentOfMethod(ClassNode parentClass, MethodDeclaration method) {
         MethodNode newMethod = new MethodNode();
         String methodName = method.getName();
@@ -289,6 +357,56 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
 
     }
 
+    /**
+     * adds the constructor to the class as a MethodNode
+     * parses all statements in the constructor
+     * @param parentClass the class containing the constructor
+     * @param constructor the ConstructorDeclaration node
+     */
+    private void parseContentOfConstructor(ClassNode parentClass, ConstructorDeclaration constructor) {
+        MethodNode newMethod = new MethodNode();
+        String methodName = constructor.getName();
+        String returnType = null;
+        Visibility visibility = util.getVisibilityFromModifier(constructor.getModifiers());
+        newMethod.setVisibility(visibility);
+        newMethod.setName(methodName);
+        newMethod.setReturnType(returnType);
+        newMethod.setConstructor(true);
+        newMethod.setStartPositionInLine(constructor.getBeginColumn());//TODO replace with line number
+        int startLine = constructor.getBeginLine();
+        String stringUntilName = constructor.toString().substring(0, constructor.toString().indexOf(constructor.getName() + "("));
+        int linesUntilName = stringUntilName.split("\n").length - 1;
+        if (constructor.getJavaDoc() != null) {
+            linesUntilName -= constructor.getJavaDoc().getEndLine() - constructor.getJavaDoc().getBeginLine() + 1;
+        }
+        startLine += linesUntilName;
+
+        newMethod.setStartLine(startLine);
+        //parse all parameters to VariableNodes
+        try {
+            for (Parameter param : constructor.getParameters()) {
+                VariableNode newParam = new VariableNode();
+                String paramName = param.getId().getName();
+                String paramType = param.getType().toString();
+                newParam.setType(paramType);
+                newParam.setStartLine(param.getBeginLine());
+                newParam.setName(paramName);
+                newMethod.getParameters().add(newParam);
+            }
+        } catch (NullPointerException ex) {
+        }
+        parentClass.getMethods().add(newMethod);
+        //iterate all statements in the method recursively and check for declarations/usages
+        if (constructor.getBlock() != null) {
+            parseStatement(constructor.getBlock(), constructor);
+        }
+    }
+
+    /**
+     * parses the statement and all childStatements depending on it's actual type
+     * @param stmt the statement that is to be parsed
+     * @param parent the parent node of the statement
+     */
     private void parseStatement(Statement stmt, Node parent) {
         stmt.setData(parent);
         if (stmt instanceof IfStmt) {
@@ -337,7 +455,7 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
                 MethodNode parentMethod = util.getMethodAtLine(catchClause.getBeginLine());
                 Parameter param = catchClause.getExcept();
                 VariableNode var = new VariableNode();
-                var.setParentLineDeclaration(parent.getBeginLine());
+                var.setParentLineDeclaration(catchClause.getCatchBlock().getBeginLine());
                 var.setAttribute(false);
                 var.setStartLine(param.getBeginLine());
                 var.setStartPositionInLine(param.getBeginColumn());
@@ -346,7 +464,7 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
                 try {
                     parentMethod.getLocalVariables().add(var);
                 } catch (NullPointerException ex) {
-                    getClass();
+                    getClass(); //FIXME
                 }
                 parseStatement(catchClause.getCatchBlock(), stmt);
             }
@@ -360,9 +478,17 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
         } else if (stmt instanceof ExplicitConstructorInvocationStmt) {
             ExplicitConstructorInvocationStmt ecis = (ExplicitConstructorInvocationStmt) stmt;
             parseExpression(ecis.getExpr(), ecis);
+        } else if (stmt instanceof ThrowStmt){
+            ThrowStmt ts = (ThrowStmt) stmt;
+            parseExpression(ts.getExpr(), ts);
         }
     }
 
+    /**
+     * parses the BlockStmt and all it's childStatements
+     * @param stmt the BlockStmt
+     * @param parent the parent node of the block statement
+     */
     private void parseBlockStmt(BlockStmt stmt, Node parent) {
         stmt.setData(parent);
         if (stmt.getStmts() == null) {
@@ -373,6 +499,11 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
         }
     }
 
+    /**
+     * parses the expression and all child expressions depending on it's actual type
+     * @param expr the expression
+     * @param parent the parent node of the expression
+     */
     private void parseExpression(Expression expr, Node parent) {
         if (expr == null) {
             return;
@@ -479,10 +610,13 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
                 parseExpression(ex, expr);
             }
         }
-
-        //TODO check for ArrayCreationExpr and ArrayInitializerExpr
     }
 
+    /**
+     * parses the condition of the expression
+     * @param expr the condition expression
+     * @param parent the parent node of the expression
+     */
     private void parseConditionExpr(Expression expr, Node parent) {
         expr.setData(parent);
         if (expr instanceof ConditionalExpr) {
@@ -507,6 +641,11 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
         }
     }
 
+    /**
+     * parses the IfStmt, the condition, the thenStatement and the elseStatement
+     * @param stmt the IfStmt
+     * @param parent the parent node of the if statement
+     */
     private void parseIfStmt(IfStmt stmt, Node parent) {
         stmt.setData(parent);
         parseConditionExpr(stmt.getCondition(), stmt);
@@ -517,45 +656,7 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
         }
     }
 
-    private void parseContentOfConstructor(ClassNode parentClass, ConstructorDeclaration constructor) {
-        MethodNode newMethod = new MethodNode();
-        String methodName = constructor.getName();
-        String returnType = null;
-        Visibility visibility = util.getVisibilityFromModifier(constructor.getModifiers());
-        newMethod.setVisibility(visibility);
-        newMethod.setName(methodName);
-        newMethod.setReturnType(returnType);
-        newMethod.setConstructor(true);
-        newMethod.setStartPositionInLine(constructor.getBeginColumn());//TODO replace with line number
-        int startLine = constructor.getBeginLine();
-        String stringUntilName = constructor.toString().substring(0, constructor.toString().indexOf(constructor.getName() + "("));
-        int linesUntilName = stringUntilName.split("\n").length - 1;
-        if (constructor.getJavaDoc() != null) {
-            linesUntilName -= constructor.getJavaDoc().getEndLine() - constructor.getJavaDoc().getBeginLine() + 1;
-        }
-        startLine += linesUntilName;
-
-        newMethod.setStartLine(startLine);
-        //parse all parameters to VariableNodes
-        try {
-            for (Parameter param : constructor.getParameters()) {
-                VariableNode newParam = new VariableNode();
-                String paramName = param.getId().getName();
-                String paramType = param.getType().toString();
-                newParam.setType(paramType);
-                newParam.setStartLine(param.getBeginLine());
-                newParam.setName(paramName);
-                newMethod.getParameters().add(newParam);
-            }
-        } catch (NullPointerException ex) {
-        }
-        parentClass.getMethods().add(newMethod);
-        //iterate all statements in the method recursively and check for declarations/usages
-        if (constructor.getBlock() != null) {
-            parseStatement(constructor.getBlock(), constructor);
-        }
-    }
-
+    @Deprecated
     private void parseAbsoluteCharPositions() {
         int lineNumber = 0;
         int absoluteChars = 0;

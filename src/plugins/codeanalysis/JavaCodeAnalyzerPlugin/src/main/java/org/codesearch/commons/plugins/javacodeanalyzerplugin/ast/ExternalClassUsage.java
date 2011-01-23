@@ -16,10 +16,12 @@ import org.codesearch.commons.plugins.javacodeanalyzerplugin.JavaCodeAnalyzerPlu
  */
 public class ExternalClassUsage extends ExternalUsage {
 
+    /** {@inheritDoc } */
     public ExternalClassUsage(int startPositionInLine, int startLine, int length, String replacedString, String targetClassName) {
         super(startPositionInLine, startLine, length, replacedString, targetClassName);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void resolveLink(String originFilePath, String repository) throws DatabaseAccessException{
         JavaCodeAnalyzerPlugin plugin = new JavaCodeAnalyzerPlugin();

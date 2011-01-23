@@ -75,9 +75,11 @@ public class DocumentSearcher {
         LOG.debug("Index location set to: " + indexLocation);
         //TODO make or find proper analyzers for search
         queryParser = new QueryParser(Version.LUCENE_30, IndexConstants.INDEX_FIELD_CONTENT_LC, new LowerCaseWhiteSpaceAnalyzer());
+        queryParser.setLowercaseExpandedTerms(false);
         queryParserCaseSensitive = new QueryParser(Version.LUCENE_30, IndexConstants.INDEX_FIELD_CONTENT, new WhitespaceAnalyzer());
         queryParser.setAllowLeadingWildcard(true);
         queryParserCaseSensitive.setAllowLeadingWildcard(true);
+        queryParserCaseSensitive.setLowercaseExpandedTerms(false);
         try {
             initSearcher();
         } catch (InvalidIndexLocationException ex) {
@@ -94,7 +96,18 @@ public class DocumentSearcher {
      * @throws ParseException if the searchString could not be parsed to a query
      * @throws IOException if the Index could not be read
      */
+    //TODO rename method
     public List<SearchResultDto> search(String searchString, boolean caseSensitive, List<String> repositoryNames, List<String> repositoryGroupNames) throws ParseException, IOException, InvalidIndexLocationException, ConfigurationException {
+        return performLuceneSearch(searchString, caseSensitive, repositoryNames, repositoryGroupNames, 1000);
+    }
+
+    public List<String> suggestSearchNames(String searchString, boolean caseSensitive, List<String> repositoryNames, List<String> repositoryGroupNames) throws ParseException, IOException, InvalidIndexLocationException, ConfigurationException {
+        List<SearchResultDto> results = performLuceneSearch(searchString, caseSensitive, repositoryNames, repositoryGroupNames, 10);
+        
+        return null;
+    }
+
+    private List<SearchResultDto> performLuceneSearch(String searchString, boolean caseSensitive, List<String> repositoryNames, List<String> repositoryGroupNames, int maxResults) throws ParseException, IOException, InvalidIndexLocationException, ConfigurationException {
         if (!searcherInitialized) {
             initSearcher();
         }
@@ -104,12 +117,14 @@ public class DocumentSearcher {
         if (caseSensitive) {
             query = queryParserCaseSensitive.parse(finalSearchString);
         } else {
+            finalSearchString = finalSearchString.replace(IndexConstants.INDEX_FIELD_FILEPATH+":", IndexConstants.INDEX_FIELD_FILEPATH_LC+":").replace(IndexConstants.INDEX_FIELD_CONTENT+":",
+                    IndexConstants.INDEX_FIELD_CONTENT_LC+":");
             query = queryParser.parse(finalSearchString);
         }
 
         LOG.info("Searching index with query: " + query.toString());
         //Retrieve all search results from search
-        TopDocs topDocs = indexSearcher.search(query, 1000);
+        TopDocs topDocs = indexSearcher.search(query, maxResults);
         LOG.info("Found " + topDocs.scoreDocs.length + " results");
         Document doc;
         //Add each search result in form of a ResultItem to the results-list

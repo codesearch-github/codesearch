@@ -271,4 +271,9 @@ public class SearcherServiceImpl extends AutowiringRemoteServiceServlet implemen
         }
         return fileContentBytes;
     }
+
+    public List<String> getSearchTermSuggestions(String searchTerm){
+        
+        return null;
+    }
 }

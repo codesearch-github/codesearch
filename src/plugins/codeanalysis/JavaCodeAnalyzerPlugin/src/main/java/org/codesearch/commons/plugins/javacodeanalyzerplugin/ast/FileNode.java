@@ -43,11 +43,13 @@ public class FileNode extends CompoundNode {
         this.classes = classes;
     }
 
+    /** {@inheritDoc} */
     @Override
     public String getOutlineName() {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<AstNode> getChildNodes() {
         LinkedList<AstNode> childs = new LinkedList<AstNode>();
@@ -55,9 +57,15 @@ public class FileNode extends CompoundNode {
         return childs;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean showInOutline() {
         return false;
+    }
+
+    @Override
+    public String getModifiers() {
+        return null;
     }
 
 }

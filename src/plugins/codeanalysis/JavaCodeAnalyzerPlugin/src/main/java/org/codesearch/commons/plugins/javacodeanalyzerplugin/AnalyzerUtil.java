@@ -17,6 +17,7 @@ import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
 import org.codesearch.commons.plugins.codeanalyzing.ast.Visibility;
 import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.ClassNode;
 import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.ExternalClassUsage;
+import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.ExternalMethodUsage;
 import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.ExternalVariableUsage;
 import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.FileNode;
 import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.MethodNode;
@@ -130,21 +131,32 @@ public class AnalyzerUtil {
                 paramTypes.add(paramType);
             }
         }
+        usages.add(new ExternalMethodUsage(methodCallColumn, lineNumber, methodName.length(), methodName, className, paramTypes));
         //FIXME
         //ExternalMethodLink methodLink = new ExternalMethodLink(lineNumber, methodCallColumn, methodName.length(), className, methodName, paramTypes);
         //externalLinks.add(methodLink);
     }
 
+    /**
+     * adds a link to the scope of the field (either an object in the current class or a class of which a static variable is referenced)
+     * adds a link to the field itself
+     * @param ex the FieldAccessExpr
+     * @param parent the parentNode of the field access
+     */
     public void addLinkToExternalField(FieldAccessExpr ex, Node parent) {
         String scope = ex.getScope().toString();
+        int startColumn = ex.getBeginColumn()+1;
         String className;
         if (!addLinkToVariableDeclaration(ex.getBeginLine(), ex.getBeginColumn(), scope, parent)) {
             addLinkToExternalClassDeclaration(ex.getBeginLine(), ex.getBeginColumn(), ex.getScope().toString());
+            startColumn += scope.length();
             className = scope;
         } else {
-            className = getVariableDeclarationForUsage(ex.getBeginLine(), scope, parent).getType();
+            VariableNode refVar = getVariableDeclarationForUsage(ex.getBeginLine(), scope, parent);
+            className = refVar.getType();
+            startColumn += refVar.getName().length();
         }
-        addLinkToExternalVariableDeclaration(ex.getBeginLine(), ex.getBeginColumn(), ex.getField(), parent, className);
+        addLinkToExternalVariableDeclaration(ex.getBeginLine(), startColumn, ex.getField(), parent, className);
     }
 
     /**
@@ -336,20 +348,18 @@ public class AnalyzerUtil {
      */
     public Visibility getVisibilityFromModifier(int modifier) {
         Visibility visibility;
-        switch (modifier) {
-            case 0:
-                visibility = Visibility.DEFAULT;
-                break;
-            case 1:
-                visibility = Visibility.PUBLIC;
-                break;
-            case 2:
-                visibility = Visibility.PRIVATE;
-                break;
-            default:
-                visibility = Visibility.DEFAULT;
-            //TODO implement other cases
+        String modifierString = Integer.toBinaryString(modifier);
+        if (!modifierString.equals("0")) {
+            if (modifierString.charAt(modifierString.length() - 1) == '1') {
+                return Visibility.PUBLIC;
+            }
+            if (modifierString.charAt(modifierString.length() - 2) == '1') {
+                return Visibility.PRIVATE;
+            }
+            if (modifierString.charAt(modifierString.length() - 3) == '1') {
+                return Visibility.PROTECTED;
+            }
         }
-        return visibility;
+        return Visibility.DEFAULT;
     }
 }

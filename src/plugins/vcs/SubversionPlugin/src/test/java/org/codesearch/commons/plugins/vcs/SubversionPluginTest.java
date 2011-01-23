@@ -95,4 +95,11 @@ public class SubversionPluginTest {
         String result = new String(sp.getFileForFilePath(filePath).getContent());
         assert (result.equals("test"));
     }
+
+    @Test
+    public void testGetFilesInDirectory() throws Exception {
+        for(String s : sp.getFilesInDirectory(null)){
+            System.out.println(s+"\n");
+        }
+    }
 }

@@ -34,7 +34,6 @@ import org.apache.log4j.Logger;
 import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
 import org.codesearch.commons.configuration.xml.XmlConfigurationReaderConstants;
 import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
-import org.codesearch.commons.plugins.codeanalyzing.ast.ExternalUsage;
 import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
 
 /**
@@ -64,6 +63,13 @@ public class DBAccess {
     private static final String STMT_CLEAR_FILES_FOR_REPOSITORY = "DELETE FROM file WHERE repository_id = ?";
     private static final String STMT_GET_IMPORTS_FOR_FILE = "SELECT imports FROM file WHERE file_path = ? AND repository_id = ?";
 
+    /**
+     * retrieves the imports as strings from the database
+     * @param filePath the file path + name of the file
+     * @param repository the name of the repository holding the file
+     * @return the imports as a list of strings
+     * @throws DatabaseAccessException
+     */
     public static List<String> getImportsForFile(String filePath, String repository) throws DatabaseAccessException {
         if (connectionPool == null) {
             setupConnections();
@@ -98,6 +104,13 @@ public class DBAccess {
         return imports;
     }
 
+    /**
+     * retrieves the usages in the file from the database
+     * @param filePath the file path + name of the file
+     * @param repository the name of the repository holding the file
+     * @return the usages ordered by line number / column
+     * @throws DatabaseAccessException
+     */
     public static List<Usage> getUsagesForFile(String filePath, String repository) throws DatabaseAccessException {
         if (connectionPool == null) {
             setupConnections();
@@ -132,6 +145,13 @@ public class DBAccess {
         return usages;
     }
 
+    /**
+     * retrieves the path of the file in which the from the database
+     * @param filePath the file path + name of the file
+     * @param repository the name of the repository holding the file
+     * @return the imports as a list of strings
+     * @throws DatabaseAccessException
+     */
     public static String getFilePathForTypeDeclaration(String fullyQualifiedName, String repository) throws DatabaseAccessException {
         if (connectionPool == null) {
             setupConnections();
@@ -157,6 +177,11 @@ public class DBAccess {
         return filePath;
     }
 
+    /**
+     * deletes all entries from the file and type table that are associated to the repository
+     * @param repoName the name of the repository
+     * @throws DatabaseAccessException
+     */
     public static void clearTablesForRepository(String repoName) throws DatabaseAccessException {
         if (connectionPool == null) {
             setupConnections();
@@ -177,6 +202,15 @@ public class DBAccess {
         }
     }
 
+    /**
+     * retrieves the file path of the file that contains the class
+     * tries with all possible packages
+     * @param className the name of class
+     * @param repository the repository that holds the file
+     * @param asteriskImports the packages that could contain the fiel
+     * @return the path of the file
+     * @throws DatabaseAccessException
+     */
     public static String getFilePathForTypeDeclaration(String className, String repository, List<String> asteriskImports) throws DatabaseAccessException {
         if (asteriskImports.isEmpty()) {
             return null;
@@ -207,6 +241,9 @@ public class DBAccess {
         return filePath;
     }
 
+    /**
+     * reads the values for the database connection from the configuration file and creates a connection to the database
+     */
     public static void setupConnections() {
         try {
             connectionPool = ConnectionPool.getInstance();
@@ -224,6 +261,12 @@ public class DBAccess {
         }
     }
 
+    /**
+     * returns the revision number of the repository that was valid during the last code analysis process
+     * @param repositoryName the repository
+     * @return the revision 
+     * @throws DatabaseAccessException
+     */
     public static String getLastAnalyzedRevisionOfRepository(String repositoryName) throws DatabaseAccessException {
         if (connectionPool == null) {
             setupConnections();
@@ -248,6 +291,13 @@ public class DBAccess {
         return lastAnalyzedRevision;
     }
 
+    /**
+     * returns the index of the file as an AstNode that contains all child nodes
+     * @param filePath the path of the file
+     * @param repository the name of the repository holding the file
+     * @return the binary index of the file
+     * @throws DatabaseAccessException
+     */
     public static AstNode getBinaryIndexForFile(String filePath, String repository) throws DatabaseAccessException {
         if (connectionPool == null) {
             setupConnections();
@@ -287,6 +337,11 @@ public class DBAccess {
         return binaryIndex;
     }
 
+    /**
+     * creates an entry for the repository in the database
+     * @param repositoryName the name of the repository
+     * @throws DatabaseAccessException
+     */
     public static void createRepositoryEntry(String repositoryName) throws DatabaseAccessException {
         if (connectionPool == null) {
             setupConnections();
@@ -303,6 +358,12 @@ public class DBAccess {
         }
     }
 
+    /**
+     * sets the last_analysis_revision of the repository in the database
+     * @param repositoryName the name of the repository
+     * @param revision the revision
+     * @throws DatabaseAccessException
+     */
     public static void setLastAnalyzedRevisionOfRepository(String repositoryName, String revision) throws DatabaseAccessException {
         if (connectionPool == null) {
             setupConnections();
@@ -320,6 +381,12 @@ public class DBAccess {
         }
     }
 
+    /**
+     * gets the id of the repository with the given name
+     * @param repoName the name of the repository
+     * @return the id if the repository
+     * @throws DatabaseAccessException
+     */
     private static int getRepoIdForRepoName(String repoName) throws DatabaseAccessException {
         if (connectionPool == null) {
             setupConnections();
@@ -342,6 +409,16 @@ public class DBAccess {
         return repoId;
     }
 
+    /**
+     * sets all data created by the CodeAnalyzerPlugin for the file
+     * @param filePath the path of the file
+     * @param repository the repository holding the file
+     * @param binaryIndex the binary index as an AstNode
+     * @param usages the usages as a list of Usages
+     * @param types the types that are declared in the file as a list of strings
+     * @param imports the imports that are declared in the file as a list of strings
+     * @throws DatabaseAccessException
+     */
     public static void setAnalysisDataForFile(String filePath, String repository, AstNode binaryIndex, List<Usage> usages, List<String> types, List<String> imports) throws DatabaseAccessException {
         if (connectionPool == null) {
             setupConnections();
@@ -378,6 +455,14 @@ public class DBAccess {
         }
     }
 
+    /**
+     * returns the id of the file with the path in the given repository
+     * if the there is no record for the file with this path and repository creates a new record and returns the id
+     * @param filePath the path of the file
+     * @param repository the name of the repository holding the file
+     * @return the id of the record
+     * @throws DatabaseAccessException
+     */
     public static int ensureThatRecordExists(String filePath, String repository) throws DatabaseAccessException {
         if (connectionPool == null) {
             setupConnections();

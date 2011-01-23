@@ -29,5 +29,10 @@ import org.codesearch.indexer.exceptions.TaskExecutionException;
  * @author David Froehlich
  */
 public interface Task {
+
+    /**
+     * executes the task
+     * @throws TaskExecutionException if the execution of the task failed
+     */
     public void execute()throws TaskExecutionException;
 }

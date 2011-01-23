@@ -55,6 +55,8 @@ public abstract class AstNode implements Serializable, Comparable<AstNode> {
      */
     public abstract List<AstNode> getChildNodes();
 
+    public abstract String getModifiers();
+
     @Override
     public int compareTo(AstNode other) {
         if (this.startLine == other.startLine) {

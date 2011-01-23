@@ -20,6 +20,7 @@ public class ExternalVariableUsage extends ExternalUsage {
         super(startPositionInLine, startLine, length, replacedString, targetClassName);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void resolveLink(String originFilePath, String repository) throws DatabaseAccessException{
         JavaCodeAnalyzerPlugin plugin = new JavaCodeAnalyzerPlugin();

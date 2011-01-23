@@ -51,24 +51,13 @@ public class ClassNode extends CompoundNode {
         this.methods = methods;
     }
 
+    /** {@inheritDoc} */
     @Override
     public String getOutlineName() {
         return name;
     }
 
-//    @Override
-//    public void addNodesToList(List<AstNode> nodes) {
-//        for (MethodNode method : methods) {
-//            nodes.add(method);
-//            method.addNodesToList(nodes);
-//        }
-//        for (VariableNode var : attributes){
-//            if(var.getVisibility() == Visibility.PUBLIC || var.getVisibility() == Visibility.PROTECTED){
-//                nodes.add(var);
-//            }
-//        }
-//    }
-
+    /** {@inheritDoc} */
     @Override
     public List<AstNode> getChildNodes() {
         List<AstNode> childNodes = new LinkedList<AstNode>();
@@ -77,9 +66,15 @@ public class ClassNode extends CompoundNode {
         return childNodes;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean showInOutline() {
         return true;
+    }
+
+    @Override
+    public String getModifiers() {
+        return "class " + this.getVisibility().toString();
     }
 
 

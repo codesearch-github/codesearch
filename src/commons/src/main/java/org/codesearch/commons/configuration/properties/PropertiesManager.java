@@ -76,6 +76,10 @@ public class PropertiesManager {
         initProperties();
     }
 
+    /**
+     * opens the properties file or creates an empty properties file if it does not exist
+     * @throws IOException
+     */
     private void initProperties() throws IOException {
         properties.clear();
         File f = new File(propertyFileLocation);

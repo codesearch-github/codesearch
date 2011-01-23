@@ -18,12 +18,12 @@
  * You should have received a copy of the GNU General Public License
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.codesearch.commons.plugins.javacodeanalyzerplugin;
 
 import japa.parser.ast.ImportDeclaration;
 import japa.parser.ast.Node;
 import japa.parser.ast.body.ClassOrInterfaceDeclaration;
+import japa.parser.ast.body.MethodDeclaration;
 import japa.parser.ast.expr.ArrayAccessExpr;
 import japa.parser.ast.expr.AssignExpr;
 import japa.parser.ast.expr.BinaryExpr;
@@ -35,12 +35,13 @@ import japa.parser.ast.expr.NameExpr;
 import japa.parser.ast.expr.ObjectCreationExpr;
 import japa.parser.ast.expr.UnaryExpr;
 import japa.parser.ast.stmt.ExplicitConstructorInvocationStmt;
+import japa.parser.ast.stmt.IfStmt;
 import japa.parser.ast.stmt.ReturnStmt;
+import japa.parser.ast.stmt.TryStmt;
 import japa.parser.ast.type.ClassOrInterfaceType;
 import japa.parser.ast.visitor.VoidVisitorAdapter;
 import java.util.LinkedList;
 import java.util.List;
-import org.codesearch.commons.plugins.codeanalyzing.ast.Visibility;
 
 /**
  * a visitor used to visit the AST created by the JavaParser
@@ -120,15 +121,16 @@ public class UsageVisitor extends VoidVisitorAdapter {
             //first add a link to the method declaration
             util.addLinkToMethodDeclaration(n);
         } else {
-            if (n.getScope() instanceof NameExpr) {
-                if (!util.addLinkToVariableDeclaration(n.getBeginLine(), n.getBeginColumn(), n.getScope().toString(), n)) {
-                    util.addLinkToExternalClassDeclaration(n.getBeginLine(), n.getBeginColumn(), n.getScope().toString());
-                }
-            }
-            //         util.addLinkToExternalMethodDeclaration(n);
+            util.addLinkToVariableDeclaration(n.getBeginLine(), n.getBeginColumn(), n.getScope().toString(), n);
+            util.addLinkToExternalMethodDeclaration(n);
         }
     }
 
+    /**
+     * visits the ReturnStmt and in case the expression is a NameExpr adds a link to the variable
+     * @param n the ReturnStmt
+     * @param arg the parent node of the statement
+     */
     @Override
     public void visit(ReturnStmt n, Object arg) {
         super.visit(n, arg);
@@ -142,6 +144,11 @@ public class UsageVisitor extends VoidVisitorAdapter {
         }
     }
 
+    /**
+     * visits the ArrayAccessExpr and in case either the name or the index is a NameExpr adds a link to the variable
+     * @param n the ArrayAccessExpr
+     * @param arg the parent node of the expression
+     */
     @Override
     public void visit(ArrayAccessExpr n, Object arg) {
         super.visit(n, arg);
@@ -154,12 +161,22 @@ public class UsageVisitor extends VoidVisitorAdapter {
         }
     }
 
+    /**
+     * visits the ClassOrInteraceType and adds an ExternalUsage to the class declaration
+     * @param n the ClassOrInterfaceType
+     * @param arg the parent node of the type
+     */
     @Override
     public void visit(ClassOrInterfaceType n, Object arg) {
         super.visit(n, arg);
         util.addLinkToExternalClassDeclaration(n.getBeginLine(), n.getBeginColumn(), n.getName());
     }
 
+    /**
+     * visits the ObjectCreationExpression and in case one of the arguments is a NameExpr adds a link to the variable
+     * @param n the ObjectCreationExpr
+     * @param arg the parent node of the expression
+     */
     @Override
     public void visit(ObjectCreationExpr n, Object arg) {
         super.visit(n, arg);
@@ -172,6 +189,11 @@ public class UsageVisitor extends VoidVisitorAdapter {
         }
     }
 
+    /**
+     * visits the AssinExpr and in case either the target or the value is a NameExpr adds a link to the variable
+     * @param n the AssignExpr
+     * @param arg the parent node of the expression
+     */
     @Override
     public void visit(AssignExpr n, Object arg) {
         super.visit(n, arg);
@@ -185,6 +207,11 @@ public class UsageVisitor extends VoidVisitorAdapter {
         }
     }
 
+    /**
+     * visits the UnaryExpr and in case the expression is a NameExpr adds a link to the variable
+     * @param n the UnaryExpr
+     * @param arg the parent node of the expression
+     */
     @Override
     public void visit(UnaryExpr n, Object arg) {
         super.visit(n, arg);
@@ -194,6 +221,19 @@ public class UsageVisitor extends VoidVisitorAdapter {
         }
     }
 
+    @Override
+    public void visit(IfStmt n, Object arg) {
+        super.visit(n, arg);
+        if(n.getCondition() instanceof NameExpr){
+            util.addLinkToVariableDeclaration(n.getCondition().getBeginLine(), n.getCondition().getBeginColumn(), n.getCondition().toString(), n);
+        }
+    }
+
+    /**
+     * visits the ConditinoalExpr and in case the condition, the thenExpression or the elseExpression is a NameExpr adds a link to the variable
+     * @param n the ContitionalExpr
+     * @param arg the parent node of the statement
+     */
     @Override
     public void visit(ConditionalExpr n, Object arg) {
         super.visit(n, arg);
@@ -214,6 +254,12 @@ public class UsageVisitor extends VoidVisitorAdapter {
         }
     }
 
+    /**
+     * visits the FieldAccessExpr and in case the scope is a NameExpr adds a link to the variable
+     * if the variable is in another file adds an ExternalUsage
+     * @param n the FieldAccessExpr
+     * @param arg the parent node of the expression
+     */
     @Override
     public void visit(FieldAccessExpr n, Object arg) {
         super.visit(n, arg);
@@ -222,9 +268,13 @@ public class UsageVisitor extends VoidVisitorAdapter {
         } else {
             util.addLinkToExternalField(n, (Node) n.getData());
         }
-        //  util.addLinkToExternalVariableDeclaration(n.getBeginLine(), n.getBeginColumn(), n.getField(), n, n.getScope().toString());
     }
 
+    /**
+     * visits the BinaryExpr and in case the left or the right expression is a NameExpr adds a link to the variable
+     * @param n the BinaryExpr
+     * @param arg the parent node of the expression
+     */
     @Override
     public void visit(BinaryExpr n, Object arg) {
         super.visit(n, arg);
@@ -237,11 +287,26 @@ public class UsageVisitor extends VoidVisitorAdapter {
     }
 
     @Override
+    public void visit(MethodDeclaration n, Object arg) {
+        super.visit(n, arg);
+        if (n.getThrows() != null) {
+            for (NameExpr currentThrow : n.getThrows()) {
+                util.addLinkToExternalClassDeclaration(currentThrow.getBeginLine(), currentThrow.getBeginColumn(), currentThrow.getName());
+            }
+        }
+    }
+
+    /**
+     * visits the ClassOrInterfaceDeclaration and adds the type to the typeDeclarations of the file
+     * @param n the ClassOrInterfaceDeclaration
+     * @param arg the parent node of the declaration
+     */
+    @Override
     public void visit(ClassOrInterfaceDeclaration n, Object arg) {
         super.visit(n, arg);
-        if (util.getVisibilityFromModifier(n.getModifiers()) == Visibility.PUBLIC) {
-            this.typeDeclarations.add(this.packageName + "." + n.getName());
-        }
+        // if (util.getVisibilityFromModifier(n.getModifiers()) == Visibility.PUBLIC) {
+        this.typeDeclarations.add(this.packageName + "." + n.getName()); //FIXME
+        // }
     }
 
     public List<String> getTypeDeclarations() {
@@ -249,6 +314,7 @@ public class UsageVisitor extends VoidVisitorAdapter {
     }
 
     public List<String> getImports() {
+        imports.add(packageName + ".*");
         return imports;
     }
 }

@@ -188,6 +188,11 @@ public class XmlConfigurationReader {
         return repo;
     }
 
+    /**
+     * returns a list of all file name patterns that are listed to be ignored on the entire system
+     * @return the list of file names
+     * @throws ConfigurationException if the configuration could not be read or the value is not defined
+     */
     private List<String> getGloballyIgnoredFileNames() throws ConfigurationException {
         if (config == null) {
             loadConfigReader();
@@ -273,6 +278,12 @@ public class XmlConfigurationReader {
         return values;
     }
 
+    /**
+     * returns a list of the names of all repositories that are in the given group
+     * @param groupName the name of the group
+     * @return the list of the repositories
+     * @throws ConfigurationException if the configuration could not be read
+     */
     public List<String> getRepositoriesForGroup(String groupName) throws ConfigurationException {
         List<String> repos = new LinkedList<String>();
         for (RepositoryDto repo : getRepositories()) {
@@ -299,6 +310,9 @@ public class XmlConfigurationReader {
         this.configpath = configpath;
     }
 
+    /**
+     * resets the configpath and the XmlConfiguration object
+     */
     public void clearConfigurationReader() {
         this.configpath = null;
         this.config = null;
