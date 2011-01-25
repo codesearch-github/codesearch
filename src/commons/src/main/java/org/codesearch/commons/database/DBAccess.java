@@ -38,6 +38,7 @@ import org.apache.log4j.Logger;
 import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
 import org.codesearch.commons.configuration.xml.XmlConfigurationReaderConstants;
 import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
+import org.codesearch.commons.plugins.codeanalyzing.ast.ExternalUsage;
 import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
 
 /**
@@ -69,19 +70,23 @@ public class DBAccess {
     private static final String STMT_CLEAR_FILES_FOR_REPOSITORY = "DELETE FROM file WHERE repository_id = ?";
     private static final String STMT_GET_IMPORTS_FOR_FILE = "SELECT imports FROM file WHERE file_path = ? AND repository_id = ?";
 
-    private static void clearImportsForFile(int fileId) throws DatabaseAccessException {
-        if (connectionPool == null) {
-            setupConnections();
+    /**
+     * returns the usage at the given id for the file
+     * @param usageId the id of the usage in the file
+     * @param filePath the full name of the file
+     * @param repository the name of the repository holding the file
+     * @return the Usage
+     * @throws DatabaseAccessException
+     */
+    public static ExternalUsage getUsageForIdInFile(int usageId, String filePath, String repository) throws DatabaseAccessException{
+        ExternalUsage usage = null;
+        List<Usage> usageList = getUsagesForFile(filePath, repository);
+        try{
+            usage = (ExternalUsage) usageList.get(usageId);
+        } catch (ClassCastException ex){
+            throw new DatabaseAccessException("Usage at requested ID is no external usage");
         }
-        Connection conn = connectionPool.getConnection();
-        try {
-            PreparedStatement ps = conn.prepareStatement(STMT_CLEAR_IMPORTS_FOR_FILE);
-            ps.setInt(1, fileId);
-        } catch (SQLException ex) {
-            throw new DatabaseAccessException("SQLException while trying to access the database\n" + ex);
-        } finally {
-            connectionPool.releaseConnection(conn);
-        }
+        return usage;
     }
 
     /**
