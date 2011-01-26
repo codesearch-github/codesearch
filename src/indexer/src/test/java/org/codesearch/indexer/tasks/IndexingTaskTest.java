@@ -21,17 +21,19 @@
 
 package org.codesearch.indexer.tasks;
 
-import org.springframework.context.ApplicationContext;
-import org.springframework.beans.factory.annotation.Autowired;
-import java.util.List;
+import static org.junit.Assert.assertFalse;
+
 import java.util.LinkedList;
+import java.util.List;
+
 import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
+import org.codesearch.commons.configuration.xml.XmlConfigurationReaderConstants;
 import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 import org.codesearch.commons.database.DBAccess;
-import org.codesearch.commons.plugins.PluginLoader;
 import org.junit.Test;
-import static org.junit.Assert.*;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.GenericXmlContextLoader;
@@ -48,8 +50,6 @@ public class IndexingTaskTest {
     private IndexingTask task = new IndexingTask();
     @Autowired
     private ApplicationContext applicationContext;
-    @Autowired
-    private PluginLoader pluginLoader;
 
     public IndexingTaskTest() {
     }
@@ -89,14 +89,20 @@ public class IndexingTaskTest {
         XmlConfigurationReader pm = new XmlConfigurationReader();
         List<RepositoryDto> repos = pm.getRepositories();
 
+        
+        String indexLocation = pm.getSingleLinePropertyValue(XmlConfigurationReaderConstants.INDEX_LOCATION);
+
         ClearTask clear = (ClearTask) applicationContext.getBean("clearTask");
-       // clear.execute();
+        clear.setIndexLocation(indexLocation);
+        clear.setCodeAnalysisEnabled(true);
+        clear.execute();
         
         for (RepositoryDto repo : repos) {
             if (repo.getVersionControlSystem().equals("FILESYSTEM")) {
                 DBAccess.setLastAnalyzedRevisionOfRepository(repo.getName(), "0");
                 repo.setUrl(repo.getUrl().replace("$home", System.getProperty("user.home")));
                 IndexingTask t = (IndexingTask) applicationContext.getBean("indexingTask");
+                t.setIndexLocation(indexLocation);
            //     pr.setPropertyFileValue(repo.getName(), "0");
                 t.setRepository(repo);
                 t.setCodeAnalysisEnabled(true);

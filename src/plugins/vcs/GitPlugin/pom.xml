@@ -25,44 +25,10 @@
 
     <build>
         <plugins>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <configuration>
-                    <archive>
-                        <manifest>
-
-                        </manifest>
-                    </archive>
-                </configuration>
             </plugin>
-
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <configuration>
-                    <archive>
-                        <manifest>
-
-                        </manifest>
-
-                    </archive>
-                </configuration>
-
-            </plugin>
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-            </plugin>
-            <!-- <plugin>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin> -->
         </plugins>
     </build>
     <pluginRepositories>
@@ -78,11 +44,6 @@
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
-
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-        </dependency>
         
         <dependency>
             <groupId>commons-io</groupId>
@@ -95,6 +56,7 @@
             <artifactId>commons</artifactId>
             <version>0.1-SNAPSHOT</version>
         </dependency>
+        
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>

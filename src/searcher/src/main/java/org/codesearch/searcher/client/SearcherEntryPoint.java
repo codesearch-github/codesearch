@@ -18,6 +18,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.codesearch.searcher.client;
 
 import org.codesearch.searcher.client.ui.RootContainer;

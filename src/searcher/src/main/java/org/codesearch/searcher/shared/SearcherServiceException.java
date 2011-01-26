@@ -22,22 +22,22 @@
 package org.codesearch.searcher.shared;
 
 /**
- * Thrown when no valid index was found.
+ * Thrown when an error in the searcher service server backend occurs.
  * @author Samuel Kogler
  */
-public class InvalidIndexLocationException extends Exception {
+public class SearcherServiceException extends Exception {
 
     /**
-     * Creates a new instance of <code>InvalidIndexLocationException</code> without detail message.
+     * Creates a new instance of <code>SearcherServiceException</code> without detail message.
      */
-    public InvalidIndexLocationException() {
+    public SearcherServiceException() {
     }
 
     /**
-     * Constructs an instance of <code>InvalidIndexLocationException</code> with the specified detail message.
+     * Constructs an instance of <code>SearcherServiceException</code> with the specified detail message.
      * @param msg the detail message.
      */
-    public InvalidIndexLocationException(String msg) {
+    public SearcherServiceException(String msg) {
         super(msg);
     }
 }

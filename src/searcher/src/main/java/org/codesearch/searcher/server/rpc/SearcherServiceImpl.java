@@ -25,11 +25,13 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.LinkedList;
 import java.util.List;
+
 import net.sf.jmimemagic.Magic;
 import net.sf.jmimemagic.MagicException;
 import net.sf.jmimemagic.MagicMatch;
 import net.sf.jmimemagic.MagicMatchNotFoundException;
 import net.sf.jmimemagic.MagicParseException;
+
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
 import org.apache.lucene.queryParser.ParseException;
@@ -47,11 +49,11 @@ import org.codesearch.commons.plugins.highlighting.HighlightingPluginException;
 import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
 import org.codesearch.commons.plugins.vcs.VersionControlPluginException;
 import org.codesearch.commons.utils.MimeTypeUtil;
-
 import org.codesearch.searcher.client.rpc.SearcherService;
 import org.codesearch.searcher.server.DocumentSearcher;
+import org.codesearch.searcher.server.InvalidIndexException;
 import org.codesearch.searcher.shared.FileDto;
-import org.codesearch.searcher.shared.InvalidIndexLocationException;
+import org.codesearch.searcher.shared.SearcherServiceException;
 import org.codesearch.searcher.shared.OutlineNode;
 import org.codesearch.searcher.shared.SearchResultDto;
 import org.codesearch.searcher.shared.SidebarNode;
@@ -72,8 +74,6 @@ public class SearcherServiceImpl extends AutowiringRemoteServiceServlet implemen
     private DocumentSearcher documentSearcher;
     @Autowired
     private XmlConfigurationReader xmlConfigurationReader;
-    @Autowired
-    private PluginLoader pluginLoader;
     private List<String> repositories;
     private List<String> repositoryGroups;
 
@@ -95,43 +95,25 @@ public class SearcherServiceImpl extends AutowiringRemoteServiceServlet implemen
 
     /** {@inheritDoc} */
     @Override
-    public List<SearchResultDto> doSearch(String query, boolean caseSensitive, List<String> selectedRepositories, List<String> selectedRepositoryGroups) throws InvalidIndexLocationException {
+    public List<SearchResultDto> doSearch(String query, boolean caseSensitive, List<String> selectedRepositories, List<String> selectedRepositoryGroups) throws SearcherServiceException {
         List<SearchResultDto> resultItems = new LinkedList<SearchResultDto>();
         try {
             resultItems = documentSearcher.search(query, caseSensitive, selectedRepositories, selectedRepositoryGroups);
         } catch (ParseException ex) {
-            LOG.error("Could not parse query: " + ex);
+            throw new SearcherServiceException("Invalid search query: \n" + ex);
         } catch (IOException ex) {
-            LOG.error(ex);
+            throw new SearcherServiceException("Exception searching the index: \n" + ex);
         } catch (ConfigurationException ex) {
-            LOG.error(ex);
+            throw new SearcherServiceException("Invalid configuration: \n" + ex);
+        } catch (InvalidIndexException ex) {
+            throw new SearcherServiceException("Invalid index: \n" + ex);
         }
         return resultItems;
     }
 
-    public void setDocumentSearcher(DocumentSearcher documentSearcher) {
-        this.documentSearcher = documentSearcher;
-    }
-
-    public void setXmlConfigurationReader(XmlConfigurationReader xmlConfigurationReader) {
-        this.xmlConfigurationReader = xmlConfigurationReader;
-    }
-
     /** {@inheritDoc} */
     @Override
-    public List<String> getAvailableRepositoryGroups() {
-        return repositoryGroups;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public List<String> getAvailableRepositories() {
-        return repositories;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public FileDto getFile(String repository, String filePath) {
+    public FileDto getFile(String repository, String filePath) throws SearcherServiceException {
         LOG.debug("Retrieving file content for file: " + filePath + " @ " + repository);
         FileDto file = new FileDto();
         try {
@@ -144,7 +126,7 @@ public class SearcherServiceImpl extends AutowiringRemoteServiceServlet implemen
             file.setBinary(MimeTypeUtil.isBinaryType(guessedMimeType));
 
             RepositoryDto repositoryDto = xmlConfigurationReader.getRepositoryByName(repository);
-            VersionControlPlugin vcPlugin = pluginLoader.getPlugin(VersionControlPlugin.class, repositoryDto.getVersionControlSystem());
+            VersionControlPlugin vcPlugin = PluginLoader.getPlugin(VersionControlPlugin.class, repositoryDto.getVersionControlSystem());
 
             vcPlugin.setRepository(new URI(repositoryDto.getUrl()), repositoryDto.getUsername(), repositoryDto.getPassword());
             org.codesearch.commons.plugins.vcs.FileDto vcFile = vcPlugin.getFileForFilePath(filePath);
@@ -164,7 +146,7 @@ public class SearcherServiceImpl extends AutowiringRemoteServiceServlet implemen
                 }
 
             } catch (DatabaseAccessException ex) {
-                LOG.error("Could not access database " + ex);
+                LOG.error("Could not access database: \n" + ex);
             }
             if (MimeTypeUtil.UNKNOWN.equals(guessedMimeType)) {
                 MagicMatch magicMatch;
@@ -184,7 +166,7 @@ public class SearcherServiceImpl extends AutowiringRemoteServiceServlet implemen
             }
 
             try {
-                HighlightingPlugin hlPlugin = pluginLoader.getPlugin(HighlightingPlugin.class, guessedMimeType);
+                HighlightingPlugin hlPlugin = PluginLoader.getPlugin(HighlightingPlugin.class, guessedMimeType);
                 String highlightingEscapeStartToken = hlPlugin.getEscapeStartToken();
                 String highlightingEscapeEndToken = hlPlugin.getEscapeEndToken();
                 byte[] parsedFileContent = addUsageLinksToFileContent(vcFile.getContent(), filePath, repository, highlightingEscapeStartToken, highlightingEscapeEndToken);
@@ -196,16 +178,54 @@ public class SearcherServiceImpl extends AutowiringRemoteServiceServlet implemen
         } catch (HighlightingPluginException ex) {
             LOG.error(ex);
         } catch (URISyntaxException ex) {
-            LOG.error(ex);
+            throw new SearcherServiceException("Invalid url syntax: \n" + ex);
         } catch (VersionControlPluginException ex) {
-            LOG.error(ex);
+            throw new SearcherServiceException("Could not get file: \n" + ex);
         } catch (ConfigurationException ex) {
-            LOG.error(ex);
+            throw new SearcherServiceException("Configuration error: \n" + ex);
         } catch (PluginLoaderException ex) {
-            LOG.error(ex);
+            throw new SearcherServiceException("Problem loading plugin: \n" + ex);
         }
         LOG.debug("Finished retrieving file content for file: " + filePath + " @ " + repository);
         return file;
+    }
+
+    @Override
+    public FileDto getFileForUsageInFile(int usageId, String repository, String filePath) throws SearcherServiceException {
+        LOG.debug("Looking up usage: " + usageId + " in file: " + filePath + "@" + repository);
+        try {
+            ExternalUsage usage = DBAccess.getUsageForIdInFile(usageId, filePath, repository);
+            LOG.debug(usage.getTargetClassName());
+            LOG.debug(usage.getTargetFilePath());
+            if (usage.getTargetFilePath() != null) {
+                FileDto file = getFile(repository, usage.getTargetFilePath());
+                file.setFocusLine(usage.getStartLine());
+                return file;
+            }
+        } catch (DatabaseAccessException ex) {
+            LOG.error(ex);
+        }
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public List<String> getAvailableRepositoryGroups() {
+        return repositoryGroups;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public List<String> getAvailableRepositories() {
+        return repositories;
+    }
+
+    public void setDocumentSearcher(DocumentSearcher documentSearcher) {
+        this.documentSearcher = documentSearcher;
+    }
+
+    public void setXmlConfigurationReader(XmlConfigurationReader xmlConfigurationReader) {
+        this.xmlConfigurationReader = xmlConfigurationReader;
     }
 
     private OutlineNode convertAstNodeToOutlineNode(AstNode astNode) {
@@ -249,8 +269,7 @@ public class SearcherServiceImpl extends AutowiringRemoteServiceServlet implemen
                         if (currentUsage instanceof ExternalUsage) {
                             javaScriptEvent = "goToUsage(" + usageIndex + ");";
                         } else {
-                            int referenceLine = currentUsage.getReferenceLine();
-                            javaScriptEvent = "goToLine(" + (referenceLine + 1) + ");";
+                            javaScriptEvent = "goToLine(" + currentUsage.getReferenceLine() + ");";
                         }
                         String anchorBegin = hlEscapeStartToken + "<a class='testLink' onclick='" + javaScriptEvent + "'>" + hlEscapeEndToken;
                         String anchorEnd = hlEscapeStartToken + "</a>" + hlEscapeEndToken;
@@ -270,10 +289,5 @@ public class SearcherServiceImpl extends AutowiringRemoteServiceServlet implemen
             LOG.error(ex);
         }
         return fileContentBytes;
-    }
-
-    public List<String> getSearchTermSuggestions(String searchTerm){
-        
-        return null;
     }
 }

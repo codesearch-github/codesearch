@@ -18,9 +18,9 @@
  * You should have received a copy of the GNU General Public License
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.codesearch.indexer.tasks;
 
+import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 import org.codesearch.indexer.exceptions.TaskExecutionException;
 
 /**
@@ -34,5 +34,23 @@ public interface Task {
      * executes the task
      * @throws TaskExecutionException if the execution of the task failed
      */
-    public void execute()throws TaskExecutionException;
+    void execute() throws TaskExecutionException;
+
+    /**
+     * Sets the repository this task should handle.
+     * @param repository The repository
+     */
+    void setRepository(RepositoryDto repository);
+
+    /**
+     * Sets whether code analysis is enabled.
+     * @param codeAnalysisEnabled Whether code analysis is enabled
+     */
+    void setCodeAnalysisEnabled(boolean codeAnalysisEnabled);
+
+    /**
+     * Sets the location of the index.
+     * @param indexLocation The index location
+     */
+    void setIndexLocation(String indexLocation);
 }

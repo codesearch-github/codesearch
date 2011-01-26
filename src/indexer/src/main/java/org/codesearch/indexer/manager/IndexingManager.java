@@ -22,6 +22,7 @@ package org.codesearch.indexer.manager;
 
 import java.util.Date;
 import java.util.List;
+
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
 import org.codesearch.commons.configuration.xml.XmlConfigurationReader;

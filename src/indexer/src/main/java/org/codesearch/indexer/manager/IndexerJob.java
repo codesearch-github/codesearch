@@ -23,13 +23,12 @@ package org.codesearch.indexer.manager;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.codesearch.commons.configuration.xml.dto.TaskDto;
 import org.codesearch.indexer.core.IndexerMain;
-import org.codesearch.indexer.tasks.IndexingTask;
-import org.codesearch.indexer.tasks.Task;
 import org.codesearch.indexer.exceptions.TaskExecutionException;
-import org.codesearch.indexer.tasks.ClearTask;
+import org.codesearch.indexer.tasks.Task;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -39,6 +38,7 @@ import org.springframework.context.ApplicationContext;
  * An indexerJob stores one or more tasks and controls their execution
  * @author Stiboller Stephan
  * @author David Froehlich
+ * @author Samuel Kogler
  */
 public class IndexerJob implements Job {
 
@@ -64,33 +64,28 @@ public class IndexerJob implements Job {
         Task task = null;
         Date startDate = new Date();
         for (int i = 0; i < taskList.size(); i++) {
-            TaskDto taskDto = taskList.get(i);
-            if (terminated) {
-                throw new JobExecutionException("Job was terminated after successful execution of " + i + " of " + taskList.size() + " jobs");
-            }
-            switch (taskDto.getType()) {
-                case index: {
-                    task = (Task) applicationContext.getBean("indexingTask");
-                    ((IndexingTask) task).setRepository(taskDto.getRepository());
-                    break;
-                }
-                case clear: {
-                    task = (Task) applicationContext.getBean("clearTask");
-                    ((ClearTask) task).setRepositoryName(taskDto.getRepository().getName());
-                    break;
-                }
-                case codeAnalysis: {
-                    task = (Task) applicationContext.getBean("indexingTask"); //TODO add bean with correct setting for codeAnalysisEnabled
-                    ((IndexingTask) task).setRepository(taskDto.getRepository());
-                    ((IndexingTask) task).setCodeAnalysisEnabled(true);
-                }
-            }
             try {
+                TaskDto taskDto = taskList.get(i);
+                if (terminated) {
+                    throw new JobExecutionException("Job was terminated after successful execution of " + i + " of " + taskList.size() + " tasks");
+                }
+                switch (taskDto.getType()) {
+                    case index: {
+                        task = (Task) applicationContext.getBean("indexingTask");
+                        break;
+                    }
+                    case clear: {
+                        task = (Task) applicationContext.getBean("clearTask");
+                        break;
+                    }
+                }
+                task.setCodeAnalysisEnabled(taskDto.isCodeAnalysisEnabled());
                 task.execute();
+                LOG.debug("Finished execution of job in " + (new Date().getTime() - startDate.getTime()) / 1000f + " seconds");
+
             } catch (TaskExecutionException ex) {
                 throw new JobExecutionException("Execution of Task number " + i + " threw an exception" + ex);
             }
         }
-        LOG.debug("Finished execution of job in " + (new Date().getTime() - startDate.getTime()) / 1000f + " seconds");
     }
 }

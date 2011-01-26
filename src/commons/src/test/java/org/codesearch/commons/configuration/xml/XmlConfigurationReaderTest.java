@@ -20,17 +20,20 @@
  */
 package org.codesearch.commons.configuration.xml;
 
-import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
-import org.codesearch.commons.configuration.xml.dto.JobDto;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.util.GregorianCalendar;
-import org.apache.commons.configuration.ConfigurationException;
 import java.util.LinkedList;
 import java.util.List;
+
+import org.apache.commons.configuration.ConfigurationException;
+import org.codesearch.commons.configuration.xml.dto.JobDto;
+import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
+import org.codesearch.commons.configuration.xml.dto.TaskDto;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.codesearch.commons.configuration.xml.dto.TaskDto;
-import static org.junit.Assert.*;
 
 /**
  *
@@ -142,12 +145,12 @@ public class XmlConfigurationReaderTest {
         ignFileNames2.add("*.class*");
         RepositoryDto repo2 = new RepositoryDto("svn_local", System.getProperty("user.home")+"/workspace/svnsearch", "null", "null", true, "FILESYSTEM", ignFileNames2, repoGroups2);
 
-        job1.getTasks().add(new TaskDto(repo1, TaskDto.TaskType.index));
+        job1.getTasks().add(new TaskDto(repo1, TaskDto.TaskType.index, true));
         job1.setInterval(60);
         job1.setStartDate(new GregorianCalendar(2010, 7, 13, 18, 0));
         JobDto job2 = new JobDto();
 
-        job2.getTasks().add(new TaskDto(null, TaskDto.TaskType.clear));
+        job2.getTasks().add(new TaskDto(null, TaskDto.TaskType.clear, true));
 
         job2.setInterval(10080);
         job2.setStartDate(new GregorianCalendar(2010, 7, 11, 18, 0));

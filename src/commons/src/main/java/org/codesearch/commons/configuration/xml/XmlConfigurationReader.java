@@ -26,6 +26,7 @@ import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
+
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.SubnodeConfiguration;
@@ -101,26 +102,17 @@ public class XmlConfigurationReader {
 
                 for (SubnodeConfiguration sc : subConf) {
                     TaskType type = null;
-                    if (sc.getString(XmlConfigurationReaderConstants.TASK_TYPE).equals("index")) { //TODO replace with a more generic method
-                        try {
-                            if (sc.getBoolean(XmlConfigurationReaderConstants.CODE_NAVIGATION_ENABLED)) {
-                                type = TaskType.codeAnalysis;
-                            } else {
-                                type = TaskType.index;
-                            }
-                        } catch (NoSuchElementException ex) {
-                            type = TaskType.index;
-                        }
-                    } else if (sc.getString(XmlConfigurationReaderConstants.TASK_TYPE).equals("index")) {
+                    boolean codeAnalysisEnabled = sc.getBoolean(XmlConfigurationReaderConstants.CODE_NAVIGATION_ENABLED);
+                    if (sc.getString(XmlConfigurationReaderConstants.TASK_TYPE).equals("index")) {
                         type = TaskType.index;
                     } else if (sc.getString(XmlConfigurationReaderConstants.TASK_TYPE).equals("clear")) {
                         type = TaskType.clear;
                     }
                     if (type == TaskType.clear && repositoryString == null) {
-                        tasks.add(new TaskDto(null, type));
+                        tasks.add(new TaskDto(null, type, codeAnalysisEnabled));
                     } else {
                         for (RepositoryDto repository : repositoriesForJob) {
-                            tasks.add(new TaskDto(repository, type));
+                            tasks.add(new TaskDto(repository, type, codeAnalysisEnabled));
                         }
                     }
                 }

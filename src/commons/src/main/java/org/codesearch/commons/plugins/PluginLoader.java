@@ -20,46 +20,41 @@
  */
 package org.codesearch.commons.plugins;
 
-import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.ServiceLoader;
 
 /**
  * A class that provides access to dynamically loaded plugins.
+ * 
  * @author Stiboller Stephan
  * @author David Froehlich
  * @author Samuel Kogler
  */
 public class PluginLoader {
 
-    /** The list of all plugins that have been loaded. */
-    @Autowired
-    private List<Plugin> loadedPlugins;
-
-    public PluginLoader() {
+    private PluginLoader() {
     }
 
     /**
-     * returns a plugin for the given purpose.
-     * Searches through all loaded plugins and finds the one with the given purpose.
+     * returns a plugin for the given purpose. Searches through all loaded plugins and finds the one with the given
+     * purpose.
+     * 
      * @param purpose the purpose of the plugin
      * @return the plugin matching the purpose
      * @throws Exception if no plugin was found with the purpose
      */
-    public <T extends Plugin> T getPlugin(final Class clazz, final String purpose) throws PluginLoaderException {
-        for (Plugin plugin : loadedPlugins) {
+    @SuppressWarnings("unchecked")
+    public static <T extends Plugin> T getPlugin(final Class<T> clazz, final String purpose)
+            throws PluginLoaderException {
+        ServiceLoader<T> serviceLoader = ServiceLoader.load(clazz);
+        for (Plugin plugin : serviceLoader) {
             String[] purposes = plugin.getPurposes().split(" ");
             for (String s : purposes) {
                 if (s.equalsIgnoreCase(purpose)) {
-                    if (clazz.isInstance(plugin)) {
-                        return (T) plugin;
-                    }
+                    return (T) plugin;
                 }
             }
         }
-        throw new PluginLoaderException("No Plugin found for purpose: " + purpose + " and Class: " + clazz);
-    }
 
-    public void setLoadedPlugins(List<Plugin> loadedPlugins) {
-        this.loadedPlugins = loadedPlugins;
+        throw new PluginLoaderException("No Plugin found for purpose: " + purpose + " and Class: " + clazz);
     }
 }

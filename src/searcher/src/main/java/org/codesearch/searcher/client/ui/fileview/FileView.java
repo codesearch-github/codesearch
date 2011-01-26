@@ -21,10 +21,12 @@
 
 package org.codesearch.searcher.client.ui.fileview;
 
+import java.util.List;
+
+import org.codesearch.searcher.shared.OutlineNode;
+
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.IsWidget;
-import java.util.List;
-import org.codesearch.searcher.shared.OutlineNode;
 
 /**
  * View that can display a file.
@@ -32,6 +34,9 @@ import org.codesearch.searcher.shared.OutlineNode;
  */
 public interface FileView extends IsWidget {
 
+    /**
+     * Resets the state of the view.
+     */
     void cleanup();
 
     /**
@@ -65,13 +70,27 @@ public interface FileView extends IsWidget {
      * @param presenter The presenter
      */
     void setPresenter(FileView.Presenter presenter);
-    
+
+    /**
+     * Connects event handlers for hotkeys.
+     */
     void connectEventHandlers();
 
+    /**
+     * Disconnects event handlers for hotkeys.
+     */
     void disconnectEventHandlers();
+
+    /**
+     * Ensures that the specified line is shown in the file view
+     * and highlights the line.
+     * @param lineNumber The specified line
+     */
+    void goToLine(int lineNumber);
 
     
     interface Presenter {
         void goTo(Place place);
+        void goToUsage(int usageId);
     }
 }

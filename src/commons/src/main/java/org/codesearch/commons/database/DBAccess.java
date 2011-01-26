@@ -20,7 +20,6 @@
  */
 package org.codesearch.commons.database;
 
-import com.mysql.jdbc.Statement;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -29,10 +28,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
 import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
@@ -40,6 +37,8 @@ import org.codesearch.commons.configuration.xml.XmlConfigurationReaderConstants;
 import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
 import org.codesearch.commons.plugins.codeanalyzing.ast.ExternalUsage;
 import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
+
+import com.mysql.jdbc.Statement;
 
 /**
  * DBUtils provides methods for access to the database specified in the configuration
@@ -69,6 +68,7 @@ public class DBAccess {
     private static final String STMT_CLEAR_TYPES_FOR_REPOSITORY = "DELETE FROM type WHERE repo_id = ?";
     private static final String STMT_CLEAR_FILES_FOR_REPOSITORY = "DELETE FROM file WHERE repository_id = ?";
     private static final String STMT_GET_IMPORTS_FOR_FILE = "SELECT imports FROM file WHERE file_path = ? AND repository_id = ?";
+    private static final String STMT_RESET_REPOSITORY_REVISIONS = "UPDATE repository SET last_analyzed_revision = '0'";
 
     /**
      * returns the usage at the given id for the file
@@ -78,12 +78,12 @@ public class DBAccess {
      * @return the Usage
      * @throws DatabaseAccessException
      */
-    public static ExternalUsage getUsageForIdInFile(int usageId, String filePath, String repository) throws DatabaseAccessException{
+    public static ExternalUsage getUsageForIdInFile(int usageId, String filePath, String repository) throws DatabaseAccessException {
         ExternalUsage usage = null;
         List<Usage> usageList = getUsagesForFile(filePath, repository);
-        try{
+        try {
             usage = (ExternalUsage) usageList.get(usageId);
-        } catch (ClassCastException ex){
+        } catch (ClassCastException ex) {
             throw new DatabaseAccessException("Usage at requested ID is no external usage");
         }
         return usage;
@@ -399,6 +399,21 @@ public class DBAccess {
             PreparedStatement ps = conn.prepareStatement(STMT_SET_LAST_ANALYZED_REVISION_OF_REPOSITORY);
             ps.setString(1, revision);
             ps.setString(2, repositoryName);
+            ps.execute();
+        } catch (SQLException ex) {
+            throw new DatabaseAccessException("SQLException while trying to access the database\n" + ex);
+        } finally {
+            connectionPool.releaseConnection(conn);
+        }
+    }
+
+    public static void resetLastAnalyzedRevision() throws DatabaseAccessException {
+        if (connectionPool == null) {
+            setupConnections();
+        }
+        Connection conn = connectionPool.getConnection();
+        try {
+            PreparedStatement ps = conn.prepareStatement(STMT_RESET_REPOSITORY_REVISIONS);
             ps.execute();
         } catch (SQLException ex) {
             throw new DatabaseAccessException("SQLException while trying to access the database\n" + ex);

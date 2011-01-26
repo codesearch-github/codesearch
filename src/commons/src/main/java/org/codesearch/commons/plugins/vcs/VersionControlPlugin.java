@@ -24,6 +24,7 @@ package org.codesearch.commons.plugins.vcs;
 import java.net.URI;
 import java.util.List;
 import java.util.Set;
+
 import org.codesearch.commons.plugins.Plugin;
 
 /**

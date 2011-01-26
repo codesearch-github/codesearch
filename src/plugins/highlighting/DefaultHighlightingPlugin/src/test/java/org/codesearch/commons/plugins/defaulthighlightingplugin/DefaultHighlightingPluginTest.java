@@ -19,42 +19,23 @@
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package org.codesearch.commons.plugins.defaulthighlightingplugin;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import junit.framework.TestCase;
-import org.codesearch.commons.utils.MimeTypeUtil;
-
+import org.junit.Test;
 
 /**
  *
  * @author David Froehlich
  */
-public class DefaultHighlightingPluginTest extends TestCase {
-    DefaultHighlightingPlugin plugin = new DefaultHighlightingPlugin();
-    public DefaultHighlightingPluginTest(String testName) {
-        super(testName);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-    }
+public class DefaultHighlightingPluginTest {
+    private DefaultHighlightingPlugin plugin = new DefaultHighlightingPlugin();
 
     /**
      * Test of parseToHtml method, of class JavaHighlightingPlugin.
      */
+    @Test
     public void testParseToHtml() throws Exception {
         BufferedReader br = new BufferedReader(new FileReader("/home/david/workspace/svnsearch/WakMusic/src/java/servlets/AddEvent.java"));
         String input = "";

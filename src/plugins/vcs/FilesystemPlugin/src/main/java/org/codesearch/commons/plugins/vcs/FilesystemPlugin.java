@@ -29,13 +29,11 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.springframework.stereotype.Component;
 
 /**
  * A VersionControlPlugin used to access files from the file system
  * @author David Froehlich
  */
-@Component
 public class FilesystemPlugin implements VersionControlPlugin {
 
     /** the folder where all code files are located */

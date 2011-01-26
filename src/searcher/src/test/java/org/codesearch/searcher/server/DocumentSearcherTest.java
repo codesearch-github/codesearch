@@ -25,19 +25,22 @@
  */
 package org.codesearch.searcher.server;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.apache.commons.configuration.ConfigurationException;
 import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
-import org.codesearch.searcher.shared.SearchResultDto;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  *

@@ -30,15 +30,18 @@ public class TaskDto {
     private RepositoryDto repository;
     /** The type of the task, for instance clear for clearing the entire index, and so on */
     private TaskType type;
+    /** Whether code analysis is enabled for this task. */
+    private boolean codeAnalysisEnabled;
 
     /**
      * Creates a new TaskDto with the given repositoryNames and the type
      * @param repositoryNames the repositories this task affects
      * @param type the type of task
      */
-    public TaskDto(RepositoryDto repository, TaskType type) {
+    public TaskDto(RepositoryDto repository, TaskType type, boolean codeAnalysisEnabled) {
         this.repository = repository;
         this.type = type;
+        this.codeAnalysisEnabled = codeAnalysisEnabled;
     }
 
     public RepositoryDto getRepository() {
@@ -57,11 +60,18 @@ public class TaskDto {
         this.type = type;
     }
 
+    public boolean isCodeAnalysisEnabled() {
+        return codeAnalysisEnabled;
+    }
+
+    public void setCodeAnalysisEnabled(boolean codeAnalysisEnabled) {
+        this.codeAnalysisEnabled = codeAnalysisEnabled;
+    }
+
     /**
      * Indicates a type for the Task, depending on the type a different Task object will be created in the IndexingManager
      */
     public enum TaskType {
-        codeAnalysis, //Indexes the specified repository incrementally and adds code-navigation-specific fields
         clear, //Clears the entire index
         index //indexes the specified repository incrementally
     }

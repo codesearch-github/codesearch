@@ -21,12 +21,14 @@
 
 package org.codesearch.searcher.server.rpc;
 
-import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
+
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 /**
  * Convenience class that enables spring autowiring for a gwt service servlet.

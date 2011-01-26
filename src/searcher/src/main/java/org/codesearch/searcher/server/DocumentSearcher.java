@@ -20,11 +20,11 @@
  */
 package org.codesearch.searcher.server;
 
-import org.codesearch.searcher.shared.InvalidIndexLocationException;
 import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.WhitespaceAnalyzer;
@@ -37,9 +37,10 @@ import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
-import org.codesearch.commons.configuration.xml.XmlConfigurationReaderConstants;
 import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
+import org.codesearch.commons.configuration.xml.XmlConfigurationReaderConstants;
 import org.codesearch.commons.constants.IndexConstants;
+import org.codesearch.searcher.shared.SearcherServiceException;
 import org.codesearch.searcher.shared.SearchResultDto;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -82,7 +83,7 @@ public class DocumentSearcher {
         queryParserCaseSensitive.setLowercaseExpandedTerms(false);
         try {
             initSearcher();
-        } catch (InvalidIndexLocationException ex) {
+        } catch (InvalidIndexException ex) {
             LOG.warn(ex);
             LOG.warn("Will try to re-initialize searcher at the first search operation");
         }
@@ -97,17 +98,17 @@ public class DocumentSearcher {
      * @throws IOException if the Index could not be read
      */
     //TODO rename method
-    public List<SearchResultDto> search(String searchString, boolean caseSensitive, List<String> repositoryNames, List<String> repositoryGroupNames) throws ParseException, IOException, InvalidIndexLocationException, ConfigurationException {
+    public List<SearchResultDto> search(String searchString, boolean caseSensitive, List<String> repositoryNames, List<String> repositoryGroupNames) throws ParseException, IOException, InvalidIndexException, ConfigurationException {
         return performLuceneSearch(searchString, caseSensitive, repositoryNames, repositoryGroupNames, 1000);
     }
 
-    public List<String> suggestSearchNames(String searchString, boolean caseSensitive, List<String> repositoryNames, List<String> repositoryGroupNames) throws ParseException, IOException, InvalidIndexLocationException, ConfigurationException {
+    public List<String> suggestSearchNames(String searchString, boolean caseSensitive, List<String> repositoryNames, List<String> repositoryGroupNames) throws ParseException, IOException, InvalidIndexException, ConfigurationException {
         List<SearchResultDto> results = performLuceneSearch(searchString, caseSensitive, repositoryNames, repositoryGroupNames, 10);
         
         return null;
     }
 
-    private List<SearchResultDto> performLuceneSearch(String searchString, boolean caseSensitive, List<String> repositoryNames, List<String> repositoryGroupNames, int maxResults) throws ParseException, IOException, InvalidIndexLocationException, ConfigurationException {
+    private List<SearchResultDto> performLuceneSearch(String searchString, boolean caseSensitive, List<String> repositoryNames, List<String> repositoryGroupNames, int maxResults) throws ParseException, IOException, InvalidIndexException, ConfigurationException {
         if (!searcherInitialized) {
             initSearcher();
         }
@@ -176,13 +177,13 @@ public class DocumentSearcher {
         return query + repoQuery.toString();
     }
 
-    private void initSearcher() throws InvalidIndexLocationException {
+    private void initSearcher() throws InvalidIndexException {
         try {
             indexSearcher = new IndexSearcher(FSDirectory.open(new File(indexLocation)), true);
             searcherInitialized = true;
         } catch (IOException exc) {
             searcherInitialized = false;
-            throw new InvalidIndexLocationException("No valid index found at: " + indexLocation + "\n" + exc);
+            throw new InvalidIndexException("No valid index found at: " + indexLocation + "\n" + exc);
         }
     }
 }

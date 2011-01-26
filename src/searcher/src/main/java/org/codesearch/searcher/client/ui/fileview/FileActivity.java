@@ -21,17 +21,19 @@
 
 package org.codesearch.searcher.client.ui.fileview;
 
-import com.google.gwt.activity.shared.AbstractActivity;
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.place.shared.Place;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import org.codesearch.searcher.client.ClientFactory;
 import org.codesearch.searcher.client.rpc.SearcherService;
 import org.codesearch.searcher.client.rpc.SearcherServiceAsync;
 import org.codesearch.searcher.client.ui.fileview.FileView.Presenter;
 import org.codesearch.searcher.shared.FileDto;
+
+import com.google.gwt.activity.shared.AbstractActivity;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.place.shared.Place;
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.AcceptsOneWidget;
 
 /**
  * Presenter for the file view.
@@ -51,29 +53,20 @@ public class FileActivity extends AbstractActivity implements Presenter {
         this.filePath = filePath;
     }
 
-    /**
-     * Starts the activity.
-     * @param panel
-     * @param eventBus
-     */
     /** {@inheritDoc} */
     @Override
     public void start(AcceptsOneWidget panel, EventBus eventBus) {
         fileView = clientFactory.getFileView();
-        fileView.setPresenter(this);
         fileView.cleanup();
+        fileView.setPresenter(this);
         fileView.setFilePath(filePath);
         fileView.setRepository(repository);
         fileView.connectEventHandlers();
-        panel.setWidget(fileView.asWidget());
         fileView.setFileContent("loading file...", true);
+        panel.setWidget(fileView.asWidget());
         searcherServiceAsync.getFile(repository, filePath, new GetFileCallback());
     }
 
-    /**
-     * Navigate to a new place.
-     * @param place
-     */
     /** {@inheritDoc} */
     @Override
     public void goTo(Place place) {
@@ -81,12 +74,17 @@ public class FileActivity extends AbstractActivity implements Presenter {
         clientFactory.getPlaceController().goTo(place);
     }
 
+    @Override
+    public void goToUsage(int usageId) {
+        searcherServiceAsync.getFileForUsageInFile(usageId, repository, filePath, new GetFileCallback());
+    }
+
     private class GetFileCallback implements AsyncCallback<FileDto>  {
 
         /** {@inheritDoc} */
         @Override
         public void onFailure(Throwable caught) {
-            fileView.setFileContent("Error getting file:\n" + caught.toString(), true);
+            Window.alert("Error getting file: \n" + caught.toString());
         }
 
         /** {@inheritDoc} */
@@ -95,6 +93,7 @@ public class FileActivity extends AbstractActivity implements Presenter {
             fileView.cleanup();
             fileView.setFileContent(result.getFileContent(), result.isBinary());
             fileView.setOutline(result.getOutline());
+            fileView.goToLine(result.getFocusLine());
         }
 
     }

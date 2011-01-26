@@ -22,13 +22,14 @@
 
 package org.codesearch.searcher.client;
 
-import com.google.gwt.activity.shared.Activity;
-import com.google.gwt.activity.shared.ActivityMapper;
-import com.google.gwt.place.shared.Place;
 import org.codesearch.searcher.client.ui.fileview.FileActivity;
 import org.codesearch.searcher.client.ui.fileview.FilePlace;
 import org.codesearch.searcher.client.ui.searchview.SearchActivity;
 import org.codesearch.searcher.client.ui.searchview.SearchPlace;
+
+import com.google.gwt.activity.shared.Activity;
+import com.google.gwt.activity.shared.ActivityMapper;
+import com.google.gwt.place.shared.Place;
 
 /**
  * Manages activities in the searcher.

@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.codesearch.commons.plugins.bazaar;
+package org.codesearch.commons.plugins.vcs;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
@@ -29,11 +29,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.apache.log4j.Logger;
-import org.codesearch.commons.plugins.vcs.FileDto;
-import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
-import org.codesearch.commons.plugins.vcs.VersionControlPluginException;
-import org.commons.codesearch.utils.bazaar.BazaarUtils;
-import org.springframework.stereotype.Component;
+import org.codesearch.commons.plugins.vcs.utils.BazaarUtils;
 import org.vcs.bazaar.client.IBazaarLogMessage;
 import org.vcs.bazaar.client.IBazaarStatus;
 import org.vcs.bazaar.client.core.BazaarClientException;
@@ -43,7 +39,6 @@ import org.vcs.bazaar.client.core.BranchLocation;
  * A plugin used to access files stored in Bazaar repositories.
  * @author Stephan Stiboller
  */
-@Component
 public class BazaarPlugin implements VersionControlPlugin {
 
     private BazaarUtils bzr_util;
@@ -131,5 +126,10 @@ public class BazaarPlugin implements VersionControlPlugin {
     @Override
     public String getVersion() {
         return "0.1";
+    }
+
+    @Override
+    public List<String> getFilesInDirectory(String directoryPath) throws VersionControlPluginException {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

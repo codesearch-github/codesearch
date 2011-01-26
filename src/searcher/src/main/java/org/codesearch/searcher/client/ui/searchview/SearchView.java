@@ -22,13 +22,15 @@
 
 package org.codesearch.searcher.client.ui.searchview;
 
+import java.util.List;
+
+import org.codesearch.searcher.shared.SearchResultDto;
+
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Panel;
-import java.util.List;
-import org.codesearch.searcher.shared.SearchResultDto;
 
 /**
  * View that allows the entering of a search query,

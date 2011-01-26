@@ -25,6 +25,7 @@ import japa.parser.ParseException;
 import japa.parser.ast.CompilationUnit;
 import japa.parser.ast.body.MethodDeclaration;
 import japa.parser.ast.visitor.VoidVisitorAdapter;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -32,34 +33,22 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map.Entry;
-import junit.framework.TestCase;
 import org.codesearch.commons.database.DBAccess;
 import org.codesearch.commons.database.DatabaseAccessException;
 import org.codesearch.commons.plugins.codeanalyzing.CodeAnalyzerPluginException;
 import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
 import org.codesearch.commons.plugins.codeanalyzing.ast.ExternalUsage;
 import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
+import org.junit.Test;
 
 /**
  *
  * @author David Froehlich
  */
-public class JavaCodeAnalyzerPluginTest extends TestCase {
+public class JavaCodeAnalyzerPluginTest {
 
     private static int uncommentedMethods = 0;
     private JavaCodeAnalyzerPlugin plugin = new JavaCodeAnalyzerPlugin();
-
-    public JavaCodeAnalyzerPluginTest(String testName) {
-        super(testName);
-    }
-
-    protected void setUp() throws Exception {
-        super.setUp();
-    }
-
-    protected void tearDown() throws Exception {
-        super.tearDown();
-    }
 
 //    /**
 //     * Test of getAstForCurrentFile method, of class JavaCodeAnalyzerPlugin.
@@ -76,6 +65,7 @@ public class JavaCodeAnalyzerPluginTest extends TestCase {
     /**
      * Test of analyzeFile method, of class JavaCodeAnalyzerPlugin.
      */
+    @Test
     public void testAnalyzeFile() throws Exception {
 //        System.out.println("analyzeFile");
 //        String fileContent = "";
@@ -89,6 +79,7 @@ public class JavaCodeAnalyzerPluginTest extends TestCase {
 //        new JavaCodeAnalyzerPlugin().analyzeFile(fileContent, repo);
     }
 
+    @Test
     public void testTEST() throws DatabaseAccessException{ //FIXME remove
         for(Entry<String, AstNode> currEntry : DBAccess.getFilesImportingTargetFile("database.DBAccess", "svn-local").entrySet()){
             System.out.println(currEntry.getKey());
@@ -96,6 +87,7 @@ public class JavaCodeAnalyzerPluginTest extends TestCase {
 
     }
 
+    @Test
     public void testParseExternalLinks() throws Exception {
 //        String fileContent = "";
 //        BufferedReader br = new BufferedReader(new FileReader("/home/david/workspace/svnsearch/WakMusic/src/java/servlets/AddEvent.java"));
@@ -109,7 +101,6 @@ public class JavaCodeAnalyzerPluginTest extends TestCase {
 //        List<String> imports = plugin.getImports();
 //        List<ExternalUsage> usages = plugin.parseExternalLinks(fileContent, imports, externalLinks, "svn_local");
     }
-
     public void iterateChildNodes(AstNode node) {
         for (AstNode childNode : node.getChildNodes()) {
             iterateChildNodes(childNode);
@@ -117,6 +108,7 @@ public class JavaCodeAnalyzerPluginTest extends TestCase {
         System.out.println(node.getModifiers());
     }
 
+    @Test
     public void testIntegrationOfUsages() throws Exception {
         String fileContent = "";
         BufferedReader br = new BufferedReader(new FileReader("/home/david/workspace/svnsearch/codesearch/src/searcher/src/main/java/org/codesearch/searcher/server/DocumentSearcher.java"));
@@ -197,6 +189,8 @@ public class JavaCodeAnalyzerPluginTest extends TestCase {
 //                cu.accept(cv, truncFileName);
 //            }
 //        }
+
+    @Test
     private void checkContentOfFile(File file) throws FileNotFoundException, IOException, CodeAnalyzerPluginException, ParseException, DatabaseAccessException {
         if (file.isDirectory()) {
             for (File child : file.listFiles()) {

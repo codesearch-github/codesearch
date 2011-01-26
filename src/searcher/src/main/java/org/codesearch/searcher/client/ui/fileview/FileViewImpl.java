@@ -20,6 +20,14 @@
  */
 package org.codesearch.searcher.client.ui.fileview;
 
+import java.util.List;
+
+import org.codesearch.searcher.client.ui.fileview.sidebar.Sidebar;
+import org.codesearch.searcher.client.ui.fileview.sidebar.SidebarImpl;
+import org.codesearch.searcher.client.ui.searchview.SearchPlace;
+import org.codesearch.searcher.shared.OutlineNode;
+import org.codesearch.searcher.shared.SidebarNode;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -41,13 +49,6 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.SplitLayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
-import java.util.List;
-import org.codesearch.searcher.client.ui.fileview.sidebar.Sidebar;
-import org.codesearch.searcher.client.ui.fileview.sidebar.SidebarImpl;
-
-import org.codesearch.searcher.client.ui.searchview.SearchPlace;
-import org.codesearch.searcher.shared.OutlineNode;
-import org.codesearch.searcher.shared.SidebarNode;
 
 /**
  * Implementation of the File View.
@@ -100,6 +101,7 @@ public class FileViewImpl extends Composite implements FileView {
         if (instance == null) {
             instance = new FileViewImpl();
             exportGoToLine();
+            exportGoToUsage();
         }
         return instance;
     }
@@ -152,6 +154,7 @@ public class FileViewImpl extends Composite implements FileView {
         splitWrapper.add(scrollWrapper);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void setOutline(List<OutlineNode> outline) {
         if (outline != null) {
@@ -160,7 +163,7 @@ public class FileViewImpl extends Composite implements FileView {
             for (SidebarNode s : outline) {
                 sidebar.add(s);
             }
-            //TODO this is a workaround
+            //FIXME this is a workaround
             splitWrapper.clear();
             splitWrapper.addWest(sidebar, 300);
             splitWrapper.add(scrollWrapper);
@@ -180,31 +183,13 @@ public class FileViewImpl extends Composite implements FileView {
         repositoryField.setText(repository);
     }
 
-    private void showFocusDiv(boolean show) {
-        if (show) {
-            focusDiv.removeClassName(style.hidden());
-        } else {
-            focusDiv.addClassName(style.hidden());
-        }
-    }
-
+    /** {@inheritDoc} */
+    @Override
     public void goToLine(int lineNumber) {
         if (lineNumber > 0 && lineNumber <= lineCount) {
             focusDiv.setAttribute("style", "top: " + (lineNumber - 1) * 15 + "px");
         }
         focusDiv.scrollIntoView();
-    }
-
-    /**
-     * Provides a dialog to enter desired line number and jumps to the specified line.
-     */
-    private void goToLineWithDialog() {
-        String input = Window.prompt("Go to line:", "");
-        try {
-            int lineNumber = Integer.parseInt(input);
-            goToLine(lineNumber);
-        } catch (NumberFormatException ex) {
-        }
     }
 
     /** {@inheritDoc} */
@@ -219,6 +204,10 @@ public class FileViewImpl extends Composite implements FileView {
         keyboardShortcutHandlerRegistration.removeHandler();
     }
 
+    public static void staticGoToUsage(int usageId) {
+        FileViewImpl.getInstance().presenter.goToUsage(usageId);
+    }
+
     public static void staticGoToLine(int lineNumber) {
         FileViewImpl.getInstance().goToLine(lineNumber);
     }
@@ -229,6 +218,37 @@ public class FileViewImpl extends Composite implements FileView {
     public static native void exportGoToLine()/*-{
     $wnd.goToLine = $entry(@org.codesearch.searcher.client.ui.fileview.FileViewImpl::staticGoToLine(I));
     }-*/;
+
+    /**
+     * Exports the goToUsage function to JavaScript so it can be used from HTML code.
+     */
+    public static native void exportGoToUsage()/*-{
+    $wnd.goToUsage = $entry(@org.codesearch.searcher.client.ui.fileview.FileViewImpl::staticGoToUsage(I));
+    }-*/;
+
+    /**
+     * Shows an input dialog for the go to line feature.
+     */
+    private void goToLineWithDialog() {
+        String input = Window.prompt("Go to line:", "");
+        try {
+            int lineNumber = Integer.parseInt(input);
+            goToLine(lineNumber);
+        } catch (NumberFormatException ex) {
+        }
+    }
+
+    /**
+     * Shows or hides the focused line div that highlights the focused line.
+     * @param show Whether to show the div
+     */
+    private void showFocusDiv(boolean show) {
+        if (show) {
+            focusDiv.removeClassName(style.hidden());
+        } else {
+            focusDiv.addClassName(style.hidden());
+        }
+    }
 
     /**
      * Handler class that intercepts native javascript events. Used for global hotkeys.

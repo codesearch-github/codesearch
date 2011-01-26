@@ -21,13 +21,16 @@
 
 package org.codesearch.commons.configuration.properties;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
+import org.codesearch.commons.constants.IndexConstants;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 
 /**
@@ -55,7 +58,7 @@ public class PropertiesManagerTest {
 
     @Before
     public void setUp() throws IOException {
-        pr = new PropertiesManager(System.getProperty("user.home") + "/workspace/svnsearch/revisions.properties");
+        pr = new PropertiesManager(System.getProperty("user.home") + "/workspace/svnsearch/" + IndexConstants.REVISIONS_PROPERTY_FILENAME);
     }
 
     @After

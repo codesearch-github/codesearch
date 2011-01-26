@@ -6,6 +6,7 @@
 package org.codesearch.commons.plugins.javacodeanalyzerplugin.ast;
 
 import java.util.List;
+
 import org.codesearch.commons.database.DBAccess;
 import org.codesearch.commons.database.DatabaseAccessException;
 import org.codesearch.commons.plugins.codeanalyzing.ast.ExternalUsage;

@@ -20,6 +20,11 @@
  */
 package org.codesearch.searcher.client.ui.searchview;
 
+import java.util.List;
+
+import org.codesearch.searcher.client.ui.fileview.FilePlace;
+import org.codesearch.searcher.shared.SearchResultDto;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -44,9 +49,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.NoSelectionModel;
 import com.google.gwt.view.client.SelectionChangeEvent;
-import java.util.List;
-import org.codesearch.searcher.client.ui.fileview.FilePlace;
-import org.codesearch.searcher.shared.SearchResultDto;
 
 /**
  * Implements the functionality of the search page.
@@ -214,7 +216,7 @@ public class SearchViewImpl extends Composite implements SearchView {
             public void onSelectionChange(SelectionChangeEvent event) {
                 SearchResultDto selected = selectionModel.getLastSelectedObject();
                 if (selected != null) {
-                    presenter.goTo(new FilePlace(selected.getRepository(), selected.getFilePath()));
+                    presenter.goTo(new FilePlace(selected.getRepository(), selected.getFilePath(), 0));
                 }
             }
         });

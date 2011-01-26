@@ -21,12 +21,14 @@
 
 package org.codesearch.searcher.client.rpc;
 
+import java.util.List;
+
+import org.codesearch.searcher.shared.FileDto;
+import org.codesearch.searcher.shared.SearcherServiceException;
+import org.codesearch.searcher.shared.SearchResultDto;
+
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
-import java.util.List;
-import org.codesearch.searcher.shared.FileDto;
-import org.codesearch.searcher.shared.InvalidIndexLocationException;
-import org.codesearch.searcher.shared.SearchResultDto;
 
 /**
  * The service used for communication between the GWT javascript client and the server.
@@ -34,8 +36,9 @@ import org.codesearch.searcher.shared.SearchResultDto;
  */
 @RemoteServiceRelativePath("searcherservice")
 public interface SearcherService extends RemoteService {
-    public List<SearchResultDto> doSearch(String query, boolean caseSensitive, List<String> selectedRepositories, List<String> selectedRepositoryGroups) throws InvalidIndexLocationException;
-    public List<String> getAvailableRepositories();
-    public List<String> getAvailableRepositoryGroups();
-    public FileDto getFile(String repository, String filePath);
+    List<SearchResultDto> doSearch(String query, boolean caseSensitive, List<String> selectedRepositories, List<String> selectedRepositoryGroups) throws SearcherServiceException;
+    List<String> getAvailableRepositories() throws SearcherServiceException;
+    List<String> getAvailableRepositoryGroups() throws SearcherServiceException;
+    FileDto getFile(String repository, String filePath) throws SearcherServiceException;
+    FileDto getFileForUsageInFile(int usageId, String repository, String filePath) throws SearcherServiceException;
 }

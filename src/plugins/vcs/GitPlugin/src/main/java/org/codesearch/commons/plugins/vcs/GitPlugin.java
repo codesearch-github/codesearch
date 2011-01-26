@@ -2,17 +2,15 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.codesearch.commons.plugins.git;
+package org.codesearch.commons.plugins.vcs;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.util.List;
 import java.util.Set;
 import org.apache.log4j.Logger;
-import org.codesearch.commons.plugins.vcs.FileDto;
-import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
-import org.codesearch.commons.plugins.vcs.VersionControlPluginException;
-import org.codesearch.commons.utils.git.GitUtils;
+import org.codesearch.commons.plugins.vcs.utils.GitUtils;
 import org.eclipse.jgit.errors.AmbiguousObjectException;
 import org.eclipse.jgit.errors.MissingObjectException;
 import org.eclipse.jgit.lib.Repository;
@@ -99,5 +97,10 @@ public class GitPlugin implements VersionControlPlugin {
     @Override
     public String getVersion() {
         return "0.1";
+    }
+
+    @Override
+    public List<String> getFilesInDirectory(String directoryPath) throws VersionControlPluginException {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

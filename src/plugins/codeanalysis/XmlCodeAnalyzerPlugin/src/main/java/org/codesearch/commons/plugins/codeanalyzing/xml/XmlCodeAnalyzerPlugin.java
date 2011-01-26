@@ -6,17 +6,16 @@ import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Stack;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
+
 import org.codesearch.commons.plugins.codeanalyzing.CodeAnalyzerPlugin;
 import org.codesearch.commons.plugins.codeanalyzing.CodeAnalyzerPluginException;
 import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
 import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
 import org.codesearch.commons.plugins.codeanalyzing.xml.ast.XmlNode;
-import org.springframework.stereotype.Component;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.Locator;
@@ -28,7 +27,6 @@ import org.xml.sax.helpers.DefaultHandler;
  * Analyzes XML files.
  * @author Samuel Kogler
  */
-@Component
 public class XmlCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
 
     private XmlNode ast = new XmlNode();
@@ -37,13 +35,13 @@ public class XmlCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
     /** {@inheritDoc} */
     @Override
     public List<String> getTypeDeclarations() throws CodeAnalyzerPluginException {
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 
     /** {@inheritDoc} */
     @Override
     public List<Usage> getUsages() throws CodeAnalyzerPluginException {
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 
     /** {@inheritDoc} */
@@ -123,13 +121,13 @@ public class XmlCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
      */
     @Override
     public List<String> getImports() throws CodeAnalyzerPluginException {
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 
     /** {@inheritDoc} */
     @Override
     public String getPurposes() {
-        return "xml"; //FIXME
+        return "application/xml"; //FIXME
     }
 
     /** {@inheritDoc} */

@@ -25,12 +25,9 @@
  */
 package org.codesearch.commons.database;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
-import org.codesearch.commons.plugins.codeanalyzing.ast.CompoundNode;
+
 import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
 import org.junit.After;
 import org.junit.AfterClass;

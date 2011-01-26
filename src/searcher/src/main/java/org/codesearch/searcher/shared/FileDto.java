@@ -33,6 +33,7 @@ public class FileDto implements Serializable {
     private String fileContent;
     private boolean binary;
     private List<OutlineNode> outline;
+    private int focusLine;
 
     public List<OutlineNode> getOutline() {
         return outline;
@@ -57,5 +58,12 @@ public class FileDto implements Serializable {
     public void setFileContent(String fileContent) {
         this.fileContent = fileContent;
     }
-    
+
+    public int getFocusLine() {
+        return focusLine;
+    }
+
+    public void setFocusLine(int focusLine) {
+        this.focusLine = focusLine;
+    }
 }

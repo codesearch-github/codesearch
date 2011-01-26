@@ -22,14 +22,10 @@
 
 package org.codesearch.commons.plugins;
 
-import java.util.Set;
-import org.springframework.stereotype.Component;
-
 /**
  * The base interface for all plugins.
  * @author David Froehlich
  */
-@Component
 public interface Plugin {
     /**
      * Returns the purpose of this plugin,

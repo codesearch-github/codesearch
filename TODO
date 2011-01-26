@@ -2,12 +2,12 @@
 
 Missing features
 ================
- - Autocomplete
+ - Extended file information: e.g Author, Commit date etc
  - Highlight search term
  - Jump between found results
  - Repository file browsing
  - Raw file button
- - Extended file information: e.g Author, Commit date etc
+ - Autocomplete
  - Enum Handling for Code Navigation
  - Preserve Index Consistency feature
 
@@ -18,20 +18,30 @@ Important TODOs
  - Fix exception handling; quite often, 
    problems are just caught and ignored 
    See that exception handling is consistent throughout the program
- - Find out why some files won't show up in the index
  - Change imports from blob to an extra table
  - Make parameter check when looking for the line number of a method declaration in an external method call
+ - Refactor database to be consistent(clearing should remove all dependent data
+   sets)
+ - When files are deleted, also delete them from the database!!
+ - In DBAccess, return a different exception/error code if an entry could not
+   be found -> currently its always a DatabaseAccessException, no way to find
+   out what went wrong
+ - When the error message display is finished, refactor searcher error handling
+   to actually use it!
+
+Bugs
+===============
+ - Ignore lists(Blacklists) do not work at all
+ - Some files won't show up in the index
+ - External code navigation usage lookup doesn't work
 
 Minor Bugs
 ===============
  - usages of parameters in methods are not correctly linked
  - if no record for repository exists in database it should automatically be created
- - PropertyManager constantly assumes that the property file does not exist, therefor creates a new one
  - execution of code analysis sometimes causes an exception at databse access -> try with empty database
- - when looking at a file and hitting the back button, the search result retrieved in the search before is not displayed, so you have to enter the search information again
  - make the release of the connection in each DBAccess method finally
  - searching for a filename in lowercase does not work since the parser parses the search term to lower case
- - internal code navigation always one line after the target line
 
 Unexpected Behaviour
 ===============

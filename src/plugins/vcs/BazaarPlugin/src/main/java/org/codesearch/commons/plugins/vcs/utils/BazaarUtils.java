@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.commons.codesearch.utils.bazaar;
+package org.codesearch.commons.plugins.vcs.utils;
 
 import java.io.File;
 import java.io.IOException;

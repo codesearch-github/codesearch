@@ -33,10 +33,10 @@
     <db-max-connections>100</db-max-connections>
     
     <global-blacklist-filenames>
-        <filename>*.jpg</filename>
-        <filename>*.txt</filename>
-        <filename>*img*</filename>
         <filename>*.svn*</filename>
+        <filename>*.class</filename>
+        <filename>*.o</filename>
+        <filename>*.bin</filename>
         <filename>*.class*</filename>
     </global-blacklist-filenames>
     <index-location>/tmp/test/</index-location>
@@ -53,7 +53,6 @@
             <tasks>
                 <task>
                     <type>index</type>
-                    <enable-code-analysis>true</enable-code-analysis>
                 </task>
             </tasks>
         </index-job> 
@@ -84,6 +83,11 @@
             <repository-groups>
                 <repo-group>group1</repo-group>
             </repository-groups>
+             <blacklist-filenames>
+                <filename>*.o</filename>
+                <filename>*.pdf</filename>
+                <filename>*.bin</filename>
+            </blacklist-filenames>
             <url>$home/workspace/svnsearch</url>
             <code-navigation-enabled>true</code-navigation-enabled>
         </repository>

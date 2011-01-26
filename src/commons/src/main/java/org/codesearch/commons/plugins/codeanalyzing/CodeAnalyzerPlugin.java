@@ -22,6 +22,7 @@
 package org.codesearch.commons.plugins.codeanalyzing;
 
 import java.util.List;
+
 import org.codesearch.commons.plugins.Plugin;
 import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
 import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;

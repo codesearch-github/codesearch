@@ -40,8 +40,10 @@ import japa.parser.ast.stmt.ReturnStmt;
 import japa.parser.ast.stmt.TryStmt;
 import japa.parser.ast.type.ClassOrInterfaceType;
 import japa.parser.ast.visitor.VoidVisitorAdapter;
+
 import java.util.LinkedList;
 import java.util.List;
+import org.codesearch.commons.plugins.codeanalyzing.ast.Visibility;
 
 /**
  * a visitor used to visit the AST created by the JavaParser

@@ -28,9 +28,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
 import org.apache.log4j.Logger;
-import org.springframework.stereotype.Component;
 import org.tmatesoft.svn.core.ISVNDirEntryHandler;
 import org.tmatesoft.svn.core.SVNDirEntry;
 import org.tmatesoft.svn.core.SVNException;
@@ -44,11 +42,8 @@ import org.tmatesoft.svn.core.auth.ISVNAuthenticationManager;
 import org.tmatesoft.svn.core.internal.io.dav.DAVRepositoryFactory;
 import org.tmatesoft.svn.core.internal.io.fs.FSRepositoryFactory;
 import org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryFactoryImpl;
-import org.tmatesoft.svn.core.internal.util.SVNURLUtil;
 import org.tmatesoft.svn.core.io.SVNRepository;
 import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
-import org.tmatesoft.svn.core.wc.SVNLogClient;
-import org.tmatesoft.svn.core.wc.SVNRevision;
 
 /**
  * A plugin used to access files stored in Subversion repositories.
@@ -56,7 +51,6 @@ import org.tmatesoft.svn.core.wc.SVNRevision;
  * @author Stephan Stiboller
  * @author Samuel Kogler
  */
-@Component
 public class SubversionPlugin implements VersionControlPlugin {
 
     /** The repository that is currently accessed. */

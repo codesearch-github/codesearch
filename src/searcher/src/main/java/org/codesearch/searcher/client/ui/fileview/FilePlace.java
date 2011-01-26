@@ -18,7 +18,6 @@
  * You should have received a copy of the GNU General Public License
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.codesearch.searcher.client.ui.fileview;
 
 import com.google.gwt.place.shared.Place;
@@ -34,10 +33,12 @@ public class FilePlace extends Place {
 
     private String repository;
     private String filePath;
+    private int focusLine;
 
-    public FilePlace(String repository, String filePath) {
+    public FilePlace(String repository, String filePath, int focusLine) {
         this.repository = repository;
         this.filePath = filePath;
+        this.focusLine = focusLine;
     }
 
     public String getFilePath() {
@@ -48,23 +49,31 @@ public class FilePlace extends Place {
         return repository;
     }
 
+    public int getFocusLine() {
+        return focusLine;
+    }
+
     public static class Tokenizer implements PlaceTokenizer<FilePlace> {
 
         /** {@inheritDoc} */
         @Override
         public String getToken(FilePlace place) {
-            return place.getFilePath() + "@" + place.getRepository();
+            return place.focusLine + "@" + place.getFilePath() + "@" + place.getRepository();
         }
 
         /** {@inheritDoc} */
         @Override
         public FilePlace getPlace(String token) {
             String[] parts = token.split("@");
-            if (parts.length == 2) {
-                return new FilePlace(parts[1], parts[0]);
-            } else {
-                return null;
+            if (parts.length == 3) {
+                try {
+                    int line = Integer.parseInt(parts[0]);
+                    return new FilePlace(parts[2], parts[1], line);
+                } catch (NumberFormatException ex) {
+                    return null;
+                }
             }
+            return null;
         }
     }
 }

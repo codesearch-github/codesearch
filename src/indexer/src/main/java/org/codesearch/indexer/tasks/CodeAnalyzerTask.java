@@ -19,13 +19,10 @@
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.codesearch.indexer.tasks;
 
 import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.codesearch.commons.configuration.properties.PropertiesManager;
 import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
@@ -69,7 +66,7 @@ public class CodeAnalyzerTask implements Task {
 //            LOG.info("Starting execution of indexing task");
 //            indexLocation = configReader.getSingleLinePropertyValue("index-location");
 //            // Read the index status file
-//            propertiesReader = new PropertiesManager(indexLocation + File.separator + "revisions.properties"); //TODO add propertiesReader path
+//            propertiesReader = new PropertiesManager(indexLocation + IndexConstants.REVISIONS_PROPERTY_FILENAME); //TODO add propertiesReader path
 //            // Get the version control plugins
 //            versionControlPlugin = pluginLoader.getPlugin(VersionControlPlugin.class, repository.getVersionControlSystem());
 //            versionControlPlugin.setRepository(new URI(repository.getUrl()), repository.getUsername(), repository.getPassword());
@@ -91,5 +88,20 @@ public class CodeAnalyzerTask implements Task {
 //        } catch (ConfigurationException ex) {
 //            //TODO make exception handling
 //        }
+    }
+
+    @Override
+    public void setRepository(RepositoryDto repository) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void setCodeAnalysisEnabled(boolean codeAnalysisEnabled) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void setIndexLocation(String indexLocation) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

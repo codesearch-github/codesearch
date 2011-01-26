@@ -20,19 +20,17 @@
  */
 package org.codesearch.indexer.tasks;
 
-import java.io.*;
-import java.net.URISyntaxException;
-import org.apache.commons.configuration.ConfigurationException;
-import org.codesearch.commons.database.DatabaseAccessException;
-import org.codesearch.commons.plugins.codeanalyzing.CodeAnalyzerPluginException;
-import org.codesearch.indexer.exceptions.TaskExecutionException;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.WhitespaceAnalyzer;
@@ -45,19 +43,20 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.store.FSDirectory;
 import org.codesearch.commons.configuration.properties.PropertiesManager;
-import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
 import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 import org.codesearch.commons.constants.IndexConstants;
 import org.codesearch.commons.database.DBAccess;
+import org.codesearch.commons.database.DatabaseAccessException;
 import org.codesearch.commons.plugins.PluginLoader;
 import org.codesearch.commons.plugins.PluginLoaderException;
 import org.codesearch.commons.plugins.codeanalyzing.CodeAnalyzerPlugin;
+import org.codesearch.commons.plugins.codeanalyzing.CodeAnalyzerPluginException;
 import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
 import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
 import org.codesearch.commons.plugins.vcs.FileDto;
 import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
 import org.codesearch.commons.plugins.vcs.VersionControlPluginException;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.codesearch.indexer.exceptions.TaskExecutionException;
 
 /**
  * This task performs basic indexing of one repository.
@@ -81,12 +80,6 @@ public class IndexingTask implements Task {
     private VersionControlPlugin versionControlPlugin;
     /** The used PropertyReader */
     private PropertiesManager propertiesManager;
-    /** The XmlConfigurationReader used to get the configuration */
-    @Autowired
-    private XmlConfigurationReader configReader;
-    /** The plugin loader. */
-    @Autowired
-    private PluginLoader pluginLoader;
     /** Defines if the task is set to analyze the class and write code navigation relevant data into the binary index */
     private boolean codeAnalysisEnabled = false;
     /** the location of the lucene index */
@@ -103,28 +96,31 @@ public class IndexingTask implements Task {
     public void execute() throws TaskExecutionException {
         try {
             LOG.info("Starting indexing of repository: " + repository.getName());
+            long start = System.currentTimeMillis();
             // Read the index status file
-            indexLocation = configReader.getSingleLinePropertyValue("index-location");
-            propertiesManager = new PropertiesManager(indexLocation + "revisions.properties");
+            propertiesManager = new PropertiesManager(indexLocation + IndexConstants.REVISIONS_PROPERTY_FILENAME);
             String lastIndexedRevision = propertiesManager.getPropertyFileValue(repository.getName());
             LOG.info("Last indexed revision is: " + lastIndexedRevision);
             // Get the version control plugins
-            versionControlPlugin = pluginLoader.getPlugin(VersionControlPlugin.class, repository.getVersionControlSystem());
+            versionControlPlugin = PluginLoader.getPlugin(VersionControlPlugin.class, repository.getVersionControlSystem());
             versionControlPlugin.setRepository(new URI(repository.getUrl()), repository.getUsername(), repository.getPassword());
             LOG.info("Newest revision is      : " + versionControlPlugin.getRepositoryRevision());
             changedFiles = versionControlPlugin.getChangedFilesSinceRevision(lastIndexedRevision);
 
-            LOG.info("Changed files: ");
-            for(FileDto f : changedFiles) {
-                LOG.debug(f.getFilePath());
-            }
+            LOG.info(changedFiles.size() + " files have changed since the last indexing");
 
             boolean retrieveNewFileList = false;
-            
+
             executeIndexing();
             propertiesManager.setPropertyFileValue(repository.getName(), versionControlPlugin.getRepositoryRevision());
-            
+            long duration = System.currentTimeMillis() - start;
+            LOG.info("Lucene indexing took " + duration / 1000 + " seconds");
+
+
             if (codeAnalysisEnabled) {
+                LOG.info("Starting code analyzing");
+                start = System.currentTimeMillis();
+
                 String lastAnalysisRevision = DBAccess.getLastAnalyzedRevisionOfRepository(repository.getName());
                 if (!lastAnalysisRevision.equals(lastIndexedRevision)) {
                     retrieveNewFileList = true;
@@ -133,7 +129,10 @@ public class IndexingTask implements Task {
                 }
                 executeCodeAnalysis(retrieveNewFileList, lastAnalysisRevision);
                 DBAccess.setLastAnalyzedRevisionOfRepository(repository.getName(), versionControlPlugin.getRepositoryRevision());
+                duration = System.currentTimeMillis() - start;
+                LOG.info("Code analyzing took " + duration / 1000 + " seconds");
             }
+
         } catch (org.apache.commons.configuration.ConfigurationException ex) {
             LOG.error("Error at DatabaseConnection \n" + ex);
         } catch (DatabaseAccessException ex) {
@@ -163,7 +162,6 @@ public class IndexingTask implements Task {
      * @throws CodeAnalyzerPluginException if the source code of one of the files could not be analyzed
      */
     private void executeCodeAnalysis(boolean retrieveNewFileList, String lastAnalysisRevision) throws VersionControlPluginException, CodeAnalyzerPluginException {
-        LOG.info("Starting code analysis");
         if (retrieveNewFileList) {
             changedFiles = versionControlPlugin.getChangedFilesSinceRevision(lastAnalysisRevision);
         }
@@ -186,7 +184,7 @@ public class IndexingTask implements Task {
                 if (plugin == null || (!currentFileType.equals(previousFileType))) {
                     //load the appropriate plugin
                     try {
-                        plugin = pluginLoader.getPlugin(CodeAnalyzerPlugin.class, currentFileType);
+                        plugin = PluginLoader.getPlugin(CodeAnalyzerPlugin.class, currentFileType);
                     } catch (PluginLoaderException ex) {
                         //in case there is no codeanalyzer plugin for the file ending
                         continue;
@@ -208,7 +206,6 @@ public class IndexingTask implements Task {
                 LOG.error("Error at DatabaseConnection \n" + ex);
             }
         }
-        LOG.info("Finished code analysis");
     }
 
     /**
@@ -356,15 +353,18 @@ public class IndexingTask implements Task {
         return path.substring(path.lastIndexOf('/') + 1);
     }
 
+    @Override
     public void setRepository(RepositoryDto repository) {
         this.repository = repository;
     }
 
-    public boolean isCodeAnalysisEnabled() {
-        return codeAnalysisEnabled;
-    }
-
+    @Override
     public void setCodeAnalysisEnabled(boolean codeAnalysisEnabled) {
         this.codeAnalysisEnabled = codeAnalysisEnabled;
+    }
+
+    @Override
+    public void setIndexLocation(String indexLocation) {
+        this.indexLocation = indexLocation;
     }
 }

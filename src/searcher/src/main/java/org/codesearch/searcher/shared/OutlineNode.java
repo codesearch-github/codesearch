@@ -2,6 +2,7 @@ package org.codesearch.searcher.shared;
 
 import java.io.Serializable;
 import java.util.List;
+
 import org.codesearch.searcher.client.ui.fileview.FileViewImpl;
 
 /**

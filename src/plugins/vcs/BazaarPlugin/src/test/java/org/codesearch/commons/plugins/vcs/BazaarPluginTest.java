@@ -23,8 +23,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.codesearch.commons.plugins.bazaar;
+package org.codesearch.commons.plugins.vcs;
 
+import org.codesearch.commons.plugins.vcs.BazaarPlugin;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Set;

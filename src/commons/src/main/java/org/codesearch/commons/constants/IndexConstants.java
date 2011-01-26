@@ -40,7 +40,8 @@ public final class IndexConstants {
     public static final String INDEX_FIELD_CONTENT_LC="content_lc";
     public static final String INDEX_FIELD_TITLE_LC="title_lc";
     public static final String INDEX_FIELD_FILE_TYPE = "file_type";
-    
+    public static final String REVISIONS_PROPERTY_FILENAME = "revisions.properties";
+
     private IndexConstants(){
         
     }

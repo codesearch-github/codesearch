@@ -21,14 +21,9 @@
 
 package org.codesearch.commons.plugins.vcs;
 
-import java.net.URI;
 import java.util.Set;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  *

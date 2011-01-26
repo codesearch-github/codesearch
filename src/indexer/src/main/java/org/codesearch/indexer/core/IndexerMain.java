@@ -22,6 +22,7 @@ package org.codesearch.indexer.core;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
 import org.codesearch.commons.database.DBAccess;
