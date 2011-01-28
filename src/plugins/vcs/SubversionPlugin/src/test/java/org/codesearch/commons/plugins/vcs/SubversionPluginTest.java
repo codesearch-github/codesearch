@@ -77,8 +77,8 @@ public class SubversionPluginTest {
     @Test
     public void testGetPathsForChangedFilesSinceRevision() throws Exception {
         System.out.println("getPathsForChangedFilesSinceRevision");
-        String revision = "218";
-       // sp.setRepository(new URI("svn://portal.htl-kaindorf.at/svnsearch"), "feldruebe", "dota!123");
+        String revision = "217";
+        sp.setRepository(new URI("svn://portal.htl-kaindorf.at/svnsearch"), "feldruebe", "dota!123");
         Set result = sp.getChangedFilesSinceRevision(revision);
         Iterator iter = result.iterator();
         FileDto file = (FileDto) iter.next();

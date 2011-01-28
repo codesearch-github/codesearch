@@ -76,9 +76,9 @@ public class DocumentSearcher {
         LOG.debug("Index location set to: " + indexLocation);
         //TODO make or find proper analyzers for search
         queryParser = new QueryParser(Version.LUCENE_30, IndexConstants.INDEX_FIELD_CONTENT_LC, new LowerCaseWhiteSpaceAnalyzer());
+        queryParser.setAllowLeadingWildcard(true);
         queryParser.setLowercaseExpandedTerms(false);
         queryParserCaseSensitive = new QueryParser(Version.LUCENE_30, IndexConstants.INDEX_FIELD_CONTENT, new WhitespaceAnalyzer());
-        queryParser.setAllowLeadingWildcard(true);
         queryParserCaseSensitive.setAllowLeadingWildcard(true);
         queryParserCaseSensitive.setLowercaseExpandedTerms(false);
         try {
@@ -120,7 +120,7 @@ public class DocumentSearcher {
         } else {
             finalSearchString = finalSearchString.replace(IndexConstants.INDEX_FIELD_FILEPATH+":", IndexConstants.INDEX_FIELD_FILEPATH_LC+":").replace(IndexConstants.INDEX_FIELD_CONTENT+":",
                     IndexConstants.INDEX_FIELD_CONTENT_LC+":");
-            query = queryParser.parse(finalSearchString);
+            query = queryParser.parse(finalSearchString.toLowerCase());
         }
 
         LOG.info("Searching index with query: " + query.toString());

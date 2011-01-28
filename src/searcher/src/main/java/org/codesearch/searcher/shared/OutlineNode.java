@@ -13,7 +13,16 @@ public class OutlineNode implements SidebarNode, Serializable {
     private List<SidebarNode> childs;
     private String name;
     private int startLine;
+    private String cssClasses;
 
+    public String getCssClasses() {
+        return cssClasses;
+    }
+
+    public void setCssClasses(String cssClasses) {
+        this.cssClasses = cssClasses;
+    }
+    
     public int getStartLine() {
         return startLine;
     }

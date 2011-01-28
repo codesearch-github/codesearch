@@ -233,6 +233,7 @@ public class SearcherServiceImpl extends AutowiringRemoteServiceServlet implemen
             OutlineNode outlineNode = new OutlineNode();
             outlineNode.setName(astNode.getOutlineName());
             outlineNode.setStartLine(astNode.getStartLine());
+            outlineNode.setCssClasses(astNode.getModifiers());
             List<SidebarNode> childs = new LinkedList<SidebarNode>();
             for (AstNode a : astNode.getChildNodes()) {
                 if (a == null) {

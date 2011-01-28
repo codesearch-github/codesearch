@@ -60,9 +60,9 @@ public class XmlCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
         } catch (UnknownHostException ex) {
         } catch (IOException ex) {
         } catch (ParserConfigurationException ex) {
-            throw new CodeAnalyzerPluginException("Exception while trying to analyzer the file\n" + ex);
+            throw new CodeAnalyzerPluginException("Exception while trying to analyze the file\n" + ex);
         } catch (SAXException ex) {
-            throw new CodeAnalyzerPluginException("Exception while trying to analyzer the file\n" + ex);
+            throw new CodeAnalyzerPluginException("Exception while trying to analyze the file\n" + ex);
         }
 
     }

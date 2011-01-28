@@ -20,10 +20,14 @@
 */
 
 
-@external .cpp_*, .xml_*, .test*, .gwt-*;
+@external .cpp_*, .xml_*, .test*, .gwt-*, .outline_*;
 
 .gwt-SplitLayoutPanel-HDragger {
     background: #0081FF;
+}
+
+.outline_method_private {
+    background-image: url('img/outline_icons/ec_private_method.png');
 }
 
 .testLink {

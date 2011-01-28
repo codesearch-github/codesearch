@@ -70,6 +70,10 @@ public class DBAccess {
     private static final String STMT_GET_IMPORTS_FOR_FILE = "SELECT imports FROM file WHERE file_path = ? AND repository_id = ?";
     private static final String STMT_RESET_REPOSITORY_REVISIONS = "UPDATE repository SET last_analyzed_revision = '0'";
 
+    public static void purgeAllRecordsForFile(String filePath, String repository){
+        //TODO write me
+    }
+
     /**
      * returns the usage at the given id for the file
      * @param usageId the id of the usage in the file

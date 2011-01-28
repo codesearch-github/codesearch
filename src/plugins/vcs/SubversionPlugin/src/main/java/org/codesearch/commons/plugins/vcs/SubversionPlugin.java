@@ -22,7 +22,6 @@ package org.codesearch.commons.plugins.vcs;
 
 import java.io.ByteArrayOutputStream;
 import java.net.URI;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -33,6 +32,7 @@ import org.tmatesoft.svn.core.ISVNDirEntryHandler;
 import org.tmatesoft.svn.core.SVNDirEntry;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNLogEntry;
+import org.tmatesoft.svn.core.SVNLogEntryPath;
 import org.tmatesoft.svn.core.SVNNodeKind;
 import org.tmatesoft.svn.core.SVNProperties;
 import org.tmatesoft.svn.core.SVNProperty;
@@ -124,28 +124,38 @@ public class SubversionPlugin implements VersionControlPlugin {
     @Override
     public Set<FileDto> getChangedFilesSinceRevision(String revision) throws VersionControlPluginException {
         Set<FileDto> files = new HashSet();
-        Collection logs = null;
+        List logs = null;
         try {
-            logs = repository.log(new String[]{}, null, Long.parseLong(revision) + 1, -1, true, false);
+            logs = (LinkedList) repository.log(new String[]{}, null, Long.parseLong(revision) + 1, -1, true, false);
         } catch (NullPointerException e) {
             throw new VersionControlPluginException("No repository specified");
         } catch (SVNException ex) {
             logs = new LinkedList();
         }
-        Iterator iter = logs.iterator();
-        while (iter.hasNext()) {
-            SVNLogEntry entry = (SVNLogEntry) iter.next();
-            Iterator iter2 = entry.getChangedPaths().keySet().iterator();
-            while (iter2.hasNext()) {
-                String path = (String) iter2.next();
-                boolean fileAlreadyInSet = false;
-                for (FileDto currentFile : files) {
-                    if (currentFile.getFilePath().equals(path)) {
-                        fileAlreadyInSet = true;
+        for (int i = 0; i < logs.size(); i++) {
+            SVNLogEntry entry = (SVNLogEntry) logs.get(i);
+            Iterator entryIterator = entry.getChangedPaths().values().iterator();
+            while (entryIterator.hasNext()) {
+                SVNLogEntryPath currentPath = (SVNLogEntryPath) entryIterator.next();
+                String filePath = currentPath.getPath();
+                if (currentPath.getType() == 'D') { //The file has been deleted
+                    FileDto deletedFile = new FileDto();
+                    deletedFile.setDeleted(true);
+                    deletedFile.setFilePath(filePath);
+                    files.add(deletedFile);
+                } else {
+                    boolean fileAlreadyInSet = false;
+                    for (FileDto currentFile : files) {
+                        if (currentFile.getFilePath().equals(filePath)) {
+                            fileAlreadyInSet = true;
+                        }
                     }
-                }
-                if (!fileAlreadyInSet) {
-                    files.add(getFileForFilePath(path));
+                    if (!fileAlreadyInSet) {
+                        FileDto changedFile = getFileForFilePath(filePath);
+                        if(changedFile != null){
+                            files.add(changedFile);
+                        }
+                    }
                 }
             }
         }

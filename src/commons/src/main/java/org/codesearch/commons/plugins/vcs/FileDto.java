@@ -40,7 +40,19 @@ public class FileDto {
     private String lastAuthor;
     private String lastAlteration;
     private List<String> imports;
+    /** determines if the file has been deleted since the last indexing process
+     * is handed to the IndexerTask so all database entries and lucene fields associated to the file get purged
+     */
+    private boolean deleted;
 
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
+    
     public String getLastAlteration() {
         return lastAlteration;
     }
@@ -56,7 +68,7 @@ public class FileDto {
     public void setLastAuthor(String lastAuthor) {
         this.lastAuthor = lastAuthor;
     }
-    
+
     public List<String> getImports() {
         return imports;
     }

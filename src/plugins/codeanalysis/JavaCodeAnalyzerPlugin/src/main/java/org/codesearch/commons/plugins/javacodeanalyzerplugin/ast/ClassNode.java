@@ -75,7 +75,10 @@ public class ClassNode extends CompoundNode {
 
     @Override
     public String getModifiers() {
-        return "class " + this.getVisibility().toString();
+        try{
+        return "class " + this.getVisibility().toString();}catch(NullPointerException ex){
+            return ""; //FIXME
+        }
     }
 
 

@@ -18,22 +18,22 @@ Important TODOs
  - Fix exception handling; quite often, 
    problems are just caught and ignored 
    See that exception handling is consistent throughout the program
- - Change imports from blob to an extra table
  - Make parameter check when looking for the line number of a method declaration in an external method call
  - Refactor database to be consistent(clearing should remove all dependent data
    sets)
- - When files are deleted, also delete them from the database!!
  - In DBAccess, return a different exception/error code if an entry could not
    be found -> currently its always a DatabaseAccessException, no way to find
    out what went wrong
  - When the error message display is finished, refactor searcher error handling
    to actually use it!
+ - When a file was deleted make sure all associated index and database files are purged
 
 Bugs
 ===============
  - Ignore lists(Blacklists) do not work at all
+    -> David: could not reproduce, tested it and works just as intended imo
  - Some files won't show up in the index
- - External code navigation usage lookup doesn't work
+    -> David: will need a little more info on that one...
 
 Minor Bugs
 ===============
@@ -41,7 +41,8 @@ Minor Bugs
  - if no record for repository exists in database it should automatically be created
  - execution of code analysis sometimes causes an exception at databse access -> try with empty database
  - make the release of the connection in each DBAccess method finally
- - searching for a filename in lowercase does not work since the parser parses the search term to lower case
+ - when clicking a usage the line after the declaration is highlighted instead of the line of the declaration
+ - when opening a file the first line is highlighted
 
 Unexpected Behaviour
 ===============

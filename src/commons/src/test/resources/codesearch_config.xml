@@ -85,6 +85,9 @@
             <username>null</username>
             <password>null</password>
             <url>$home/workspace/svnsearch</url>
+            <blacklist-filenames>
+                <filename>*generated*</filename>
+            </blacklist-filenames>
             <code-navigation-enabled>true</code-navigation-enabled>
         </repository>
         <repository>

@@ -99,7 +99,7 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
     private String fileContent;
     private List<String> typeDeclarations;
     private List<String> imports;
-    AnalyzerUtil util;
+    public AnalyzerUtil util;
 
     /**
      * sets the lineNumber and the targetFilePath for the class usage
@@ -180,6 +180,14 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
         }
     }
 
+    /**
+     * returns the file path of the file declaring the given class
+     * @param repository the repository holding the file
+     * @param fileImports the list of imports in the source file, these will be searched through
+     * @param className the name of the class that is searched
+     * @return the path of the file holding the declaration
+     * @throws DatabaseAccessException
+     */
     private String getFilePathOfDeclaration(String repository, List<String> fileImports, String className) throws DatabaseAccessException {
         String targetFilePath;
         List<String> asteriskImports = new LinkedList<String>();
@@ -200,9 +208,6 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
         
         return targetFilePath;
     }
-
-    
-    
 
     /** {@inheritDoc} */
     public FileNode getFileNode() {

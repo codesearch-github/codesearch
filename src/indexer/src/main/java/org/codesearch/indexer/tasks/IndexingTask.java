@@ -116,7 +116,6 @@ public class IndexingTask implements Task {
             long duration = System.currentTimeMillis() - start;
             LOG.info("Lucene indexing took " + duration / 1000 + " seconds");
 
-
             if (codeAnalysisEnabled) {
                 LOG.info("Starting code analyzing");
                 start = System.currentTimeMillis();
@@ -172,36 +171,38 @@ public class IndexingTask implements Task {
         String previousFileType = null;
         for (FileDto currentFile : changedFiles) {
             try {
-                if (currentFile.getFilePath().contains("IndexingManager")) {
-                    getClass();
-                }
-                try {
-                    currentFileType = currentFile.getFilePath().substring(currentFile.getFilePath().lastIndexOf(".") + 1); //TODO add handling for files without file endings or hidden files
-                } catch (StringIndexOutOfBoundsException ex) {
-                    //In case the file has no ending no code analyzis will be executed
-                    continue;
-                }
-                if (plugin == null || (!currentFileType.equals(previousFileType))) {
-                    //load the appropriate plugin
+                if (currentFile.isDeleted()) {
+                    DBAccess.purgeAllRecordsForFile(currentFile.getFilePath(), repository.getName());
+                    LOG.debug("Deleted all records assoziated with " + currentFile.getFilePath() + " since it was deleted from the file system");
+                } else {
                     try {
-                        plugin = PluginLoader.getPlugin(CodeAnalyzerPlugin.class, currentFileType);
-                    } catch (PluginLoaderException ex) {
-                        //in case there is no codeanalyzer plugin for the file ending
+                        currentFileType = currentFile.getFilePath().substring(currentFile.getFilePath().lastIndexOf(".") + 1); //TODO add handling for files without file endings or hidden files
+                    } catch (StringIndexOutOfBoundsException ex) {
+                        //In case the file has no ending no code analyzis will be executed
                         continue;
                     }
-                }
+                    if (plugin == null || (!currentFileType.equals(previousFileType))) {
+                        //load the appropriate plugin
+                        try {
+                            plugin = PluginLoader.getPlugin(CodeAnalyzerPlugin.class, currentFileType);
+                        } catch (PluginLoaderException ex) {
+                            //in case there is no codeanalyzer plugin for the file ending
+                            continue;
+                        }
+                    }
 
-                plugin.analyzeFile(new String(currentFile.getContent()));
-                AstNode ast = plugin.getAst();
-                List<String> typeDeclarations = plugin.getTypeDeclarations();
-                List<Usage> usages = plugin.getUsages();
-                List<String> imports = plugin.getImports();
-                //List<ExternalUsage> externalUsages =
-                previousFileType = currentFileType;
-                //add the externalLinks to the FileDto, so they can be parsed after the regular indexing is finished
-                //write the AST information into the database
-                DBAccess.setAnalysisDataForFile(currentFile.getFilePath(), repository.getName(), ast, usages, typeDeclarations, imports);
-                LOG.debug("Analyzed file: " + currentFile.getFilePath());
+                    plugin.analyzeFile(new String(currentFile.getContent()));
+                    AstNode ast = plugin.getAst();
+                    List<String> typeDeclarations = plugin.getTypeDeclarations();
+                    List<Usage> usages = plugin.getUsages();
+                    List<String> imports = plugin.getImports();
+                    //List<ExternalUsage> externalUsages =
+                    previousFileType = currentFileType;
+                    //add the externalLinks to the FileDto, so they can be parsed after the regular indexing is finished
+                    //write the AST information into the database
+                    DBAccess.setAnalysisDataForFile(currentFile.getFilePath(), repository.getName(), ast, usages, typeDeclarations, imports);
+                    LOG.debug("Analyzed file: " + currentFile.getFilePath());
+                }
             } catch (DatabaseAccessException ex) {
                 LOG.error("Error at DatabaseConnection \n" + ex);
             }
@@ -275,7 +276,7 @@ public class IndexingTask implements Task {
         try {
             int i = 0;
             for (FileDto file : changedFiles) {
-                if (!(fileIsOnIgnoreList(file.getFilePath()))) {
+                if (!(fileIsOnIgnoreList(file.getFilePath())) && !file.isDeleted()) {
                     // The lucene document containing all relevant indexing information
                     doc = new Document();
                     // Add fields
@@ -284,6 +285,8 @@ public class IndexingTask implements Task {
                     // Add document to the index
                     indexWriter.addDocument(doc);
                     i++;
+                } else {
+                    LOG.info("File " + file.getFilePath() + " matched a blacklist pattern"); //TODO remove
                 }
             }
             indexWriter.commit();
