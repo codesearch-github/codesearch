@@ -67,13 +67,13 @@ public class STAutocompleterTest {
     @Test
     public void testSuggest() throws Exception {
         System.out.println("suggest test");
-        String queryString = "foo" ;
+        String queryString = "class" ;
         List<String> result = sta.suggest(queryString);
         for(String r : result)
         {
             System.out.println(" -- " + r);
         }
-        assertTrue(1 == 1);
+        assertTrue(true);
     }
 
 

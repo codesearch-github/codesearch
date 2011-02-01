@@ -58,18 +58,18 @@ public class RootContainer extends Composite implements AcceptsOneWidget {
 
     public RootContainer() {
         initWidget(uiBinder.createAndBindUi(this));
-        errorPanel.add(addErrorPanel("1"));
-        errorPanel.add(addErrorPanel("2"));
-        errorPanel.add(addErrorPanel("3"));
-        errorPanel.add(addErrorPanel("lolololol"));
-        errorPanel.add(addErrorPanel("roflroflrofl"));
-        errorPanel.add(addErrorPanel("lolololol"));
-        errorPanel.add(addErrorPanel("roflroflrofl"));
-        errorPanel.add(addErrorPanel("roflroflrofl"));
-        errorPanel.add(addErrorPanel("roflroflrofl"));
-        errorPanel.add(addErrorPanel("lolololol"));
-        errorPanel.add(addErrorPanel("roflroflrofl"));
-        errorPanel.add(addErrorPanel("roflroflrofl"));
+//        errorPanel.add(addErrorPanel("1"));
+//        errorPanel.add(addErrorPanel("2"));
+//        errorPanel.add(addErrorPanel("3"));
+//        errorPanel.add(addErrorPanel("lolololol"));
+//        errorPanel.add(addErrorPanel("roflroflrofl"));
+//        errorPanel.add(addErrorPanel("lolololol"));
+//        errorPanel.add(addErrorPanel("roflroflrofl"));
+//        errorPanel.add(addErrorPanel("roflroflrofl"));
+//        errorPanel.add(addErrorPanel("roflroflrofl"));
+//        errorPanel.add(addErrorPanel("lolololol"));
+//        errorPanel.add(addErrorPanel("roflroflrofl"));
+//        errorPanel.add(addErrorPanel("roflroflrofl"));
         
     }
 
@@ -81,7 +81,6 @@ public class RootContainer extends Composite implements AcceptsOneWidget {
         if (widget != null) {
             contentPanel.add(w);
         }
-
 
     }
 
