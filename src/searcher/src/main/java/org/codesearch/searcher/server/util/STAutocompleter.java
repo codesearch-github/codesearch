@@ -36,7 +36,7 @@ import org.apache.lucene.store.Directory;
  * */
 public class STAutocompleter {
 
-    private static String defaultField = "content";
+    private String defaultField = "content";
     private Directory spellIndexDirectory;
 
     public STAutocompleter(String defaultField, Directory spellIndexDirectory) {
@@ -52,9 +52,6 @@ public class STAutocompleter {
      */
     public List<String> suggest(String queryString) throws IOException {
         SpellChecker spellChecker = new SpellChecker(spellIndexDirectory);
-        if (spellChecker.exist(queryString)) {
-            return null;
-        }
         String[] spresult = spellChecker.suggestSimilar(queryString, 1);
         if (spresult.length == 0) {
             return null;

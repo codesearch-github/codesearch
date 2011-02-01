@@ -54,7 +54,7 @@ public class IndexingTaskTest {
     public IndexingTaskTest() {
     }
 
-    @Test
+//    @Test
     public void testFileIsOnIgnoreList() {
         List<String> ignoredFileNames = new LinkedList<String>();
         ignoredFileNames.add("*.xml");
@@ -94,18 +94,18 @@ public class IndexingTaskTest {
 
         ClearTask clear = (ClearTask) applicationContext.getBean("clearTask");
         clear.setIndexLocation(indexLocation);
-        clear.setCodeAnalysisEnabled(true);
+        clear.setCodeAnalysisEnabled(false);
         clear.execute();
         
         for (RepositoryDto repo : repos) {
             if (repo.getVersionControlSystem().equals("FILESYSTEM")) {
-                DBAccess.setLastAnalyzedRevisionOfRepository(repo.getName(), "0");
+                // DBAccess.setLastAnalyzedRevisionOfRepository(repo.getName(), "0");
                 repo.setUrl(repo.getUrl().replace("$home", System.getProperty("user.home")));
                 IndexingTask t = (IndexingTask) applicationContext.getBean("indexingTask");
                 t.setIndexLocation(indexLocation);
            //     pr.setPropertyFileValue(repo.getName(), "0");
                 t.setRepository(repo);
-                t.setCodeAnalysisEnabled(true);
+                t.setCodeAnalysisEnabled(false);
                 t.execute();
             }
         }

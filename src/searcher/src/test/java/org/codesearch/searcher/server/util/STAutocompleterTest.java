@@ -66,8 +66,8 @@ public class STAutocompleterTest {
      */
     @Test
     public void testSuggest() throws Exception {
-        System.out.println("suggest teest");
-        String queryString = "b";
+        System.out.println("suggest test");
+        String queryString = "foo" ;
         List<String> result = sta.suggest(queryString);
         for(String r : result)
         {
