@@ -41,5 +41,5 @@ public interface Resources extends ClientBundle {
     CssResource searcherStyle();
 
     @Source("img/error_msg_close.png")
-    ImageResource error_msg_close();
+    ImageResource errorMessageClose();
 }

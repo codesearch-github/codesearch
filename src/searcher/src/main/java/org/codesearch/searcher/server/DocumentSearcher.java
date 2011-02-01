@@ -35,11 +35,13 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
 import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
 import org.codesearch.commons.configuration.xml.XmlConfigurationReaderConstants;
 import org.codesearch.commons.constants.IndexConstants;
+import org.codesearch.searcher.server.util.STAutocompleter;
 import org.codesearch.searcher.shared.SearcherServiceException;
 import org.codesearch.searcher.shared.SearchResultDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +64,9 @@ public class DocumentSearcher {
     private boolean searcherInitialized = false;
     /** The location of the index. **/
     private String indexLocation;
+    /** Used completer for search term autocompletion functionality */
+    private STAutocompleter autocompleter;
+
     @Autowired
     private XmlConfigurationReader xmlConfigurationReader;
 
@@ -97,7 +102,6 @@ public class DocumentSearcher {
      * @throws ParseException if the searchString could not be parsed to a query
      * @throws IOException if the Index could not be read
      */
-    //TODO rename method
     public List<SearchResultDto> search(String searchString, boolean caseSensitive, List<String> repositoryNames, List<String> repositoryGroupNames) throws ParseException, IOException, InvalidIndexException, ConfigurationException {
         return performLuceneSearch(searchString, caseSensitive, repositoryNames, repositoryGroupNames, 1000);
     }

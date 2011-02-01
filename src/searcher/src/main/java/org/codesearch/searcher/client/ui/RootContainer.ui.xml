@@ -32,21 +32,30 @@
         }
         .errorMessage
         {
-            color: red;
+        color: blue;
+        }
+        .errorButton
+        {
+        float: left;
+        margin-right: 3px;
+        margin-left: 3px;
+        }
+        .errorLabel
+        {
+        float: left;
         }
     </ui:style>
-    <g:DockLayoutPanel unit='PX'>
-        <g:north size='30'>
-            <g:FlowPanel styleName='{style.header}'>
-                <g:Image resource='{res.logo}' />
-            </g:FlowPanel>
-        </g:north>
-        <g:center>
-            <g:LayoutPanel ui:field='contentPanel' />
-        </g:center>
-        <g:south size='30'>
-            <g:LayoutPanel ui:field='errorPanel' styleName='{style.errorMessage}' />
-        </g:south>
-    </g:DockLayoutPanel>
+    <g:FlowPanel ui:field='errorPanel' styleName='{style.errorMessage}' >
+        <g:DockLayoutPanel unit='PX'>
+            <g:north size='30'>
+                <g:FlowPanel styleName='{style.header}'>
+                    <g:Image resource='{res.logo}' />
+                </g:FlowPanel>
+            </g:north>
+            <g:center>
+                <g:LayoutPanel ui:field='contentPanel' />
+            </g:center>
+        </g:DockLayoutPanel>
+    </g:FlowPanel>
 
 </ui:UiBinder>

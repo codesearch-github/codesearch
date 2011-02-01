@@ -21,16 +21,23 @@
 package org.codesearch.searcher.client.ui;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.HasHorizontalAlignment;
-import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.LayoutPanel;
+import com.google.gwt.user.client.ui.PushButton;
+import com.google.gwt.user.client.ui.RootLayoutPanel;
+import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
+import org.codesearch.searcher.client.Resources;
 
 /**
  * The container of all views. Allows to define UI that shows up everywhere.
@@ -46,13 +53,24 @@ public class RootContainer extends Composite implements AcceptsOneWidget {
     @UiField
     LayoutPanel contentPanel;
     @UiField
-    LayoutPanel errorPanel;
+    FlowPanel errorPanel;
+   
 
     public RootContainer() {
         initWidget(uiBinder.createAndBindUi(this));
-        errorPanel.setVisible(true);
-        errorPanel.add(createErrorPanel("lololol"));
-
+        errorPanel.add(addErrorPanel("1"));
+        errorPanel.add(addErrorPanel("2"));
+        errorPanel.add(addErrorPanel("3"));
+        errorPanel.add(addErrorPanel("lolololol"));
+        errorPanel.add(addErrorPanel("roflroflrofl"));
+        errorPanel.add(addErrorPanel("lolololol"));
+        errorPanel.add(addErrorPanel("roflroflrofl"));
+        errorPanel.add(addErrorPanel("roflroflrofl"));
+        errorPanel.add(addErrorPanel("roflroflrofl"));
+        errorPanel.add(addErrorPanel("lolololol"));
+        errorPanel.add(addErrorPanel("roflroflrofl"));
+        errorPanel.add(addErrorPanel("roflroflrofl"));
+        
     }
 
     /** {@inheritDoc} */
@@ -63,6 +81,8 @@ public class RootContainer extends Composite implements AcceptsOneWidget {
         if (widget != null) {
             contentPanel.add(w);
         }
+
+
     }
 
     /**
@@ -70,17 +90,28 @@ public class RootContainer extends Composite implements AcceptsOneWidget {
      * @param String errorMessage to be displayed
      * @return VerticalPanel the error display
      */
-    public HorizontalPanel createErrorPanel(String errorMessage) {
-        //Image icon = new Image("images/error_msg_close.png");
+    public FlowPanel addErrorPanel(String errorMessage) {
+        //Button
+        PushButton pushButton = new PushButton(new Image(Resources.INSTANCE.errorMessageClose()));
+        pushButton.getElement().setAttribute("style", "float: left");
+        pushButton.setSize("8px", "8px");
+        pushButton.addClickHandler(new ClickHandler()
+        {
+            @Override
+            public void onClick(ClickEvent event)
+            {
+                ((PushButton)event.getSource()).getParent().setVisible(false);
+            }
+        });
+        //Label
         Label label = new Label();
+        label.getElement().setAttribute("style", "float: left");
         label.setText(errorMessage);
-        label.setVisible(true);
-        HorizontalPanel horizontalPanel = new HorizontalPanel();
-        horizontalPanel.getElement().setId("errorMessageContainer");
-        horizontalPanel.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
-        horizontalPanel.add(label);
-        horizontalPanel.setSpacing(3);
-        horizontalPanel.setVisible(true);
-        return horizontalPanel;
+        //Panel
+        FlowPanel flowP = new FlowPanel();
+        flowP.add(pushButton);
+        flowP.add(label);
+        flowP.add(new HTML("<div style=\"clear:both\"/>"));
+        return flowP;
     }
 }
