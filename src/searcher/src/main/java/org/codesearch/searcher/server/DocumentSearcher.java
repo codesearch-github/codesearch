@@ -41,7 +41,7 @@ import org.apache.lucene.util.Version;
 import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
 import org.codesearch.commons.configuration.xml.XmlConfigurationReaderConstants;
 import org.codesearch.commons.constants.IndexConstants;
-import org.codesearch.searcher.server.util.STAutocompleter;
+import org.codesearch.searcher.server.util.STAlternativeSuggestor;
 import org.codesearch.searcher.shared.SearcherServiceException;
 import org.codesearch.searcher.shared.SearchResultDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,7 +65,7 @@ public class DocumentSearcher {
     /** The location of the index. **/
     private String indexLocation;
     /** Used completer for search term autocompletion functionality */
-    private STAutocompleter autocompleter;
+    private STAlternativeSuggestor autocompleter;
 
     @Autowired
     private XmlConfigurationReader xmlConfigurationReader;

@@ -1,96 +1,90 @@
-/**
- * Copyright 2010 David Froehlich   <david.froehlich@businesssoftware.at>,
- *                Samuel Kogler     <samuel.kogler@gmail.com>,
- *                Stephan Stiboller <stistc06@htlkaindorf.at>
- *
- * This file is part of Codesearch.
- *
- * Codesearch is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Codesearch is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
- */
 package org.codesearch.searcher.server.util;
 
+import java.io.File;
 import java.io.IOException;
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import org.apache.lucene.document.Document;
+import org.apache.lucene.document.Field;
+import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.search.spell.Dictionary;
+import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.spell.LuceneDictionary;
-import org.apache.lucene.search.spell.SpellChecker;
 import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.FSDirectory;
 
 /**
- * This
  *
- * @author Stephan Stiboller
- * */
-public class STAutocompleter {
+ * @author zeheron
+ */
+public final class STAutocompleter {
 
-    private String defaultField = "content";
-    private Directory spellIndexDirectory;
+    private static final String GRAMMED_WORDS_FIELD = "words";
+    private static final String SOURCE_WORD_FIELD = "sourceWord";
+    private final Directory autoCompleteDirectory;
+    private IndexReader autoCompleteReader;
+    private IndexSearcher autoCompleteSearcher;
 
-    public STAutocompleter(String defaultField, Directory spellIndexDirectory) {
-        this.defaultField = defaultField;
-        this.spellIndexDirectory = spellIndexDirectory;
+    public STAutocompleter(String autoCompleteDir) throws IOException {
+        this.autoCompleteDirectory = FSDirectory.open(new File(autoCompleteDir));
+        setupReader();
     }
 
-    /**
-     * Returns a list of autocomplete suggestions.
-     * @param queryString
-     * @return String[] of completion suggestions
-     * @throws IOException
-     */
-    public List<String> suggest(String queryString) throws IOException {
-        SpellChecker spellChecker = new SpellChecker(spellIndexDirectory);
-        String[] spresult = spellChecker.suggestSimilar(queryString, 20);
-        if (spresult.length == 0) {
-            return null;
+    public List<String> suggest(String term) throws IOException {
+        Query query = new TermQuery(new Term(GRAMMED_WORDS_FIELD, term));
+        TopDocs docs = autoCompleteSearcher.search(query, 5);
+        List<String> suggestions = new ArrayList<String>();
+        for (ScoreDoc doc : docs.scoreDocs) {
+            suggestions.add(autoCompleteReader.document(doc.doc).get(
+                    SOURCE_WORD_FIELD));
         }
-        LinkedList<String> suggestions = new LinkedList<String>();
-        for(int i = 0; i < spresult.length; i ++ )
-            suggestions.add(spresult[i]);
-
         return suggestions;
     }
 
-    /**
-     * Creates the spell index for the SpellChecker
-     * @param field
-     * @param originalIndexDirectory
-     * @param spellIndexDirectory
-     * @throws IOException
-     */
-    public void createSpellIndex(String field, Directory originalIndexDirectory, Directory spellIndexDirectory) throws IOException {
-        IndexReader indexReader = null;
-        try {
-            indexReader = IndexReader.open(originalIndexDirectory);
-            Dictionary dictionary = new LuceneDictionary(indexReader, field);
-            SpellChecker spellChecker = new SpellChecker(spellIndexDirectory);
-            spellChecker.indexDictionary(dictionary);
-        } finally {
-            if (indexReader != null) {
-                indexReader.close();
+    public void setupIndex(Directory sourceDirectory, String fieldToAutocomplete) throws CorruptIndexException, IOException {
+        IndexReader sourceReader = IndexReader.open(sourceDirectory);
+        LuceneDictionary dict = new LuceneDictionary(sourceReader, fieldToAutocomplete);
+        IndexWriter writer = new IndexWriter(autoCompleteDirectory, new STAutocompleteLuceneAnalyzer(), IndexWriter.MaxFieldLength.UNLIMITED);
+        writer.setMergeFactor(300);
+        writer.setMaxBufferedDocs(150);
+        Map<String, Integer> wordsMap = new HashMap<String, Integer>();
+        Iterator<String> iter = (Iterator<String>) dict.getWordsIterator();
+        while (iter.hasNext()) {
+            String word = iter.next();
+            if (word.length() < 0) {
+                continue;
             }
+            wordsMap.put(word, sourceReader.docFreq(new Term(fieldToAutocomplete, word)));
         }
+        for (String word : wordsMap.keySet()) {
+            Document doc = new Document();
+            doc.add(new Field(SOURCE_WORD_FIELD, word, Field.Store.YES, Field.Index.NOT_ANALYZED));
+            System.out.println(":s"+word);
+            doc.add(new Field(GRAMMED_WORDS_FIELD, word, Field.Store.YES, Field.Index.ANALYZED));
+            System.out.println(":g"+word);
+            writer.addDocument(doc);
+        }
+        sourceReader.close();
+        writer.optimize();
+        writer.close();
+        setupReader();
     }
 
-    /**
-     * Creates the default spell index.
-     * @param originalIndexDirectory
-     * @param spellIndexDirectory
-     * @throws IOException
-     */
-     public void createDefaultSpellIndex(Directory originalIndexDirectory, Directory spellIndexDirectory) throws IOException {
-         createSpellIndex(defaultField, originalIndexDirectory, spellIndexDirectory);
-     }
+    private void setupReader() throws CorruptIndexException, IOException {
+        if (autoCompleteReader == null) {
+            autoCompleteReader = IndexReader.open(autoCompleteDirectory);
+        } else {
+            autoCompleteReader.reopen();
+        }
+        autoCompleteSearcher = new IndexSearcher(autoCompleteReader);
+    }
 }
