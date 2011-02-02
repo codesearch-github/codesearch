@@ -94,17 +94,17 @@ public class IndexingTaskTest {
 
         ClearTask clear = (ClearTask) applicationContext.getBean("clearTask");
         clear.setIndexLocation(indexLocation);
-        clear.setCodeAnalysisEnabled(false);
+        clear.setCodeAnalysisEnabled(true);
         clear.execute();
         
         for (RepositoryDto repo : repos) {
             if (repo.getVersionControlSystem().equals("FILESYSTEM")) {
-                // DBAccess.setLastAnalyzedRevisionOfRepository(repo.getName(), "0");
+                DBAccess.setLastAnalyzedRevisionOfRepository(repo.getName(), "0");
                 repo.setUrl(repo.getUrl().replace("$home", System.getProperty("user.home")));
                 IndexingTask t = (IndexingTask) applicationContext.getBean("indexingTask");
                 t.setIndexLocation(indexLocation);
                 t.setRepository(repo);
-                t.setCodeAnalysisEnabled(false);
+                t.setCodeAnalysisEnabled(true);
                 t.execute();
             }
         }

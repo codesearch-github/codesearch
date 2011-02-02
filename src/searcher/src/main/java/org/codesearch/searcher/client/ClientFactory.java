@@ -18,7 +18,6 @@
  * You should have received a copy of the GNU General Public License
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.codesearch.searcher.client;
 
 import org.codesearch.searcher.client.ui.fileview.FileView;
@@ -31,9 +30,22 @@ import com.google.gwt.place.shared.PlaceController;
  * Provides the implementations of classes used throughout the client.
  * @author Samuel Kogler
  */
-public interface ClientFactory {
-    EventBus getEventBus();
-    PlaceController getPlaceController();
-    SearchView getSearchView();
-    FileView getFileView();
+public abstract class ClientFactory {
+
+    private static ClientFactory clientFactory;
+
+    public static ClientFactory getDefaultFactory() {
+        if (clientFactory == null) {
+            clientFactory = new ClientFactoryImpl();
+        }
+        return clientFactory;
+    }
+
+    public abstract EventBus getEventBus();
+
+    public abstract PlaceController getPlaceController();
+
+    public abstract SearchView getSearchView();
+
+    public abstract FileView getFileView();
 }

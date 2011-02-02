@@ -34,12 +34,12 @@ import com.google.gwt.place.shared.PlaceController;
  * Implementation of the factory.
  * @author Samuel Kogler
  */
-public class ClientFactoryImpl implements ClientFactory {
+public class ClientFactoryImpl extends ClientFactory {
 
     private final EventBus eventBus = new SimpleEventBus();
     private final PlaceController placeController = new PlaceController(eventBus);
     private final SearchView searchView = new SearchViewImpl();
-    private final FileView fileView = FileViewImpl.getInstance();
+    private final FileView fileView = new FileViewImpl();
 
     /** {@inheritDoc} */
     @Override

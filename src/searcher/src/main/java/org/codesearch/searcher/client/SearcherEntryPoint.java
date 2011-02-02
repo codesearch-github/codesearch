@@ -48,7 +48,7 @@ public class SearcherEntryPoint implements EntryPoint {
     public void onModuleLoad() {
         Resources.INSTANCE.searcherStyle().ensureInjected();
         
-        ClientFactory clientFactory = new ClientFactoryImpl();
+        ClientFactory clientFactory = ClientFactory.getDefaultFactory();
         EventBus eventBus = clientFactory.getEventBus();
         PlaceController placeController = clientFactory.getPlaceController();
 

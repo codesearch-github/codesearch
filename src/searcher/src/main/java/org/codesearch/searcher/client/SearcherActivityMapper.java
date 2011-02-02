@@ -52,7 +52,7 @@ public class SearcherActivityMapper implements ActivityMapper {
         }
         if(place instanceof FilePlace) {
             FilePlace filePlace = (FilePlace) place;
-            return new FileActivity(clientFactory, filePlace.getRepository(), filePlace.getFilePath());
+            return new FileActivity(clientFactory, filePlace);
         }
 
         return null;

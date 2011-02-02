@@ -216,7 +216,7 @@ public class SearchViewImpl extends Composite implements SearchView {
             public void onSelectionChange(SelectionChangeEvent event) {
                 SearchResultDto selected = selectionModel.getLastSelectedObject();
                 if (selected != null) {
-                    presenter.goTo(new FilePlace(selected.getRepository(), selected.getFilePath(), 0));
+                    presenter.goTo(new FilePlace(selected.getRepository(), selected.getFilePath()));
                 }
             }
         });

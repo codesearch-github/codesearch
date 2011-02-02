@@ -49,6 +49,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.SplitLayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
+import org.codesearch.searcher.client.ClientFactory;
 
 /**
  * Implementation of the File View.
@@ -82,8 +83,6 @@ public class FileViewImpl extends Composite implements FileView {
     HasClickHandlers backButton;
     @UiField
     DivElement focusDiv;
-    /** Singleton instance */
-    private static FileViewImpl instance;
     /** UiBinder template. */
     private static FileViewUiBinder uiBinder = GWT.create(FileViewUiBinder.class);
     /** The presenter for this view. */
@@ -92,18 +91,12 @@ public class FileViewImpl extends Composite implements FileView {
     private HandlerRegistration keyboardShortcutHandlerRegistration;
     /** Number of lines of the displayed file */
     private int lineCount = 0;
+    private boolean focusDivVisible;
 
-    private FileViewImpl() {
+    public FileViewImpl() {
         initWidget(uiBinder.createAndBindUi(this));
-    }
-
-    public static FileViewImpl getInstance() {
-        if (instance == null) {
-            instance = new FileViewImpl();
-            exportGoToLine();
-            exportGoToUsage();
-        }
-        return instance;
+        exportGoToLine();
+        exportGoToUsage();
     }
 
     @UiHandler("backButton")
@@ -122,6 +115,8 @@ public class FileViewImpl extends Composite implements FileView {
         fileContentContainer.clear();
         lineNumbersContainer.clear();
         splitWrapper.clear();
+        lineCount = 0;
+        showFocusDiv(false);
     }
 
     /** {@inheritDoc} */
@@ -130,17 +125,20 @@ public class FileViewImpl extends Composite implements FileView {
         this.presenter = presenter;
     }
 
+    @Override
+    public Presenter getPresenter() {
+        return presenter;
+    }
+
     /** {@inheritDoc} */
     @Override
     public void setFileContent(String fileContent, boolean binary) {
         lineNumbersContainer.setVisible(!binary);
-        showFocusDiv(!binary);
-        lineCount = 0;
+        showFocusDiv(false);
 
         if (!binary) {
             String[] fileContentArray = fileContent.split("\n");
             lineCount = fileContentArray.length;
-            goToLine(1);
             for (int i = 0; i < fileContentArray.length; i++) {
                 Label lineNumber = new Label(String.valueOf(i + 1));
                 lineNumber.addClickHandler(new LineNumberClickHandler(i + 1));
@@ -186,6 +184,9 @@ public class FileViewImpl extends Composite implements FileView {
     /** {@inheritDoc} */
     @Override
     public void goToLine(int lineNumber) {
+        if (!focusDivVisible) {
+            showFocusDiv(true);
+        }
         if (lineNumber > 0 && lineNumber <= lineCount) {
             focusDiv.setAttribute("style", "top: " + (lineNumber - 1) * 15 + "px");
         }
@@ -205,11 +206,11 @@ public class FileViewImpl extends Composite implements FileView {
     }
 
     public static void staticGoToUsage(int usageId) {
-        FileViewImpl.getInstance().presenter.goToUsage(usageId);
+        ClientFactory.getDefaultFactory().getFileView().getPresenter().goToUsage(usageId);
     }
 
     public static void staticGoToLine(int lineNumber) {
-        FileViewImpl.getInstance().goToLine(lineNumber);
+        ClientFactory.getDefaultFactory().getFileView().goToLine(lineNumber);
     }
 
     /**
@@ -243,6 +244,7 @@ public class FileViewImpl extends Composite implements FileView {
      * @param show Whether to show the div
      */
     private void showFocusDiv(boolean show) {
+        focusDivVisible = show;
         if (show) {
             focusDiv.removeClassName(style.hidden());
         } else {

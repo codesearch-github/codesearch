@@ -200,7 +200,7 @@ public class SearcherServiceImpl extends AutowiringRemoteServiceServlet implemen
             LOG.debug(usage.getTargetFilePath());
             if (usage.getTargetFilePath() != null) {
                 FileDto file = getFile(repository, usage.getTargetFilePath());
-                file.setFocusLine(usage.getStartLine());
+                file.setFocusLine(usage.getReferenceLine());
                 return file;
             }
         } catch (DatabaseAccessException ex) {

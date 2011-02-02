@@ -30,6 +30,8 @@ Important TODOs
 
 Bugs
 ===============
+ - In external code navigation front end has no way to get filepath and repo
+   after a jump
  - Ignore lists(Blacklists) do not work at all
     -> David: could not reproduce, tested it and works just as intended imo
  - Some files won't show up in the index

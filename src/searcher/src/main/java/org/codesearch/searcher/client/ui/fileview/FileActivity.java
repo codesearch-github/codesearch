@@ -47,10 +47,10 @@ public class FileActivity extends AbstractActivity implements Presenter {
     private String repository;
     private String filePath;
 
-    public FileActivity(ClientFactory clientFactory, String repository, String filePath) {
+    public FileActivity(ClientFactory clientFactory, FilePlace filePlace) {
         this.clientFactory = clientFactory;
-        this.repository = repository;
-        this.filePath = filePath;
+        this.repository = filePlace.getRepository();
+        this.filePath = filePlace.getFilePath();
     }
 
     /** {@inheritDoc} */
@@ -76,6 +76,7 @@ public class FileActivity extends AbstractActivity implements Presenter {
 
     @Override
     public void goToUsage(int usageId) {
+        //FIXME how can i get filepath + repository like this?
         searcherServiceAsync.getFileForUsageInFile(usageId, repository, filePath, new GetFileCallback());
     }
 
