@@ -127,7 +127,7 @@ public class XmlCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
     /** {@inheritDoc} */
     @Override
     public String getPurposes() {
-        return "application/xml"; //FIXME
+        return "application/xml"; 
     }
 
     /** {@inheritDoc} */

@@ -39,6 +39,7 @@ import org.codesearch.commons.plugins.codeanalyzing.ast.ExternalUsage;
 import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
 
 import com.mysql.jdbc.Statement;
+import java.util.LinkedList;
 
 /**
  * DBUtils provides methods for access to the database specified in the configuration
@@ -67,7 +68,6 @@ public class DBAccess {
     private static final String STMT_GET_USAGES_FOR_FILE = "SELECT usages FROM file WHERE file_path = ? AND repository_id = ?";
     private static final String STMT_CLEAR_TYPES_FOR_REPOSITORY = "DELETE FROM type WHERE repo_id = ?";
     private static final String STMT_CLEAR_FILES_FOR_REPOSITORY = "DELETE FROM file WHERE repository_id = ?";
-    private static final String STMT_GET_IMPORTS_FOR_FILE = "SELECT imports FROM file WHERE file_path = ? AND repository_id = ?";
     private static final String STMT_RESET_REPOSITORY_REVISIONS = "UPDATE repository SET last_analyzed_revision = '0'";
 
     public static void purgeAllRecordsForFile(String filePath, String repository){
@@ -104,28 +104,20 @@ public class DBAccess {
         if (connectionPool == null) {
             setupConnections();
         }
-        List<String> imports = null;
+        List<String> imports = new LinkedList<String>();
         Connection conn = connectionPool.getConnection();
         try {
-            ObjectInputStream regObjectStream = null;
-
             int repo_id = getRepoIdForRepoName(repository);
-            PreparedStatement ps = conn.prepareStatement(STMT_GET_IMPORTS_FOR_FILE);
-            ps.setString(1, filePath);
-            ps.setInt(2, repo_id);
+            int file_id = getFileIdForFileName(filePath, repo_id);
+            PreparedStatement ps = conn.prepareStatement("SELECT target_file_path FROM import WHERE source_file_id = ?");
+            ps.setInt(1, file_id);
+            
             ResultSet rs = ps.executeQuery();
-            if (rs.first()) {
-                byte[] regBytes = rs.getBytes("imports");
-                if (regBytes != null) {
-                    ByteArrayInputStream regArrayStream = new ByteArrayInputStream(regBytes);
-                    regObjectStream = new ObjectInputStream(regArrayStream);
-                    imports = (List<String>) regObjectStream.readObject();
-                }
+            String currentImport = "";
+            while(rs.next()){
+                currentImport = rs.getString("target_file_path");
+                imports.add(currentImport);
             }
-        } catch (IOException ex) {
-            throw new DatabaseAccessException("The content of the blob storing the imports of file " + filePath + " repository " + repository + " could not be parsed to an Object, the database content is probably corrupt");
-        } catch (ClassNotFoundException ex) {
-            throw new DatabaseAccessException("The content of the blob storing the imports of file " + filePath + " repository " + repository + " could not be parsed to an Object, the database content is probably corrupt");
         } catch (SQLException ex) {
             throw new DatabaseAccessException("SQLException while trying to access the database\n" + ex);
         } finally {

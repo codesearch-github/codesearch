@@ -56,6 +56,7 @@ import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
 import org.codesearch.commons.plugins.vcs.FileDto;
 import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
 import org.codesearch.commons.plugins.vcs.VersionControlPluginException;
+import org.codesearch.commons.utils.MimeTypeUtil;
 import org.codesearch.indexer.exceptions.TaskExecutionException;
 
 /**
@@ -173,10 +174,10 @@ public class IndexingTask implements Task {
             try {
                 if (currentFile.isDeleted()) {
                     DBAccess.purgeAllRecordsForFile(currentFile.getFilePath(), repository.getName());
-                    LOG.debug("Deleted all records assoziated with " + currentFile.getFilePath() + " since it was deleted from the file system");
+                    LOG.debug("Deleted all records associated with " + currentFile.getFilePath() + " since it was deleted from the file system");
                 } else {
                     try {
-                        currentFileType = currentFile.getFilePath().substring(currentFile.getFilePath().lastIndexOf(".") + 1); //TODO add handling for files without file endings or hidden files
+                        currentFileType = MimeTypeUtil.guessMimeTypeViaFileEnding(currentFile.getFilePath());
                     } catch (StringIndexOutOfBoundsException ex) {
                         //In case the file has no ending no code analyzis will be executed
                         continue;
@@ -190,7 +191,7 @@ public class IndexingTask implements Task {
                             continue;
                         }
                     }
-
+                    LOG.debug("Analyzing file: " + currentFile.getFilePath());
                     plugin.analyzeFile(new String(currentFile.getContent()));
                     AstNode ast = plugin.getAst();
                     List<String> typeDeclarations = plugin.getTypeDeclarations();
@@ -201,7 +202,6 @@ public class IndexingTask implements Task {
                     //add the externalLinks to the FileDto, so they can be parsed after the regular indexing is finished
                     //write the AST information into the database
                     DBAccess.setAnalysisDataForFile(currentFile.getFilePath(), repository.getName(), ast, usages, typeDeclarations, imports);
-                    LOG.debug("Analyzed file: " + currentFile.getFilePath());
                 }
             } catch (DatabaseAccessException ex) {
                 LOG.error("Error at DatabaseConnection \n" + ex);
@@ -285,8 +285,6 @@ public class IndexingTask implements Task {
                     // Add document to the index
                     indexWriter.addDocument(doc);
                     i++;
-                } else {
-                    LOG.info("File " + file.getFilePath() + " matched a blacklist pattern"); //TODO remove
                 }
             }
             indexWriter.commit();

@@ -240,7 +240,6 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
             typeDeclarations = uv.getTypeDeclarations();
             imports = uv.getImports();
             Collections.sort(usages);
-            parseAbsoluteCharPositions();
 
         } catch (ParseException ex) {
             System.out.println(ex.toString());
@@ -683,7 +682,7 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
     /** {@inheritDoc} */
     @Override
     public String getPurposes() {
-        return "java"; //FIXME
+        return "text/x-java-source";
     }
 
     /** {@inheritDoc} */

@@ -103,7 +103,6 @@ public class IndexingTaskTest {
                 repo.setUrl(repo.getUrl().replace("$home", System.getProperty("user.home")));
                 IndexingTask t = (IndexingTask) applicationContext.getBean("indexingTask");
                 t.setIndexLocation(indexLocation);
-           //     pr.setPropertyFileValue(repo.getName(), "0");
                 t.setRepository(repo);
                 t.setCodeAnalysisEnabled(false);
                 t.execute();

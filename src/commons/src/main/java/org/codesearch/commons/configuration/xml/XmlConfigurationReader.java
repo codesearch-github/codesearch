@@ -102,17 +102,17 @@ public class XmlConfigurationReader {
 
                 for (SubnodeConfiguration sc : subConf) {
                     TaskType type = null;
-                    boolean codeAnalysisEnabled = sc.getBoolean(XmlConfigurationReaderConstants.CODE_NAVIGATION_ENABLED);
+//                    boolean codeAnalysisEnabled = sc.getBoolean(XmlConfigurationReaderConstants.CODE_NAVIGATION_ENABLED);
                     if (sc.getString(XmlConfigurationReaderConstants.TASK_TYPE).equals("index")) {
                         type = TaskType.index;
                     } else if (sc.getString(XmlConfigurationReaderConstants.TASK_TYPE).equals("clear")) {
                         type = TaskType.clear;
                     }
                     if (type == TaskType.clear && repositoryString == null) {
-                        tasks.add(new TaskDto(null, type, codeAnalysisEnabled));
+                        tasks.add(new TaskDto(null, type, true));
                     } else {
                         for (RepositoryDto repository : repositoriesForJob) {
-                            tasks.add(new TaskDto(repository, type, codeAnalysisEnabled));
+                            tasks.add(new TaskDto(repository, type, true));
                         }
                     }
                 }

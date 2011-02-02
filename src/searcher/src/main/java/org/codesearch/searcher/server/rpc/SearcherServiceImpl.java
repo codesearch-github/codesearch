@@ -195,6 +195,7 @@ public class SearcherServiceImpl extends AutowiringRemoteServiceServlet implemen
         LOG.debug("Looking up usage: " + usageId + " in file: " + filePath + "@" + repository);
         try {
             ExternalUsage usage = DBAccess.getUsageForIdInFile(usageId, filePath, repository);
+            usage.resolveLink(filePath, repository);
             LOG.debug(usage.getTargetClassName());
             LOG.debug(usage.getTargetFilePath());
             if (usage.getTargetFilePath() != null) {

@@ -58,6 +58,9 @@
                 <task>
                     <type>clear</type>
                 </task>
+                <task>
+                    <type>index</type>
+                </task>
             </tasks>
             </index-job>
         </index-jobs>
