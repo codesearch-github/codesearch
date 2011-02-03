@@ -133,10 +133,11 @@ public class AnalyzerUtil {
                 paramTypes.add(paramType);
             }
         }
-        usages.add(new ExternalMethodUsage(methodCallColumn, lineNumber, methodName.length(), methodName, className, paramTypes));
-        //FIXME
-        //ExternalMethodLink methodLink = new ExternalMethodLink(lineNumber, methodCallColumn, methodName.length(), className, methodName, paramTypes);
-        //externalLinks.add(methodLink);
+        if (!className.contains(".")) {
+            if (n.getBeginLine() == n.getEndLine()) {
+                usages.add(new ExternalMethodUsage(methodCallColumn, lineNumber, methodName.length(), methodName, className, paramTypes));
+            }
+        }
     }
 
     /**
@@ -147,7 +148,7 @@ public class AnalyzerUtil {
      */
     public void addLinkToExternalField(FieldAccessExpr ex, Node parent) {
         String scope = ex.getScope().toString();
-        int startColumn = ex.getBeginColumn()+1;
+        int startColumn = ex.getBeginColumn() + 1;
         String className;
         if (!addLinkToVariableDeclaration(ex.getBeginLine(), ex.getBeginColumn(), scope, parent)) {
             addLinkToExternalClassDeclaration(ex.getBeginLine(), ex.getBeginColumn(), ex.getScope().toString());
