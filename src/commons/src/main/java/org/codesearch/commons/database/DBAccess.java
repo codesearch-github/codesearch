@@ -30,6 +30,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
 import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
@@ -70,7 +71,7 @@ public class DBAccess {
     private static final String STMT_CLEAR_FILES_FOR_REPOSITORY = "DELETE FROM file WHERE repository_id = ?";
     private static final String STMT_RESET_REPOSITORY_REVISIONS = "UPDATE repository SET last_analyzed_revision = '0'";
 
-    public static void purgeAllRecordsForFile(String filePath, String repository){
+    public static void purgeAllRecordsForFile(String filePath, String repository) {
         //TODO write me
     }
 
@@ -83,14 +84,18 @@ public class DBAccess {
      * @throws DatabaseAccessException
      */
     public static ExternalUsage getUsageForIdInFile(int usageId, String filePath, String repository) throws DatabaseAccessException {
-        ExternalUsage usage = null;
-        List<Usage> usageList = getUsagesForFile(filePath, repository);
         try {
-            usage = (ExternalUsage) usageList.get(usageId);
-        } catch (ClassCastException ex) {
-            throw new DatabaseAccessException("Usage at requested ID is no external usage");
+            ExternalUsage usage = null;
+            List<Usage> usageList = getUsagesForFile(filePath, repository);
+            try {
+                usage = (ExternalUsage) usageList.get(usageId);
+            } catch (ClassCastException ex) {
+                throw new DatabaseAccessException("Usage at requested ID is no external usage");
+            }
+            return usage;
+        } catch (DatabaseEntryNotFoundException ex) {
+            throw new DatabaseAccessException("There are no usages stored for the file " + filePath + " in the repository " + repository);
         }
-        return usage;
     }
 
     /**
@@ -111,10 +116,10 @@ public class DBAccess {
             int file_id = getFileIdForFileName(filePath, repo_id);
             PreparedStatement ps = conn.prepareStatement("SELECT target_file_path FROM import WHERE source_file_id = ?");
             ps.setInt(1, file_id);
-            
+
             ResultSet rs = ps.executeQuery();
             String currentImport = "";
-            while(rs.next()){
+            while (rs.next()) {
                 currentImport = rs.getString("target_file_path");
                 imports.add(currentImport);
             }
@@ -133,7 +138,7 @@ public class DBAccess {
      * @return the usages ordered by line number / column
      * @throws DatabaseAccessException
      */
-    public static List<Usage> getUsagesForFile(String filePath, String repository) throws DatabaseAccessException {
+    public static List<Usage> getUsagesForFile(String filePath, String repository) throws DatabaseAccessException, DatabaseEntryNotFoundException {
         if (connectionPool == null) {
             setupConnections();
         }
@@ -154,6 +159,8 @@ public class DBAccess {
                     regObjectStream = new ObjectInputStream(regArrayStream);
                     usages = (List<Usage>) regObjectStream.readObject();
                 }
+            } else {
+                throw new DatabaseEntryNotFoundException("There is no record for the file "+ filePath + " in the repository "+ repository+" it probably is in a repository that has code navigation disabled or is in an external library");
             }
         } catch (IOException ex) {
             throw new DatabaseAccessException("The content of the blob storing the usages of the file " + filePath + " repository " + repository + " could not be parsed to an Object, the database content is probably corrupt");
@@ -320,7 +327,7 @@ public class DBAccess {
      * @return the binary index of the file
      * @throws DatabaseAccessException
      */
-    public static AstNode getBinaryIndexForFile(String filePath, String repository) throws DatabaseAccessException {
+    public static AstNode getBinaryIndexForFile(String filePath, String repository) throws DatabaseAccessException, DatabaseEntryNotFoundException {
         if (connectionPool == null) {
             setupConnections();
         }
@@ -332,10 +339,12 @@ public class DBAccess {
             ps.setString(1, filePath);
             ps.setString(2, repository);
             ResultSet rs = ps.executeQuery();
-            rs.first();
+            if(!rs.first()){
+                throw new DatabaseEntryNotFoundException("There is no record for the file "+ filePath + " in the repository "+ repository+" it probably is in a repository that has code navigation disabled or is in an external library");
+            }
             byte[] regBytes = rs.getBytes("binary_index");
             if (regBytes == null) {
-                return null;
+                throw new DatabaseEntryNotFoundException("The record for the file " + filePath + " in the repository " + repository + "does not contain a binary index");
             }
             ByteArrayInputStream regArrayStream = new ByteArrayInputStream(regBytes);
             regObjectStream = new ObjectInputStream(regArrayStream);

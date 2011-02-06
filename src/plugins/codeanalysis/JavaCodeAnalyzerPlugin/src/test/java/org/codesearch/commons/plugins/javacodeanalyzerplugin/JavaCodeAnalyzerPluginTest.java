@@ -68,16 +68,23 @@ public class JavaCodeAnalyzerPluginTest {
      */
     @Test
     public void testAnalyzeFile() throws Exception {
-//        System.out.println("analyzeFile");
-//        String fileContent = "";
-//        BufferedReader br = new BufferedReader(new FileReader("/home/david/codesearch/src/indexer/src/main/java/org/codesearch/indexer/tasks/IndexingTask.java"));
-//
-//        while (br.ready()) {
-//            fileContent += br.readLine() + "\n";
-//        }
-////        System.out.println(fileContent);
-//        RepositoryDto repo = new RepositoryDto("test", "test", "test", "test", true, "SVN", null, null);
-//        new JavaCodeAnalyzerPlugin().analyzeFile(fileContent, repo);
+        System.out.println("analyzeFile");
+        String fileContent = "";
+        BufferedReader br = new BufferedReader(new FileReader("/home/david/workspace/codesearch/src/commons/src/main/java/org/codesearch/commons/plugins/codeanalyzing/ast/Visibility.java"));
+
+        while (br.ready()) {
+            fileContent += br.readLine() + "\n";
+        }
+//        System.out.println(fileContent);
+        plugin.analyzeFile(fileContent);
+        soutChildNodes(plugin.getAst());
+    }
+
+    private void soutChildNodes(AstNode ast){
+        for(AstNode currentChild : ast.getChildNodes()){
+            System.out.println(currentChild.getName() + "\n");
+            soutChildNodes(currentChild);
+        }
     }
 
     @Test

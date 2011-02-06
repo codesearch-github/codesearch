@@ -63,10 +63,12 @@ public class ClearTask implements Task {
             if (repository == null) { // Clear the whole index
                 File indexDir = new File(indexLocation);
                 boolean deleteSuccess = true;
-                for (File f : indexDir.listFiles()) {
-                    if (!f.delete()) {
-                        LOG.error("Could not delete file: " + f.getName());
-                        deleteSuccess = false;
+                if (indexDir.listFiles() != null) {
+                    for (File f : indexDir.listFiles()) {
+                        if (!f.delete()) {
+                            LOG.error("Could not delete file: " + f.getName());
+                            deleteSuccess = false;
+                        }
                     }
                 }
                 if (deleteSuccess) {

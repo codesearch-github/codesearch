@@ -35,7 +35,7 @@ public class MethodNode extends CompoundNode {
     private String returnType;
     private boolean constructor;
     private List<VariableNode> localVariables = new LinkedList<VariableNode>();
-
+    
     public List<VariableNode> getLocalVariables() {
         return localVariables;
     }

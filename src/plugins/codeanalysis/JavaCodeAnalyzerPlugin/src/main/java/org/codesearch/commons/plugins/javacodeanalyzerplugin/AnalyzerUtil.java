@@ -18,9 +18,9 @@ import java.util.List;
 import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
 import org.codesearch.commons.plugins.codeanalyzing.ast.Visibility;
 import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.ClassNode;
-import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.ExternalClassUsage;
+import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.ExternalClassOrEnumUsage;
 import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.ExternalMethodUsage;
-import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.ExternalVariableUsage;
+import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.ExternalVariableOrEnumValueUsage;
 import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.FileNode;
 import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.MethodNode;
 import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.VariableNode;
@@ -72,7 +72,7 @@ public class AnalyzerUtil {
      * @param className the name of the class that is used
      */
     public void addLinkToExternalClassDeclaration(int lineNumber, int startColumn, String className) {
-        usages.add(new ExternalClassUsage(startColumn, lineNumber, className.length(), className, className));
+        usages.add(new ExternalClassOrEnumUsage(startColumn, lineNumber, className.length(), className, className));
     }
 
     /**
@@ -85,7 +85,7 @@ public class AnalyzerUtil {
      */
     public void addLinkToExternalVariableDeclaration(int lineNumber, int startColumn, String varName, Node parent, String className) {
         //add a link to the variable
-        usages.add(new ExternalVariableUsage(startColumn, lineNumber, className.length(), varName, className));
+        usages.add(new ExternalVariableOrEnumValueUsage(startColumn, lineNumber, className.length(), varName, className));
     }
 
     /**
@@ -122,7 +122,7 @@ public class AnalyzerUtil {
         VariableNode scopeObject = getVariableDeclarationForUsage(n.getBeginLine(), scopeName, n);
         if (scopeObject == null) { //the method is a static method from another class
             className = scopeName;
-            usages.add(new ExternalClassUsage(scopeColumn, lineNumber, className.length(), className, className));
+            usages.add(new ExternalClassOrEnumUsage(scopeColumn, lineNumber, className.length(), className, className));
         } else { //the method is called from an object in the class
             className = scopeObject.getType();
             //       usages.add(new Usage(n.getBeginColumn(), lineNumber, scopeName.length(), scopeObject.getStartLine(), scopeName));
@@ -350,7 +350,6 @@ public class AnalyzerUtil {
      * @return the visibility
      */
     public Visibility getVisibilityFromModifier(int modifier) {
-        Visibility visibility;
         String modifierString = Integer.toBinaryString(modifier);
         if (!modifierString.equals("0")) {
             if (modifierString.charAt(modifierString.length() - 1) == '1') {

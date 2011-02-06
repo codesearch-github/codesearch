@@ -18,7 +18,6 @@
  * You should have received a copy of the GNU General Public License
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.codesearch.commons.plugins.javacodeanalyzerplugin.ast;
 
 import java.util.LinkedList;
@@ -35,6 +34,15 @@ public class ClassNode extends CompoundNode {
 
     private List<MethodNode> methods = new LinkedList<MethodNode>();
     private List<VariableNode> attributes = new LinkedList<VariableNode>();
+    private List<EnumNode> enums = new LinkedList<EnumNode>();
+
+    public List<EnumNode> getEnums() {
+        return enums;
+    }
+
+    public void setEnums(List<EnumNode> enums) {
+        this.enums = enums;
+    }
 
     public List<VariableNode> getAttributes() {
         return attributes;
@@ -43,7 +51,7 @@ public class ClassNode extends CompoundNode {
     public void setAttributes(List<VariableNode> attributes) {
         this.attributes = attributes;
     }
-    
+
     public List<MethodNode> getMethods() {
         return methods;
     }
@@ -64,6 +72,7 @@ public class ClassNode extends CompoundNode {
         List<AstNode> childNodes = new LinkedList<AstNode>();
         childNodes.addAll(attributes);
         childNodes.addAll(methods);
+        childNodes.addAll(enums);
         return childNodes;
     }
 
@@ -75,11 +84,10 @@ public class ClassNode extends CompoundNode {
 
     @Override
     public String getModifiers() {
-        try{
-        return "class " + this.getVisibility().toString();}catch(NullPointerException ex){
+        try {
+            return "class " + this.getVisibility().toString();
+        } catch (NullPointerException ex) {
             return ""; //FIXME
         }
     }
-
-
 }

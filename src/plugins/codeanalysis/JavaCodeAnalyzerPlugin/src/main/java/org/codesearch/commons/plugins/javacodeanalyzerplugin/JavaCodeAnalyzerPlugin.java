@@ -27,6 +27,8 @@ import japa.parser.ast.Node;
 import japa.parser.ast.body.BodyDeclaration;
 import japa.parser.ast.body.ClassOrInterfaceDeclaration;
 import japa.parser.ast.body.ConstructorDeclaration;
+import japa.parser.ast.body.EnumConstantDeclaration;
+import japa.parser.ast.body.EnumDeclaration;
 import japa.parser.ast.body.FieldDeclaration;
 import japa.parser.ast.body.MethodDeclaration;
 import japa.parser.ast.body.Parameter;
@@ -74,16 +76,18 @@ import java.util.List;
 
 import org.codesearch.commons.database.DBAccess;
 import org.codesearch.commons.database.DatabaseAccessException;
+import org.codesearch.commons.database.DatabaseEntryNotFoundException;
 import org.codesearch.commons.plugins.codeanalyzing.CodeAnalyzerPlugin;
 import org.codesearch.commons.plugins.codeanalyzing.CodeAnalyzerPluginException;
 import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
-import org.codesearch.commons.plugins.codeanalyzing.ast.ExternalUsage;
 import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
 import org.codesearch.commons.plugins.codeanalyzing.ast.Visibility;
 import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.ClassNode;
-import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.ExternalClassUsage;
+import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.EnumNode;
+import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.EnumValueNode;
+import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.ExternalClassOrEnumUsage;
 import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.ExternalMethodUsage;
-import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.ExternalVariableUsage;
+import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.ExternalVariableOrEnumValueUsage;
 import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.FileNode;
 import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.MethodNode;
 import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.VariableNode;
@@ -99,7 +103,7 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
     private String fileContent;
     private List<String> typeDeclarations;
     private List<String> imports;
-    public AnalyzerUtil util;
+    private AnalyzerUtil util;
 
     /**
      * sets the lineNumber and the targetFilePath for the class usage
@@ -109,7 +113,7 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
      * @param originFilePath the filePath of the file that holds the usage
      * @throws DatabaseAccessException
      */
-    public void parseLineNumberAndFileNameOfUsage(ExternalClassUsage usage, String repository, List<String> fileImports, String originFilePath) throws DatabaseAccessException {
+    public void parseLineNumberAndFileNameOfUsage(ExternalClassOrEnumUsage usage, String repository, List<String> fileImports, String originFilePath) throws DatabaseAccessException {
         String className = usage.getTargetClassName();
         String targetFilePath = getFilePathOfDeclaration(repository, fileImports, className);
         usage.setTargetFilePath(targetFilePath);
@@ -128,7 +132,7 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
      * @param originFilePath the filePath of the file that holds the usage
      * @throws DatabaseAccessException
      */
-    public void parseLineNumberAndFileNameOfUsage(ExternalVariableUsage usage, String repository, List<String> fileImports, String originFilePath) throws DatabaseAccessException {
+    public void parseLineNumberAndFileNameOfUsage(ExternalVariableOrEnumValueUsage usage, String repository, List<String> fileImports, String originFilePath) throws DatabaseAccessException, DatabaseEntryNotFoundException {
         String className = usage.getTargetClassName();
         String targetFilePath = getFilePathOfDeclaration(repository, fileImports, className);
         usage.setTargetFilePath(targetFilePath);
@@ -139,7 +143,14 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
         checkChildNodesForVariable(currentFileNode, usage);
     }
 
-    private void checkChildNodesForVariable(AstNode node, ExternalVariableUsage usage){
+
+    /**
+     * recursively checks all child nodes of this node for the values of the usage
+     * if it finds the declarations sets the referenceLineNumber of the usage to the start line of the declaration
+     * @param node
+     * @param usage
+     */
+    private void checkChildNodesForVariable(AstNode node, ExternalVariableOrEnumValueUsage usage) {
         for (AstNode currentNode : node.getChildNodes()) {
             if (currentNode instanceof VariableNode) {
                 VariableNode currentVariable = (VariableNode) currentNode;
@@ -151,7 +162,7 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
             checkChildNodesForVariable(currentNode, usage);
         }
     }
-    
+
     /**
      * sets the lineNumber and the targetFilePath for the method usage
      * @param usage the usage that is parsed
@@ -160,7 +171,7 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
      * @param originFilePath the filePath of the file that holds the usage
      * @throws DatabaseAccessException
      */
-    public void parseLineNumberAndFileNameOfUsage(ExternalMethodUsage usage, String repository, List<String> fileImports, String originFilePath) throws DatabaseAccessException {
+    public void parseLineNumberAndFileNameOfUsage(ExternalMethodUsage usage, String repository, List<String> fileImports, String originFilePath) throws DatabaseAccessException, DatabaseEntryNotFoundException {
         String className = usage.getTargetClassName();
         String targetFilePath = getFilePathOfDeclaration(repository, fileImports, className);
         usage.setTargetFilePath(targetFilePath);
@@ -168,16 +179,32 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
             return;
         }
         AstNode currentFileNode = DBAccess.getBinaryIndexForFile(originFilePath, repository);
+        MethodNode bestMatch = null;
+        int paramCount = usage.getParameters().size();
+        outer:
         for (AstNode currentNode : currentFileNode.getChildNodes()) {
             if (currentNode instanceof MethodNode) {
                 MethodNode currentMethodNode = (MethodNode) currentNode;
                 if (currentNode.getName().equals(usage.getReplacedString()) && currentMethodNode.getParameters().size() == usage.getParameters().size()) {
-                    //TODO make parameter check
-                    usage.setReferenceLine(currentMethodNode.getStartLine());
-                    return;
+                    if (bestMatch == null) {
+                        bestMatch = currentMethodNode;
+                    } else {
+                        for (int i = 0; i < paramCount; i++) {
+                            String givenParam = usage.getParameters().get(i);
+                            String currentNodeParam = currentMethodNode.getParameters().get(i).getType();
+                            if (!givenParam.equals(currentNodeParam)) {
+                                continue outer;
+                            }
+                        }
+                        bestMatch = currentMethodNode;
+                    }
                 }
             }
         }
+        if (bestMatch != null) {
+            usage.setReferenceLine(bestMatch.getStartLine());
+        }
+        return;
     }
 
     /**
@@ -205,7 +232,7 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
         } else {
             targetFilePath = DBAccess.getFilePathForTypeDeclaration(className, repository);
         }
-        
+
         return targetFilePath;
     }
 
@@ -259,7 +286,35 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
     private void buildAST(CompilationUnit cu) {
         //iterate all types (classes) from the compilation unit
         for (TypeDeclaration type : cu.getTypes()) {
-            parseContentOfClass(type);
+            if (type instanceof ClassOrInterfaceDeclaration) {
+                parseContentOfClass(((ClassOrInterfaceDeclaration) type));
+            } else if (type instanceof EnumDeclaration) {
+                parseContentOfEnum(((EnumDeclaration)type), fileNode);
+            }
+        }
+
+    }
+
+    /**
+     * parses the enum and adds it to the parent node
+     * @param en
+     */
+    private void parseContentOfEnum(EnumDeclaration en, AstNode parent) {
+        EnumNode enumNode = new EnumNode();
+        enumNode.setName(en.getName());
+        enumNode.setStartLine(en.getBeginLine());
+        enumNode.setVisibility(util.getVisibilityFromModifier(en.getModifiers()));
+        for(EnumConstantDeclaration ecd : en.getEntries()){
+            EnumValueNode newValue = new EnumValueNode();
+            newValue.setName(ecd.getName());
+            newValue.setStartLine(ecd.getBeginLine());
+            newValue.setStartPositionInLine(ecd.getBeginColumn());
+            enumNode.getValues().add(newValue);
+        }
+        if(parent instanceof FileNode){
+            ((FileNode)parent).getEnums().add(enumNode);
+        } else if (parent instanceof ClassNode) {
+            ((ClassNode)parent).getEnums().add(enumNode);
         }
     }
 
@@ -268,7 +323,7 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
      * parses all methods and statements in the class
      * @param type the TypeDeclaration node
      */
-    private void parseContentOfClass(TypeDeclaration type) {
+    private void parseContentOfClass(ClassOrInterfaceDeclaration type) {
         //create ClassNode and extract required info from TypeDeclaration
         ClassNode newClass = new ClassNode();
         int startLine = type.getBeginLine();
@@ -284,7 +339,7 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
         if (type.getMembers() != null) {
             for (BodyDeclaration member : type.getMembers()) {
                 if (member instanceof ClassOrInterfaceDeclaration) {
-                    parseContentOfClass((TypeDeclaration) member);
+                    parseContentOfClass((ClassOrInterfaceDeclaration) member);
                 } else if (member instanceof MethodDeclaration) {
                     parseContentOfMethod(newClass, (MethodDeclaration) member);
                 } else if (member instanceof ConstructorDeclaration) {
@@ -301,6 +356,8 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
                         newVariable.setAttribute(true);
                         newClass.getAttributes().add(newVariable);
                     }
+                } else if (member instanceof EnumDeclaration){
+                    parseContentOfEnum((EnumDeclaration) member, newClass);
                 }
             }
         }
@@ -481,7 +538,7 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
         } else if (stmt instanceof ExplicitConstructorInvocationStmt) {
             ExplicitConstructorInvocationStmt ecis = (ExplicitConstructorInvocationStmt) stmt;
             parseExpression(ecis.getExpr(), ecis);
-        } else if (stmt instanceof ThrowStmt){
+        } else if (stmt instanceof ThrowStmt) {
             ThrowStmt ts = (ThrowStmt) stmt;
             parseExpression(ts.getExpr(), ts);
         }

@@ -23,7 +23,9 @@ package org.codesearch.commons.plugins.javacodeanalyzerplugin;
 import japa.parser.ast.ImportDeclaration;
 import japa.parser.ast.Node;
 import japa.parser.ast.body.ClassOrInterfaceDeclaration;
+import japa.parser.ast.body.EnumDeclaration;
 import japa.parser.ast.body.MethodDeclaration;
+import japa.parser.ast.body.TypeDeclaration;
 import japa.parser.ast.expr.ArrayAccessExpr;
 import japa.parser.ast.expr.AssignExpr;
 import japa.parser.ast.expr.BinaryExpr;
@@ -37,13 +39,13 @@ import japa.parser.ast.expr.UnaryExpr;
 import japa.parser.ast.stmt.ExplicitConstructorInvocationStmt;
 import japa.parser.ast.stmt.IfStmt;
 import japa.parser.ast.stmt.ReturnStmt;
-import japa.parser.ast.stmt.TryStmt;
+import japa.parser.ast.stmt.TypeDeclarationStmt;
 import japa.parser.ast.type.ClassOrInterfaceType;
 import japa.parser.ast.visitor.VoidVisitorAdapter;
 
 import java.util.LinkedList;
 import java.util.List;
-import org.codesearch.commons.plugins.codeanalyzing.ast.Visibility;
+import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.ClassNode;
 
 /**
  * a visitor used to visit the AST created by the JavaParser
@@ -109,6 +111,11 @@ public class UsageVisitor extends VoidVisitorAdapter {
     @Override
     public void visit(MethodCallExpr n, Object arg) {
         super.visit(n, arg);
+        ClassNode currentClass = util.getClassAtLine(n.getBeginLine());
+        if (currentClass == null) {
+            return;//FIXME
+        }
+        String currentClassName = currentClass.getName();
         List<Expression> parameterList = n.getArgs();
         if (parameterList != null) {
             for (Expression currentParameter : parameterList) {
@@ -117,7 +124,8 @@ public class UsageVisitor extends VoidVisitorAdapter {
                 }
             }
         }
-        String currentClassName = util.getClassAtLine(n.getBeginColumn()).getName();
+
+
         if (n.getScope() == null || n.getScope().toString().equals("this") || n.getScope().toString().equals(currentClassName)) {
             //in case the method is a method from the current class
             //first add a link to the method declaration
@@ -226,7 +234,7 @@ public class UsageVisitor extends VoidVisitorAdapter {
     @Override
     public void visit(IfStmt n, Object arg) {
         super.visit(n, arg);
-        if(n.getCondition() instanceof NameExpr){
+        if (n.getCondition() instanceof NameExpr) {
             util.addLinkToVariableDeclaration(n.getCondition().getBeginLine(), n.getCondition().getBeginColumn(), n.getCondition().toString(), n);
         }
     }
@@ -309,6 +317,12 @@ public class UsageVisitor extends VoidVisitorAdapter {
         // if (util.getVisibilityFromModifier(n.getModifiers()) == Visibility.PUBLIC) {
         this.typeDeclarations.add(this.packageName + "." + n.getName()); //FIXME
         // }
+    }
+
+    @Override
+    public void visit(EnumDeclaration n, Object arg) {
+        super.visit(n, arg);
+        this.typeDeclarations.add(this.packageName + "." + n.getName()); //FIXME
     }
 
     public List<String> getTypeDeclarations() {

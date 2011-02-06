@@ -33,6 +33,15 @@ import org.codesearch.commons.plugins.codeanalyzing.ast.CompoundNode;
  */
 public class FileNode extends CompoundNode {
     private List<ClassNode> classes = new LinkedList<ClassNode>();
+    private List<EnumNode> enums = new LinkedList<EnumNode>();
+
+    public List<EnumNode> getEnums() {
+        return enums;
+    }
+
+    public void setEnums(List<EnumNode> enums) {
+        this.enums = enums;
+    }
 
     public List<ClassNode> getClasses() {
         return classes;
@@ -53,6 +62,7 @@ public class FileNode extends CompoundNode {
     public List<AstNode> getChildNodes() {
         LinkedList<AstNode> childs = new LinkedList<AstNode>();
         childs.addAll(classes);
+        childs.addAll(enums);
         return childs;
     }
 

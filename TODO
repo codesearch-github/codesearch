@@ -19,7 +19,6 @@ Important TODOs
  - Fix exception handling; quite often, 
    problems are just caught and ignored 
    See that exception handling is consistent throughout the program
- - Make parameter check when looking for the line number of a method declaration in an external method call
  - Refactor database to be consistent(clearing should remove all dependent data
    sets)
  - In DBAccess, return a different exception/error code if an entry could not
@@ -27,7 +26,7 @@ Important TODOs
    out what went wrong
  - When the error message display is finished, refactor searcher error handling
    to actually use it!
- - When a file was deleted make sure all associated index and database files are purged
+ - Refactor Exception Handling in IndexingTask
 
 Bugs
 ===============
@@ -40,11 +39,7 @@ Bugs
 Minor Bugs
 ===============
  - usages of parameters in methods are not correctly linked
- - if no record for repository exists in database it should automatically be created
- - execution of code analysis sometimes causes an exception at databse access -> try with empty database
- - make the release of the connection in each DBAccess method finally
- - when clicking a usage the line after the declaration is highlighted instead of the line of the declaration
- - when opening a file the first line is highlighted
+ - add external code navigation for attribute types
 
 Unexpected Behaviour
 ===============

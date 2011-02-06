@@ -5,6 +5,7 @@
 package org.codesearch.commons.plugins.codeanalyzing.ast;
 
 import org.codesearch.commons.database.DatabaseAccessException;
+import org.codesearch.commons.database.DatabaseEntryNotFoundException;
 
 /**
  *
@@ -40,7 +41,7 @@ public abstract class ExternalUsage extends Usage {
      * @param repository the repository holding the file
      * @throws DatabaseAccessException
      */
-    public abstract void resolveLink(String originFilePath, String repository) throws DatabaseAccessException;
+    public abstract void resolveLink(String originFilePath, String repository) throws DatabaseAccessException, DatabaseEntryNotFoundException;
 
     public String getTargetClassName() {
         return targetClassName;

@@ -25,6 +25,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
 
 import net.sf.jmimemagic.Magic;
 import net.sf.jmimemagic.MagicException;
@@ -39,6 +40,7 @@ import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
 import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 import org.codesearch.commons.database.DBAccess;
 import org.codesearch.commons.database.DatabaseAccessException;
+import org.codesearch.commons.database.DatabaseEntryNotFoundException;
 import org.codesearch.commons.plugins.PluginLoader;
 import org.codesearch.commons.plugins.PluginLoaderException;
 import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
@@ -145,6 +147,8 @@ public class SearcherServiceImpl extends AutowiringRemoteServiceServlet implemen
                     file.setOutline(outline);
                 }
 
+            } catch (DatabaseEntryNotFoundException ex) {
+                //in case the file has no binary index it is simply displayed without an outline
             } catch (DatabaseAccessException ex) {
                 LOG.error("Could not access database: \n" + ex);
             }
@@ -203,6 +207,8 @@ public class SearcherServiceImpl extends AutowiringRemoteServiceServlet implemen
                 file.setFocusLine(usage.getReferenceLine());
                 return file;
             }
+        } catch (DatabaseEntryNotFoundException ex) {
+            //TODO redirect to current file here, probably return null
         } catch (DatabaseAccessException ex) {
             LOG.error(ex);
         }
@@ -251,7 +257,13 @@ public class SearcherServiceImpl extends AutowiringRemoteServiceServlet implemen
 
     private byte[] addUsageLinksToFileContent(byte[] fileContentBytes, String filePath, String repository, String hlEscapeStartToken, String hlEscapeEndToken) {
         try {
-            List<Usage> usages = DBAccess.getUsagesForFile(filePath, repository);
+            List<Usage> usages;
+            try {
+                usages = DBAccess.getUsagesForFile(filePath, repository);
+            } catch (DatabaseEntryNotFoundException ex) {
+                //in case the file does not have a binary index just display it without links
+                usages = null;
+            }
             String resultString = "";
             if (usages == null) {
                 //in case there is no entry for the filePath it is a file that has not been analyzed
