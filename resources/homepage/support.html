@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<!-- header -->
+    <head>
+        <title>Codesearch - News</title>
+        <link rel="stylesheet" href="basic.css" type="text/css" media="screen" />
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
+    </head>
+    <body>
+        <header>
+        <div id="header">
+            <div id="logo"></div>
+        </div>
+        </header>
+        <nav>
+        <ul id="menu">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="news.html">News</a></li>
+            <li><a href="support.html">Support</a></li>
+            <li><a href="aboutCodesearch.html">About codesearch</a></li>
+            <li><a href="aboutTheDevelopers.html">The developers</a></li>
+        </ul>
+        </nav>
+<!-- /header -->
+        <div id="content">
+        <h1>Install instructions</h1>
+        <h2>Prerequisites:</h2>
+        <ul>
+            <li>Java 6 or higher</li>
+            <li>Apache Maven build tool</li>
+            <li>Apache Tomcat 6 or higher</li>
+            <li>MySQL Database(for code analyzing support)</li>
+        </ul>
+        <h2>Basic setup</h2>
+        <ol>
+            <li>Make sure you have everything listed above.</li>
+            <li>Get the source code.</li>
+            <li>Switch to the src directory</li>
+            <li>Edit <pre>commons/src/main/resources/codesearch_config.xml</pre> (better solution in development))</li>
+            <li>Execute <pre>mvn clean package -DskipTests=true</pre></li>
+            <li>Copy 
+                <pre>src/indexer/target/indexer-{version}.war
+src/searcher/target/searcher-{version}.war</pre>
+                to your Tomcat webapps directory.
+            </li>
+            <li>Run your Tomcat</li>
+            <li>Go to {tomcat-address}/searcher-{version}</li>
+        </ol>
+        <h2>Code Analyzing</h2>
+        If you want code analyzing(outline, navigation between method calls and
+        definitions etc.), you have to do the following:
+        <ol>
+            <li>enable code analyzing in the config(see above))</li>
+            <li>configure the database connection in the config</li>
+            <li>create the database user and execute the SQL script in <pre>resources/db-script.sql</pre></li>
+            <li>make sure the configured user has access to the created db(codesearch_db)</li>
+            <li>deploy CodeAnalyzingPlugins on your Tomcat server</li>
+        </ol>
+        <h2>Plugin Setup</h2>
+        coming soon...
+        </div>
+    </body>
+</html>

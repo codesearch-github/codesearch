@@ -119,7 +119,7 @@ public class BazaarPlugin implements VersionControlPlugin {
      /** {@inheritDoc} */
     @Override
     public String getPurposes() {
-        return "BRZ";
+        return "BZR";
     }
 
      /** {@inheritDoc} */

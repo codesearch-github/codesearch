@@ -40,7 +40,7 @@ public class XmlCodeAnalyzerPluginTest {
     public void testAST() throws Exception {
         System.out.println("analyzeFile");
         String fileContent = "";
-        BufferedReader br = new BufferedReader(new FileReader("/home/david/codesearch/src/commons/pom.xml"));
+        BufferedReader br = new BufferedReader(new FileReader("/home/daasdingo/workspace/svnsearch/src_java/main/webapp/details.xhtml"));
         while(br.ready()){
             fileContent += br.readLine() + "\n";
         }

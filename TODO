@@ -30,6 +30,7 @@ Important TODOs
 
 Bugs
 ===============
+ - XmlCodeAnalyzer takes reaaallly long to analyze some files
  - Either find a way to preserve \n chars at parsing or completely replace the JavaParser with the EclipseAstParser
  - In external code navigation front end has no way to get filepath and repo
    after a jump

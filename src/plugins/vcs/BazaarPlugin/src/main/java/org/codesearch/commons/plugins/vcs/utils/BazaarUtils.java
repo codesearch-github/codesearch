@@ -20,9 +20,11 @@
  */
 package org.codesearch.commons.plugins.vcs.utils;
 
+import com.sun.jmx.remote.internal.ClientCommunicatorAdmin;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.logging.Level;
 import org.vcs.bazaar.client.BazaarRevision;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -45,7 +47,7 @@ import org.vcs.bazaar.client.core.BranchLocation;
  */
 public class BazaarUtils {
     //TODO: use external shh auth client
-   
+
     private static BazaarUtils instance;
     private IBazaarClient bazaarClient;
     private static final Logger LOG = Logger.getLogger(BazaarUtils.class);
@@ -70,10 +72,9 @@ public class BazaarUtils {
     /*
      * Sets the work dir
      */
-    public void setWorkingDirectory(String path)
-    {
-       LOG.debug("Set workdirektory: " + path);
-       bazaarClient.setWorkDir(new File(path));
+    public void setWorkingDirectory(String path) {
+        LOG.debug("Set workdirectory: " + path);
+        bazaarClient.setWorkDir(new File(path));
     }
 
     /**
@@ -118,13 +119,19 @@ public class BazaarUtils {
         URI uri = branchLocation.getURI();
         if (!userName.isEmpty() && !password.isEmpty()) {
             URI newURI = new URI(uri.getScheme(), userName + ":" + password, uri.getPath(), uri.getQuery(), uri.getFragment());
-            System.out.println("URI" +uri.getScheme()+userName + ":" + password+ uri.getPath()+ uri.getQuery()+ uri.getFragment());
+            System.out.println("URI" + uri.getScheme() + userName + ":" + password + uri.getPath() + uri.getQuery() + uri.getFragment());
             branchLocation = new BranchLocation(newURI);
+            try {
+                //TODO edit path
+                bazaarClient.checkout(branchLocation, new File("/tmp/bzr"), new Option("-v"));
+            } catch (BazaarClientException ex) {
+                java.util.logging.Logger.getLogger(BazaarUtils.class.getName()).log(Level.SEVERE, null, ex);
+            }
             return branchLocation;
         } else {
             return branchLocation;
         }
-        
+
     }
 
     /**

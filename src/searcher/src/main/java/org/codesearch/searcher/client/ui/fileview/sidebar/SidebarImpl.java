@@ -7,7 +7,6 @@ import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.Tree;
 import com.google.gwt.user.client.ui.TreeItem;
@@ -25,18 +24,13 @@ public class SidebarImpl extends Sidebar {
     }
     @UiField
     Tree sidebarTree;
-    @UiField
-    Label titleLabel;
-    @UiField
-    ScrollPanel scrollWrapper;
 
     public SidebarImpl() {
         initWidget(uiBinder.createAndBindUi(this));
         sidebarTree.addSelectionHandler(new SelectionHandler<TreeItem>() {
-
             @Override
             public void onSelection(SelectionEvent<TreeItem> event) {
-                ( (SidebarNode) event.getSelectedItem().getUserObject() ).onClick();
+                ((SidebarNode) event.getSelectedItem().getUserObject()).onClick();
             }
         });
     }
@@ -44,7 +38,6 @@ public class SidebarImpl extends Sidebar {
     /** {@inheritDoc} */
     @Override
     public void add(SidebarNode sidebarNode) {
-
         if (sidebarNode != null) {
             sidebarTree.addItem(convertSidebarNodeToTreeItem(sidebarNode));
         }
@@ -53,6 +46,10 @@ public class SidebarImpl extends Sidebar {
     private TreeItem convertSidebarNodeToTreeItem(SidebarNode sidebarNode) {
         TreeItem treeItem = new TreeItem(sidebarNode.getDisplayText());
         treeItem.setUserObject(sidebarNode);
+        String cssClasses = sidebarNode.getCssClasses();
+        if (cssClasses != null) {
+            treeItem.getElement().setClassName(cssClasses.toLowerCase());
+        }
         treeItem.setState(true);
         for (SidebarNode s : sidebarNode.getChilds()) {
             if (s != null) {
@@ -60,11 +57,6 @@ public class SidebarImpl extends Sidebar {
             }
         }
         return treeItem;
-    }
-
-    @Override
-    public void setSidebarTitle(String title) {
-        this.titleLabel.setText(title);
     }
 
     /** {@inheritDoc} */

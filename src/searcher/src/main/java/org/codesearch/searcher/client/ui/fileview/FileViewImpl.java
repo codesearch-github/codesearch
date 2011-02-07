@@ -48,7 +48,9 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.SplitLayoutPanel;
+import com.google.gwt.user.client.ui.TabLayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
+import java.util.LinkedList;
 import org.codesearch.searcher.client.ClientFactory;
 
 /**
@@ -82,7 +84,11 @@ public class FileViewImpl extends Composite implements FileView {
     @UiField
     HasClickHandlers backButton;
     @UiField
+    HasClickHandlers sidebarButton;
+    @UiField
     DivElement focusDiv;
+    @UiField
+    TabLayoutPanel sidebarTabPanel;
     /** UiBinder template. */
     private static FileViewUiBinder uiBinder = GWT.create(FileViewUiBinder.class);
     /** The presenter for this view. */
@@ -91,7 +97,10 @@ public class FileViewImpl extends Composite implements FileView {
     private HandlerRegistration keyboardShortcutHandlerRegistration;
     /** Number of lines of the displayed file */
     private int lineCount = 0;
+    /** Whether or not the focus line div is visible. */
     private boolean focusDivVisible;
+    private boolean sidebarVisible;
+    private List<Sidebar> shownSidebars = new LinkedList<Sidebar>();
 
     public FileViewImpl() {
         initWidget(uiBinder.createAndBindUi(this));
@@ -109,12 +118,41 @@ public class FileViewImpl extends Composite implements FileView {
         goToLineWithDialog();
     }
 
+    @UiHandler("sidebarButton")
+    void onSidebar(ClickEvent event) {
+        toggleSidebar();
+    }
+
+    void toggleSidebar() {
+        if (sidebarVisible) {
+            splitWrapper.remove(sidebarTabPanel);
+            sidebarVisible = false;
+        } else {
+            splitWrapper.clear();
+            splitWrapper.addWest(sidebarTabPanel, 300);
+            splitWrapper.add(scrollWrapper);
+            sidebarVisible = true;
+        }
+        splitWrapper.animate(100);
+    }
+
+    private void updateSidebar() {
+        sidebarTabPanel.clear();
+        for (Sidebar sidebar : shownSidebars) {
+            sidebarTabPanel.add(sidebar, sidebar.getTitle());
+        }
+    }
+
     /** {@inheritDoc} */
     @Override
     public void cleanup() {
         fileContentContainer.clear();
         lineNumbersContainer.clear();
-        splitWrapper.clear();
+        shownSidebars.clear();
+        updateSidebar();
+        if (sidebarVisible) {
+            toggleSidebar();
+        }
         lineCount = 0;
         showFocusDiv(false);
     }
@@ -149,7 +187,6 @@ public class FileViewImpl extends Composite implements FileView {
         fileContent = "<pre>" + fileContent + "</pre>";
 
         fileContentContainer.add(new HTML(fileContent));
-        splitWrapper.add(scrollWrapper);
     }
 
     /** {@inheritDoc} */
@@ -157,15 +194,16 @@ public class FileViewImpl extends Composite implements FileView {
     public void setOutline(List<OutlineNode> outline) {
         if (outline != null) {
             Sidebar sidebar = new SidebarImpl();
-            sidebar.setSidebarTitle("Outline");
+            sidebar.setTitle("Outline");
             for (SidebarNode s : outline) {
                 sidebar.add(s);
             }
-            //FIXME this is a workaround
-            splitWrapper.clear();
-            splitWrapper.addWest(sidebar, 300);
-            splitWrapper.add(scrollWrapper);
             sidebar.expandAll();
+            shownSidebars.add(sidebar);
+            updateSidebar();
+            if (!sidebarVisible) {
+                toggleSidebar();
+            }
         }
     }
 

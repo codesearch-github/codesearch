@@ -12,12 +12,6 @@ import com.google.gwt.user.client.ui.Composite;
 public abstract class Sidebar extends Composite {
 
     /**
-     * Sets the title of the sidebar.
-     * @param title The title
-     */
-    public abstract void setSidebarTitle(String title);
-
-    /**
      * Clears all elements from the sidebar.
      */
     public abstract void clear();

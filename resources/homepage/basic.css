@@ -1,68 +1,89 @@
 body
 {
     padding: 0;
-    margin: 0;
+    margin: 5px auto 0px auto;
+    font-family: sans-serif;
+    max-width: 1024px;
+    min-width: 700px;
+}
+
+h1
+{
+    font-size: 1.5em;
+}
+
+h2
+{
+    font-size: 1em;
 }
 
 #header
 {
     width: 100%;
-    background-color: #555555;
 }
 
 #logo
 {
-    white-space: nowrap;
-    color: white;
-    font-family: monospace;
-    margin-left: 2em;
-}
-
-#title
-{
-    display: block;
-    font-size: 30pt;
-}
-
-#subtitle
-{
-    display: block;
-    font-size: 16pt;
-}
-
-#left-sidebar
-{
-    float: left;
-    background-color: #555555;
+    background: url("img/codesearch_header_logo.png") no-repeat;
+    height: 85px;
+    margin: 0;
 }
 
 #menu
 {
     display: block;
+    width: 100%;
     list-style: none;
-    margin-left: 2em;
+    padding: 0;
 }
 
 #menu li
 {
-    display: block;
+    display: inline-block;
 }
 
-#menu a
+#menu li a
 {
     width: 100%;
-    display: block;
+    padding: 0.3em 1em;
+    border-right: 1px solid #BBBBBB;
     text-decoration: none;
+    font-weight: bold;
+    color: black;
 }
 
-#menu a:hover
+#menu li:first-child a
 {
-    background-color: #CCCCCC;
+    padding-left: 0em;
 }
 
+#menu li:last-child a
+{
+    border-right: none;
+}
+
+#menu li a:hover
+{
+    color: #0081FF;
+}
 #content
 {
-    float: right;
-    background-color: #CCCCCC;
+    background-color: #EEEEEE;
     padding: 1em 1em 1em 1em;
+}
+
+.news-header
+{
+    border-bottom: 1px solid black;
+    margin-bottom: 5px;
+}
+
+.news-date
+{
+    float:right;
+    font-style: italic;
+}
+
+.news-title
+{
 }

@@ -105,6 +105,7 @@
                 <div class="{style.controlbar}">
                     <g:Button ui:field="backButton" text="Back" />
                     <g:Button ui:field="goToLineButton" text="Go to line" />
+                    <g:Button ui:field="sidebarButton" text="Sidebar" />
                     <div class="{style.clearfix}"/>
                 </div>
                 <div class="{style.fileinfo}">
@@ -125,6 +126,9 @@
                         </g:HTMLPanel>
                     </g:ScrollPanel>
                 </g:center>
+                <g:west size="300">
+                    <g:TabLayoutPanel ui:field="sidebarTabPanel" barUnit='EM' barHeight='1.7' height="100%" />
+                </g:west>
             </g:SplitLayoutPanel>
         </g:center>
     </g:DockLayoutPanel>

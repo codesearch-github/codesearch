@@ -57,12 +57,10 @@ public class FileActivity extends AbstractActivity implements Presenter {
     @Override
     public void start(AcceptsOneWidget panel, EventBus eventBus) {
         fileView = clientFactory.getFileView();
-        fileView.cleanup();
         fileView.setPresenter(this);
         fileView.setFilePath(filePath);
         fileView.setRepository(repository);
         fileView.connectEventHandlers();
-        fileView.setFileContent("loading file...", true);
         panel.setWidget(fileView.asWidget());
         searcherServiceAsync.getFile(repository, filePath, new GetFileCallback());
     }
@@ -70,8 +68,13 @@ public class FileActivity extends AbstractActivity implements Presenter {
     /** {@inheritDoc} */
     @Override
     public void goTo(Place place) {
-        fileView.disconnectEventHandlers();
         clientFactory.getPlaceController().goTo(place);
+    }
+
+    @Override
+    public void onStop() {
+        fileView.disconnectEventHandlers();
+        fileView.cleanup();
     }
 
     @Override
@@ -91,10 +94,8 @@ public class FileActivity extends AbstractActivity implements Presenter {
         /** {@inheritDoc} */
         @Override
         public void onSuccess(FileDto result) {
-            fileView.cleanup();
             fileView.setFileContent(result.getFileContent(), result.isBinary());
             fileView.setOutline(result.getOutline());
-            fileView.goToLine(result.getFocusLine());
         }
 
     }

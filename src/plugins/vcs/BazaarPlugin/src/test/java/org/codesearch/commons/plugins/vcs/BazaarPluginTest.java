@@ -25,16 +25,10 @@
  */
 package org.codesearch.commons.plugins.vcs;
 
-import org.codesearch.commons.plugins.vcs.BazaarPlugin;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Set;
-import org.codesearch.commons.plugins.vcs.FileDto;
-import org.codesearch.commons.plugins.vcs.VersionControlPluginException;
-import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -47,14 +41,14 @@ import static org.junit.Assert.*;
 public class BazaarPluginTest {
 
     BazaarPlugin plugin = new BazaarPlugin();
-    private String localPath = "file:///home/zeheron/workspace/testground/bazaar/";
+    private String path = "lp:codesearch";
 
     public BazaarPluginTest() {
     }
 
     @Before
     public void setUp() throws URISyntaxException, VersionControlPluginException {
-        plugin.setRepository(new URI(localPath), "", "");
+        plugin.setRepository(new URI(path), "", "");
     }
     
     /**
@@ -63,7 +57,7 @@ public class BazaarPluginTest {
     @Test
     public void testGetFileContentForFilePath() throws Exception {
         System.out.println("getFileContentForFilePath");
-        String filePath = "file:///home/zeheron/workspace/testground/bazaar/test.java";
+        String filePath = "/TODO";
         byte[] result = plugin.getFileForFilePath(filePath).getContent();
         boolean content = false;
         if(result != null)

@@ -1,6 +1,7 @@
 package org.codesearch.searcher.shared;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.List;
 
 import org.codesearch.searcher.client.ui.fileview.FileViewImpl;
@@ -15,6 +16,7 @@ public class OutlineNode implements SidebarNode, Serializable {
     private int startLine;
     private String cssClasses;
 
+    @Override
     public String getCssClasses() {
         return cssClasses;
     }
@@ -33,6 +35,9 @@ public class OutlineNode implements SidebarNode, Serializable {
 
     @Override
     public List<SidebarNode> getChilds() {
+        if(childs == null) {
+            return Collections.EMPTY_LIST;
+        }
         return childs;
     }
 

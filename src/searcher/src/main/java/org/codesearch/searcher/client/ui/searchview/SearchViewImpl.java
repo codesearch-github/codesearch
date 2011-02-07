@@ -64,7 +64,6 @@ public class SearchViewImpl extends Composite implements SearchView {
     private static SearchViewUiBinder uiBinder = GWT.create(SearchViewUiBinder.class);
     // RESULT LIST RELATED
     private ListDataProvider<SearchResultDto> searchResultDataProvider;
-    private Presenter presenter;
     @UiField(provided = true)
     CellTable<SearchResultDto> resultTable;
     @UiField(provided = true)
@@ -84,6 +83,8 @@ public class SearchViewImpl extends Composite implements SearchView {
     FlowPanel resultView;
     @UiField
     HasValue<Boolean> caseSensitive;
+
+    private Presenter presenter;
 
     public SearchViewImpl() {
         initResultTable();
@@ -181,7 +182,7 @@ public class SearchViewImpl extends Composite implements SearchView {
     }
 
     private void initResultTable() {
-        resultTable = new CellTable<SearchResultDto>(1000);
+        resultTable = new CellTable<SearchResultDto>(200);
         resultTable.addColumn(new TextColumn<SearchResultDto>() {
 
             /** {@inheritDoc} */
@@ -220,7 +221,7 @@ public class SearchViewImpl extends Composite implements SearchView {
                 }
             }
         });
-        // Create a Pager to control the table.
+        // Create a pager to control the table.
         SimplePager.Resources pagerResources = GWT.create(SimplePager.Resources.class);
         resultTablePager = new SimplePager(TextLocation.CENTER, pagerResources, false, 0, true);
         resultTablePager.setDisplay(resultTable);

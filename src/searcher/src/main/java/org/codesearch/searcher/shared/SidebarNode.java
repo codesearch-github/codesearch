@@ -11,4 +11,5 @@ public interface SidebarNode {
     void onClick();
     String getDisplayText();
     List<SidebarNode> getChilds();
+    String getCssClasses();
 }

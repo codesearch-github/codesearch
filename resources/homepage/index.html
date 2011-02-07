@@ -1,26 +1,39 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html>
+<!-- header -->
     <head>
         <title>Codesearch - Homepage</title>
         <link rel="stylesheet" href="basic.css" type="text/css" media="screen" />
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
     </head>
     <body>
+        <header>
         <div id="header">
-            <div id="logo">
-                <span id="title">Codesearch</span>
-                <span id="subtitle">A java code search application</span>
-            </div>
+            <div id="logo"></div>
         </div>
-        <div id="left-sidebar">
-            <ul id="menu">
-                <li><a href="#">Home</a></li>
-                <li><a href="#">About codesearch</a></li>
-		<li><a href="aboutTheDevelopers.html">About the developers</a></li>
-                <li><a href="#">News</a></li>
-            </ul>
-        </div>
+        </header>
+        <nav>
+        <ul id="menu">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="news.html">News</a></li>
+            <li><a href="support.html">Support</a></li>
+            <li><a href="aboutCodesearch.html">About codesearch</a></li>
+            <li><a href="aboutTheDevelopers.html">The developers</a></li>
+        </ul>
+        </nav>
+<!-- /header -->
         <div id="content">
-            Work in progress...
+            Welcome to the homepage of Codesearch, an application that helps
+            you keep an overview of your source code.<br/>
+            Codesearch gives you the power to search and view all code that is 
+            managed by version control systems such as Subversion, Git or Bazaar.<br/>
+            You can easily extend Codesearch with your own plugins, currently
+            for these features:
+            <ul>
+                <li>Version control systems</li>
+                <li>Syntax highlighting</li>
+                <li>Code analyzing(Abstract Syntax Tree parsing)</li>
+            </ul>
         </div>
     </body>
 </html>

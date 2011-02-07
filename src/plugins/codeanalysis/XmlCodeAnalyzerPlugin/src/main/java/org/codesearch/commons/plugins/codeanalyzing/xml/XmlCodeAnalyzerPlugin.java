@@ -106,6 +106,14 @@ public class XmlCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
         public void endElement(String string, String string1, String string2) throws SAXException {
             nodes.pop();
         }
+
+        @Override
+        public InputSource resolveEntity(String publicId, String systemId) throws IOException, SAXException {
+            return new InputSource(
+            new ByteArrayInputStream("<?xml version='1.0' encoding='UTF-8'?>".getBytes()));
+        }
+
+
     }
 
     /** {@inheritDoc} */
