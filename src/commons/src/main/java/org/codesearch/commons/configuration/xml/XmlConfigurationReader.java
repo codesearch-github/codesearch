@@ -49,11 +49,20 @@ public class XmlConfigurationReader {
     private XMLConfiguration config;
     /** The path to the configuration file. */
     private String configpath = "codesearch_config.xml";
+    /** the singleton instance of this class */
+    private static XmlConfigurationReader theInstance;
+
+    public static synchronized XmlConfigurationReader getInstance(){
+        if(theInstance == null){
+            theInstance = new XmlConfigurationReader();
+        }
+        return theInstance;
+    }
 
     /**
      * creates a new instance of XmlConfigurationReader
      */
-    public XmlConfigurationReader() {
+    private XmlConfigurationReader() {
     }
 
     /**
@@ -85,7 +94,6 @@ public class XmlConfigurationReader {
                 if (timeString == null) {
                     calc = GregorianCalendar.getInstance();
                 } else {
-
                     String[] timeParts = timeString.split("-");
                     calc = new GregorianCalendar(Integer.parseInt(timeParts[0]), Integer.parseInt(timeParts[1]) - 1,
                             Integer.parseInt(timeParts[2]), Integer.parseInt(timeParts[3]), Integer.parseInt(timeParts[4]));

@@ -31,7 +31,6 @@ import org.codesearch.commons.plugins.PluginLoader;
 import org.codesearch.commons.plugins.codeanalyzing.CodeAnalyzerPlugin;
 import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
 import org.codesearch.indexer.exceptions.TaskExecutionException;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  *
@@ -49,10 +48,8 @@ public class CodeAnalyzerTask implements Task {
     /** The used PropertyReader */
     private PropertiesManager propertiesReader;
     /** The XmlConfigurationReader used to get the configuration */
-    @Autowired
     private XmlConfigurationReader configReader;
     /** The plugin loader. */
-    @Autowired
     private PluginLoader pluginLoader;
     /** The Version control Plugin */
     private VersionControlPlugin versionControlPlugin;

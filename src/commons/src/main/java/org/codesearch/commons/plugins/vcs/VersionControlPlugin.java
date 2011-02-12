@@ -21,9 +21,9 @@
 
 package org.codesearch.commons.plugins.vcs;
 
-import java.net.URI;
 import java.util.List;
 import java.util.Set;
+import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 
 import org.codesearch.commons.plugins.Plugin;
 
@@ -37,11 +37,9 @@ public interface VersionControlPlugin extends Plugin {
      * Sets the current repository.
      * It is required that the repository is set before calling any of the
      * other Version Control Plugin methods.
-     * @param url The repository base URL.
-     * @param username The username used to access the repository.
-     * @param password The password used to access the repository.
+     * @param repository
      */
-    void setRepository(URI url, String username, String password) throws VersionControlPluginException;
+    void setRepository(RepositoryDto repository) throws VersionControlPluginException;
 
     /**
      * Retrieves the file corresponding to the given file path.

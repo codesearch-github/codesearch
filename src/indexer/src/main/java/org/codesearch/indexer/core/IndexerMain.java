@@ -28,9 +28,6 @@ import org.apache.log4j.Logger;
 import org.codesearch.commons.database.DBAccess;
 import org.codesearch.indexer.manager.IndexingManager;
 import org.quartz.SchedulerException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * Listener class that calls required methods at startup and destruction of the program
@@ -41,21 +38,17 @@ public class IndexerMain implements ServletContextListener {
     protected static final Logger LOG = Logger.getLogger(IndexerMain.class);
     /** The IndexingManager used to control the execution of the IndexingJobs */
     private IndexingManager indexingManager;
-    /** the application context used to retrieve spring-beans in the indexer */
-    private static ApplicationContext applicationContext;
-
+    
     /**
      * Instantiates the IndexingManager and starts its scheduler
      * @param sce dummy parameter needed by the parent class implementation
      */
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        applicationContext = new ClassPathXmlApplicationContext("classpath:org/codesearch/indexer/IndexerBeans.xml");
         DBAccess.setupConnections();
         try {
             indexingManager = new IndexingManager();
             indexingManager.startScheduler();
-            applicationContext = WebApplicationContextUtils.getWebApplicationContext(sce.getServletContext());
         } catch (SchedulerException ex) {
             LOG.error("Problem with scheduler at context initialization: " + ex);
         } catch (ConfigurationException ex) {
@@ -65,9 +58,5 @@ public class IndexerMain implements ServletContextListener {
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
-    }
-
-    public static ApplicationContext getApplicationContext() {
-        return applicationContext;
     }
 }

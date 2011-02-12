@@ -20,6 +20,8 @@
  */
 package org.codesearch.commons.plugins;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.ServiceLoader;
 
 /**
@@ -45,16 +47,40 @@ public class PluginLoader {
     @SuppressWarnings("unchecked")
     public static <T extends Plugin> T getPlugin(final Class<T> clazz, final String purpose)
             throws PluginLoaderException {
+        Plugin validPlugin = null;
         ServiceLoader<T> serviceLoader = ServiceLoader.load(clazz);
         for (Plugin plugin : serviceLoader) {
             String[] purposes = plugin.getPurposes().split(" ");
             for (String s : purposes) {
                 if (s.equalsIgnoreCase(purpose)) {
-                    return (T) plugin;
+                    if (validPlugin == null) {
+                        validPlugin = plugin;
+                    } else {
+                        throw new PluginLoaderException("Multiple plugins found for purpose " + purpose + " and class " + clazz + " which only supports a single plugin");
+                    }
                 }
             }
         }
-
+        if (validPlugin != null) {
+            return (T) validPlugin;
+        }
         throw new PluginLoaderException("No Plugin found for purpose: " + purpose + " and Class: " + clazz);
+    }
+
+    public static <T extends Plugin> List<T> getMultiplePluginsForSingelPurpose(final Class<T> clazz, final String purpose) throws PluginLoaderException {
+        List<T> validPlugins = new LinkedList<T>();
+        ServiceLoader<T> serviceLoader = ServiceLoader.load(clazz);
+        for (Plugin plugin : serviceLoader) {
+            String[] purposes = plugin.getPurposes().split(" ");
+            for (String s : purposes) {
+                if (s.equalsIgnoreCase(purpose)) {
+                    validPlugins.add((T) plugin);
+                }
+            }
+        }
+        if (validPlugins.isEmpty()) {
+            throw new PluginLoaderException("No Plugin found for purpose: " + purpose + " and Class: " + clazz);
+        }
+        return validPlugins;
     }
 }

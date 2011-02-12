@@ -31,7 +31,7 @@
     <db-port-number>3306</db-port-number>
     <db-name>codesearch</db-name>
     <db-max-connections>100</db-max-connections>
-    
+
     <global-blacklist-filenames>
         <filename>*.svn*</filename>
         <filename>*.class</filename>

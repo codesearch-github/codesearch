@@ -52,7 +52,7 @@ public class DocumentSearcherTest {
 
     public DocumentSearcherTest() {
         try {
-            instance = new DocumentSearcher(new XmlConfigurationReader());
+            instance = new DocumentSearcher(XmlConfigurationReader.getInstance());
         } catch (ConfigurationException ex) {
             Logger.getLogger(DocumentSearcherTest.class.getName()).log(Level.SEVERE, null, ex);
         }

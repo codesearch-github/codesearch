@@ -55,15 +55,7 @@ public class SubversionPluginTest {
 
     @Before
     public void setUp() {
-        try {
-            try {
-                sp.setRepository(new URI("svn://portal.htl-kaindorf.at/svnsearch"), "feldruebe", "dota!123");
-            } catch (URISyntaxException ex) {
-                Logger.getLogger(SubversionPluginTest.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        } catch (VersionControlPluginException ex) {
-            fail("The repository could not be opened");
-        }
+       
         
     }
 
@@ -78,7 +70,7 @@ public class SubversionPluginTest {
     public void testGetPathsForChangedFilesSinceRevision() throws Exception {
         System.out.println("getPathsForChangedFilesSinceRevision");
         String revision = "217";
-        sp.setRepository(new URI("svn://portal.htl-kaindorf.at/svnsearch"), "feldruebe", "dota!123");
+   //     sp.setRepository(new URI("svn://portal.htl-kaindorf.at/svnsearch"), "feldruebe", "dota!123");
         Set result = sp.getChangedFilesSinceRevision(revision);
         Iterator iter = result.iterator();
         FileDto file = (FileDto) iter.next();

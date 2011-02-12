@@ -57,7 +57,7 @@ public final class IndexingManager {
      * @throws SchedulerException In case the scheduler could not be instantiated
      */
     public IndexingManager() throws SchedulerException {
-        configReader = new XmlConfigurationReader();
+        configReader = XmlConfigurationReader.getInstance();
         SchedulerFactory sf = new StdSchedulerFactory();
         scheduler = sf.getScheduler();
     }

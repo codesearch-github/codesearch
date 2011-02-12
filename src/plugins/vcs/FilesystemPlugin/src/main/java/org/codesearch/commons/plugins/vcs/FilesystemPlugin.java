@@ -24,11 +24,12 @@ package org.codesearch.commons.plugins.vcs;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.URI;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
+
 
 /**
  * A VersionControlPlugin used to access files from the file system
@@ -37,12 +38,12 @@ import java.util.Set;
 public class FilesystemPlugin implements VersionControlPlugin {
 
     /** the folder where all code files are located */
-    private String codeLocation;
-
+    private RepositoryDto repository;
+    
     /** {@inheritDoc} */
     @Override
-    public void setRepository(URI url, String username, String password) throws VersionControlPluginException {
-        this.codeLocation = url.getPath();
+    public void setRepository(RepositoryDto repository) throws VersionControlPluginException {
+        this.repository = repository;
     }
 
     /** {@inheritDoc} */
@@ -64,6 +65,7 @@ public class FilesystemPlugin implements VersionControlPlugin {
             fileDto.setContent(fileContent);
             fileDto.setBinary(false);
             fileDto.setFilePath(filePath);
+            fileDto.setRepository(repository);
             return fileDto;
         } catch (IOException ex) {
             throw new VersionControlPluginException("File could not be opened: \n" + ex);
@@ -78,7 +80,7 @@ public class FilesystemPlugin implements VersionControlPlugin {
     @Override
     public Set<FileDto> getChangedFilesSinceRevision(String revision) throws VersionControlPluginException {
         Set<FileDto> files = new HashSet<FileDto>();
-        addChangedFilesFromDirectoryToSet(files, new File(codeLocation), Long.parseLong(revision));
+        addChangedFilesFromDirectoryToSet(files, new File(repository.getUrl()), Long.parseLong(revision));
         return files;
     }
 
@@ -106,7 +108,7 @@ public class FilesystemPlugin implements VersionControlPlugin {
     /** {@inheritDoc} */
     @Override
     public String getRepositoryRevision() throws VersionControlPluginException {
-        return Long.toString(getHighestLastModifiedDateFromDirectory(new File(codeLocation)));
+        return Long.toString(getHighestLastModifiedDateFromDirectory(new File(repository.getUrl())));
     }
 
     /**

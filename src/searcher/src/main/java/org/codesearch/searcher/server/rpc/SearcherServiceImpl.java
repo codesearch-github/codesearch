@@ -130,7 +130,7 @@ public class SearcherServiceImpl extends AutowiringRemoteServiceServlet implemen
             RepositoryDto repositoryDto = xmlConfigurationReader.getRepositoryByName(repository);
             VersionControlPlugin vcPlugin = PluginLoader.getPlugin(VersionControlPlugin.class, repositoryDto.getVersionControlSystem());
 
-            vcPlugin.setRepository(new URI(repositoryDto.getUrl()), repositoryDto.getUsername(), repositoryDto.getPassword());
+            vcPlugin.setRepository(repositoryDto);
             org.codesearch.commons.plugins.vcs.FileDto vcFile = vcPlugin.getFileForFilePath(filePath);
 
             // GET OUTLINE IF EXISTING
@@ -181,8 +181,6 @@ public class SearcherServiceImpl extends AutowiringRemoteServiceServlet implemen
             }
         } catch (HighlightingPluginException ex) {
             LOG.error(ex);
-        } catch (URISyntaxException ex) {
-            throw new SearcherServiceException("Invalid url syntax: \n" + ex);
         } catch (VersionControlPluginException ex) {
             throw new SearcherServiceException("Could not get file: \n" + ex);
         } catch (ConfigurationException ex) {

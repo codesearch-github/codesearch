@@ -28,6 +28,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import org.apache.log4j.Logger;
+import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 import org.tmatesoft.svn.core.ISVNDirEntryHandler;
 import org.tmatesoft.svn.core.SVNDirEntry;
 import org.tmatesoft.svn.core.SVNException;
@@ -54,7 +55,7 @@ import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
 public class SubversionPlugin implements VersionControlPlugin {
 
     /** The repository that is currently accessed. */
-    private SVNRepository repository;
+    private SVNRepository svnRepo;
     private static final Logger LOG = Logger.getLogger(SubversionPlugin.class);
     private ISVNAuthenticationManager authManager;
 
@@ -81,13 +82,12 @@ public class SubversionPlugin implements VersionControlPlugin {
 
     /** {@inheritDoc} */
     @Override
-    public void setRepository(URI url, String username, String password) throws VersionControlPluginException {
+    public void setRepository(RepositoryDto repository) throws VersionControlPluginException {
         try {
-            SVNURL svnurl = SVNURL.parseURIDecoded(url.toString());
-            repository = SVNRepositoryFactory.create(svnurl);
-
-            authManager = new BasicAuthenticationManager(username, password);
-            repository.setAuthenticationManager(authManager);
+            SVNURL svnurl = SVNURL.parseURIDecoded(repository.getUrl().toString());
+            svnRepo = SVNRepositoryFactory.create(svnurl);
+            authManager = new BasicAuthenticationManager(repository.getUsername(), repository.getPassword());
+            svnRepo.setAuthenticationManager(authManager);
         } catch (SVNException ex) {
             throw new VersionControlPluginException(ex.toString());
         }
@@ -99,14 +99,14 @@ public class SubversionPlugin implements VersionControlPlugin {
         try {
             LOG.debug("Retrieving file: " + filePath);
             FileDto fileDto = new FileDto();
-            SVNNodeKind nodeKind = repository.checkPath(filePath, -1);
+            SVNNodeKind nodeKind = svnRepo.checkPath(filePath, -1);
             if (nodeKind != SVNNodeKind.FILE) {
                 return null;
             }
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
             SVNProperties properties = new SVNProperties();
-            repository.getFile(filePath, -1, properties, baos);
+            svnRepo.getFile(filePath, -1, properties, baos);
             boolean binary = !SVNProperty.isTextMimeType(properties.getStringValue(SVNProperty.MIME_TYPE));
             String lastAuthor = properties.getStringValue(SVNProperty.LAST_AUTHOR);
             String lastAlterationDate = properties.getStringValue(SVNProperty.COMMITTED_DATE); //TODO test this
@@ -126,7 +126,7 @@ public class SubversionPlugin implements VersionControlPlugin {
         Set<FileDto> files = new HashSet();
         List logs = null;
         try {
-            logs = (LinkedList) repository.log(new String[]{}, null, Long.parseLong(revision) + 1, -1, true, false);
+            logs = (LinkedList) svnRepo.log(new String[]{}, null, Long.parseLong(revision) + 1, -1, true, false);
         } catch (NullPointerException e) {
             throw new VersionControlPluginException("No repository specified");
         } catch (SVNException ex) {
@@ -166,7 +166,7 @@ public class SubversionPlugin implements VersionControlPlugin {
     @Override
     public String getRepositoryRevision() throws VersionControlPluginException {
         try {
-            return Long.toString(repository.getLatestRevision());
+            return Long.toString(svnRepo.getLatestRevision());
         } catch (SVNException ex) {
             throw new VersionControlPluginException(ex.toString());
         }
@@ -176,8 +176,8 @@ public class SubversionPlugin implements VersionControlPlugin {
     public List<String> getFilesInDirectory(String directoryPath) throws VersionControlPluginException {
         List<String> fileNames = new LinkedList<String>();
         try {
-            directoryPath = repository.getRepositoryRoot(true).getPath();
-            repository.getDir(directoryPath, -1, null, new ListDirectoryDirEntryHandler(fileNames));
+            directoryPath = svnRepo.getRepositoryRoot(true).getPath();
+            svnRepo.getDir(directoryPath, -1, null, new ListDirectoryDirEntryHandler(fileNames));
         } catch (SVNException ex) {
             System.out.println(ex);
         }

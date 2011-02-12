@@ -62,8 +62,8 @@
                     <type>index</type>
                 </task>
             </tasks>
-            </index-job>
-        </index-jobs>
+        </index-job>
+    </index-jobs>
     <testproperty>asdf</testproperty>
     <repository-groups>group1 group2 group3 group4</repository-groups>
     <repositories>
@@ -103,7 +103,7 @@
             <not_indexed_filenames>
                 <filename>*.xml</filename>
             </not_indexed_filenames>
-             <repository-groups>
+            <repository-groups>
                 <repo-group>group1</repo-group>
             </repository-groups>
         </repository>
@@ -124,7 +124,7 @@
             <code-navigation-enabled>true</code-navigation-enabled>
         </repository>
     </repositories>
-	<repository-groups>group1,group2,group3</repository-groups>
+    <repository-groups>group1,group2,group3</repository-groups>
     <listTest>1</listTest>
     <listTest>2</listTest>
     <listTest>3</listTest>

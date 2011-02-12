@@ -27,6 +27,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -36,6 +37,8 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.WhitespaceAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.Field.Index;
+import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
@@ -43,16 +46,21 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.store.FSDirectory;
 import org.codesearch.commons.configuration.properties.PropertiesManager;
+import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
+import org.codesearch.commons.configuration.xml.XmlConfigurationReaderConstants;
 import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 import org.codesearch.commons.constants.IndexConstants;
 import org.codesearch.commons.database.DBAccess;
 import org.codesearch.commons.database.DatabaseAccessException;
+import org.codesearch.commons.plugins.Plugin;
 import org.codesearch.commons.plugins.PluginLoader;
 import org.codesearch.commons.plugins.PluginLoaderException;
 import org.codesearch.commons.plugins.codeanalyzing.CodeAnalyzerPlugin;
 import org.codesearch.commons.plugins.codeanalyzing.CodeAnalyzerPluginException;
 import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
 import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
+import org.codesearch.commons.plugins.lucenefields.LuceneFieldPlugin;
+import org.codesearch.commons.plugins.lucenefields.LuceneFieldValueException;
 import org.codesearch.commons.plugins.vcs.FileDto;
 import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
 import org.codesearch.commons.plugins.vcs.VersionControlPluginException;
@@ -85,6 +93,8 @@ public class IndexingTask implements Task {
     private boolean codeAnalysisEnabled = false;
     /** the location of the lucene index */
     private String indexLocation = null;
+    /** The config reader used to read the configuration */
+    private XmlConfigurationReader configReader = XmlConfigurationReader.getInstance();
     /* Logger */
     private static final Logger LOG = Logger.getLogger(IndexingTask.class);
 
@@ -104,7 +114,7 @@ public class IndexingTask implements Task {
             LOG.info("Last indexed revision is: " + lastIndexedRevision);
             // Get the version control plugins
             versionControlPlugin = PluginLoader.getPlugin(VersionControlPlugin.class, repository.getVersionControlSystem());
-            versionControlPlugin.setRepository(new URI(repository.getUrl()), repository.getUsername(), repository.getPassword());
+            versionControlPlugin.setRepository(repository);
             LOG.info("Newest revision is      : " + versionControlPlugin.getRepositoryRevision());
             changedFiles = versionControlPlugin.getChangedFilesSinceRevision(lastIndexedRevision);
 
@@ -141,8 +151,6 @@ public class IndexingTask implements Task {
             LOG.error("VersionControlPlugin files could not be retrieved: " + ex);
         } catch (PluginLoaderException ex) {
             LOG.error("VersionControlPlugin could not be loaded: " + ex);
-        } catch (URISyntaxException ex) {
-            LOG.error("Repository url could not be parsed to URI" + ex);
         } catch (FileNotFoundException ex) {
             LOG.error("Index not found at task execution" + ex);
         } catch (IOException ex) {
@@ -233,19 +241,18 @@ public class IndexingTask implements Task {
      * @param doc the target document
      * @return document with added lucene fields
      */
-    public Document addLuceneFields(Document doc, FileDto file) throws VersionControlPluginException {
-        doc.add(new Field(IndexConstants.INDEX_FIELD_TITLE, extractFilename(file.getFilePath()), Field.Store.YES, Field.Index.NOT_ANALYZED));
-        doc.add(new Field(IndexConstants.INDEX_FIELD_FILEPATH, file.getFilePath(), Field.Store.YES, Field.Index.NOT_ANALYZED));
-        if (!file.isBinary()) {
-            doc.add(new Field(IndexConstants.INDEX_FIELD_CONTENT, new String(file.getContent()), Field.Store.YES, Field.Index.ANALYZED));
-            doc.add(new Field(IndexConstants.INDEX_FIELD_CONTENT_LC, new String(file.getContent()).toLowerCase(), Field.Store.YES, Field.Index.ANALYZED));
+    public Document addLuceneFields(Document doc, FileDto file) throws VersionControlPluginException, ConfigurationException, PluginLoaderException, LuceneFieldValueException {
+        for(LuceneFieldPlugin currentPlugin : PluginLoader.getMultiplePluginsForSingelPurpose(LuceneFieldPlugin.class, "lucene_field_plugin")){ //TODO probably move the string to a constant
+            String fieldValue = currentPlugin.getFieldValue(file);
+            String currentFieldName = currentPlugin.getFieldName();
+            Store store = currentPlugin.isStored() ? Field.Store.YES : Field.Store.NO;
+            Index index = currentPlugin.isAnalyzed() ? Field.Index.ANALYZED : Field.Index.NOT_ANALYZED;
+            doc.add(new Field(currentFieldName, fieldValue, store, index));
+            if(currentPlugin.addLowercase()){
+                doc.add(new Field(currentFieldName + "_lc", fieldValue.toLowerCase(), store, index));
+            }
         }
-        doc.add(new Field(IndexConstants.INDEX_FIELD_REPOSITORY, repository.getName(), Field.Store.YES, Field.Index.NOT_ANALYZED));
-        doc.add(new Field(IndexConstants.INDEX_FIELD_REVISION, versionControlPlugin.getRepositoryRevision(), Field.Store.YES, Field.Index.ANALYZED));
-        //doc.add(new Field(IndexConstants.INDEX_FILED_REPOSITORY_GROUP, repository.getRepositoryGroupsAsString(), Field.Store.YES, Field.Index.ANALYZED));
-        //doc.add(new Field(IndexConstants.INDEX_FIELD_TITLE_LC, extractFilename(path).toLowerCase(), Field.Store.YES, Field.Index.NOT_ANALYZED));
-        doc.add(new Field(IndexConstants.INDEX_FIELD_FILEPATH_LC, file.getFilePath().toLowerCase(), Field.Store.YES, Field.Index.NOT_ANALYZED));
-        // doc.add(new Field(IndexConstants.INDEX_FIELD_FILE_TYPE, file.getMimeType(), Field.Store.YES, Field.Index.ANALYZED)); //TODO add mime type
+        
         return doc;
     }
 
@@ -281,7 +288,7 @@ public class IndexingTask implements Task {
                     doc = new Document();
                     // Add fields
                     doc = addLuceneFields(doc, file);
-                    LOG.debug("Added file: " + doc.get(IndexConstants.INDEX_FIELD_TITLE) + " to index.");
+                    LOG.debug("Added file: " + doc.get(IndexConstants.INDEX_FIELD_FILENAME) + " to index.");
                     // Add document to the index
                     indexWriter.addDocument(doc);
                     i++;
@@ -290,6 +297,12 @@ public class IndexingTask implements Task {
             indexWriter.commit();
             //indexWriter.optimize(); //TODO check whether optimize makes removing of documents impossible
             indexWriter.close();
+        } catch (ConfigurationException ex) {
+            LOG.error("Could not retrieve the list of lucene fields from the config\n" + ex);
+        } catch (PluginLoaderException ex) {
+            LOG.error("A LuceneFieldPlugin that was configured to be used could not be loaded\n" + ex);
+        } catch (LuceneFieldValueException ex) {
+            LOG.error("Determination of the field content failed\n" + ex);
         } catch (CorruptIndexException ex) {
             LOG.error("Indexing  of: " + doc.get("title") + " failed! \n" + ex);
         } catch (IOException ex) {

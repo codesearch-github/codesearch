@@ -39,7 +39,6 @@ public final class XmlConfigurationReaderConstants {
     public static final String REPOSITORY_LIST = "repositories.repository";
     /** Used to retrieve all tasks in the xml-config file */
     public static final String TASK_LIST = "tasks.task";
-
     //REPOSITORY GROUP CONSTANT
     /** Used to retrieve the repository group list */
     public static final String REPOSITORY_GROUP_LIST = "repository-groups";

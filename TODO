@@ -21,12 +21,10 @@ Important TODOs
    See that exception handling is consistent throughout the program
  - Refactor database to be consistent(clearing should remove all dependent data
    sets)
- - In DBAccess, return a different exception/error code if an entry could not
-   be found -> currently its always a DatabaseAccessException, no way to find
-   out what went wrong
  - When the error message display is finished, refactor searcher error handling
    to actually use it!
  - Refactor Exception Handling in IndexingTask
+ - rewrite plugin loader so multiple plugins for a single purpose can be loaded
 
 Bugs
 ===============
@@ -34,8 +32,6 @@ Bugs
  - Either find a way to preserve \n chars at parsing or completely replace the JavaParser with the EclipseAstParser
  - In external code navigation front end has no way to get filepath and repo
    after a jump
- - Some files won't show up in the index
-    -> David: will need a little more info on that one...
 
 Minor Bugs
 ===============

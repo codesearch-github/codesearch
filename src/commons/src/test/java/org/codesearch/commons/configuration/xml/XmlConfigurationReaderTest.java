@@ -45,7 +45,7 @@ public class XmlConfigurationReaderTest {
 
     //   TODO use spring injection
     //   @Autowired
-    private XmlConfigurationReader configReader = new XmlConfigurationReader();
+    private XmlConfigurationReader configReader = XmlConfigurationReader.getInstance();
 
     public XmlConfigurationReaderTest() {
     }
@@ -180,7 +180,7 @@ public class XmlConfigurationReaderTest {
         expResult.add("1");
         expResult.add("2");
         expResult.add("3");
-        List<String> result = configReader.getSingleLinePropertyValueList("listTest");
+        List<String> result = configReader.getSingleLinePropertyValueList("listtest");
         assertEquals(expResult.get(0), result.get(0));
         assertEquals(expResult.get(1), result.get(1));
         assertEquals(expResult.get(2), result.get(2));

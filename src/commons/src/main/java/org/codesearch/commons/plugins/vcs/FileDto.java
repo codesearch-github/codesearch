@@ -19,13 +19,10 @@
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.codesearch.commons.plugins.vcs;
 
 import java.util.List;
+import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 
 /**
  * stores information about a specific file in a repository
@@ -40,6 +37,16 @@ public class FileDto {
     private String lastAuthor;
     private String lastAlteration;
     private List<String> imports;
+
+    private RepositoryDto repository;
+
+    public RepositoryDto getRepository() {
+        return repository;
+    }
+
+    public void setRepository(RepositoryDto repository) {
+        this.repository = repository;
+    }
     /** determines if the file has been deleted since the last indexing process
      * is handed to the IndexerTask so all database entries and lucene fields associated to the file get purged
      */

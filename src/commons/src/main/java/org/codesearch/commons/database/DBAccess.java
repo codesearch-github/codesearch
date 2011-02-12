@@ -48,7 +48,7 @@ import java.util.LinkedList;
  */
 public class DBAccess {
 
-    private static XmlConfigurationReader configReader = new XmlConfigurationReader(); //TODO replace this with spring conform solution
+    private static XmlConfigurationReader configReader = XmlConfigurationReader.getInstance(); //TODO replace this with spring conform solution
     private static ConnectionPool connectionPool;
     private static final Logger LOG = Logger.getLogger(DBAccess.class);
     private static final String STMT_GET_LAST_ANALYZED_REVISION_OF_REPOSITORY = "SELECT last_analyzed_revision FROM repository WHERE repository_name = ?";

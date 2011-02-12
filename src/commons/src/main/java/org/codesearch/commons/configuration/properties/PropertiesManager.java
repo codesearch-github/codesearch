@@ -33,7 +33,7 @@ import java.util.Properties;
  * @author Stephan Stiboller
  */
 public class PropertiesManager {
-
+//TODO make PropertiesManager only instanciable through a factory, so only one propertymangager can exist per properties file
     /** The used Property file. */
     private Properties properties = new Properties();
     /** The property file location. */

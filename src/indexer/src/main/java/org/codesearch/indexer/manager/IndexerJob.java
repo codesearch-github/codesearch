@@ -26,13 +26,13 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.codesearch.commons.configuration.xml.dto.TaskDto;
-import org.codesearch.indexer.core.IndexerMain;
 import org.codesearch.indexer.exceptions.TaskExecutionException;
+import org.codesearch.indexer.tasks.ClearTask;
+import org.codesearch.indexer.tasks.IndexingTask;
 import org.codesearch.indexer.tasks.Task;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
-import org.springframework.context.ApplicationContext;
 
 /**
  * An indexerJob stores one or more tasks and controls their execution
@@ -56,9 +56,8 @@ public class IndexerJob implements Job {
      * @throws JobExecutionException if the execution of a task was not successful or if the job was terminated
      */
     @Override
-    public void execute(JobExecutionContext jec) throws JobExecutionException {
+    public void execute(JobExecutionContext jec) throws JobExecutionException { //TODO refactor the task creation, there is no need for a TaskDto
         LOG.info("Executing IndexerJob");
-        ApplicationContext applicationContext = IndexerMain.getApplicationContext();
         terminated = (Boolean) jec.getJobDetail().getJobDataMap().get("terminated");
         taskList = (List<TaskDto>) (jec.getJobDetail().getJobDataMap().get("tasks"));
         Task task = null;
@@ -71,14 +70,15 @@ public class IndexerJob implements Job {
                 }
                 switch (taskDto.getType()) {
                     case index: {
-                        task = (Task) applicationContext.getBean("indexingTask");
+                        task = new IndexingTask();
                         break;
                     }
                     case clear: {
-                        task = (Task) applicationContext.getBean("clearTask");
+                        task = new ClearTask();
                         break;
                     }
                 }
+                task.setRepository(taskDto.getRepository());
                 task.setCodeAnalysisEnabled(taskDto.isCodeAnalysisEnabled());
                 task.execute();
                 LOG.debug("Finished execution of job in " + (new Date().getTime() - startDate.getTime()) / 1000f + " seconds");
