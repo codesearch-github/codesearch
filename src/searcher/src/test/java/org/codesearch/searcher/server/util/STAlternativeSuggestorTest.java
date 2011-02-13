@@ -7,7 +7,6 @@ package org.codesearch.searcher.server.util;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -68,7 +67,7 @@ public class STAlternativeSuggestorTest {
     @Test
     public void testSuggest() throws Exception {
         System.out.println("suggest test");
-        String queryString = "class" ;
+        String queryString = "int" ;
         List<String> result = sta.suggest(queryString);
         for(String r : result)
         {

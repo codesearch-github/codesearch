@@ -28,7 +28,6 @@ import org.quartz.SchedulerException;
 
 //TODO implement test and add javadoc
 /**
- *
  * @author David Froehlich
  */
 public class IndexingManagerTest {

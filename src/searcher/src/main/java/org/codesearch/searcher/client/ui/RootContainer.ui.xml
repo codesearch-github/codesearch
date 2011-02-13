@@ -54,7 +54,7 @@
         <g:center>
             <g:LayoutPanel ui:field='contentPanel' />
         </g:center>
-        <g:south size= '1'>
+        <g:south size= '15'>
             <g:FlowPanel ui:field='errorPanel' styleName='{style.errorMessage}' />
         </g:south>
     </g:DockLayoutPanel>

@@ -52,7 +52,7 @@ public class STAlternativeSuggestor {
      */
     public List<String> suggest(String queryString) throws IOException {
         SpellChecker spellChecker = new SpellChecker(spellIndexDirectory);
-        String[] spresult = spellChecker.suggestSimilar(queryString, 20);
+        String[] spresult = spellChecker.suggestSimilar(queryString, 10);
         if (spresult.length == 0) {
             return null;
         }

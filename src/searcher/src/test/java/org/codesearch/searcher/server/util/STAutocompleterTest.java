@@ -47,7 +47,6 @@ public class STAutocompleterTest {
             comDir = FSDirectory.open(new File(comDirString));
             realIndex = FSDirectory.open(new File(realIndexString));
             ag = new STAutocompleter(comDirString);
-            ag.setupIndex(comDir, defaultField);
             
         } catch (IOException ex) {
             Logger.getLogger(STAutocompleterTest.class.getName()).log(Level.SEVERE, null, ex);
@@ -63,8 +62,9 @@ public class STAutocompleterTest {
      */
     @Test
     public void testSuggest() throws Exception {
-        System.out.println("suggest");
+        System.out.println("autocomplete examples");
         String term = "class";
+        ag.setupIndex(realIndex, defaultField);
         List<String> result = ag.suggest(term);
         System.out.println("count: " + result.size());
         for(String r : result)

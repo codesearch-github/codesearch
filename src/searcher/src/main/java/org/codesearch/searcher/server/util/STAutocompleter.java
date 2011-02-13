@@ -41,7 +41,7 @@ public final class STAutocompleter {
 
     public List<String> suggest(String term) throws IOException {
         Query query = new TermQuery(new Term(GRAMMED_WORDS_FIELD, term));
-        TopDocs docs = autoCompleteSearcher.search(query, 5);
+        TopDocs docs = autoCompleteSearcher.search(query, 50);
         List<String> suggestions = new ArrayList<String>();
         for (ScoreDoc doc : docs.scoreDocs) {
             suggestions.add(autoCompleteReader.document(doc.doc).get(
@@ -65,6 +65,7 @@ public final class STAutocompleter {
             }
             wordsMap.put(word, sourceReader.docFreq(new Term(fieldToAutocomplete, word)));
         }
+        System.out.println("SetupIndex: " + GRAMMED_WORDS_FIELD);
         for (String word : wordsMap.keySet()) {
             Document doc = new Document();
             doc.add(new Field(SOURCE_WORD_FIELD, word, Field.Store.YES, Field.Index.NOT_ANALYZED));

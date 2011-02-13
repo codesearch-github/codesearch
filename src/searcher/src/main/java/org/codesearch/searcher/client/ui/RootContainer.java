@@ -52,22 +52,25 @@ public class RootContainer extends Composite implements AcceptsOneWidget {
     }
     @UiField
     LayoutPanel contentPanel;
+    @UiField
+    FlowPanel errorPanel;
    
 
     public RootContainer() {
         initWidget(uiBinder.createAndBindUi(this));
-//        errorPanel.add(addErrorPanel("1"));
-//        errorPanel.add(addErrorPanel("2"));
-//        errorPanel.add(addErrorPanel("3"));
-//        errorPanel.add(addErrorPanel("lolololol"));
-//        errorPanel.add(addErrorPanel("roflroflrofl"));
-//        errorPanel.add(addErrorPanel("lolololol"));
-//        errorPanel.add(addErrorPanel("roflroflrofl"));
-//        errorPanel.add(addErrorPanel("roflroflrofl"));
-//        errorPanel.add(addErrorPanel("roflroflrofl"));
-//        errorPanel.add(addErrorPanel("lolololol"));
-//        errorPanel.add(addErrorPanel("roflroflrofl"));
-//        errorPanel.add(addErrorPanel("roflroflrofl"));
+        errorPanel.add(addErrorPanel("1"));
+        errorPanel.add(addErrorPanel("2"));
+        errorPanel.add(addErrorPanel("3"));
+        errorPanel.add(addErrorPanel("lolololol"));
+        errorPanel.add(addErrorPanel("roflroflrofl"));
+        errorPanel.add(addErrorPanel("lolololol"));
+        errorPanel.add(addErrorPanel("roflroflrofl"));
+        errorPanel.add(addErrorPanel("roflroflrofl"));
+        errorPanel.add(addErrorPanel("roflroflrofl"));
+        errorPanel.add(addErrorPanel("lolololol"));
+        errorPanel.add(addErrorPanel("roflroflrofl"));
+        errorPanel.add(addErrorPanel("roflroflrofl"));
+        
     }
 
     /** {@inheritDoc} */
@@ -81,5 +84,35 @@ public class RootContainer extends Composite implements AcceptsOneWidget {
 
     }
 
-   
+    /**
+     * Creates an error panel display for the given errorMessage
+     * @param String errorMessage to be displayed
+     * @return VerticalPanel the error display
+     */
+    public FlowPanel addErrorPanel(String errorMessage) {
+        //Button
+        PushButton pushButton = new PushButton(new Image(Resources.INSTANCE.errorMessageClose()));
+        pushButton.getElement().setAttribute("style", "float: left");
+        pushButton.setSize("8px", "8px");
+        pushButton.addClickHandler(new ClickHandler()
+        {
+            @Override
+            public void onClick(ClickEvent event)
+            {
+                ((PushButton)event.getSource()).getParent().setVisible(false);
+                Widget wi = ((PushButton)event.getSource()).getParent().getParent().getParent();
+                System.out.println("Offset: " + wi.getOffsetHeight());
+            }
+        });
+        //Label
+        Label label = new Label();
+        label.getElement().setAttribute("style", "float: left");
+        label.setText(errorMessage);
+        //Panel
+        FlowPanel flowP = new FlowPanel();
+        flowP.add(pushButton);
+        flowP.add(label);
+        flowP.add(new HTML("<div style=\"clear:both\"/>"));
+        return flowP;
+    }
 }
