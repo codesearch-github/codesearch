@@ -94,20 +94,6 @@
             <code-navigation-enabled>true</code-navigation-enabled>
         </repository>
         <repository>
-            <name>svnsearch_repo</name>
-            <version_control_system>SVN</version_control_system>
-            <username>feldruebe</username>
-            <password>dota!123</password>
-            <url>svn://portal.htl-kaindorf.at/svnsearch</url>
-            <code-navigation-enabled>true</code-navigation-enabled>
-            <not_indexed_filenames>
-                <filename>*.xml</filename>
-            </not_indexed_filenames>
-            <repository-groups>
-                <repo-group>group1</repo-group>
-            </repository-groups>
-        </repository>
-        <repository>
             <name>testRepo2</name>
             <username>testUser</username>
             <password>testPassword</password>

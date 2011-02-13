@@ -80,7 +80,7 @@ public class DocumentSearcher {
         indexLocation = configReader.getSingleLinePropertyValue(XmlConfigurationReaderConstants.INDEX_LOCATION);
         LOG.debug("Index location set to: " + indexLocation);
         //TODO make or find proper analyzers for search
-        queryParser = new QueryParser(Version.LUCENE_30, IndexConstants.INDEX_FIELD_CONTENT_LC, new LowerCaseWhiteSpaceAnalyzer());
+        queryParser = new QueryParser(Version.LUCENE_30, IndexConstants.INDEX_FIELD_CONTENT+"_lc", new LowerCaseWhiteSpaceAnalyzer());
         queryParser.setAllowLeadingWildcard(true);
         queryParser.setLowercaseExpandedTerms(false);
         queryParserCaseSensitive = new QueryParser(Version.LUCENE_30, IndexConstants.INDEX_FIELD_CONTENT, new WhitespaceAnalyzer());
@@ -122,8 +122,8 @@ public class DocumentSearcher {
         if (caseSensitive) {
             query = queryParserCaseSensitive.parse(finalSearchString);
         } else {
-            finalSearchString = finalSearchString.replace(IndexConstants.INDEX_FIELD_FILEPATH+":", IndexConstants.INDEX_FIELD_FILEPATH_LC+":").replace(IndexConstants.INDEX_FIELD_CONTENT+":",
-                    IndexConstants.INDEX_FIELD_CONTENT_LC+":");
+            finalSearchString = finalSearchString.replace(IndexConstants.INDEX_FIELD_FILEPATH+":", IndexConstants.INDEX_FIELD_FILEPATH+"_lc:").replace(IndexConstants.INDEX_FIELD_CONTENT+":",
+                    IndexConstants.INDEX_FIELD_CONTENT+"_lc:");
             query = queryParser.parse(finalSearchString.toLowerCase());
         }
 
@@ -169,7 +169,7 @@ public class DocumentSearcher {
         StringBuilder repoQuery = new StringBuilder();
         repoQuery.append(" AND ");
         repoQuery.append(IndexConstants.INDEX_FIELD_REPOSITORY);
-        repoQuery.append(":(");
+        repoQuery.append(":("); //this is because the lucene query is sad
 
         for (String repo : repositoryNames) {
             repoQuery.append(repo);

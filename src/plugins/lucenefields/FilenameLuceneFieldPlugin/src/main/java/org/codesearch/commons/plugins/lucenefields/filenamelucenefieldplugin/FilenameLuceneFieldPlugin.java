@@ -13,7 +13,7 @@ import org.codesearch.commons.plugins.vcs.FileDto;
  * @author David Froehlich
  */
 public class FilenameLuceneFieldPlugin extends LuceneFieldPlugin {
-
+    /** {@inhertDoc} */
     public String getFieldValue(FileDto fileDto) throws LuceneFieldValueException {
         try {
             return fileDto.getFilePath().substring(fileDto.getFilePath().lastIndexOf("."));
@@ -23,19 +23,23 @@ public class FilenameLuceneFieldPlugin extends LuceneFieldPlugin {
 
     }
 
+    /** {@inhertDoc} */
     public boolean isAnalyzed() {
         return true;
     }
 
+    /** {@inhertDoc} */
     public boolean addLowercase() {
         return true;
     }
 
+    /** {@inhertDoc} */
     public boolean isStored() {
         return true;
     }
 
+    /** {@inhertDoc} */
     public String getFieldName() {
-        return "fieldname";
+        return "filename";
     }
 }

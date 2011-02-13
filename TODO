@@ -8,7 +8,6 @@ Missing features
  - Repository file browsing
  - Raw file button
  - Autocomplete
- - Enum Handling for Code Navigation
  - Preserve Index Consistency feature
  - Display file without code navigation button
 
@@ -25,6 +24,7 @@ Important TODOs
    to actually use it!
  - Refactor Exception Handling in IndexingTask
  - rewrite plugin loader so multiple plugins for a single purpose can be loaded
+ - Use a PerFieldAnalyzerWrapper in the DocumentSearcher
 
 Bugs
 ===============

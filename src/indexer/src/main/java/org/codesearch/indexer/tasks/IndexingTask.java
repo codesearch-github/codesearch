@@ -109,7 +109,7 @@ public class IndexingTask implements Task {
             LOG.info("Starting indexing of repository: " + repository.getName());
             long start = System.currentTimeMillis();
             // Read the index status file
-            propertiesManager = new PropertiesManager(indexLocation + IndexConstants.REVISIONS_PROPERTY_FILENAME);
+            propertiesManager = new PropertiesManager(indexLocation + "revisions.properties");//FIXME
             String lastIndexedRevision = propertiesManager.getPropertyFileValue(repository.getName());
             LOG.info("Last indexed revision is: " + lastIndexedRevision);
             // Get the version control plugins
@@ -180,6 +180,9 @@ public class IndexingTask implements Task {
         String previousFileType = null;
         for (FileDto currentFile : changedFiles) {
             try {
+                if(currentFile.getFilePath().endsWith(".xml")){
+                    getClass(); //FIXME
+                }
                 if (currentFile.isDeleted()) {
                     DBAccess.purgeAllRecordsForFile(currentFile.getFilePath(), repository.getName());
                     LOG.debug("Deleted all records associated with " + currentFile.getFilePath() + " since it was deleted from the file system");
@@ -283,12 +286,19 @@ public class IndexingTask implements Task {
         try {
             int i = 0;
             for (FileDto file : changedFiles) {
+                String fileName;
+                try {
+                    fileName = file.getFilePath().substring(file.getFilePath().lastIndexOf("/"));
+                }catch (StringIndexOutOfBoundsException ex){
+                    //if for whatever reason the file is in the root directory of the repositorys
+                    fileName = file.getFilePath();
+                }
                 if (!(fileIsOnIgnoreList(file.getFilePath())) && !file.isDeleted()) {
                     // The lucene document containing all relevant indexing information
                     doc = new Document();
                     // Add fields
                     doc = addLuceneFields(doc, file);
-                    LOG.debug("Added file: " + doc.get(IndexConstants.INDEX_FIELD_FILENAME) + " to index.");
+                    LOG.debug("Added file: " + file.getFilePath().substring(file.getFilePath().lastIndexOf("/")) + " to index.");
                     // Add document to the index
                     indexWriter.addDocument(doc);
                     i++;

@@ -17,6 +17,7 @@ import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
 import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
 import org.codesearch.commons.plugins.codeanalyzing.xml.ast.XmlNode;
 import org.xml.sax.Attributes;
+import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
@@ -54,7 +55,15 @@ public class XmlCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
             nodes.add(ast);
             SAXParserFactory spf = SAXParserFactory.newInstance();
             SAXParser saxParser = spf.newSAXParser();
+
+
             XMLReader xmlReader = saxParser.getXMLReader();
+            xmlReader.setEntityResolver(new EntityResolver() {
+
+                public InputSource resolveEntity(String publicId, String systemId) {
+                    return new InputSource(new ByteArrayInputStream("<?xml version='1.0'encoding='UTF-8'?>".getBytes()));
+                }
+            });
             xmlReader.setContentHandler(new LocationDefaultHandler());
             xmlReader.parse(new InputSource(bais));
         } catch (UnknownHostException ex) {
@@ -71,6 +80,7 @@ public class XmlCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
      * DefaultHandler that parses elements in an XML file to XmlNodes and adds the line number of creation via a Locator
      */
     class LocationDefaultHandler extends DefaultHandler {
+
         Locator locator;
 
         /** {@inheritDoc} */
@@ -110,10 +120,8 @@ public class XmlCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
         @Override
         public InputSource resolveEntity(String publicId, String systemId) throws IOException, SAXException {
             return new InputSource(
-            new ByteArrayInputStream("<?xml version='1.0' encoding='UTF-8'?>".getBytes()));
+                    new ByteArrayInputStream("<?xml version='1.0' encoding='UTF-8'?>".getBytes()));
         }
-
-
     }
 
     /** {@inheritDoc} */

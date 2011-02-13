@@ -67,9 +67,9 @@ public class DBAccess {
     private static final String STMT_GET_FILE_PATH_FOR_TYPE_DECLARATION = "SELECT f.file_path FROM file f JOIN type t ON f.file_id = t.file_id WHERE f.repository_id = ? AND t.full_name LIKE ?";
     private static final String STMT_GET_FILE_PATH_FOR_TYPE_DECLARATION_WITH_PACKAGES = "SELECT f.file_path FROM file f JOIN type t ON f.file_id = t.file_id WHERE f.repository_id = ? AND t.full_name IN (";
     private static final String STMT_GET_USAGES_FOR_FILE = "SELECT usages FROM file WHERE file_path = ? AND repository_id = ?";
-    private static final String STMT_CLEAR_TYPES_FOR_REPOSITORY = "DELETE FROM type WHERE repo_id = ?";
     private static final String STMT_CLEAR_FILES_FOR_REPOSITORY = "DELETE FROM file WHERE repository_id = ?";
     private static final String STMT_RESET_REPOSITORY_REVISIONS = "UPDATE repository SET last_analyzed_revision = '0'";
+    private static final String STMT_PURGE_ALL_FILE_RECORDS = "DELETE FROM file";
 
     public static void purgeAllRecordsForFile(String filePath, String repository) {
         //TODO write me
@@ -219,9 +219,6 @@ public class DBAccess {
         try {
             int repoId = getRepoIdForRepoName(repoName);
             PreparedStatement ps = conn.prepareStatement(STMT_CLEAR_FILES_FOR_REPOSITORY);
-            ps.setInt(1, repoId);
-            ps.execute();
-            ps = conn.prepareStatement(STMT_CLEAR_TYPES_FOR_REPOSITORY);
             ps.setInt(1, repoId);
             ps.execute();
         } catch (SQLException ex) {
@@ -412,13 +409,15 @@ public class DBAccess {
         }
     }
 
-    public static void resetLastAnalyzedRevision() throws DatabaseAccessException {
+    public static void purgeDatabaseEntries() throws DatabaseAccessException {
         if (connectionPool == null) {
             setupConnections();
         }
         Connection conn = connectionPool.getConnection();
         try {
             PreparedStatement ps = conn.prepareStatement(STMT_RESET_REPOSITORY_REVISIONS);
+            ps.execute();
+            ps = conn.prepareStatement(STMT_PURGE_ALL_FILE_RECORDS);
             ps.execute();
         } catch (SQLException ex) {
             throw new DatabaseAccessException("SQLException while trying to access the database\n" + ex);

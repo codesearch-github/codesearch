@@ -24,6 +24,7 @@ package org.codesearch.commons.constants;
 import org.apache.lucene.util.Version;
 
 /**
+ * stores the name of the lucene fields that are created by default
  * @author Stephan Stiboller
  * @author David Froehlich
  */
@@ -35,10 +36,6 @@ public final class IndexConstants {
     public static final String INDEX_FIELD_CONTENT="content";
     public static final String INDEX_FIELD_FILENAME="filename";
     public static final String INDEX_FIELD_REVISION="revision";
-    public static final String INDEX_FILED_REPOSITORY_GROUP = "repository-groups";
-    public static final String INDEX_FIELD_FILEPATH_LC="filepath_lc";
-    public static final String INDEX_FIELD_CONTENT_LC="content_lc";
-    public static final String INDEX_FIELD_TITLE_LC="title_lc";
     public static final String INDEX_FIELD_FILE_TYPE = "file_type";
     public static final String REVISIONS_PROPERTY_FILENAME = "revisions.properties";
 

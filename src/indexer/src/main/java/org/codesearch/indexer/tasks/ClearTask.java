@@ -78,7 +78,7 @@ public class ClearTask implements Task {
                 }
                 if (codeAnalysisEnabled) {
                     try {
-                        DBAccess.resetLastAnalyzedRevision();
+                        DBAccess.purgeDatabaseEntries();
                         LOG.info("Cleared code analysis index");
                     } catch (DatabaseAccessException ex) {
                         LOG.error("Could not clear code analysis index: \n" + ex);
@@ -90,7 +90,7 @@ public class ClearTask implements Task {
                 deleteDocumentsFromIndexUsingTerm(term, searcher);
                 searcher.close();
 
-                PropertiesManager propertiesManager = new PropertiesManager(indexLocation + IndexConstants.REVISIONS_PROPERTY_FILENAME);
+                PropertiesManager propertiesManager = new PropertiesManager(indexLocation + "/revisions.properties");
                 propertiesManager.setPropertyFileValue(repository.getName(), "0");
 
                 LOG.debug("Deleted " + searcher.getIndexReader().deleteDocuments(term) + " documents for repository " + repository.getName());

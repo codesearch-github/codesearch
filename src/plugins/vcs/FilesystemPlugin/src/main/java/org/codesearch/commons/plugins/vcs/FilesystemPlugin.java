@@ -18,7 +18,6 @@
  * You should have received a copy of the GNU General Public License
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.codesearch.commons.plugins.vcs;
 
 import java.io.File;
@@ -30,7 +29,6 @@ import java.util.List;
 import java.util.Set;
 import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 
-
 /**
  * A VersionControlPlugin used to access files from the file system
  * @author David Froehlich
@@ -39,7 +37,7 @@ public class FilesystemPlugin implements VersionControlPlugin {
 
     /** the folder where all code files are located */
     private RepositoryDto repository;
-    
+
     /** {@inheritDoc} */
     @Override
     public void setRepository(RepositoryDto repository) throws VersionControlPluginException {
@@ -49,7 +47,7 @@ public class FilesystemPlugin implements VersionControlPlugin {
     /** {@inheritDoc} */
     @Override
     public FileDto getFileForFilePath(String filePath) throws VersionControlPluginException {
-        
+
         try {
             File file = new File(filePath);
             FileDto fileDto = new FileDto();
@@ -69,12 +67,10 @@ public class FilesystemPlugin implements VersionControlPlugin {
             return fileDto;
         } catch (IOException ex) {
             throw new VersionControlPluginException("File could not be opened: \n" + ex);
-        }
-        catch (NullPointerException ex){
+        } catch (NullPointerException ex) {
             return null;
         }
     }
-
 
     /** {@inheritDoc} */
     @Override
@@ -94,13 +90,8 @@ public class FilesystemPlugin implements VersionControlPlugin {
         for (File f : directory.listFiles()) {
             if (f.isDirectory()) {
                 addChangedFilesFromDirectoryToSet(files, f, lastModified);
-            } else {
-                if(f.getAbsolutePath().contains("IndexingManager")){
-                    getClass();
-                }
-                if (f.lastModified() > lastModified) {
-                    files.add(getFileForFilePath(f.getAbsolutePath()));
-                }
+            } else if (f.lastModified() > lastModified) {
+                files.add(getFileForFilePath(f.getAbsolutePath()));
             }
         }
     }

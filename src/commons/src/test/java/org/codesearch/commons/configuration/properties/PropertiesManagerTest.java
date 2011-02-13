@@ -58,7 +58,7 @@ public class PropertiesManagerTest {
 
     @Before
     public void setUp() throws IOException {
-        pr = new PropertiesManager(System.getProperty("user.home") + "/workspace/svnsearch/" + IndexConstants.REVISIONS_PROPERTY_FILENAME);
+        
     }
 
     @After

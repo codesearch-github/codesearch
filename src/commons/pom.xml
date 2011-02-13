@@ -75,7 +75,11 @@
             <artifactId>RepositoryLuceneFieldPlugin</artifactId>
             <version>0.1-SNAPSHOT</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.codesearch</groupId>
+            <artifactId>FilenameLuceneFieldPlugin</artifactId>
+            <version>0.1-SNAPSHOT</version>
+        </dependency>
         <dependency>
             <groupId>org.codesearch</groupId>
             <artifactId>XmlCodeAnalyzerPlugin</artifactId>
