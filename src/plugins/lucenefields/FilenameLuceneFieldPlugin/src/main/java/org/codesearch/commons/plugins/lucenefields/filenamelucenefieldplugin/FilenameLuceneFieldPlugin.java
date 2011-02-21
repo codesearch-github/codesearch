@@ -4,8 +4,11 @@
  */
 package org.codesearch.commons.plugins.lucenefields.filenamelucenefieldplugin;
 
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.codesearch.commons.plugins.lucenefields.LuceneFieldPlugin;
 import org.codesearch.commons.plugins.lucenefields.LuceneFieldValueException;
+import org.codesearch.commons.plugins.lucenefields.contentlucenefieldplugin.LetterAnalyzer;
 import org.codesearch.commons.plugins.vcs.FileDto;
 
 /**
@@ -16,7 +19,7 @@ public class FilenameLuceneFieldPlugin extends LuceneFieldPlugin {
     /** {@inhertDoc} */
     public String getFieldValue(FileDto fileDto) throws LuceneFieldValueException {
         try {
-            return fileDto.getFilePath().substring(fileDto.getFilePath().lastIndexOf("."));
+            return fileDto.getFilePath().substring(fileDto.getFilePath().lastIndexOf("/"));
         } catch (StringIndexOutOfBoundsException ex) {
             return fileDto.getFilePath();
         }
@@ -41,5 +44,13 @@ public class FilenameLuceneFieldPlugin extends LuceneFieldPlugin {
     /** {@inhertDoc} */
     public String getFieldName() {
         return "filename";
+    }
+
+    public Analyzer getRegularCaseAnalyzer() {
+        return new LetterAnalyzer();
+    }
+
+    public Analyzer getLowerCaseAnalyzer() {
+        return new SimpleAnalyzer();
     }
 }

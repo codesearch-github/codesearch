@@ -4,6 +4,8 @@
  */
 package org.codesearch.commons.plugins.lucenefields.contentlucenefieldplugin;
 
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.codesearch.commons.plugins.lucenefields.LuceneFieldPlugin;
 import org.codesearch.commons.plugins.lucenefields.LuceneFieldValueException;
 import org.codesearch.commons.plugins.vcs.FileDto;
@@ -22,6 +24,7 @@ public class ContentLuceneFieldPlugin extends LuceneFieldPlugin {
      * @return
      * @throws LuceneFieldValueException
      */
+    @Override
     public String getFieldValue(FileDto fileDto) throws LuceneFieldValueException {
         String content = "";
         try{if (!fileDto.isBinary() && !MimeTypeUtil.isBinaryType(MimeTypeUtil.guessMimeTypeViaFileEnding(fileDto.getFilePath().substring(fileDto.getFilePath().lastIndexOf("."))))) {
@@ -34,26 +37,41 @@ public class ContentLuceneFieldPlugin extends LuceneFieldPlugin {
     }
 
     /** {@inheritDoc} */
+    @Override
     public String getPurposes() {
         return "lucene_field_plugin";
     }
 
     /** {@inheritDoc} */
+    @Override
     public boolean isAnalyzed() {
         return true;
     }
 
     /** {@inheritDoc} */
+    @Override
     public boolean isStored() {
         return true;
     }
 
     /** {@inheritDoc} */
+    @Override
     public boolean addLowercase() {
         return true;
     }
 
+    @Override
     public String getFieldName() {
         return "content";
+    }
+
+    @Override
+    public Analyzer getRegularCaseAnalyzer() {
+        return new LetterAnalyzer();
+    }
+
+    @Override
+    public Analyzer getLowerCaseAnalyzer() {
+        return new SimpleAnalyzer();
     }
 }

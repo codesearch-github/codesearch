@@ -32,6 +32,17 @@
     <db-name>codesearch</db-name>
     <db-max-connections>100</db-max-connections>
 
+    <indexer-users>
+        <indexer-user>
+            <username>hannes</username>
+            <password>dota!123</password>
+        </indexer-user>
+        <indexer-user>
+            <username>guenther</username>
+            <password>dota!123</password>
+        </indexer-user>
+    </indexer-users>
+
     <global-blacklist-filenames>
         <filename>*.svn*</filename>
         <filename>*.class</filename>

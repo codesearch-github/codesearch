@@ -41,6 +41,12 @@ import org.quartz.JobExecutionException;
  * @author Samuel Kogler
  */
 public class IndexerJob implements Job {
+    public static final String FIELD_TERMINATED = "terminated";
+    public static final String FIELD_TASKS = "tasks";
+    public static final String FIELD_TASKS_FINISHED = "tasks_finished";
+    public static final String FIELD_ID = "id";
+    public static final String FIELD_CURRENT_TYPE = "type";
+    public static final String FIELD_CURRENT_REPOSITORY = "current_repository";
 
     /** Indicates if the thread is terminated or not.
      * If flagged as terminated the job will not start the execution of the next task and terminate itself instead */
@@ -58,8 +64,8 @@ public class IndexerJob implements Job {
     @Override
     public void execute(JobExecutionContext jec) throws JobExecutionException { //TODO refactor the task creation, there is no need for a TaskDto
         LOG.info("Executing IndexerJob");
-        terminated = (Boolean) jec.getJobDetail().getJobDataMap().get("terminated");
-        taskList = (List<TaskDto>) (jec.getJobDetail().getJobDataMap().get("tasks"));
+        terminated = (Boolean) jec.getJobDetail().getJobDataMap().get(IndexerJob.FIELD_TERMINATED);
+        taskList = (List<TaskDto>) (jec.getJobDetail().getJobDataMap().get(FIELD_TASKS));
         Task task = null;
         Date startDate = new Date();
         for (int i = 0; i < taskList.size(); i++) {
@@ -70,19 +76,22 @@ public class IndexerJob implements Job {
                 }
                 switch (taskDto.getType()) {
                     case index: {
+                        jec.getJobDetail().getJobDataMap().put(IndexerJob.FIELD_CURRENT_TYPE, "index");
                         task = new IndexingTask();
                         break;
                     }
                     case clear: {
+                        jec.getJobDetail().getJobDataMap().put(IndexerJob.FIELD_CURRENT_TYPE, "clear");
                         task = new ClearTask();
                         break;
                     }
                 }
+                jec.getJobDetail().getJobDataMap().put(IndexerJob.FIELD_CURRENT_REPOSITORY, taskDto.getRepository().getName());
                 task.setRepository(taskDto.getRepository());
                 task.setCodeAnalysisEnabled(taskDto.isCodeAnalysisEnabled());
                 task.execute();
+                jec.getJobDetail().getJobDataMap().put(IndexerJob.FIELD_TASKS_FINISHED, i+1);
                 LOG.debug("Finished execution of job in " + (new Date().getTime() - startDate.getTime()) / 1000f + " seconds");
-
             } catch (TaskExecutionException ex) {
                 throw new JobExecutionException("Execution of Task number " + i + " threw an exception" + ex);
             }

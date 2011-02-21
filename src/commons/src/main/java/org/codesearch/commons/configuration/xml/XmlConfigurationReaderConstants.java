@@ -29,6 +29,13 @@ public final class XmlConfigurationReaderConstants {
     /** Private constructor so its  not instantiable. */
     private XmlConfigurationReaderConstants () {}
     //GLOBAL CONSTANTS
+
+    /** used to store the data of the users authorized to access the indexer via the web interface */
+    public static final String INDEXER_USERS = "indexer-users.indexer-user";
+    /** used to access the username of a indexing-user */
+    public static final String USERNAME = "username";
+    /** Used to access the password of a indexing-user */
+    public static final String PASSWORD = "password";
     /** Used to find out the index location */
     public static final String INDEX_LOCATION = "index-location";
     /** Used to access indexing jobs in the xml-config file */

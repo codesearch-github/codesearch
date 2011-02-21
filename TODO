@@ -44,4 +44,6 @@ Unexpected Behaviour
 
 Missing documentation
 ===============
+ - Userstories that still have to be documented
+   - Frontend implementation of code navigation links
  - Make sure all classes are documented (not the methods, but the classes)

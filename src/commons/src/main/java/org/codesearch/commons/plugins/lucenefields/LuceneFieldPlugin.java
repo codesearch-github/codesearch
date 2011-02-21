@@ -5,6 +5,7 @@
 
 package org.codesearch.commons.plugins.lucenefields;
 
+import org.apache.lucene.analysis.Analyzer;
 import org.codesearch.commons.plugins.Plugin;
 import org.codesearch.commons.plugins.vcs.FileDto;
 
@@ -47,6 +48,19 @@ public abstract class LuceneFieldPlugin implements Plugin {
      * @return
      */
     public abstract String getFieldName();
+    
+    /**
+     * returns the analyzer used for this field in regular case
+     * @return
+     */
+    public abstract Analyzer getRegularCaseAnalyzer();
+
+    /**
+     * returns the analyzer used for the content of the lower case field
+     * only used if addLowercase() returns true
+     * @return
+     */
+    public abstract Analyzer getLowerCaseAnalyzer();
 
     /** {@inheritDoc} */
     @Override

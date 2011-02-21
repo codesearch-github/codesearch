@@ -21,7 +21,10 @@
 package org.codesearch.indexer.manager;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
@@ -52,6 +55,24 @@ public final class IndexingManager {
     /** The XmlConfigReader used to retrieve information from the configuration */
     private XmlConfigurationReader configReader;
 
+    public Map<Integer, IndexingJobDto> getIndexingJobs() throws SchedulerException {
+        Map<Integer, IndexingJobDto> jobs = new HashMap<Integer, IndexingJobDto>();
+        List<JobExecutionContext> currentlyExecutedJobs = (List<JobExecutionContext>) scheduler.getCurrentlyExecutingJobs();
+        for(JobExecutionContext currentJob : currentlyExecutedJobs) {
+            int index = Integer.parseInt(currentJob.getJobDetail().getJobDataMap().getString(IndexerJob.FIELD_ID));
+            int tasksFinished = currentJob.getJobDetail().getJobDataMap().getInt(IndexerJob.FIELD_TASKS_FINISHED);
+            int tasksTotal = ((List)currentJob.getJobDetail().getJobDataMap().get(IndexerJob.FIELD_TASKS)).size();
+            Date timeStarted = currentJob.getFireTime();
+            String type = currentJob.getJobDetail().getJobDataMap().getString(IndexerJob.FIELD_CURRENT_TYPE);
+            String currentlyAccessedRepository = currentJob.getJobDetail().getJobDataMap().getString(IndexerJob.FIELD_CURRENT_REPOSITORY);
+            IndexingJobDto currentDto = new IndexingJobDto(type, timeStarted, tasksTotal, tasksFinished, currentlyAccessedRepository);
+            jobs.put(index, currentDto);
+        }
+        return jobs;
+    }
+
+
+
     /**
      * Creates a new instance of IndexingManager
      * @throws SchedulerException In case the scheduler could not be instantiated
@@ -71,9 +92,9 @@ public final class IndexingManager {
         List<JobExecutionContext> currentlyExecutedJobs = (List<JobExecutionContext>) scheduler.getCurrentlyExecutingJobs();
         for (JobExecutionContext jec : currentlyExecutedJobs) {
             JobDataMap dataMap = jec.getJobDetail().getJobDataMap();
-            int currentIndex = Integer.parseInt(dataMap.getString("id"));
+            int currentIndex = Integer.parseInt(dataMap.getString(IndexerJob.FIELD_ID));
             if (i == currentIndex) {
-                dataMap.put("terminated", true);
+                dataMap.put(IndexerJob.FIELD_TERMINATED, true);
                 return;
             }
         }

@@ -31,6 +31,7 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.SubnodeConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
+import org.codesearch.commons.configuration.xml.dto.IndexerUserDto;
 import org.codesearch.commons.configuration.xml.dto.JobDto;
 import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 import org.codesearch.commons.configuration.xml.dto.TaskDto;
@@ -63,6 +64,26 @@ public class XmlConfigurationReader {
      * creates a new instance of XmlConfigurationReader
      */
     private XmlConfigurationReader() {
+    }
+
+    /**
+     * returns all users authorized to access the indexer via the web interface
+     * @return the users as a list of IndexerUserDto
+     * @throws ConfigurationException
+     */
+    public List<IndexerUserDto> getIndexerUsers() throws ConfigurationException{
+        List<IndexerUserDto> users = new LinkedList<IndexerUserDto>();
+        if(config == null) {
+            loadConfigReader();
+        }
+        List<HierarchicalConfiguration> userConfig = config.configurationsAt(XmlConfigurationReaderConstants.INDEXER_USERS);
+        for(HierarchicalConfiguration hc : userConfig){
+            IndexerUserDto userDto = new IndexerUserDto();
+            userDto.setUserName(hc.getString(XmlConfigurationReaderConstants.USERNAME));
+            userDto.setPassword((hc.getString(XmlConfigurationReaderConstants.PASSWORD)));
+            users.add(userDto);
+        }
+        return users;
     }
 
     /**

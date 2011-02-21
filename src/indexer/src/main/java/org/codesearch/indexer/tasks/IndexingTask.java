@@ -23,18 +23,16 @@ package org.codesearch.indexer.tasks;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.WhitespaceAnalyzer;
+import org.apache.lucene.analysis.PerFieldAnalyzerWrapper;
+import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Field.Index;
@@ -47,12 +45,10 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.store.FSDirectory;
 import org.codesearch.commons.configuration.properties.PropertiesManager;
 import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
-import org.codesearch.commons.configuration.xml.XmlConfigurationReaderConstants;
 import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 import org.codesearch.commons.constants.IndexConstants;
 import org.codesearch.commons.database.DBAccess;
 import org.codesearch.commons.database.DatabaseAccessException;
-import org.codesearch.commons.plugins.Plugin;
 import org.codesearch.commons.plugins.PluginLoader;
 import org.codesearch.commons.plugins.PluginLoaderException;
 import org.codesearch.commons.plugins.codeanalyzing.CodeAnalyzerPlugin;
@@ -97,6 +93,8 @@ public class IndexingTask implements Task {
     private XmlConfigurationReader configReader = XmlConfigurationReader.getInstance();
     /* Logger */
     private static final Logger LOG = Logger.getLogger(IndexingTask.class);
+    /** the plugins that will be used to create the fields for each document */
+    private List<LuceneFieldPlugin> luceneFields = new LinkedList<LuceneFieldPlugin>();
 
     /**
      * executes the task,
@@ -155,8 +153,6 @@ public class IndexingTask implements Task {
             LOG.error("Index not found at task execution" + ex);
         } catch (IOException ex) {
             LOG.error("IOException at execution of task: " + ex);
-        } catch (CodeAnalyzerPluginException ex) {
-            LOG.error("Error executing code analysis \n" + ex);
         }
         LOG.info("Finished indexing of repository: " + repository.getName());
     }
@@ -169,7 +165,7 @@ public class IndexingTask implements Task {
      * @throws VersionControlPluginException if no VCP could be loaded for the set repository
      * @throws CodeAnalyzerPluginException if the source code of one of the files could not be analyzed
      */
-    private void executeCodeAnalysis(boolean retrieveNewFileList, String lastAnalysisRevision) throws VersionControlPluginException, CodeAnalyzerPluginException {
+    private void executeCodeAnalysis(boolean retrieveNewFileList, String lastAnalysisRevision) throws VersionControlPluginException {
         if (retrieveNewFileList) {
             changedFiles = versionControlPlugin.getChangedFilesSinceRevision(lastAnalysisRevision);
         }
@@ -180,9 +176,6 @@ public class IndexingTask implements Task {
         String previousFileType = null;
         for (FileDto currentFile : changedFiles) {
             try {
-                if(currentFile.getFilePath().endsWith(".xml")){
-                    getClass(); //FIXME
-                }
                 if (currentFile.isDeleted()) {
                     DBAccess.purgeAllRecordsForFile(currentFile.getFilePath(), repository.getName());
                     LOG.debug("Deleted all records associated with " + currentFile.getFilePath() + " since it was deleted from the file system");
@@ -214,6 +207,8 @@ public class IndexingTask implements Task {
                     //write the AST information into the database
                     DBAccess.setAnalysisDataForFile(currentFile.getFilePath(), repository.getName(), ast, usages, typeDeclarations, imports);
                 }
+            } catch (CodeAnalyzerPluginException ex) {
+                LOG.error("Error while trying to analyze file " + currentFile.getFilePath() + "\n" + ex);
             } catch (DatabaseAccessException ex) {
                 LOG.error("Error at DatabaseConnection \n" + ex);
             }
@@ -226,7 +221,7 @@ public class IndexingTask implements Task {
      * @throws ConfigurationException if the necessary configuration could not be read from the config file
      * @throws VersionControlPluginException if the current revision could not be determined from the VersionControlPlugin
      */
-    private void executeIndexing() throws IOException, ConfigurationException, VersionControlPluginException {
+    private void executeIndexing() throws IOException, ConfigurationException, VersionControlPluginException, PluginLoaderException {
         if (changedFiles.isEmpty()) {
             LOG.info("Index of repository " + repository.getName() + " is up to date");
             return;
@@ -235,7 +230,7 @@ public class IndexingTask implements Task {
         indexDirectory = FSDirectory.open(dir);
 
         clearPreviousDocuments();
-        initializeIndexWriter(new WhitespaceAnalyzer(), dir); //IndexConstants.LUCENE_VERSION
+        initializeIndexWriter(dir);
         createIndex();
     }
 
@@ -245,17 +240,18 @@ public class IndexingTask implements Task {
      * @return document with added lucene fields
      */
     public Document addLuceneFields(Document doc, FileDto file) throws VersionControlPluginException, ConfigurationException, PluginLoaderException, LuceneFieldValueException {
-        for(LuceneFieldPlugin currentPlugin : PluginLoader.getMultiplePluginsForSingelPurpose(LuceneFieldPlugin.class, "lucene_field_plugin")){ //TODO probably move the string to a constant
+        for (LuceneFieldPlugin currentPlugin : luceneFields) { //TODO probably move the string to a constant
             String fieldValue = currentPlugin.getFieldValue(file);
             String currentFieldName = currentPlugin.getFieldName();
             Store store = currentPlugin.isStored() ? Field.Store.YES : Field.Store.NO;
             Index index = currentPlugin.isAnalyzed() ? Field.Index.ANALYZED : Field.Index.NOT_ANALYZED;
             doc.add(new Field(currentFieldName, fieldValue, store, index));
-            if(currentPlugin.addLowercase()){
+            if (currentPlugin.addLowercase()) {
                 doc.add(new Field(currentFieldName + "_lc", fieldValue.toLowerCase(), store, index));
             }
         }
-        
+        //add the analyzed source content
+
         return doc;
     }
 
@@ -264,9 +260,17 @@ public class IndexingTask implements Task {
      * @param analyzer analyzer for the files.
      * @param dir The location for the  lucene index
      */
-    public void initializeIndexWriter(Analyzer luceneAnalyzer, File dir) {
+    public void initializeIndexWriter(File dir) throws PluginLoaderException {
+        PerFieldAnalyzerWrapper analyzer = new PerFieldAnalyzerWrapper(new SimpleAnalyzer());
+        for (LuceneFieldPlugin currentPlugin : PluginLoader.getMultiplePluginsForSingelPurpose(LuceneFieldPlugin.class, "lucene_field_plugin")) {
+            luceneFields.add(currentPlugin);
+            analyzer.addAnalyzer(currentPlugin.getFieldName(), currentPlugin.getRegularCaseAnalyzer());
+            if (currentPlugin.addLowercase()) {
+                analyzer.addAnalyzer(currentPlugin.getFieldName() + "_lc", currentPlugin.getLowerCaseAnalyzer());
+            }
+        }
         try {
-            indexWriter = new IndexWriter(indexDirectory, luceneAnalyzer, IndexWriter.MaxFieldLength.LIMITED);
+            indexWriter = new IndexWriter(indexDirectory, analyzer, IndexWriter.MaxFieldLength.LIMITED);
             LOG.debug("IndexWriter initialization successful: " + dir.getAbsolutePath());
         } catch (IOException ex) {
             LOG.error(ex);
@@ -286,10 +290,13 @@ public class IndexingTask implements Task {
         try {
             int i = 0;
             for (FileDto file : changedFiles) {
+                if (file.getFilePath().contains("IndexingTaskTest")) {
+                    getClass();
+                }
                 String fileName;
                 try {
-                    fileName = file.getFilePath().substring(file.getFilePath().lastIndexOf("/"));
-                }catch (StringIndexOutOfBoundsException ex){
+                    fileName = file.getFilePath().substring(file.getFilePath().lastIndexOf("/") + 1);
+                } catch (StringIndexOutOfBoundsException ex) {
                     //if for whatever reason the file is in the root directory of the repositorys
                     fileName = file.getFilePath();
                 }
@@ -298,7 +305,7 @@ public class IndexingTask implements Task {
                     doc = new Document();
                     // Add fields
                     doc = addLuceneFields(doc, file);
-                    LOG.debug("Added file: " + file.getFilePath().substring(file.getFilePath().lastIndexOf("/")) + " to index.");
+                    LOG.debug("Added file: " + fileName + " to index.");
                     // Add document to the index
                     indexWriter.addDocument(doc);
                     i++;

@@ -5,8 +5,11 @@
 
 package org.codesearch.commons.plugins.lucenefields.filepathlucenefieldplugin;
 
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.codesearch.commons.plugins.lucenefields.LuceneFieldPlugin;
 import org.codesearch.commons.plugins.lucenefields.LuceneFieldValueException;
+import org.codesearch.commons.plugins.lucenefields.contentlucenefieldplugin.LetterAnalyzer;
 import org.codesearch.commons.plugins.vcs.FileDto;
 /**
  *
@@ -52,6 +55,14 @@ public class FilepathLuceneFieldPlugin extends LuceneFieldPlugin {
 
     public String getFieldName() {
         return "filepath";
+    }
+
+    public Analyzer getRegularCaseAnalyzer() {
+        return new LetterAnalyzer();
+    }
+
+    public Analyzer getLowerCaseAnalyzer() {
+        return new SimpleAnalyzer();
     }
 
 }

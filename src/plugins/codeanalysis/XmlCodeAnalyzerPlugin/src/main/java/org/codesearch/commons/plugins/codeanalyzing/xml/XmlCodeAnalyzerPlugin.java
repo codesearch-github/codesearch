@@ -55,11 +55,9 @@ public class XmlCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
             nodes.add(ast);
             SAXParserFactory spf = SAXParserFactory.newInstance();
             SAXParser saxParser = spf.newSAXParser();
-
-
             XMLReader xmlReader = saxParser.getXMLReader();
             xmlReader.setEntityResolver(new EntityResolver() {
-
+                @Override
                 public InputSource resolveEntity(String publicId, String systemId) {
                     return new InputSource(new ByteArrayInputStream("<?xml version='1.0'encoding='UTF-8'?>".getBytes()));
                 }

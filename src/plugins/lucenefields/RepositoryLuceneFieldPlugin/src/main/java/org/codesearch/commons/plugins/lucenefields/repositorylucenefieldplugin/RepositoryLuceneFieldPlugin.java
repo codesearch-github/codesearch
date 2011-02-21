@@ -2,9 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package org.codesearch.commons.plugins.lucenefields.repositorylucenefieldplugin;
 
+import org.apache.lucene.analysis.Analyzer;
 import org.codesearch.commons.plugins.lucenefields.LuceneFieldPlugin;
 import org.codesearch.commons.plugins.lucenefields.LuceneFieldValueException;
 import org.codesearch.commons.plugins.vcs.FileDto;
@@ -13,7 +13,7 @@ import org.codesearch.commons.plugins.vcs.FileDto;
  * LuceneFieldPlugin that returns the name of the repository 
  * @author David Froehlich
  */
-public class RepositoryLuceneFieldPlugin extends LuceneFieldPlugin{
+public class RepositoryLuceneFieldPlugin extends LuceneFieldPlugin {
 
     /**
      * returns the name of the repository
@@ -30,10 +30,10 @@ public class RepositoryLuceneFieldPlugin extends LuceneFieldPlugin{
         return "lucene_field_plugin";
     }
 
-   /**
-    * returns false
-    * @return
-    */
+    /**
+     * returns false
+     * @return
+     */
     public boolean isAnalyzed() {
         return false;
     }
@@ -51,8 +51,18 @@ public class RepositoryLuceneFieldPlugin extends LuceneFieldPlugin{
         return false;
     }
 
+    /** {@inheritDoc} */
     public String getFieldName() {
         return "repository";
     }
 
+    /** {@inheritDoc} */
+    public Analyzer getRegularCaseAnalyzer() {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    public Analyzer getLowerCaseAnalyzer() {
+        return null;
+    }
 }
