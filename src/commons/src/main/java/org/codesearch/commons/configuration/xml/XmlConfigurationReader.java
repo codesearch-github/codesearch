@@ -53,8 +53,8 @@ public class XmlConfigurationReader {
     /** the singleton instance of this class */
     private static XmlConfigurationReader theInstance;
 
-    public static synchronized XmlConfigurationReader getInstance(){
-        if(theInstance == null){
+    public static synchronized XmlConfigurationReader getInstance() {
+        if (theInstance == null) {
             theInstance = new XmlConfigurationReader();
         }
         return theInstance;
@@ -71,13 +71,13 @@ public class XmlConfigurationReader {
      * @return the users as a list of IndexerUserDto
      * @throws ConfigurationException
      */
-    public List<IndexerUserDto> getIndexerUsers() throws ConfigurationException{
+    public List<IndexerUserDto> getIndexerUsers() throws ConfigurationException {
         List<IndexerUserDto> users = new LinkedList<IndexerUserDto>();
-        if(config == null) {
+        if (config == null) {
             loadConfigReader();
         }
         List<HierarchicalConfiguration> userConfig = config.configurationsAt(XmlConfigurationReaderConstants.INDEXER_USERS);
-        for(HierarchicalConfiguration hc : userConfig){
+        for (HierarchicalConfiguration hc : userConfig) {
             IndexerUserDto userDto = new IndexerUserDto();
             userDto.setUserName(hc.getString(XmlConfigurationReaderConstants.USERNAME));
             userDto.setPassword((hc.getString(XmlConfigurationReaderConstants.PASSWORD)));
@@ -188,25 +188,52 @@ public class XmlConfigurationReader {
         List<HierarchicalConfiguration> repositories = config.configurationsAt(XmlConfigurationReaderConstants.REPOSITORY_LIST);
         for (HierarchicalConfiguration hc : repositories) {
             if (hc.getString(XmlConfigurationReaderConstants.REPOSITORY_NAME).equals(name)) {
+
+                //retrieve the repository blacklisted filenames and add all global filenames
                 List<String> ignoredFileNames = hc.getList(XmlConfigurationReaderConstants.REPOSITORY_BLACKLIST);
                 if (ignoredFileNames == null) {
                     ignoredFileNames = new LinkedList<String>();
                 }
-                List<String> repositoryGroups = hc.getList(XmlConfigurationReaderConstants.REPOSITORY_BLACKLIST);
+                ignoredFileNames.addAll(getGloballyIgnoredFileNames());
+
+                //retrieve the repository whitelisted filenames and add all global filenames
+                List<String> whitelistFileNames = hc.getList(XmlConfigurationReaderConstants.REPOSITORY_WHITELIST_FILENAMES);
+                if (whitelistFileNames == null) {
+                    whitelistFileNames = new LinkedList<String>();
+                }
+                whitelistFileNames.addAll(getGloballyWhitelistedFileNames());
+
+                List<String> repositoryGroups = hc.getList(XmlConfigurationReaderConstants.REPOSITORY_GROUPS);
                 if (repositoryGroups == null) {
                     repositoryGroups = new LinkedList<String>();
                 }
-                ignoredFileNames.addAll(getGloballyIgnoredFileNames());
                 repo = new RepositoryDto(name, hc.getString(XmlConfigurationReaderConstants.REPOSITORY_URL),
                         hc.getString(XmlConfigurationReaderConstants.REPOSITORY_USERNAME),
                         hc.getString(XmlConfigurationReaderConstants.REPOSITORY_PASSWORD),
                         hc.getBoolean(XmlConfigurationReaderConstants.REPOSITORY_CODE_NAVIGATION_ENABLED),
                         hc.getString(XmlConfigurationReaderConstants.REPOSITORY_VCS),
                         ignoredFileNames,
+                        whitelistFileNames,
                         repositoryGroups);
             }
         }
         return repo;
+    }
+
+    /**
+     * returns a list of all globally whitelisted filenames, so every filename has to match at least one of the whitelist names (only if the whitelist is not empty)
+     * @return
+     * @throws ConfigurationException
+     */
+    public List<String> getGloballyWhitelistedFileNames() throws ConfigurationException {
+        if (config == null) {
+            loadConfigReader();
+        }
+        List<String> whitelist = config.getList(XmlConfigurationReaderConstants.GLOBAL_WHITELIST);
+        if (whitelist == null) {
+            whitelist = new LinkedList<String>();
+        }
+        return whitelist;
     }
 
     /**
@@ -218,7 +245,11 @@ public class XmlConfigurationReader {
         if (config == null) {
             loadConfigReader();
         }
-        return config.getList(XmlConfigurationReaderConstants.GLOBAL_BLACKLIST);
+        List<String> blacklist = config.getList(XmlConfigurationReaderConstants.GLOBAL_BLACKLIST);
+        if(blacklist == null){
+            blacklist = new LinkedList<String>();
+        }
+        return blacklist;
     }
 
     /**

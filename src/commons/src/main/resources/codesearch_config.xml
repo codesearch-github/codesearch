@@ -44,12 +44,16 @@
     </indexer-users>
 
     <global-blacklist-filenames>
-        <filename>*.svn*</filename>
-        <filename>*.class</filename>
-        <filename>*.o</filename>
-        <filename>*.bin</filename>
-        <filename>*.class*</filename>
+        <filename>.*\.svn.*</filename>
+        <filename>.*\.class</filename>
+        <filename>.*\.o</filename>
+        <filename>.*\.bin</filename>
     </global-blacklist-filenames>
+
+    <global-whitelist-filenames>
+        <filename>.*java</filename>
+    </global-whitelist-filenames>
+
     <index-location>/tmp/test/</index-location>
     <index-jobs>
        <index-job>
@@ -69,7 +73,9 @@
         </index-job> 
     </index-jobs>
     <testproperty>fdsa</testproperty>
+    
     <repository-groups>group1 group2</repository-groups>
+
     <repositories>
         <repository>
             <name>svnsearch_repo</name>
@@ -79,7 +85,7 @@
             <url>svn://portal.htl-kaindorf.at/svnsearch</url>
             <code-navigation-enabled>true</code-navigation-enabled>
             <blacklist-filenames>
-                <filename>*.xml</filename>
+                <filename>.*\.xml</filename>
             </blacklist-filenames>
             <repository-groups>
                 <repo-group>group1</repo-group>
@@ -95,9 +101,9 @@
                 <repo-group>group1</repo-group>
             </repository-groups>
              <blacklist-filenames>
-                <filename>*.o</filename>
-                <filename>*.pdf</filename>
-                <filename>*.bin</filename>
+                <filename>.*\.o</filename>
+                <filename>.*\.pdf</filename>
+                <filename>.*\.bin</filename>
             </blacklist-filenames>
             <url>$home/workspace/svnsearch</url>
             <code-navigation-enabled>true</code-navigation-enabled>

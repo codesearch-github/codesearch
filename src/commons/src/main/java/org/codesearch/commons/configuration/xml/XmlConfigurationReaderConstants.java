@@ -42,6 +42,8 @@ public final class XmlConfigurationReaderConstants {
     public static final String INDEX_JOB = "index-jobs.index-job";
     /** Used to access globally blacklisted filenames in the xml-config file */
     public static final String GLOBAL_BLACKLIST = "global-blacklist-filenames.filename";
+    /** Used to access globally whitelisted filenames, so filenames that a file hast to match so it is indexed */
+    public static final String GLOBAL_WHITELIST = "global-whitelist-filenames.filename";
     /** Used to retrieve all repositories in the xml-config file */
     public static final String REPOSITORY_LIST = "repositories.repository";
     /** Used to retrieve all tasks in the xml-config file */
@@ -67,6 +69,8 @@ public final class XmlConfigurationReaderConstants {
     public static final String REPOSITORY_CODE_NAVIGATION_ENABLED = "code-navigation-enabled";
     /** Used to find out in which repository group the repository is  */
     public static final String REPOSITORY_GROUPS = "repository-groups.repo-group";
+    /** Used to retrieve the filename-patterns files have to match to be indexed */
+    public static final String REPOSITORY_WHITELIST_FILENAMES = "whitelist-filenames.filename";
 
     //TASK CONSTANTS
     /** Used to access a single task */

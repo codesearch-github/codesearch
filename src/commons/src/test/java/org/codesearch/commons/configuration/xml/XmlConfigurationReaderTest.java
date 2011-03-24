@@ -20,6 +20,7 @@
  */
 package org.codesearch.commons.configuration.xml;
 
+import java.util.Collections;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -79,7 +80,7 @@ public class XmlConfigurationReaderTest {
         ignFileNames1.add("*.class*");
         
 
-        RepositoryDto repo1 = new RepositoryDto("svnsearch_repo", "svn://portal.htl-kaindorf.at/svnsearch", "feldruebe", "dota!123", true, "SVN", ignFileNames1, repoGroups1);
+        RepositoryDto repo1 = new RepositoryDto("svnsearch_repo", "svn://portal.htl-kaindorf.at/svnsearch", "feldruebe", "dota!123", true, "SVN", ignFileNames1, new LinkedList<String>(), repoGroups1);
 
         List<String> ignFileNames2 = new LinkedList<String>();
         List<String> repoGroups2 = new LinkedList<String>();
@@ -91,7 +92,7 @@ public class XmlConfigurationReaderTest {
         ignFileNames2.add("*img*");
         ignFileNames2.add("*.svn*");
         ignFileNames2.add("*.class*");
-        RepositoryDto repo2 = new RepositoryDto("svn_local", System.getProperty("user.home")+"/workspace/svnsearch", "null", "null", true, "FILESYSTEM", ignFileNames2, repoGroups2);
+        RepositoryDto repo2 = new RepositoryDto("svn_local", System.getProperty("user.home")+"/workspace/svnsearch", "null", "null", true, "FILESYSTEM", ignFileNames2, new LinkedList<String>(), repoGroups2);
 
         List result = configReader.getRepositories();
         assertTrue(repo1.equals(result.get(1)));
@@ -131,7 +132,7 @@ public class XmlConfigurationReaderTest {
         ignFileNames1.add("*img*");
         ignFileNames1.add("*.svn*");
         ignFileNames1.add("*.class*");
-        RepositoryDto repo1 = new RepositoryDto("svnsearch_repo", "svn://portal.htl-kaindorf.at/svnsearch", "feldruebe", "dota!123", true, "SVN", ignFileNames1, repoGroups1);
+        RepositoryDto repo1 = new RepositoryDto("svnsearch_repo", "svn://portal.htl-kaindorf.at/svnsearch", "feldruebe", "dota!123", true, "SVN", ignFileNames1, repoGroups1,new LinkedList<String>());
 
         List<String> ignFileNames2 = new LinkedList<String>();
         List<String> repoGroups2 = new LinkedList<String>();
@@ -143,7 +144,7 @@ public class XmlConfigurationReaderTest {
         ignFileNames2.add("*img*");
         ignFileNames2.add("*.svn*");
         ignFileNames2.add("*.class*");
-        RepositoryDto repo2 = new RepositoryDto("svn_local", System.getProperty("user.home")+"/workspace/svnsearch", "null", "null", true, "FILESYSTEM", ignFileNames2, repoGroups2);
+        RepositoryDto repo2 = new RepositoryDto("svn_local", System.getProperty("user.home")+"/workspace/svnsearch", "null", "null", true, "FILESYSTEM", ignFileNames2, new LinkedList<String>(), repoGroups2);
 
         job1.getTasks().add(new TaskDto(repo1, TaskDto.TaskType.index, true));
         job1.setInterval(60);
@@ -169,7 +170,7 @@ public class XmlConfigurationReaderTest {
         ignoredFiles.add("*.xml");
         ignoredFiles.add("*.jpg");
         ignoredFiles.add("*.txt");
-        RepositoryDto expResult = new RepositoryDto("testRepo1", "http://test.org", "testUser", "testPassword", true, "SVN", ignoredFiles, repoGroups);
+        RepositoryDto expResult = new RepositoryDto("testRepo1", "http://test.org", "testUser", "testPassword", true, "SVN", ignoredFiles, new LinkedList<String>(), repoGroups);
         RepositoryDto result = configReader.getRepositoryByName("testRepo1");
     }
 

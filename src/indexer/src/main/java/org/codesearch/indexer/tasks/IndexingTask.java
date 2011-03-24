@@ -180,6 +180,9 @@ public class IndexingTask implements Task {
                     DBAccess.purgeAllRecordsForFile(currentFile.getFilePath(), repository.getName());
                     LOG.debug("Deleted all records associated with " + currentFile.getFilePath() + " since it was deleted from the file system");
                 } else {
+                    if(currentFile.getFilePath().endsWith("NewReservation.java")){
+                        getClass();
+                    }
                     try {
                         currentFileType = MimeTypeUtil.guessMimeTypeViaFileEnding(currentFile.getFilePath());
                     } catch (StringIndexOutOfBoundsException ex) {
@@ -290,9 +293,6 @@ public class IndexingTask implements Task {
         try {
             int i = 0;
             for (FileDto file : changedFiles) {
-                if (file.getFilePath().contains("IndexingTaskTest")) {
-                    getClass();
-                }
                 String fileName;
                 try {
                     fileName = file.getFilePath().substring(file.getFilePath().lastIndexOf("/") + 1);
@@ -354,25 +354,15 @@ public class IndexingTask implements Task {
      */
     public boolean fileIsOnIgnoreList(String path) {
         Pattern p;
+        //TODO running out of battery, implement whitelist when charger is found
         for (String s : repository.getIgnoredFileNames()) {
-            p = Pattern.compile(parseRegexString(s));
+            p = Pattern.compile(s);
             Matcher m = p.matcher(path);
             if (m.find()) {
                 return true;
             }
         }
         return false;
-    }
-
-    //TODO check for different chars the user could specify in configuration
-    /**
-     * Parses the string that represents an entry in the ignore list from the configuration to a string that can be read by java regex
-     * @param string the string that is to be parsed
-     * @return the regex pattern string
-     */
-    private String parseRegexString(String string) {
-        String retString = string.replace(".", "\\.").replace("*", ".*");
-        return retString;
     }
 
     /**

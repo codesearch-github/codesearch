@@ -25,6 +25,8 @@ Important TODOs
  - Refactor Exception Handling in IndexingTask
  - rewrite plugin loader so multiple plugins for a single purpose can be loaded
  - Use a PerFieldAnalyzerWrapper in the DocumentSearcher
+ - Find out whether the Repository Groups in the configuration are really necessary, if yes, update the thesis document, section 3.2
+ - Make sure no two indexing jobs are executed at the same time
 
 Bugs
 ===============

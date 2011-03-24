@@ -41,6 +41,8 @@ public class RepositoryDto {
     /** The version control system used for this repository, (for instance SVN or Bazaar),
      * must match the purpose attribute of the corresponding version control plugin */
     private String versionControlSystem;
+    /** A list of file name patterns that the files that will be indexed have to match (every file has to match at least one of the entries */
+    private List<String> whitelistNames;
     /** A list of all file names (in regex) that will not be indexed in this repository */
     private List<String> ignoredFileNames;
     /** A list of repository groups this repositorie belongs to */
@@ -56,7 +58,7 @@ public class RepositoryDto {
      * @param codeNavigationEnabled specifies whether the repository should have the additional
      * indexes for the code navigation
      */
-    public RepositoryDto(String name, String url, String username, String password, boolean codeNavigationEnabled, String versionControlSystem, List<String> ignoredFileNames, List<String> repositoryGroups) {
+    public RepositoryDto(String name, String url, String username, String password, boolean codeNavigationEnabled, String versionControlSystem, List<String> ignoredFileNames, List<String> whitelistNames, List<String> repositoryGroups) {
         this.name = name;
         this.url = url;
         this.username = username;
@@ -65,6 +67,15 @@ public class RepositoryDto {
         this.versionControlSystem = versionControlSystem;
         this.ignoredFileNames = ignoredFileNames;
         this.repositoryGroups = repositoryGroups;
+        this.whitelistNames = whitelistNames;
+    }
+
+    public List<String> getWhitelistNames() {
+        return whitelistNames;
+    }
+
+    public void setWhitelistNames(List<String> whitelistNames) {
+        this.whitelistNames = whitelistNames;
     }
 
     public List<String> getIgnoredFileNames() {

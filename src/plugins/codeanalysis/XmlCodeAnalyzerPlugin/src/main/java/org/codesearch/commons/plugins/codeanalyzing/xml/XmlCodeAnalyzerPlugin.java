@@ -59,7 +59,7 @@ public class XmlCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
             xmlReader.setEntityResolver(new EntityResolver() {
                 @Override
                 public InputSource resolveEntity(String publicId, String systemId) {
-                    return new InputSource(new ByteArrayInputStream("<?xml version='1.0'encoding='UTF-8'?>".getBytes()));
+                    return new InputSource(new ByteArrayInputStream("<?xml version='1.0' encoding='UTF-8'?>".getBytes()));
                 }
             });
             xmlReader.setContentHandler(new LocationDefaultHandler());

@@ -42,10 +42,6 @@
     </context-param>
 
     <listener>
-        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
-    </listener>
-
-    <listener>
         <listener-class>org.codesearch.indexer.core.IndexerMain</listener-class>
     </listener>
 
