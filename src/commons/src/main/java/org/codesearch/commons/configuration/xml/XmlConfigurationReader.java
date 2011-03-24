@@ -164,6 +164,7 @@ public class XmlConfigurationReader {
         if (config == null) {
             loadConfigReader();
         }
+        //if no name is specified retrieve all repositories
         if (repositoryString == null) {
             return getRepositories();
         }
@@ -188,35 +189,47 @@ public class XmlConfigurationReader {
         List<HierarchicalConfiguration> repositories = config.configurationsAt(XmlConfigurationReaderConstants.REPOSITORY_LIST);
         for (HierarchicalConfiguration hc : repositories) {
             if (hc.getString(XmlConfigurationReaderConstants.REPOSITORY_NAME).equals(name)) {
-
-                //retrieve the repository blacklisted filenames and add all global filenames
-                List<String> ignoredFileNames = hc.getList(XmlConfigurationReaderConstants.REPOSITORY_BLACKLIST);
-                if (ignoredFileNames == null) {
-                    ignoredFileNames = new LinkedList<String>();
-                }
-                ignoredFileNames.addAll(getGloballyIgnoredFileNames());
-
-                //retrieve the repository whitelisted filenames and add all global filenames
-                List<String> whitelistFileNames = hc.getList(XmlConfigurationReaderConstants.REPOSITORY_WHITELIST_FILENAMES);
-                if (whitelistFileNames == null) {
-                    whitelistFileNames = new LinkedList<String>();
-                }
-                whitelistFileNames.addAll(getGloballyWhitelistedFileNames());
-
-                List<String> repositoryGroups = hc.getList(XmlConfigurationReaderConstants.REPOSITORY_GROUPS);
-                if (repositoryGroups == null) {
-                    repositoryGroups = new LinkedList<String>();
-                }
-                repo = new RepositoryDto(name, hc.getString(XmlConfigurationReaderConstants.REPOSITORY_URL),
-                        hc.getString(XmlConfigurationReaderConstants.REPOSITORY_USERNAME),
-                        hc.getString(XmlConfigurationReaderConstants.REPOSITORY_PASSWORD),
-                        hc.getBoolean(XmlConfigurationReaderConstants.REPOSITORY_CODE_NAVIGATION_ENABLED),
-                        hc.getString(XmlConfigurationReaderConstants.REPOSITORY_VCS),
-                        ignoredFileNames,
-                        whitelistFileNames,
-                        repositoryGroups);
+                repo = getRepositoryFromConfig(hc);
             }
         }
+        return repo;
+    }
+
+    /**
+     * retrieves all required data about the given repository from the configuration via the HierarchicalConfiguration and returns it as a RepositoryDto
+     * @param hc
+     * @return
+     * @throws ConfigurationException
+     */
+    private RepositoryDto getRepositoryFromConfig(HierarchicalConfiguration hc) throws ConfigurationException {
+        RepositoryDto repo = new RepositoryDto();
+        //retrieve the repository blacklisted filenames and add all global filenames
+        String name = hc.getString(XmlConfigurationReaderConstants.REPOSITORY_NAME);
+        List<String> blacklistEntries = hc.getList(XmlConfigurationReaderConstants.REPOSITORY_BLACKLIST);
+        if (blacklistEntries == null) {
+            blacklistEntries = new LinkedList<String>();
+        }
+        blacklistEntries.addAll(getGlobalBlacklistEntries());
+
+        //retrieve the repository whitelisted filenames and add all global filenames
+        List<String> whitelistFileNames = hc.getList(XmlConfigurationReaderConstants.REPOSITORY_WHITELIST_FILENAMES);
+        if (whitelistFileNames == null) {
+            whitelistFileNames = new LinkedList<String>();
+        }
+        whitelistFileNames.addAll(getGlobalWhitelistEntries());
+
+        List<String> repositoryGroups = hc.getList(XmlConfigurationReaderConstants.REPOSITORY_GROUPS);
+        if (repositoryGroups == null) {
+            repositoryGroups = new LinkedList<String>();
+        }
+        repo = new RepositoryDto(name, hc.getString(XmlConfigurationReaderConstants.REPOSITORY_URL),
+                hc.getString(XmlConfigurationReaderConstants.REPOSITORY_USERNAME),
+                hc.getString(XmlConfigurationReaderConstants.REPOSITORY_PASSWORD),
+                hc.getBoolean(XmlConfigurationReaderConstants.REPOSITORY_CODE_NAVIGATION_ENABLED),
+                hc.getString(XmlConfigurationReaderConstants.REPOSITORY_VCS),
+                blacklistEntries,
+                whitelistFileNames,
+                repositoryGroups);
         return repo;
     }
 
@@ -225,7 +238,7 @@ public class XmlConfigurationReader {
      * @return
      * @throws ConfigurationException
      */
-    public List<String> getGloballyWhitelistedFileNames() throws ConfigurationException {
+    public List<String> getGlobalWhitelistEntries() throws ConfigurationException {
         if (config == null) {
             loadConfigReader();
         }
@@ -241,12 +254,12 @@ public class XmlConfigurationReader {
      * @return the list of file names
      * @throws ConfigurationException if the configuration could not be read or the value is not defined
      */
-    private List<String> getGloballyIgnoredFileNames() throws ConfigurationException {
+    private List<String> getGlobalBlacklistEntries() throws ConfigurationException {
         if (config == null) {
             loadConfigReader();
         }
         List<String> blacklist = config.getList(XmlConfigurationReaderConstants.GLOBAL_BLACKLIST);
-        if(blacklist == null){
+        if (blacklist == null) {
             blacklist = new LinkedList<String>();
         }
         return blacklist;
@@ -265,25 +278,7 @@ public class XmlConfigurationReader {
         List<RepositoryDto> repositories = new LinkedList<RepositoryDto>();
         List<HierarchicalConfiguration> repositoryConfigs = config.configurationsAt(XmlConfigurationReaderConstants.REPOSITORY_LIST);
         for (HierarchicalConfiguration repositoryConfig : repositoryConfigs) {
-            RepositoryDto repositoryDto = new RepositoryDto();
-            repositoryDto.setVersionControlSystem(repositoryConfig.getString(XmlConfigurationReaderConstants.REPOSITORY_VCS));
-            repositoryDto.setName(repositoryConfig.getString(XmlConfigurationReaderConstants.REPOSITORY_NAME));
-            repositoryDto.setUrl(repositoryConfig.getString(XmlConfigurationReaderConstants.REPOSITORY_URL));
-            repositoryDto.setUsername(repositoryConfig.getString(XmlConfigurationReaderConstants.REPOSITORY_USERNAME));
-            repositoryDto.setPassword(repositoryConfig.getString(XmlConfigurationReaderConstants.REPOSITORY_PASSWORD));
-            repositoryDto.setCodeNavigationEnabled(repositoryConfig.getBoolean(XmlConfigurationReaderConstants.REPOSITORY_CODE_NAVIGATION_ENABLED));
-            List<String> ignoredFileNames = repositoryConfig.getList(XmlConfigurationReaderConstants.REPOSITORY_BLACKLIST);
-            if (ignoredFileNames == null) {
-                ignoredFileNames = new LinkedList<String>();
-            }
-            ignoredFileNames.addAll(this.getGloballyIgnoredFileNames());
-            repositoryDto.setIgnoredFileNames(ignoredFileNames);
-            List<String> repositoryGroups = repositoryConfig.getList(XmlConfigurationReaderConstants.REPOSITORY_GROUPS);
-            if (repositoryGroups == null) {
-                repositoryGroups = new LinkedList<String>();
-            }
-            repositoryDto.setRepositoryGroups(repositoryGroups);
-            repositories.add(repositoryDto);
+            repositories.add(getRepositoryFromConfig(repositoryConfig));
         }
         return repositories;
     }

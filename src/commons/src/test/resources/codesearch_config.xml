@@ -91,6 +91,9 @@
             <blacklist-filenames>
                 <filename>*generated*</filename>
             </blacklist-filenames>
+            <whitelist-filenames>
+                <filename>.*DBAccess.*</filename>
+            </whitelist-filenames>
             <code-navigation-enabled>true</code-navigation-enabled>
         </repository>
         <repository>

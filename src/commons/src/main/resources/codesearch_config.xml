@@ -100,6 +100,9 @@
             <repository-groups>
                 <repo-group>group1</repo-group>
             </repository-groups>
+            <whitelist-filenames>
+                <filename>.*DBAccess.*</filename>
+            </whitelist-filenames>
              <blacklist-filenames>
                 <filename>.*\.o</filename>
                 <filename>.*\.pdf</filename>

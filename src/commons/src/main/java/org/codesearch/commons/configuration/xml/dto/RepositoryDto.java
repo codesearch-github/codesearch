@@ -42,9 +42,9 @@ public class RepositoryDto {
      * must match the purpose attribute of the corresponding version control plugin */
     private String versionControlSystem;
     /** A list of file name patterns that the files that will be indexed have to match (every file has to match at least one of the entries */
-    private List<String> whitelistNames;
+    private List<String> whitelistEntries;
     /** A list of all file names (in regex) that will not be indexed in this repository */
-    private List<String> ignoredFileNames;
+    private List<String> blacklistEntries;
     /** A list of repository groups this repositorie belongs to */
     private List<String> repositoryGroups;
 
@@ -52,38 +52,43 @@ public class RepositoryDto {
     }
 
     /**
-     * Creates a new instance setting all attributes to the given parameters.
-     * @param name the name of the repository
-     * @param indexingEnabled specifies whether the repository should have indexing enabled
-     * @param codeNavigationEnabled specifies whether the repository should have the additional
-     * indexes for the code navigation
+     * Creates a new instance of RepositoryDto
+     * @param name the unique name of the repository
+     * @param url the url used by the VersionControlPlugin to access the repository
+     * @param username the username used by the VersionControlPlugin to access the repository, use null if not required
+     * @param password the password used by the VersionControlPlugin to access the repository, use null if not required
+     * @param codeNavigationEnabled determines whether code navigation is enabled for this repository
+     * @param versionControlSystem determines which VersionControlSystem is used for the repository, must match the string returned by the getPurpose method of the VersionControlPlugin
+     * @param blacklistEntries the list of regex strings representing the filenames of files that will not be indexed
+     * @param whitelistEntries the list of regex strings a filename must match in order for the file to be indexed (only one entry has to be matched)
+     * @param repositoryGroups the groups this repository belongs to
      */
-    public RepositoryDto(String name, String url, String username, String password, boolean codeNavigationEnabled, String versionControlSystem, List<String> ignoredFileNames, List<String> whitelistNames, List<String> repositoryGroups) {
+    public RepositoryDto(String name, String url, String username, String password, boolean codeNavigationEnabled, String versionControlSystem, List<String> blacklistEntries, List<String> whitelistEntries, List<String> repositoryGroups) {
         this.name = name;
         this.url = url;
         this.username = username;
         this.password = password;
         this.codeNavigationEnabled = codeNavigationEnabled;
         this.versionControlSystem = versionControlSystem;
-        this.ignoredFileNames = ignoredFileNames;
+        this.blacklistEntries = blacklistEntries;
         this.repositoryGroups = repositoryGroups;
-        this.whitelistNames = whitelistNames;
+        this.whitelistEntries = whitelistEntries;
     }
 
-    public List<String> getWhitelistNames() {
-        return whitelistNames;
+    public List<String> getWhitelistEntries() {
+        return whitelistEntries;
     }
 
-    public void setWhitelistNames(List<String> whitelistNames) {
-        this.whitelistNames = whitelistNames;
+    public void setWhitelistEntries(List<String> whitelistEntries) {
+        this.whitelistEntries = whitelistEntries;
     }
 
-    public List<String> getIgnoredFileNames() {
-        return ignoredFileNames;
+    public List<String> getBlacklistEntries() {
+        return blacklistEntries;
     }
 
-    public void setIgnoredFileNames(List<String> ignoredFileNames) {
-        this.ignoredFileNames = ignoredFileNames;
+    public void setBlacklistEntries(List<String> blacklistEntries) {
+        this.blacklistEntries = blacklistEntries;
     }
 
     public boolean isCodeNavigationEnabled() {
@@ -175,16 +180,16 @@ public class RepositoryDto {
         }
         try {
             RepositoryDto other = (RepositoryDto) o;
-            if (this.getName().equals(other.getName()) && this.isCodeNavigationEnabled() == other.isCodeNavigationEnabled() && ignoredFileNames.size() == other.getIgnoredFileNames().size() && repositoryGroups.size() == other.getRepositoryGroups().size()) {
+            if (this.getName().equals(other.getName()) && this.isCodeNavigationEnabled() == other.isCodeNavigationEnabled() && blacklistEntries.size() == other.getBlacklistEntries().size() && repositoryGroups.size() == other.getRepositoryGroups().size()) {
                 for(int i = 0; i < repositoryGroups.size(); i++){
                     if(!repositoryGroups.get(i).equals(other.getRepositoryGroups().get(i))){
                         return false;
                     }
                 }
 
-                for (int i = 0; i < ignoredFileNames.size(); i++) {
-                    String s = ignoredFileNames.get(i);
-                    if (!(s.equals(other.getIgnoredFileNames().get(i)))) {
+                for (int i = 0; i < blacklistEntries.size(); i++) {
+                    String s = blacklistEntries.get(i);
+                    if (!(s.equals(other.getBlacklistEntries().get(i)))) {
                         return false;
                     }
                 }

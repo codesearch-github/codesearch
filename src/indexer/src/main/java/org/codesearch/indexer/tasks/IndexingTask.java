@@ -119,7 +119,9 @@ public class IndexingTask implements Task {
             LOG.info(changedFiles.size() + " files have changed since the last indexing");
 
             boolean retrieveNewFileList = false;
-
+//            for(String s : repository.getWhitelistEntries()){
+//                System.out.println(s);
+//            }
             executeIndexing();
             propertiesManager.setPropertyFileValue(repository.getName(), versionControlPlugin.getRepositoryRevision());
             long duration = System.currentTimeMillis() - start;
@@ -176,16 +178,13 @@ public class IndexingTask implements Task {
         String previousFileType = null;
         for (FileDto currentFile : changedFiles) {
             try {
-                if(currentFile.getFilePath().endsWith(".xml")){
+                if (currentFile.getFilePath().endsWith(".xml")) {
                     getClass(); //FIXME
                 }
                 if (currentFile.isDeleted()) {
                     DBAccess.purgeAllRecordsForFile(currentFile.getFilePath(), repository.getName());
                     LOG.debug("Deleted all records associated with " + currentFile.getFilePath() + " since it was deleted from the file system");
                 } else {
-                    if(currentFile.getFilePath().endsWith("NewReservation.java")){
-                        getClass();
-                    }
                     try {
                         currentFileType = MimeTypeUtil.guessMimeTypeViaFileEnding(currentFile.getFilePath());
                     } catch (StringIndexOutOfBoundsException ex) {
@@ -302,7 +301,7 @@ public class IndexingTask implements Task {
                     //if for whatever reason the file is in the root directory of the repositorys
                     fileName = file.getFilePath();
                 }
-                if (!(fileIsOnIgnoreList(file.getFilePath())) && !file.isDeleted()) {
+                if ((fileShouldBeIndexed(file.getFilePath())) && !file.isDeleted()) {
                     // The lucene document containing all relevant indexing information
                     doc = new Document();
                     // Add fields
@@ -354,17 +353,35 @@ public class IndexingTask implements Task {
     /**
      * Checks whether the current file is on the list of files that will not be indexed
      */
-    public boolean fileIsOnIgnoreList(String path) {
+    public boolean fileShouldBeIndexed(String path) {
         Pattern p;
-        //TODO running out of battery, implement whitelist when charger is found
-        for (String s : repository.getIgnoredFileNames()) {
-            p = Pattern.compile(s);
-            Matcher m = p.matcher(path);
-            if (m.find()) {
-                return true;
+        boolean matchesElementOnWhitelist = false;
+        boolean fileShouldBeIndexed = true;
+        //if no whitelist is specified all files pass the whitelist check
+        if (repository.getWhitelistEntries().isEmpty()) {
+            matchesElementOnWhitelist = true;
+        } else {
+            //else check if the filename matches one of the whitelist entries
+            for (String currentWhitelistEntry : repository.getWhitelistEntries()) {
+                p = Pattern.compile(currentWhitelistEntry);
+                Matcher m = p.matcher(path);
+                if (m.find()) {
+                    matchesElementOnWhitelist = true;
+                    break;
+                }
             }
         }
-        return false;
+        //check if the filename matches one of the blacklist entries, if yes return true, so the file won't be indexed
+        if (matchesElementOnWhitelist) {
+            for (String currentBlacklistEntry : repository.getBlacklistEntries()) {
+                p = Pattern.compile(currentBlacklistEntry);
+                Matcher m = p.matcher(path);
+                if (m.find()) {
+                    fileShouldBeIndexed = false;
+                }
+            }
+        }
+        return fileShouldBeIndexed && matchesElementOnWhitelist;
     }
 
     /**
