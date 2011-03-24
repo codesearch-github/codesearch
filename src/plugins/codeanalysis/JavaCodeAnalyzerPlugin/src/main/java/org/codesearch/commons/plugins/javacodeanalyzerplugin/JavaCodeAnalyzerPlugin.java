@@ -269,8 +269,7 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
             Collections.sort(usages);
 
         } catch (ParseException ex) {
-            System.out.println(ex.toString());
-            //TODO throw exception
+            throw new CodeAnalyzerPluginException(ex.getMessage());
         } finally {
             try {
                 bais.close();

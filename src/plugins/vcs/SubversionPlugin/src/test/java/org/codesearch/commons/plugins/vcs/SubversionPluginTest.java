@@ -21,18 +21,14 @@
 
 package org.codesearch.commons.plugins.vcs;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  *
@@ -41,6 +37,9 @@ import static org.junit.Assert.*;
 public class SubversionPluginTest {
 
     SubversionPlugin sp = new SubversionPlugin();
+
+     /* Logger */
+    private static final Logger LOG = Logger.getLogger(SubversionPluginTest.class);
 
     public SubversionPluginTest() {
     }
@@ -68,7 +67,7 @@ public class SubversionPluginTest {
      */
     @Test
     public void testGetPathsForChangedFilesSinceRevision() throws Exception {
-        System.out.println("getPathsForChangedFilesSinceRevision");
+        LOG.info("getPathsForChangedFilesSinceRevision");
         String revision = "217";
    //     sp.setRepository(new URI("svn://portal.htl-kaindorf.at/svnsearch"), "feldruebe", "dota!123");
         Set result = sp.getChangedFilesSinceRevision(revision);
@@ -82,7 +81,7 @@ public class SubversionPluginTest {
      */
     @Test
     public void testGetFileContentForFilePath() throws Exception {
-        System.out.println("getFileContentForFilePath");
+        LOG.info("getFileContentForFilePath");
         String filePath = "/svnsearch/trunk/src/main/java/com/bearingpoint/ta/svnsearch/testfile.txt";
         String result = new String(sp.getFileForFilePath(filePath).getContent());
         assert (result.equals("test"));
@@ -91,7 +90,7 @@ public class SubversionPluginTest {
     @Test
     public void testGetFilesInDirectory() throws Exception {
         for(String s : sp.getFilesInDirectory(null)){
-            System.out.println(s+"\n");
+            LOG.info(s+"\n");
         }
     }
 }

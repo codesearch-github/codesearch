@@ -24,6 +24,7 @@ package org.codesearch.commons.configuration.properties;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
+import org.apache.log4j.Logger;
 import org.codesearch.commons.constants.IndexConstants;
 
 import org.junit.After;
@@ -44,6 +45,9 @@ public class PropertiesManagerTest {
      * The used PropertiesReader instance
      */
     private PropertiesManager pr;
+
+     /* Logger */
+    private static final Logger LOG = Logger.getLogger(PropertiesManagerTest.class);
 
     public PropertiesManagerTest() {
     }
@@ -70,7 +74,7 @@ public class PropertiesManagerTest {
      */
     @Test
     public void testGetPropertyFileValue() throws Exception {
-        System.out.println("getPropertyFileValue");
+        LOG.info("getPropertyFileValue");
         String key = "testrepo1";
         String expResult = "0";
         String result = pr.getPropertyFileValue(key);

@@ -54,6 +54,12 @@ public interface FileView extends IsWidget {
     void setFilePath(String filePath);
 
     /**
+     * Sets the search term that resulted in the current file
+     * @param searchTerm
+     */
+    void setSearchTerm(String searchTerm);
+
+    /**
      * Sets the repository-name of the file to be displayed.
      * @param repository The repository name
      */

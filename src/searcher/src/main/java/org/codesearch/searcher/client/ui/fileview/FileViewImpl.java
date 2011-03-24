@@ -55,10 +55,12 @@ import org.codesearch.searcher.client.ClientFactory;
 
 /**
  * Implementation of the File View.
- * TODO cleanup this class
  * @author Samuel Kogler
  */
 public class FileViewImpl extends Composite implements FileView {
+
+
+    //TODO cleanup this class
 
     interface FileViewUiBinder extends UiBinder<Widget, FileViewImpl> {
     }
@@ -99,6 +101,7 @@ public class FileViewImpl extends Composite implements FileView {
     private int lineCount = 0;
     /** Whether or not the focus line div is visible. */
     private boolean focusDivVisible;
+    private String searchTerm;
     private boolean sidebarVisible;
     private List<Sidebar> shownSidebars = new LinkedList<Sidebar>();
 
@@ -163,6 +166,7 @@ public class FileViewImpl extends Composite implements FileView {
         this.presenter = presenter;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Presenter getPresenter() {
         return presenter;
@@ -182,11 +186,28 @@ public class FileViewImpl extends Composite implements FileView {
                 lineNumber.addClickHandler(new LineNumberClickHandler(i + 1));
                 lineNumbersContainer.add(lineNumber);
             }
+            highlightSearchTerm(fileContent);
         }
 
         fileContent = "<pre>" + fileContent + "</pre>";
 
+
         fileContentContainer.add(new HTML(fileContent));
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void setSearchTerm(String searchTerm) {
+        this.searchTerm = searchTerm;
+    }
+    
+    /**
+     * Highlights the search term in the given file content
+     * @param fileContent
+     */
+    public void highlightSearchTerm(String fileContent)
+    {
+       
     }
 
     /** {@inheritDoc} */

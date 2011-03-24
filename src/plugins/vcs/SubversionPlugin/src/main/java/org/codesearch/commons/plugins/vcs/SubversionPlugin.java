@@ -59,6 +59,7 @@ public class SubversionPlugin implements VersionControlPlugin {
     private static final Logger LOG = Logger.getLogger(SubversionPlugin.class);
     private ISVNAuthenticationManager authManager;
 
+
     /**
      * creates a new instance of SubversionPlugin and sets up all factories required for connections
      */
@@ -179,7 +180,7 @@ public class SubversionPlugin implements VersionControlPlugin {
             directoryPath = svnRepo.getRepositoryRoot(true).getPath();
             svnRepo.getDir(directoryPath, -1, null, new ListDirectoryDirEntryHandler(fileNames));
         } catch (SVNException ex) {
-            System.out.println(ex);
+            throw new VersionControlPluginException(ex.getMessage());
         }
         return fileNames;
     }

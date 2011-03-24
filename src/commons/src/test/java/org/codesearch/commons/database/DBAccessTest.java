@@ -27,6 +27,7 @@ package org.codesearch.commons.database;
 
 import java.util.LinkedList;
 import java.util.List;
+import org.apache.log4j.Logger;
 
 import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
 import org.junit.After;
@@ -40,6 +41,9 @@ import org.junit.Test;
  * @author David Froehlich
  */
 public class DBAccessTest {
+
+    /* Logger */
+    private static final Logger LOG = Logger.getLogger(DBAccessTest.class);
 
     public DBAccessTest() {
     }
@@ -82,7 +86,7 @@ public class DBAccessTest {
         //dummy object, dunno why i picked arraylist
         List<Usage> usages = new LinkedList<Usage>();
         usages.add(new Usage(0, 0, 0, 0, ""));
-//        DBAccess.setAnalysisDataForFile(filePath, repository, usages, Collections.EMPTY_LIST, Collections.EMPTY_LIST);
+//        DBAccess.setAnalyysisDataForFile(filePath, repository, usages, Collections.EMPTY_LIST, Collections.EMPTY_LIST);
       //  assert (List<Usage>)(DBAccess.getBinaryIndexForFile(filePath, repository)) != null;
     }
 
@@ -91,7 +95,7 @@ public class DBAccessTest {
      */
     @Test
     public void testSetupConnections() throws Exception {
-//        System.out.println("setupConnections");
+//        LOG.info("setupConnections");
 //        DBUtils.setupConnections();
 //        fail("The test case is a prototype.");
     }
@@ -101,7 +105,7 @@ public class DBAccessTest {
      */
     @Test
     public void testGetLastAnalyzedRevisionOfRepository() throws Exception {
-//        System.out.println("getLastAnalyzedRevisionOfRepository");
+//        LOG.info("getLastAnalyzedRevisionOfRepository");
 //        String repositoryName = "";
 //        String expResult = "";
 //        String result = DBUtils.getLastAnalyzedRevisionOfRepository(repositoryName);
@@ -114,7 +118,7 @@ public class DBAccessTest {
      */
     @Test
     public void testCreateRepositoryEntryInDatabase() throws Exception {
-//        System.out.println("createRepositoryEntryInDatabase");
+//        LOG.info("createRepositoryEntryInDatabase");
 //        String repositoryName = "";
 //        DBUtils.createRepositoryEntry(repositoryName);
 //        fail("The test case is a prototype.");
@@ -125,7 +129,7 @@ public class DBAccessTest {
      */
     @Test
     public void testSetLastAnalyzedRevisionOfRepository() throws Exception {
-//        System.out.println("setLastAnalyzedRevisionOfRepository");
+//        LOG.info("setLastAnalyzedRevisionOfRepository");
 //        String repositoryName = "";
 //        String revision = "";
 //        DBUtils.setLastAnalyzedRevisionOfRepository(repositoryName, revision);
@@ -137,9 +141,9 @@ public class DBAccessTest {
      */
     @Test
     public void testEnsureThatRecordExists() throws Exception {
-        System.out.println("ensureThatRecordExists");
+        LOG.info("ensureThatRecordExists");
         String filePath = "asdf";
         String repository = "svn_local";
-        System.out.println(DBAccess.ensureThatRecordExists(filePath, repository));
+        LOG.info(DBAccess.ensureThatRecordExists(filePath, repository));
     }
 }

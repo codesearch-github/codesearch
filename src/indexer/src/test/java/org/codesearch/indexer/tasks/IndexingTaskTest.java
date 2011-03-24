@@ -25,6 +25,7 @@ import static org.junit.Assert.assertFalse;
 
 import java.util.LinkedList;
 import java.util.List;
+import org.apache.log4j.Logger;
 
 import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
 import org.codesearch.commons.configuration.xml.XmlConfigurationReaderConstants;
@@ -40,6 +41,8 @@ import org.junit.Test;
 public class IndexingTaskTest {
 
     private IndexingTask task = new IndexingTask();
+     /* Logger */
+    private static final Logger LOG = Logger.getLogger(IndexingTaskTest.class);
     public IndexingTaskTest() {
     }
 
@@ -83,17 +86,17 @@ public class IndexingTaskTest {
 
         ClearTask clear = new ClearTask();
         clear.setIndexLocation(indexLocation);
-        clear.setCodeAnalysisEnabled(true);
+        clear.setCodeAnalysisEnabled(false);
         clear.execute();
         
         for (RepositoryDto repo : repos) {
             if (repo.getVersionControlSystem().equals("FILESYSTEM")) {
-                DBAccess.setLastAnalyzedRevisionOfRepository(repo.getName(), "0");
+                //DBAccess.setLastAnalyzedRevisionOfRepository(repo.getName(), "0");
                 repo.setUrl(repo.getUrl().replace("$home", System.getProperty("user.home")));
                 IndexingTask t = new IndexingTask();
                 t.setIndexLocation(indexLocation);
                 t.setRepository(repo);
-                t.setCodeAnalysisEnabled(true);
+                t.setCodeAnalysisEnabled(false);
                 t.execute();
             }
         }
@@ -104,7 +107,7 @@ public class IndexingTaskTest {
      */
     @Test
     public void testCreateIndex() throws Exception {
-//        System.out.println("createIndex");
+//        LOG.info("createIndex");
 //        IndexingTask instance = new IndexingTask();
 //        boolean expResult = false;
 //        boolean result = instance.createIndex();
@@ -118,7 +121,7 @@ public class IndexingTaskTest {
      */
     @Test
     public void testSetRepository() {
-//        System.out.println("setRepository");
+//        LOG.info("setRepository");
 //        RepositoryDto repository = null;
 //        IndexingTask instance = new IndexingTask();
 //        instance.setRepository(repository);

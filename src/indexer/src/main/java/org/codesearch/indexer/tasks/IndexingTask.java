@@ -176,6 +176,9 @@ public class IndexingTask implements Task {
         String previousFileType = null;
         for (FileDto currentFile : changedFiles) {
             try {
+                if(currentFile.getFilePath().endsWith(".xml")){
+                    getClass(); //FIXME
+                }
                 if (currentFile.isDeleted()) {
                     DBAccess.purgeAllRecordsForFile(currentFile.getFilePath(), repository.getName());
                     LOG.debug("Deleted all records associated with " + currentFile.getFilePath() + " since it was deleted from the file system");
@@ -254,7 +257,6 @@ public class IndexingTask implements Task {
             }
         }
         //add the analyzed source content
-
         return doc;
     }
 

@@ -22,6 +22,7 @@
 package org.codesearch.commons.plugins.vcs;
 
 import java.util.Set;
+import org.apache.log4j.Logger;
 
 import org.junit.Test;
 
@@ -30,7 +31,9 @@ import org.junit.Test;
  * @author David Froehlich
  */
 public class FilesystemPluginTest {
-    
+
+     /* Logger */
+    private static final Logger LOG = Logger.getLogger(FilesystemPluginTest.class);
     /**
      * Test of getFileContentForFilePath method, of class FilesystemPlugin.
      */
@@ -40,6 +43,6 @@ public class FilesystemPluginTest {
         Set<FileDto> files = fsPlugin.getChangedFilesSinceRevision("0");
         FileDto file = (FileDto) files.toArray()[0];
         byte[] content =  fsPlugin.getFileForFilePath(file.getFilePath()).getContent();
-        System.out.println(new String(content));
+        LOG.info(new String(content));
     }
 }

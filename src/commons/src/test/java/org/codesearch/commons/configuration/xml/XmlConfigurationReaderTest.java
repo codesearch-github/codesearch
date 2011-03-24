@@ -29,6 +29,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.configuration.ConfigurationException;
+import org.apache.log4j.Logger;
 import org.codesearch.commons.configuration.xml.dto.JobDto;
 import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 import org.codesearch.commons.configuration.xml.dto.TaskDto;
@@ -47,6 +48,8 @@ public class XmlConfigurationReaderTest {
     //   TODO use spring injection
     //   @Autowired
     private XmlConfigurationReader configReader = XmlConfigurationReader.getInstance();
+    /* Logger */
+    private static final Logger LOG = Logger.getLogger(XmlConfigurationReaderTest.class);
 
     public XmlConfigurationReaderTest() {
     }
@@ -64,7 +67,7 @@ public class XmlConfigurationReaderTest {
      */
     @Test
     public void testGetRepositories() throws Exception {
-        System.out.println("getRepositories");
+        LOG.info("getRepositories");
         List<String> ignFileNames1 = new LinkedList<String>();
         List<String> repoGroups1 = new LinkedList<String>();
         repoGroups1.add("group1");
@@ -104,7 +107,7 @@ public class XmlConfigurationReaderTest {
      */
     @Test
     public void testGetSingleLinePropertyValue() throws Exception {
-        System.out.println("getSingleLinePropertyValue");
+        LOG.info("getSingleLinePropertyValue");
         String key = "testproperty";
         String expResult = "asdf";
         String result = configReader.getSingleLinePropertyValue(key);
@@ -116,7 +119,7 @@ public class XmlConfigurationReaderTest {
      */
     @Test
     public void testGetJobs() throws ConfigurationException {
-        System.out.println("getJobs");
+        LOG.info("getJobs");
         JobDto job1 = new JobDto();
 
         List<String> ignFileNames1 = new LinkedList<String>();
@@ -164,7 +167,7 @@ public class XmlConfigurationReaderTest {
 
     @Test
     public void testGetRepositoryByName() throws Exception {
-        System.out.println("getRepositoryByName");
+        LOG.info("getRepositoryByName");
         List<String> ignoredFiles = new LinkedList<String>();
         List<String> repoGroups = new LinkedList<String>();
         ignoredFiles.add("*.xml");
@@ -176,7 +179,7 @@ public class XmlConfigurationReaderTest {
 
     @Test
     public void testGetSingleLinePropertyValueList() throws Exception {
-        System.out.println("getSingleLinePropertyValueList");
+        LOG.info("getSingleLinePropertyValueList");
         List<String> expResult = new LinkedList<String>();
         expResult.add("1");
         expResult.add("2");

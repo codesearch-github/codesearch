@@ -32,9 +32,10 @@ import static org.junit.Assert.assertTrue;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
-import java.util.logging.Logger;
+
 
 import org.apache.commons.configuration.ConfigurationException;
+import org.apache.log4j.Logger;
 import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -50,11 +51,14 @@ public class DocumentSearcherTest {
 
     private DocumentSearcher instance;
 
+     /* Logger */
+    private static final Logger LOG = Logger.getLogger(DocumentSearcherTest.class);
+
     public DocumentSearcherTest() {
         try {
             instance = new DocumentSearcher(XmlConfigurationReader.getInstance());
         } catch (ConfigurationException ex) {
-            Logger.getLogger(DocumentSearcherTest.class.getName()).log(Level.SEVERE, null, ex);
+            LOG.error(DocumentSearcherTest.class.getName());
         }
 
     }
@@ -80,7 +84,7 @@ public class DocumentSearcherTest {
      */
     @Test
     public void testSearch() throws Exception {
-        System.out.println("search");
+        LOG.info("search");
         String searchString = "SVN_NAME";
         List result = instance.search(searchString, true, new LinkedList<String>(), new LinkedList<String>());
         assertFalse(result.isEmpty());
@@ -99,7 +103,7 @@ public class DocumentSearcherTest {
 
     @Test
     public void testParseQuery() throws Exception{
-        System.out.println("parseQuery");
+        LOG.info("parseQuery");
         String searchTerm = "asdf";
         List<String> repositories = new LinkedList<String>();
         repositories.add("testRepo1");
@@ -107,8 +111,8 @@ public class DocumentSearcherTest {
         repositories.add("testRepo3");
         String expectedResult = "content:\"asdf\" AND (repository:testRepo1 OR repository:testRepo2 OR repository:testRepo3)";
         String result = instance.parseQuery(searchTerm, true, repositories, new LinkedList<String>());
-        System.out.println(result);
-        System.out.println(expectedResult);
+        LOG.info(result);
+        LOG.info(expectedResult);
         assertEquals(expectedResult, result);
         List<String> repositoryGroups = new LinkedList<String>();
         repositoryGroups.add("group1");

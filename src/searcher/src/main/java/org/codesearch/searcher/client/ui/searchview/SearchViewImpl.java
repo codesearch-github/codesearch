@@ -68,6 +68,7 @@ public class SearchViewImpl extends Composite implements SearchView {
     CellTable<SearchResultDto> resultTable;
     @UiField(provided = true)
     SimplePager resultTablePager;
+    private String currentQuery;
     // OTHER UI ELEMENTS
     @UiField
     TextBox searchBox;
@@ -83,7 +84,6 @@ public class SearchViewImpl extends Composite implements SearchView {
     FlowPanel resultView;
     @UiField
     HasValue<Boolean> caseSensitive;
-
     private Presenter presenter;
 
     public SearchViewImpl() {
@@ -97,6 +97,7 @@ public class SearchViewImpl extends Composite implements SearchView {
     @UiHandler("searchButton")
     void onSearchButton(ClickEvent e) {
         presenter.doSearch();
+        currentQuery = searchBox.getValue();
     }
 
     @UiHandler("searchBox")
@@ -212,12 +213,13 @@ public class SearchViewImpl extends Composite implements SearchView {
         final NoSelectionModel<SearchResultDto> selectionModel = new NoSelectionModel<SearchResultDto>();
         resultTable.setSelectionModel(selectionModel);
         selectionModel.addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
+
             /** {@inheritDoc} */
             @Override
             public void onSelectionChange(SelectionChangeEvent event) {
                 SearchResultDto selected = selectionModel.getLastSelectedObject();
                 if (selected != null) {
-                    presenter.goTo(new FilePlace(selected.getRepository(), selected.getFilePath()));
+                    presenter.goTo(new FilePlace(selected.getRepository(), selected.getFilePath(), currentQuery));
                 }
             }
         });

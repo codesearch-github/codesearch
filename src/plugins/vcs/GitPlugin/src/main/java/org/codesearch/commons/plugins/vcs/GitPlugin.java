@@ -10,6 +10,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.Set;
 import org.apache.log4j.Logger;
+import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 import org.codesearch.commons.plugins.vcs.utils.GitUtils;
 import org.eclipse.jgit.errors.AmbiguousObjectException;
 import org.eclipse.jgit.errors.MissingObjectException;
@@ -35,11 +36,11 @@ public class GitPlugin implements VersionControlPlugin {
 
     /** {@inheritDoc} */
     @Override
-    public void setRepository(URI url, String username, String password) throws VersionControlPluginException {
+    public void setRepository(RepositoryDto repo) throws VersionControlPluginException {
         try {
             LOG.debug("Git repository set to: " + repository);
             RepositoryBuilder builder = new RepositoryBuilder();
-            builder.setGitDir(new File(url));
+            builder.setGitDir(new File(repo.getUrl()));
             builder.readEnvironment(); // scans environment GIT_* variables
             builder.findGitDir();
             builder.setup();
@@ -101,6 +102,6 @@ public class GitPlugin implements VersionControlPlugin {
 
     @Override
     public List<String> getFilesInDirectory(String directoryPath) throws VersionControlPluginException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException("Not supported yet."); //TODO impl
     }
 }

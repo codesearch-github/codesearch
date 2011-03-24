@@ -23,6 +23,7 @@ package org.codesearch.commons.plugins.defaulthighlightingplugin;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import org.apache.log4j.Logger;
 import org.junit.Test;
 
 /**
@@ -32,6 +33,8 @@ import org.junit.Test;
 public class DefaultHighlightingPluginTest {
     private DefaultHighlightingPlugin plugin = new DefaultHighlightingPlugin();
 
+     /* Logger */
+    private static final Logger LOG = Logger.getLogger(DefaultHighlightingPluginTest.class);
     /**
      * Test of parseToHtml method, of class JavaHighlightingPlugin.
      */
@@ -44,6 +47,6 @@ public class DefaultHighlightingPluginTest {
         }
 
         String result = plugin.parseToHtml(input.getBytes(), "text/x-java-source");
-        System.out.println(result);
+        LOG.info(result);
     }
 }

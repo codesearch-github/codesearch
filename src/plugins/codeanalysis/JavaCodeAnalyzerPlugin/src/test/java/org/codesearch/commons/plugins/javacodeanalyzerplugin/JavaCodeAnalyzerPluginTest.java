@@ -20,12 +20,9 @@
  */
 package org.codesearch.commons.plugins.javacodeanalyzerplugin;
 
-import japa.parser.JavaParser;
 import japa.parser.ParseException;
-import japa.parser.ast.CompilationUnit;
 import japa.parser.ast.body.MethodDeclaration;
 import japa.parser.ast.visitor.VoidVisitorAdapter;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -33,6 +30,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map.Entry;
+import org.apache.log4j.Logger;
 import org.codesearch.commons.database.DBAccess;
 import org.codesearch.commons.database.DatabaseAccessException;
 import org.codesearch.commons.plugins.codeanalyzing.CodeAnalyzerPluginException;
@@ -50,12 +48,14 @@ public class JavaCodeAnalyzerPluginTest {
     private static int count = 0;
     private static int uncommentedMethods = 0;
     private JavaCodeAnalyzerPlugin plugin = new JavaCodeAnalyzerPlugin();
+     /* Logger */
+    private static final Logger LOG = Logger.getLogger(JavaCodeAnalyzerPluginTest.class);
 
 //    /**
 //     * Test of getAstForCurrentFile method, of class JavaCodeAnalyzerPlugin.
 //     */
 //    public void testGetAstForCurrentFile() throws Exception {
-//        System.out.println("getAstForCurrentFile");
+//        LOG.info("getAstForCurrentFile");
 //        JavaCodeAnalyzerPlugin instance = new JavaCodeAnalyzerPlugin();
 //        Map expResult = null;
 //        Map result = instance.getAstForCurrentFile();
@@ -68,21 +68,21 @@ public class JavaCodeAnalyzerPluginTest {
      */
     @Test
     public void testAnalyzeFile() throws Exception {
-        System.out.println("analyzeFile");
+        LOG.info("analyzeFile");
         String fileContent = "";
         BufferedReader br = new BufferedReader(new FileReader("/home/david/workspace/codesearch/src/commons/src/main/java/org/codesearch/commons/plugins/codeanalyzing/ast/Visibility.java"));
 
         while (br.ready()) {
             fileContent += br.readLine() + "\n";
         }
-//        System.out.println(fileContent);
+//        LOG.info(fileContent);
         plugin.analyzeFile(fileContent);
         soutChildNodes(plugin.getAst());
     }
 
     private void soutChildNodes(AstNode ast){
         for(AstNode currentChild : ast.getChildNodes()){
-            System.out.println(currentChild.getName() + "\n");
+            LOG.info(currentChild.getName() + "\n");
             soutChildNodes(currentChild);
         }
     }
@@ -90,7 +90,7 @@ public class JavaCodeAnalyzerPluginTest {
     @Test
     public void testTEST() throws DatabaseAccessException { //FIXME remove
         for (Entry<String, AstNode> currEntry : DBAccess.getFilesImportingTargetFile("database.DBAccess", "svn-local").entrySet()) {
-            System.out.println(currEntry.getKey());
+            LOG.info(currEntry.getKey());
         }
 
     }
@@ -114,7 +114,7 @@ public class JavaCodeAnalyzerPluginTest {
         for (AstNode childNode : node.getChildNodes()) {
             iterateChildNodes(childNode);
         }
-        System.out.println(node.getModifiers());
+        LOG.info(node.getModifiers());
     }
 
     @Test
@@ -177,7 +177,7 @@ public class JavaCodeAnalyzerPluginTest {
             resultString += currentLine + "\n";
         }
         resultString = resultString.substring(0, resultString.length() - 1);
-        System.out.println(resultString);
+        LOG.info(resultString);
     }
 
 //            for (File child : file.listFiles()) {
@@ -225,7 +225,7 @@ public class JavaCodeAnalyzerPluginTest {
             }
             if (n.getJavaDoc() == null) {
                 uncommentedMethods++;
-                System.out.println("Method " + n.getName() + " at line " + n.getBeginLine() + " in file " + (String) arg + " is not commented #" + uncommentedMethods);
+                LOG.info("Method " + n.getName() + " at line " + n.getBeginLine() + " in file " + (String) arg + " is not commented #" + uncommentedMethods);
             }
         }
     }

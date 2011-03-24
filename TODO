@@ -13,7 +13,7 @@ Missing features
 
 Important TODOs
 ===============
- - Refactor every System.out that is not in a Unit test
+ x Refactor every System.out that is not in a Unit test
    This helps debugging problems; please use appropriate logging levels
  - Fix exception handling; quite often, 
    problems are just caught and ignored 

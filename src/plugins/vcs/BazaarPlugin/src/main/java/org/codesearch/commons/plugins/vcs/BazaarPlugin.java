@@ -29,6 +29,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.apache.log4j.Logger;
+import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 import org.codesearch.commons.plugins.vcs.utils.BazaarUtils;
 import org.vcs.bazaar.client.IBazaarLogMessage;
 import org.vcs.bazaar.client.IBazaarStatus;
@@ -55,10 +56,10 @@ public class BazaarPlugin implements VersionControlPlugin {
 
      /** {@inheritDoc} */
     @Override
-    public void setRepository(URI url, String username, String password) throws VersionControlPluginException {
+    public void setRepository(RepositoryDto repo) throws VersionControlPluginException {
         try {
-            bl = bzr_util.createBranchLocation(url.toString(), username, password);
-            bzr_util.setWorkingDirectory(url.toString().substring(6));
+            bl = bzr_util.createBranchLocation(repo.getUrl(), repo.getName(), repo.getPassword());
+            bzr_util.setWorkingDirectory(repo.getUrl().substring(6));
         } catch (URISyntaxException ex) {
             throw new VersionControlPluginException(ex.toString());
         }
@@ -83,7 +84,7 @@ public class BazaarPlugin implements VersionControlPlugin {
     public Set<FileDto> getChangedFilesSinceRevision(String revision) throws VersionControlPluginException {
         Set<FileDto> files = new HashSet<FileDto>();
         try {
-            System.out.println("bl  " + bl.getURI().toString());
+            LOG.info("bl  " + bl.getURI().toString());
             List<IBazaarLogMessage> iblm = bzr_util.getChangesSinceRevison(bl, revision);
             for (IBazaarLogMessage log : iblm) {
                 for (IBazaarStatus bs : log.getAffectedFiles()) {

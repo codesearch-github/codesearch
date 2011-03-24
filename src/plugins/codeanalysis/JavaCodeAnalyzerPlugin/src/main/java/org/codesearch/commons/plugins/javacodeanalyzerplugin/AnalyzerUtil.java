@@ -58,7 +58,6 @@ public class AnalyzerUtil {
     public boolean addLinkToVariableDeclaration(int lineNumber, int startColumn, String varName, Node parent) {
         VariableNode refVar = getVariableDeclarationForUsage(lineNumber, varName, parent);
         if (refVar == null) {
-            //System.out.println("variableName " + varName);
             return false;
         }
         usages.add(new Usage(startColumn, lineNumber, refVar.getName().length(), refVar.getStartLine(), refVar.getName()));

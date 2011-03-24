@@ -33,10 +33,12 @@ public class FilePlace extends Place {
 
     private String repository;
     private String filePath;
+    private String searchTerm;
 
-    public FilePlace(String repository, String filePath) {
+    public FilePlace(String repository, String filePath, String searchTerm) {
         this.repository = repository;
         this.filePath = filePath;
+        this.searchTerm = searchTerm;
     }
 
     public String getFilePath() {
@@ -47,21 +49,25 @@ public class FilePlace extends Place {
         return repository;
     }
 
+    public String getSearchTerm() {
+        return searchTerm;
+    }
+
     public static class Tokenizer implements PlaceTokenizer<FilePlace> {
 
         /** {@inheritDoc} */
         @Override
         public String getToken(FilePlace place) {
-            return place.getFilePath() + "@" + place.getRepository();
+            return place.getFilePath() + "@" + place.getRepository() + "@" + place.getSearchTerm();
         }
 
         /** {@inheritDoc} */
         @Override
         public FilePlace getPlace(String token) {
             String[] parts = token.split("@");
-            if (parts.length == 2) {
+            if (parts.length == 3) {
                 try {
-                    return new FilePlace(parts[1], parts[0]);
+                    return new FilePlace(parts[1], parts[0], parts[2]);
                 } catch (NumberFormatException ex) {
                     return null;
                 }

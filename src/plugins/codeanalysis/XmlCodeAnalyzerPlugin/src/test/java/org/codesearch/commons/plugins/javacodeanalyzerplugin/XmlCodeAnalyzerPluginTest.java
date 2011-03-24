@@ -22,6 +22,7 @@ package org.codesearch.commons.plugins.javacodeanalyzerplugin;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import org.apache.log4j.Logger;
 
 import org.codesearch.commons.plugins.codeanalyzing.CodeAnalyzerPlugin;
 import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
@@ -33,31 +34,34 @@ import org.junit.Test;
  *
  * @author Samuel Kogler
  */
-
 public class XmlCodeAnalyzerPluginTest {
+
+    /* Logger */
+    private static final Logger LOG = Logger.getLogger(XmlCodeAnalyzerPluginTest.class);
 
     @Test
     public void testAST() throws Exception {
-        System.out.println("analyzeFile");
+        LOG.info("analyzeFile");
         String fileContent = "";
         BufferedReader br = new BufferedReader(new FileReader("/home/daasdingo/workspace/svnsearch/src_java/main/webapp/details.xhtml"));
-        while(br.ready()){
+        while (br.ready()) {
             fileContent += br.readLine() + "\n";
         }
-        
+
         CodeAnalyzerPlugin plugin = new XmlCodeAnalyzerPlugin();
         plugin.analyzeFile(fileContent);
         AstNode ast = plugin.getAst();
         recursiveOutput((XmlNode) ast, 0);
     }
-    private void recursiveOutput(XmlNode node, int level){
-        for(AstNode childNode : node.getChildNodes()){
-            recursiveOutput((XmlNode) childNode, level+1);
+
+    private void recursiveOutput(XmlNode node, int level) {
+        for (AstNode childNode : node.getChildNodes()) {
+            recursiveOutput((XmlNode) childNode, level + 1);
         }
         String preamble = "";
-        for(int i = 0; i < level; i++)  {
+        for (int i = 0; i < level; i++) {
             preamble += "  ";
         }
-        System.out.println(preamble + node.getOutlineName());
+        LOG.info(preamble + node.getOutlineName());
     }
 }

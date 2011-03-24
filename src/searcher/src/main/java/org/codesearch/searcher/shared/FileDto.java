@@ -23,7 +23,6 @@ package org.codesearch.searcher.shared;
 
 import java.io.Serializable;
 import java.util.List;
-import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 
 /**
  * Represents a file.

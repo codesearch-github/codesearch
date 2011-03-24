@@ -34,8 +34,6 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.PushButton;
-import com.google.gwt.user.client.ui.RootLayoutPanel;
-import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import org.codesearch.searcher.client.Resources;
 
@@ -47,7 +45,7 @@ import org.codesearch.searcher.client.Resources;
 public class RootContainer extends Composite implements AcceptsOneWidget {
 
     private static RootContainerUiBinder uiBinder = GWT.create(RootContainerUiBinder.class);
-
+ 
     interface RootContainerUiBinder extends UiBinder<Widget, RootContainer> {
     }
     @UiField
@@ -58,18 +56,6 @@ public class RootContainer extends Composite implements AcceptsOneWidget {
 
     public RootContainer() {
         initWidget(uiBinder.createAndBindUi(this));
-        errorPanel.add(addErrorPanel("1"));
-        errorPanel.add(addErrorPanel("2"));
-        errorPanel.add(addErrorPanel("3"));
-        errorPanel.add(addErrorPanel("lolololol"));
-        errorPanel.add(addErrorPanel("roflroflrofl"));
-        errorPanel.add(addErrorPanel("lolololol"));
-        errorPanel.add(addErrorPanel("roflroflrofl"));
-        errorPanel.add(addErrorPanel("roflroflrofl"));
-        errorPanel.add(addErrorPanel("roflroflrofl"));
-        errorPanel.add(addErrorPanel("lolololol"));
-        errorPanel.add(addErrorPanel("roflroflrofl"));
-        errorPanel.add(addErrorPanel("roflroflrofl"));
         
     }
 
@@ -101,7 +87,7 @@ public class RootContainer extends Composite implements AcceptsOneWidget {
             {
                 ((PushButton)event.getSource()).getParent().setVisible(false);
                 Widget wi = ((PushButton)event.getSource()).getParent().getParent().getParent();
-                System.out.println("Offset: " + wi.getOffsetHeight());
+               
             }
         });
         //Label

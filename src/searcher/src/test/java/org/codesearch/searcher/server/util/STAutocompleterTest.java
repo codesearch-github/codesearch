@@ -7,8 +7,8 @@ package org.codesearch.searcher.server.util;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.log4j.Logger;
+
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.junit.After;
@@ -32,6 +32,8 @@ public class STAutocompleterTest {
     public Directory comDir;
     public Directory realIndex;
     public STAutocompleter ag;
+     /* Logger */
+    private static final Logger LOG = Logger.getLogger(STAutocompleterTest.class);
     
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -49,7 +51,7 @@ public class STAutocompleterTest {
             ag = new STAutocompleter(comDirString);
             
         } catch (IOException ex) {
-            Logger.getLogger(STAutocompleterTest.class.getName()).log(Level.SEVERE, null, ex);
+            LOG.info(STAutocompleterTest.class.getName());
         }
     }
 
@@ -62,14 +64,14 @@ public class STAutocompleterTest {
      */
     @Test
     public void testSuggest() throws Exception {
-        System.out.println("autocomplete examples");
+        LOG.info("autocomplete examples");
         String term = "class";
         ag.setupIndex(realIndex, defaultField);
         List<String> result = ag.suggest(term);
-        System.out.println("count: " + result.size());
+        LOG.info("count: " + result.size());
         for(String r : result)
         {
-            System.out.println(" ++ " + r);
+            LOG.info(" ++ " + r);
         }
         assertTrue(true);
     }

@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import org.apache.log4j.Logger;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.CorruptIndexException;
@@ -33,6 +34,8 @@ public final class STAutocompleter {
     private final Directory autoCompleteDirectory;
     private IndexReader autoCompleteReader;
     private IndexSearcher autoCompleteSearcher;
+     /* Logger */
+    private static final Logger LOG = Logger.getLogger(STAutocompleter.class);
 
     public STAutocompleter(String autoCompleteDir) throws IOException {
         this.autoCompleteDirectory = FSDirectory.open(new File(autoCompleteDir));
@@ -65,13 +68,13 @@ public final class STAutocompleter {
             }
             wordsMap.put(word, sourceReader.docFreq(new Term(fieldToAutocomplete, word)));
         }
-        System.out.println("SetupIndex: " + GRAMMED_WORDS_FIELD);
+        LOG.info("SetupIndex: " + GRAMMED_WORDS_FIELD);
         for (String word : wordsMap.keySet()) {
             Document doc = new Document();
             doc.add(new Field(SOURCE_WORD_FIELD, word, Field.Store.YES, Field.Index.NOT_ANALYZED));
-            System.out.println(":s"+word);
+            LOG.info("source:"+word);
             doc.add(new Field(GRAMMED_WORDS_FIELD, word, Field.Store.YES, Field.Index.ANALYZED));
-            System.out.println(":g"+word);
+            LOG.info("grammed:"+word);
             writer.addDocument(doc);
         }
         sourceReader.close();

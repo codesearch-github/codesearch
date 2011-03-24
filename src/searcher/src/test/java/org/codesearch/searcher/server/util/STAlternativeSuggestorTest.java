@@ -8,8 +8,7 @@ package org.codesearch.searcher.server.util;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.log4j.Logger;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.junit.After;
@@ -34,6 +33,8 @@ public class STAlternativeSuggestorTest {
     public Directory spellIndex;
     public Directory realIndex;
     public STAlternativeSuggestor sta;
+     /* Logger */
+    private static final Logger LOG = Logger.getLogger(STAlternativeSuggestorTest.class);
 
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -53,7 +54,7 @@ public class STAlternativeSuggestorTest {
             
             
         } catch (IOException ex) {
-            Logger.getLogger(STAlternativeSuggestorTest.class.getName()).log(Level.SEVERE, null, ex);
+            LOG.info(STAlternativeSuggestorTest.class.getName());
         }
     }
 
@@ -66,12 +67,12 @@ public class STAlternativeSuggestorTest {
      */
     @Test
     public void testSuggest() throws Exception {
-        System.out.println("suggest test");
+        LOG.info("suggest test");
         String queryString = "int" ;
         List<String> result = sta.suggest(queryString);
         for(String r : result)
         {
-            System.out.println(" -- " + r);
+            LOG.info(" -- " + r);
         }
         assertTrue(true);
     }

@@ -48,6 +48,7 @@ import org.vcs.bazaar.client.core.BranchLocation;
 public class BazaarUtils {
     //TODO: use external shh auth client
 
+    
     private static BazaarUtils instance;
     private IBazaarClient bazaarClient;
     private static final Logger LOG = Logger.getLogger(BazaarUtils.class);
@@ -60,6 +61,7 @@ public class BazaarUtils {
             CommandLineClientFactory.setup(true);
             BazaarClientFactory.setPreferredClientType(CommandLineClientFactory.CLIENT_TYPE);
             BazaarClientFactory.setupBestAvailableBackend(true);
+            
             this.bazaarClient = BazaarClientFactory.createClient(CommandLineClientFactory.CLIENT_TYPE);
 
         } catch (BazaarClientException bce) {
@@ -119,11 +121,11 @@ public class BazaarUtils {
         URI uri = branchLocation.getURI();
         if (!userName.isEmpty() && !password.isEmpty()) {
             URI newURI = new URI(uri.getScheme(), userName + ":" + password, uri.getPath(), uri.getQuery(), uri.getFragment());
-            System.out.println("URI" + uri.getScheme() + userName + ":" + password + uri.getPath() + uri.getQuery() + uri.getFragment());
+            LOG.debug("URI" + uri.getScheme() + userName + ":" + password + uri.getPath() + uri.getQuery() + uri.getFragment());
             branchLocation = new BranchLocation(newURI);
             try {
-                //TODO edit path
-                bazaarClient.checkout(branchLocation, new File("/tmp/bzr"), new Option("-v"));
+                bazaarClient.checkout(branchLocation, new File("/tmp/bzr"), new Option("-v")); //TODO create general directory for checkouts
+                //bazaarClient.revno(branchLocation);
             } catch (BazaarClientException ex) {
                 java.util.logging.Logger.getLogger(BazaarUtils.class.getName()).log(Level.SEVERE, null, ex);
             }

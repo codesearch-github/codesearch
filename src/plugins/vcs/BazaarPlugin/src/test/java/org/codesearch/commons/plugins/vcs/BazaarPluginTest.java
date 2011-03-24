@@ -25,9 +25,10 @@
  */
 package org.codesearch.commons.plugins.vcs;
 
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Set;
+import org.apache.log4j.Logger;
+import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -42,13 +43,15 @@ public class BazaarPluginTest {
 
     BazaarPlugin plugin = new BazaarPlugin();
     private String path = "lp:codesearch";
+     /* Logger */
+    private static final Logger LOG = Logger.getLogger(BazaarPluginTest.class);
 
     public BazaarPluginTest() {
     }
 
     @Before
     public void setUp() throws URISyntaxException, VersionControlPluginException {
-        plugin.setRepository(new URI(path), "", "");
+        plugin.setRepository(new RepositoryDto("", path, "", "", true, "BZR", null, null));
     }
     
     /**
@@ -56,7 +59,7 @@ public class BazaarPluginTest {
      */
     @Test
     public void testGetFileContentForFilePath() throws Exception {
-        System.out.println("getFileContentForFilePath");
+        LOG.info("getFileContentForFilePath");
         String filePath = "/TODO";
         byte[] result = plugin.getFileForFilePath(filePath).getContent();
         boolean content = false;
@@ -70,19 +73,13 @@ public class BazaarPluginTest {
      */
     @Test
     public void testGetChangedFilesSinceRevision() throws Exception {
-        System.out.println("getChangedFilesSinceRevision");
+        LOG.info("getChangedFilesSinceRevision");
         String revision = "1";
         boolean expResult = false;
         Set<FileDto> result = plugin.getChangedFilesSinceRevision(revision);
         if(result != null)
             expResult=true;
         assertTrue(expResult);
-
-        //assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        //fail("The test case is a prototype.");
     }
 
-
-  
 }

@@ -46,11 +46,13 @@ public class FileActivity extends AbstractActivity implements Presenter {
     private SearcherServiceAsync searcherServiceAsync = GWT.create(SearcherService.class);
     private String repository;
     private String filePath;
+    private String searchTerm;
 
     public FileActivity(ClientFactory clientFactory, FilePlace filePlace) {
         this.clientFactory = clientFactory;
         this.repository = filePlace.getRepository();
         this.filePath = filePlace.getFilePath();
+        this.searchTerm = filePlace.getSearchTerm();
     }
 
     /** {@inheritDoc} */
@@ -61,6 +63,7 @@ public class FileActivity extends AbstractActivity implements Presenter {
         fileView.setFilePath(filePath);
         fileView.setRepository(repository);
         fileView.connectEventHandlers();
+        fileView.setSearchTerm(searchTerm);
         panel.setWidget(fileView.asWidget());
         searcherServiceAsync.getFile(repository, filePath, new GetFileCallback());
     }
@@ -82,7 +85,7 @@ public class FileActivity extends AbstractActivity implements Presenter {
         //FIXME how can i get filepath + repository like this?
         searcherServiceAsync.getFileForUsageInFile(usageId, repository, filePath, new GetFileCallback());
     }
-
+    
     private class GetFileCallback implements AsyncCallback<FileDto>  {
 
         /** {@inheritDoc} */
@@ -97,6 +100,6 @@ public class FileActivity extends AbstractActivity implements Presenter {
             fileView.setFileContent(result.getFileContent(), result.isBinary());
             fileView.setOutline(result.getOutline());
         }
-
+        
     }
 }
