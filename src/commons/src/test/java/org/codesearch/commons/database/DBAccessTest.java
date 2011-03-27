@@ -19,61 +19,37 @@
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.codesearch.commons.database;
 
 import java.util.LinkedList;
 import java.util.List;
 import org.apache.log4j.Logger;
 
-import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
- *
+ * Tests {@link DBAccessImpl}
+ * @author Samuel Kogler
  * @author David Froehlich
  */
 public class DBAccessTest {
 
-    /* Logger */
-    private static final Logger LOG = Logger.getLogger(DBAccessTest.class);
 
     public DBAccessTest() {
     }
 
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-        DBAccess.setupConnections();
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
-
-    @Before
-    public void setUp() {
-    }
-
-    @After
-    public void tearDown() {
-    }
-
     @Test
     public void testSetAnalysisDataForFile() throws Exception {
-        String filePath = "asdf";
-        String repository = "svn_local";
-        List<String> types = new LinkedList<String>();
-        types.add("testType1");
-        types.add("org.blargh.testType2");
-        Object usages = new LinkedList();
-     //   DBAccess.setAnalysisDataForFile(filePath, repository, usages, usages, types);
+//        String filePath = "asdf";
+//        String repository = "svn_local";
+//        List<String> types = new LinkedList<String>();
+//        List<String> imports = new LinkedList<String>();
+//        AstNode mockAstNode = new MockAstNode();
+//        List<Usage> usages = new LinkedList<Usage>();
+//
+//        dbAccess.setAnalysisDataForFile(filePath, repository, mockAstNode, usages, types, imports);
+//        dbAccess.getBinaryIndexForFile(filePath, repository);
+    //FIXME the whole architecture is so fucked up that its impossible to test properly
     }
 
     /**
@@ -81,23 +57,12 @@ public class DBAccessTest {
      */
     @Test
     public void testSerializeObject() throws Exception {
-        String filePath = "asdf";
-        String repository = "svn_local";
-        //dummy object, dunno why i picked arraylist
-        List<Usage> usages = new LinkedList<Usage>();
-        usages.add(new Usage(0, 0, 0, 0, ""));
-//        DBAccess.setAnalyysisDataForFile(filePath, repository, usages, Collections.EMPTY_LIST, Collections.EMPTY_LIST);
-      //  assert (List<Usage>)(DBAccess.getBinaryIndexForFile(filePath, repository)) != null;
-    }
-
-    /**
-     * Test of setupConnections method, of class DBUtils.
-     */
-    @Test
-    public void testSetupConnections() throws Exception {
-//        LOG.info("setupConnections");
-//        DBUtils.setupConnections();
-//        fail("The test case is a prototype.");
+//        String filePath = "asdf";
+//        String repository = "svn_local";
+//        List<Usage> usages = new LinkedList<Usage>();
+//        usages.add(new Usage(0, 0, 0, 0, ""));
+//        dbAccess.setAnalysisDataForFile(filePath, repository, usages, Collections.EMPTY_LIST, Collections.EMPTY_LIST);
+      //  assert (List<Usage>)(DBAccessImpl.getBinaryIndexForFile(filePath, repository)) != null;
     }
 
     /**
@@ -105,7 +70,6 @@ public class DBAccessTest {
      */
     @Test
     public void testGetLastAnalyzedRevisionOfRepository() throws Exception {
-//        LOG.info("getLastAnalyzedRevisionOfRepository");
 //        String repositoryName = "";
 //        String expResult = "";
 //        String result = DBUtils.getLastAnalyzedRevisionOfRepository(repositoryName);
@@ -118,7 +82,6 @@ public class DBAccessTest {
      */
     @Test
     public void testCreateRepositoryEntryInDatabase() throws Exception {
-//        LOG.info("createRepositoryEntryInDatabase");
 //        String repositoryName = "";
 //        DBUtils.createRepositoryEntry(repositoryName);
 //        fail("The test case is a prototype.");
@@ -129,7 +92,6 @@ public class DBAccessTest {
      */
     @Test
     public void testSetLastAnalyzedRevisionOfRepository() throws Exception {
-//        LOG.info("setLastAnalyzedRevisionOfRepository");
 //        String repositoryName = "";
 //        String revision = "";
 //        DBUtils.setLastAnalyzedRevisionOfRepository(repositoryName, revision);
@@ -141,9 +103,8 @@ public class DBAccessTest {
      */
     @Test
     public void testEnsureThatRecordExists() throws Exception {
-        LOG.info("ensureThatRecordExists");
-        String filePath = "asdf";
-        String repository = "svn_local";
-        LOG.info(DBAccess.ensureThatRecordExists(filePath, repository));
+//        String filePath = "asdf";
+//        String repository = "svn_local";
+//        System.out.println(dbAccess.ensureThatRecordExists(filePath, repository));
     }
 }

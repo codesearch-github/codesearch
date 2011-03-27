@@ -20,12 +20,15 @@
  */
 package org.codesearch.indexer.core;
 
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.Module;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
-import org.codesearch.commons.database.DBAccess;
+import org.codesearch.commons.CommonsGuiceModule;
 import org.codesearch.indexer.manager.IndexingManager;
 import org.quartz.SchedulerException;
 
@@ -35,19 +38,23 @@ import org.quartz.SchedulerException;
  */
 public class IndexerMain implements ServletContextListener {
 
-    protected static final Logger LOG = Logger.getLogger(IndexerMain.class);
+    private static final Logger LOG = Logger.getLogger(IndexerMain.class);
+    public static final String INJECTOR_KEY = Injector.class.getName();
     /** The IndexingManager used to control the execution of the IndexingJobs */
     private IndexingManager indexingManager;
-    
+
     /**
      * Instantiates the IndexingManager and starts its scheduler
      * @param sce dummy parameter needed by the parent class implementation
      */
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        DBAccess.setupConnections();
+        Injector injector = Guice.createInjector(new Module[]{new CommonsGuiceModule()});
+
+        sce.getServletContext().setAttribute(INJECTOR_KEY, injector);
+
         try {
-            indexingManager = new IndexingManager();
+            indexingManager = injector.getInstance(IndexingManager.class);
             indexingManager.startScheduler();
         } catch (SchedulerException ex) {
             LOG.error("Problem with scheduler at context initialization: " + ex);
@@ -56,7 +63,9 @@ public class IndexerMain implements ServletContextListener {
         }
     }
 
+
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
+        sce.getServletContext().removeAttribute(INJECTOR_KEY);
     }
 }

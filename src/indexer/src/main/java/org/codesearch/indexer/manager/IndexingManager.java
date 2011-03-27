@@ -20,15 +20,16 @@
  */
 package org.codesearch.indexer.manager;
 
+import com.google.inject.Inject;
+import com.google.inject.Injector;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
-import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
+import org.codesearch.commons.configuration.ConfigurationReader;
 import org.codesearch.commons.configuration.xml.dto.JobDto;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
@@ -39,7 +40,7 @@ import org.quartz.SchedulerException;
 import org.quartz.SchedulerFactory;
 import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
-import org.quartz.impl.StdSchedulerFactory;
+import org.quartz.spi.JobFactory;
 
 /**
  * controls the scheduler used to execute the indexing jobs
@@ -52,53 +53,34 @@ public final class IndexingManager {
     private static final Logger LOG = Logger.getLogger(IndexingManager.class);
     /** The scheduler used to schedule the IndexingJobss */
     private Scheduler scheduler;
-    /** The XmlConfigReader used to retrieve information from the configuration */
-    private XmlConfigurationReader configReader;
-
-    public Map<Integer, IndexingJobDto> getIndexingJobs() throws SchedulerException {
-        Map<Integer, IndexingJobDto> jobs = new HashMap<Integer, IndexingJobDto>();
-        List<JobExecutionContext> currentlyExecutedJobs = (List<JobExecutionContext>) scheduler.getCurrentlyExecutingJobs();
-        for(JobExecutionContext currentJob : currentlyExecutedJobs) {
-            int index = Integer.parseInt(currentJob.getJobDetail().getJobDataMap().getString(IndexerJob.FIELD_ID));
-            int tasksFinished = currentJob.getJobDetail().getJobDataMap().getInt(IndexerJob.FIELD_TASKS_FINISHED);
-            int tasksTotal = ((List)currentJob.getJobDetail().getJobDataMap().get(IndexerJob.FIELD_TASKS)).size();
-            Date timeStarted = currentJob.getFireTime();
-            String type = currentJob.getJobDetail().getJobDataMap().getString(IndexerJob.FIELD_CURRENT_TYPE);
-            String currentlyAccessedRepository = currentJob.getJobDetail().getJobDataMap().getString(IndexerJob.FIELD_CURRENT_REPOSITORY);
-            IndexingJobDto currentDto = new IndexingJobDto(type, timeStarted, tasksTotal, tasksFinished, currentlyAccessedRepository);
-            jobs.put(index, currentDto);
-        }
-        return jobs;
-    }
-
-
+    /** The configurated jobs. */
+    private List<JobDto> jobs;
 
     /**
      * Creates a new instance of IndexingManager
      * @throws SchedulerException In case the scheduler could not be instantiated
      */
-    public IndexingManager() throws SchedulerException {
-        configReader = XmlConfigurationReader.getInstance();
-        SchedulerFactory sf = new StdSchedulerFactory();
+    @Inject
+    public IndexingManager(ConfigurationReader configurationReader, SchedulerFactory sf, JobFactory jobFactory) throws SchedulerException {
+        jobs = configurationReader.getJobs();
         scheduler = sf.getScheduler();
+        scheduler.setJobFactory(jobFactory);
     }
 
-    /**
-     * Flags the job as terminated which causes it to stop after the execution of the current task or throws a JobExecutionException if the task could not be found
-     * @param i the id of the job that is to be terminated
-     * @throws SchedulerException if there is no job found with the id or if the jobs could not be read from the scheduler
-     */
-    public void terminateJob(int i) throws SchedulerException {
+    public Map<Integer, IndexingJobDto> getCurrentStatus() throws SchedulerException {
+        Map<Integer, IndexingJobDto> current_jobs = new HashMap<Integer, IndexingJobDto>();
         List<JobExecutionContext> currentlyExecutedJobs = (List<JobExecutionContext>) scheduler.getCurrentlyExecutingJobs();
-        for (JobExecutionContext jec : currentlyExecutedJobs) {
-            JobDataMap dataMap = jec.getJobDetail().getJobDataMap();
-            int currentIndex = Integer.parseInt(dataMap.getString(IndexerJob.FIELD_ID));
-            if (i == currentIndex) {
-                dataMap.put(IndexerJob.FIELD_TERMINATED, true);
-                return;
-            }
+        for(JobExecutionContext currentJob : currentlyExecutedJobs) {
+            int index = Integer.parseInt(currentJob.getJobDetail().getJobDataMap().getString(IndexingJob.FIELD_ID));
+            int tasksFinished = currentJob.getJobDetail().getJobDataMap().getInt(IndexingJob.FIELD_TASKS_FINISHED);
+            int tasksTotal = ((List)currentJob.getJobDetail().getJobDataMap().get(IndexingJob.FIELD_TASKS)).size();
+            Date timeStarted = currentJob.getFireTime();
+            String type = currentJob.getJobDetail().getJobDataMap().getString(IndexingJob.FIELD_CURRENT_TYPE);
+            String currentlyAccessedRepository = currentJob.getJobDetail().getJobDataMap().getString(IndexingJob.FIELD_CURRENT_REPOSITORY);
+            IndexingJobDto currentDto = new IndexingJobDto(type, timeStarted, tasksTotal, tasksFinished, currentlyAccessedRepository);
+            current_jobs.put(index, currentDto);
         }
-        throw new JobExecutionException("Job specified for termination could not be found");
+        return current_jobs;
     }
 
     /**
@@ -108,12 +90,11 @@ public final class IndexingManager {
      */
     public void startScheduler() throws SchedulerException, ConfigurationException {
         LOG.debug("Starting scheduler");
-        List<JobDto> jobs = configReader.getJobs();
         int i = 0;
         LOG.info("Starting scheduler with " + jobs.size() + " jobs");
 
         for (JobDto job : jobs) {
-            JobDetail jobDetail = new JobDetail("Job" + i, "IndexingJobs", IndexerJob.class);
+            JobDetail jobDetail = new JobDetail("Job" + i, "IndexingJobs", IndexingJob.class);
             jobDetail.getJobDataMap().put("tasks", job.getTasks());
             jobDetail.getJobDataMap().put("id", i);
 
@@ -130,5 +111,23 @@ public final class IndexingManager {
             i++;
         }
         scheduler.start();
+    }
+
+     /**
+     * Flags the job as terminated which causes it to stop after the execution of the current task or throws a JobExecutionException if the task could not be found
+     * @param i the id of the job that is to be terminated
+     * @throws SchedulerException if there is no job found with the id or if the jobs could not be read from the scheduler
+     */
+    public void terminateJob(int i) throws SchedulerException {
+        List<JobExecutionContext> currentlyExecutedJobs = (List<JobExecutionContext>) scheduler.getCurrentlyExecutingJobs();
+        for (JobExecutionContext jec : currentlyExecutedJobs) {
+            JobDataMap dataMap = jec.getJobDetail().getJobDataMap();
+            int currentIndex = Integer.parseInt(dataMap.getString(IndexingJob.FIELD_ID));
+            if (i == currentIndex) {
+                dataMap.put(IndexingJob.FIELD_TERMINATED, true);
+                return;
+            }
+        }
+        throw new JobExecutionException("Job specified for termination could not be found");
     }
 }

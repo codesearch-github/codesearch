@@ -21,6 +21,7 @@
 package org.codesearch.commons.configuration.xml.dto;
 
 import java.util.List;
+import org.apache.commons.collections.CollectionUtils;
 
 /**
  * DTO used to store information about a repository specified in the config.xml file
@@ -139,7 +140,7 @@ public class RepositoryDto {
         this.versionControlSystem = versionControlSystem;
     }
 
-     /**
+    /**
      * @return the repositoryGroups
      */
     public List<String> getRepositoryGroups() {
@@ -151,11 +152,9 @@ public class RepositoryDto {
      * the groups are spearated with a whitespace
      * @return repository list as a single string separated by whitspaces
      */
-    public String getRepositoryGroupsAsString()
-    {
+    public String getRepositoryGroupsAsString() {
         String repoString = "";
-        for(String repo : repositoryGroups)
-        {
+        for (String repo : repositoryGroups) {
             repoString += repo + " ";
         }
         return repoString;
@@ -167,7 +166,7 @@ public class RepositoryDto {
     public void setRepositoryGroups(List<String> repositoryGroups) {
         this.repositoryGroups = repositoryGroups;
     }
-    
+
     /**
      * compares this RepositoryDto with the given one
      * @param o the RepositoryDto to compare
@@ -178,28 +177,24 @@ public class RepositoryDto {
         if (!(o instanceof RepositoryDto)) {
             return false;
         }
-        try {
-            RepositoryDto other = (RepositoryDto) o;
-            if (this.getName().equals(other.getName()) && this.isCodeNavigationEnabled() == other.isCodeNavigationEnabled() && blacklistEntries.size() == other.getBlacklistEntries().size() && repositoryGroups.size() == other.getRepositoryGroups().size()) {
-                for(int i = 0; i < repositoryGroups.size(); i++){
-                    if(!repositoryGroups.get(i).equals(other.getRepositoryGroups().get(i))){
-                        return false;
-                    }
-                }
-
-                for (int i = 0; i < blacklistEntries.size(); i++) {
-                    String s = blacklistEntries.get(i);
-                    if (!(s.equals(other.getBlacklistEntries().get(i)))) {
-                        return false;
-                    }
-                }
-                return true;
+        RepositoryDto other = (RepositoryDto) o;
+        if (this.getName().equals(other.getName()) &&
+            this.isCodeNavigationEnabled() == other.isCodeNavigationEnabled() &&
+            this.blacklistEntries.size() == other.getBlacklistEntries().size() &&
+            this.whitelistEntries.size() == other.getWhitelistEntries().size() &&
+            this.repositoryGroups.size() == other.getRepositoryGroups().size()) {
+            if (!CollectionUtils.isEqualCollection(this.blacklistEntries, other.getBlacklistEntries())) {
+                return false;
             }
-            return false;
-        } catch (ClassCastException ex) {
-            return false;
+            if (!CollectionUtils.isEqualCollection(this.whitelistEntries, other.getWhitelistEntries())) {
+                return false;
+            }
+            if (!CollectionUtils.isEqualCollection(this.repositoryGroups, other.repositoryGroups)) {
+                return false;
+            }
+            return true;
         }
-    }
+        return false;
 
-   
+    }
 }

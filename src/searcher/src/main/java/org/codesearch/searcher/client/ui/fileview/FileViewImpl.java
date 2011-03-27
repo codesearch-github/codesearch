@@ -102,13 +102,14 @@ public class FileViewImpl extends Composite implements FileView {
     /** Whether or not the focus line div is visible. */
     private boolean focusDivVisible;
     private String searchTerm;
+    /** Whether or not the sidebar is visible. */
     private boolean sidebarVisible;
+    /** The list of displayed sidebars in this view. */
     private List<Sidebar> shownSidebars = new LinkedList<Sidebar>();
 
     public FileViewImpl() {
         initWidget(uiBinder.createAndBindUi(this));
-        exportGoToLine();
-        exportGoToUsage();
+        exportJSFunctions();
     }
 
     @UiHandler("backButton")
@@ -124,26 +125,6 @@ public class FileViewImpl extends Composite implements FileView {
     @UiHandler("sidebarButton")
     void onSidebar(ClickEvent event) {
         toggleSidebar();
-    }
-
-    void toggleSidebar() {
-        if (sidebarVisible) {
-            splitWrapper.remove(sidebarTabPanel);
-            sidebarVisible = false;
-        } else {
-            splitWrapper.clear();
-            splitWrapper.addWest(sidebarTabPanel, 300);
-            splitWrapper.add(scrollWrapper);
-            sidebarVisible = true;
-        }
-        splitWrapper.animate(100);
-    }
-
-    private void updateSidebar() {
-        sidebarTabPanel.clear();
-        for (Sidebar sidebar : shownSidebars) {
-            sidebarTabPanel.add(sidebar, sidebar.getTitle());
-        }
     }
 
     /** {@inheritDoc} */
@@ -179,9 +160,9 @@ public class FileViewImpl extends Composite implements FileView {
         showFocusDiv(false);
 
         if (!binary) {
-            String[] fileContentArray = fileContent.split("\n");
-            lineCount = fileContentArray.length;
-            for (int i = 0; i < fileContentArray.length; i++) {
+            lineCount = fileContent.split("\n").length;
+
+            for (int i = 0; i < lineCount; i++) {
                 Label lineNumber = new Label(String.valueOf(i + 1));
                 lineNumber.addClickHandler(new LineNumberClickHandler(i + 1));
                 lineNumbersContainer.add(lineNumber);
@@ -273,18 +254,32 @@ public class FileViewImpl extends Composite implements FileView {
     }
 
     /**
-     * Exports the goToLine function to JavaScript so it can be used from HTML code.
+     * Exports static functions to JavaScript so they can be used from HTML code.
      */
-    public static native void exportGoToLine()/*-{
+    public static native void exportJSFunctions()/*-{
     $wnd.goToLine = $entry(@org.codesearch.searcher.client.ui.fileview.FileViewImpl::staticGoToLine(I));
-    }-*/;
-
-    /**
-     * Exports the goToUsage function to JavaScript so it can be used from HTML code.
-     */
-    public static native void exportGoToUsage()/*-{
     $wnd.goToUsage = $entry(@org.codesearch.searcher.client.ui.fileview.FileViewImpl::staticGoToUsage(I));
     }-*/;
+
+    private void toggleSidebar() {
+        if (sidebarVisible) {
+            splitWrapper.remove(sidebarTabPanel);
+            sidebarVisible = false;
+        } else {
+            splitWrapper.clear();
+            splitWrapper.addWest(sidebarTabPanel, 300);
+            splitWrapper.add(scrollWrapper);
+            sidebarVisible = true;
+        }
+        splitWrapper.animate(100);
+    }
+
+    private void updateSidebar() {
+        sidebarTabPanel.clear();
+        for (Sidebar sidebar : shownSidebars) {
+            sidebarTabPanel.add(sidebar, sidebar.getTitle());
+        }
+    }
 
     /**
      * Shows an input dialog for the go to line feature.

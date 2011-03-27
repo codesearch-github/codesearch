@@ -20,12 +20,12 @@
  */
 package org.codesearch.searcher.server.rpc;
 
+import com.google.gwt.user.server.rpc.RemoteServiceServlet;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Level;
 
 import net.sf.jmimemagic.Magic;
 import net.sf.jmimemagic.MagicException;
@@ -33,9 +33,10 @@ import net.sf.jmimemagic.MagicMatch;
 import net.sf.jmimemagic.MagicMatchNotFoundException;
 import net.sf.jmimemagic.MagicParseException;
 
-import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.apache.lucene.queryParser.ParseException;
+import org.codesearch.commons.configuration.ConfigurationReader;
 import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
 import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 import org.codesearch.commons.database.DBAccess;
@@ -50,7 +51,7 @@ import org.codesearch.commons.plugins.highlighting.HighlightingPlugin;
 import org.codesearch.commons.plugins.highlighting.HighlightingPluginException;
 import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
 import org.codesearch.commons.plugins.vcs.VersionControlPluginException;
-import org.codesearch.commons.utils.MimeTypeUtil;
+import org.codesearch.commons.utils.mime.MimeTypeUtil;
 import org.codesearch.searcher.client.rpc.SearcherService;
 import org.codesearch.searcher.server.DocumentSearcher;
 import org.codesearch.searcher.server.InvalidIndexException;
@@ -59,39 +60,37 @@ import org.codesearch.searcher.shared.SearcherServiceException;
 import org.codesearch.searcher.shared.OutlineNode;
 import org.codesearch.searcher.shared.SearchResultDto;
 import org.codesearch.searcher.shared.SidebarNode;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.util.HtmlUtils;
 
 /**
  * Service used for search operations.
  * @author Samuel Kogler
  */
-public class SearcherServiceImpl extends AutowiringRemoteServiceServlet implements SearcherService {
+@Singleton
+public class SearcherServiceImpl extends RemoteServiceServlet implements SearcherService {
 
     private static final long serialVersionUID = 1389141189614933738L;
     /** The logger. */
     private static final Logger LOG = Logger.getLogger(SearcherServiceImpl.class);
     /** The document searcher used to search the index. */
-    @Autowired
     private DocumentSearcher documentSearcher;
-    @Autowired
-    private XmlConfigurationReader xmlConfigurationReader;
+    private ConfigurationReader configurationReader;
+    private PluginLoader pluginLoader;
+    private DBAccess dba;
     private List<String> repositories;
     private List<String> repositoryGroups;
 
-    /** {@inheritDoc} */
-    @Override
-    protected void postConstruct() {
-        try {
-            repositoryGroups = xmlConfigurationReader.getRepositoryGroups();
-            repositories = new LinkedList<String>();
-            for (RepositoryDto dto : xmlConfigurationReader.getRepositories()) {
-                if (dto != null) {
-                    repositories.add(dto.getName());
-                }
+    @Inject
+    public SearcherServiceImpl(DocumentSearcher documentSearcher, ConfigurationReader configurationReader, PluginLoader pluginLoader, DBAccess dba) {
+        this.documentSearcher = documentSearcher;
+        this.configurationReader = configurationReader;
+        this.pluginLoader = pluginLoader;
+        this.dba = dba;
+        repositoryGroups = configurationReader.getRepositoryGroups();
+        repositories = new LinkedList<String>();
+        for (RepositoryDto dto : configurationReader.getRepositories()) {
+            if (dto != null) {
+                repositories.add(dto.getName());
             }
-        } catch (ConfigurationException ex) {
-            LOG.error(ex);
         }
     }
 
@@ -105,8 +104,6 @@ public class SearcherServiceImpl extends AutowiringRemoteServiceServlet implemen
             throw new SearcherServiceException("Invalid search query: \n" + ex);
         } catch (IOException ex) {
             throw new SearcherServiceException("Exception searching the index: \n" + ex);
-        } catch (ConfigurationException ex) {
-            throw new SearcherServiceException("Invalid configuration: \n" + ex);
         } catch (InvalidIndexException ex) {
             throw new SearcherServiceException("Invalid index: \n" + ex);
         }
@@ -127,15 +124,15 @@ public class SearcherServiceImpl extends AutowiringRemoteServiceServlet implemen
             LOG.debug("detected mime is: " + guessedMimeType);
             file.setBinary(MimeTypeUtil.isBinaryType(guessedMimeType));
 
-            RepositoryDto repositoryDto = xmlConfigurationReader.getRepositoryByName(repository);
-            VersionControlPlugin vcPlugin = PluginLoader.getPlugin(VersionControlPlugin.class, repositoryDto.getVersionControlSystem());
+            RepositoryDto repositoryDto = configurationReader.getRepositoryByName(repository);
+            VersionControlPlugin vcPlugin = pluginLoader.getPlugin(VersionControlPlugin.class, repositoryDto.getVersionControlSystem());
 
             vcPlugin.setRepository(repositoryDto);
             org.codesearch.commons.plugins.vcs.FileDto vcFile = vcPlugin.getFileForFilePath(filePath);
 
             // GET OUTLINE IF EXISTING
             try {
-                AstNode fileNode = DBAccess.getBinaryIndexForFile(filePath, repository);
+                AstNode fileNode = dba.getBinaryIndexForFile(filePath, repository);
                 if (fileNode != null) {
                     List<OutlineNode> outline = new LinkedList<OutlineNode>();
                     for (AstNode a : fileNode.getChildNodes()) {
@@ -170,21 +167,19 @@ public class SearcherServiceImpl extends AutowiringRemoteServiceServlet implemen
             }
 
             try {
-                HighlightingPlugin hlPlugin = PluginLoader.getPlugin(HighlightingPlugin.class, guessedMimeType);
+                HighlightingPlugin hlPlugin = pluginLoader.getPlugin(HighlightingPlugin.class, guessedMimeType);
                 String highlightingEscapeStartToken = hlPlugin.getEscapeStartToken();
                 String highlightingEscapeEndToken = hlPlugin.getEscapeEndToken();
                 byte[] parsedFileContent = addUsageLinksToFileContent(vcFile.getContent(), filePath, repository, highlightingEscapeStartToken, highlightingEscapeEndToken);
                 file.setFileContent(hlPlugin.parseToHtml(parsedFileContent, guessedMimeType));
             } catch (PluginLoaderException ex) {
                 // No plugin found, just escape to HTML
-                file.setFileContent(HtmlUtils.htmlEscape(new String(vcFile.getContent())));
+                file.setFileContent(StringEscapeUtils.escapeHtml(new String(vcFile.getContent())));
             }
         } catch (HighlightingPluginException ex) {
             LOG.error(ex);
         } catch (VersionControlPluginException ex) {
             throw new SearcherServiceException("Could not get file: \n" + ex);
-        } catch (ConfigurationException ex) {
-            throw new SearcherServiceException("Configuration error: \n" + ex);
         } catch (PluginLoaderException ex) {
             throw new SearcherServiceException("Problem loading plugin: \n" + ex);
         }
@@ -193,17 +188,19 @@ public class SearcherServiceImpl extends AutowiringRemoteServiceServlet implemen
     }
 
     @Override
-    public FileDto getFileForUsageInFile(int usageId, String repository, String filePath) throws SearcherServiceException {
+    public SearchResultDto resolveUsage(int usageId, String repository, String filePath) throws SearcherServiceException {
         LOG.debug("Looking up usage: " + usageId + " in file: " + filePath + "@" + repository);
         try {
-            ExternalUsage usage = DBAccess.getUsageForIdInFile(usageId, filePath, repository);
+            ExternalUsage usage = dba.getUsageForIdInFile(usageId, filePath, repository);
             usage.resolveLink(filePath, repository);
             LOG.debug(usage.getTargetClassName());
             LOG.debug(usage.getTargetFilePath());
             if (usage.getTargetFilePath() != null) {
-                FileDto file = getFile(repository, usage.getTargetFilePath());
-                file.setFocusLine(usage.getReferenceLine());
-                return file;
+                SearchResultDto searchResultDto = new SearchResultDto();
+                searchResultDto.setFilePath(usage.getTargetFilePath());
+                //FIXME maybe add possibility to jump between repositories
+                searchResultDto.setRepository(repository);
+                return searchResultDto;
             }
         } catch (DatabaseEntryNotFoundException ex) {
             //TODO redirect to current file here, probably return null
@@ -230,7 +227,7 @@ public class SearcherServiceImpl extends AutowiringRemoteServiceServlet implemen
     }
 
     public void setXmlConfigurationReader(XmlConfigurationReader xmlConfigurationReader) {
-        this.xmlConfigurationReader = xmlConfigurationReader;
+        this.configurationReader = xmlConfigurationReader;
     }
 
     private OutlineNode convertAstNodeToOutlineNode(AstNode astNode) {
@@ -257,7 +254,7 @@ public class SearcherServiceImpl extends AutowiringRemoteServiceServlet implemen
         try {
             List<Usage> usages;
             try {
-                usages = DBAccess.getUsagesForFile(filePath, repository);
+                usages = dba.getUsagesForFile(filePath, repository);
             } catch (DatabaseEntryNotFoundException ex) {
                 //in case the file does not have a binary index just display it without links
                 usages = null;

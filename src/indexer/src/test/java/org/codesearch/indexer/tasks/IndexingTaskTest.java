@@ -18,19 +18,13 @@
  * You should have received a copy of the GNU General Public License
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.codesearch.indexer.tasks;
 
-import static org.junit.Assert.assertFalse;
-
-import java.util.LinkedList;
-import java.util.List;
-import org.apache.log4j.Logger;
-
+import org.codesearch.commons.configuration.ConfigurationReader;
 import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
-import org.codesearch.commons.configuration.xml.XmlConfigurationReaderConstants;
 import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
-import org.codesearch.commons.database.DBAccess;
+import org.codesearch.commons.plugins.PluginLoader;
+import org.codesearch.commons.plugins.PluginLoaderImpl;
 import org.junit.Test;
 
 /**
@@ -40,92 +34,40 @@ import org.junit.Test;
  */
 public class IndexingTaskTest {
 
-    private IndexingTask task = new IndexingTask();
-     /* Logger */
-    private static final Logger LOG = Logger.getLogger(IndexingTaskTest.class);
+
     public IndexingTaskTest() {
     }
 
-//    @Test
-    public void testFileIsOnIgnoreList() {
-        List<String> ignoredFileNames = new LinkedList<String>();
-        ignoredFileNames.add("*.xml");
-        ignoredFileNames.add("*test*");
-        ignoredFileNames.add("*/test/*");
-        task.setRepository(new RepositoryDto(null, null, null, null, false, null, ignoredFileNames, new LinkedList<String>(), null));
-        assert (task.fileShouldBeIndexed("asdf.xml"));
-        assert (task.fileShouldBeIndexed("asdftestasdf"));
-        assert (task.fileShouldBeIndexed("/test/fasdf"));
-        assertFalse(task.fileShouldBeIndexed("asdf.txt"));
-    }
-
-    /**
-     * Test of execute method, of class IndexingTask.
-     */
     @Test
     public void testExecute() throws Exception {
-//        XmlConfigurationReader pm = new XmlConfigurationReader();
-//        List<RepositoryDto> repos = pm.getRepositories();
-//        for (RepositoryDto repo : repos) {
-//            if (!repo.getVersionControlSystem().equals("FILESYSTEM")) {
-//                IndexingTask t = (IndexingTask) applicationContext.getBean("indexingTask");
-//                t.setRepository(repo);
-//                t.setCodeAnalysisEnabled(true);
-//                t.execute();
-//            }
-//        }
+        //TODO write this test
     }
 
     @Test
     public void testExecuteLocal() throws Exception {
-        XmlConfigurationReader pm = XmlConfigurationReader.getInstance();
-        List<RepositoryDto> repos = pm.getRepositories();
+        ConfigurationReader configReader = new XmlConfigurationReader(null);
 
-        
-        String indexLocation = pm.getSingleLinePropertyValue(XmlConfigurationReaderConstants.INDEX_LOCATION);
-
-        ClearTask clear = new ClearTask();
-        clear.setIndexLocation(indexLocation);
-        clear.setCodeAnalysisEnabled(false);
-        clear.execute();
-        
-        for (RepositoryDto repo : repos) {
-            if (repo.getVersionControlSystem().equals("FILESYSTEM")) {
-                //DBAccess.setLastAnalyzedRevisionOfRepository(repo.getName(), "0");
-                repo.setUrl(repo.getUrl().replace("$home", System.getProperty("user.home")));
-                IndexingTask t = new IndexingTask();
-                t.setIndexLocation(indexLocation);
-                t.setRepository(repo);
-                t.setCodeAnalysisEnabled(false);
-                t.execute();
-            }
-        }
+        PluginLoader pl = new PluginLoaderImpl();
+        IndexingTask t = new IndexingTask(configReader, null, pl);
+        t.setIndexLocation("/tmp/test/");
+        RepositoryDto repo = configReader.getRepositoryByName("svn_local");
+        repo.setUrl(repo.getUrl().replace("$home", System.getProperty("user.home")));
+        t.setRepository(repo);
+        t.setCodeAnalysisEnabled(false);
+        t.execute();
     }
 
-    /**
-     * Test of createIndex method, of class IndexingTask.
-     */
     @Test
-    public void testCreateIndex() throws Exception {
-//        LOG.info("createIndex");
-//        IndexingTask instance = new IndexingTask();
-//        boolean expResult = false;
-//        boolean result = instance.createIndex();
-//        assertEquals(expResult, result);
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
-    }
+    public void testWithCodeAnalysis() throws Exception {
+        ConfigurationReader configReader = new XmlConfigurationReader(null);
 
-    /**
-     * Test of setRepository method, of class IndexingTask.
-     */
-    @Test
-    public void testSetRepository() {
-//        LOG.info("setRepository");
-//        RepositoryDto repository = null;
-//        IndexingTask instance = new IndexingTask();
-//        instance.setRepository(repository);
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
+        PluginLoader pl = new PluginLoaderImpl();
+        IndexingTask t = new IndexingTask(configReader, null, pl);
+        t.setIndexLocation("/tmp/test/");
+        RepositoryDto repo = configReader.getRepositoryByName("svn_local");
+        repo.setUrl(repo.getUrl().replace("$home", System.getProperty("user.home")));
+        t.setRepository(repo);
+        t.setCodeAnalysisEnabled(true);
+        t.execute();
     }
 }

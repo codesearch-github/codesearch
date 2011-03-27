@@ -25,3 +25,9 @@ doc/user_stories/html
 *.ps
 *.bbl
 *.blg
+doc/thesis/diploma_thesis.pdf
+doc/thesis/test.pdf
+doc/thesis/test.tex
+doc/kickoff_presentation/presentation.nav
+doc/kickoff_presentation/presentation.pdf
+doc/kickoff_presentation/presentation.snm

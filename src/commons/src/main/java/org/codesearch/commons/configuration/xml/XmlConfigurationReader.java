@@ -20,6 +20,9 @@
  */
 package org.codesearch.commons.configuration.xml;
 
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
+import org.codesearch.commons.configuration.ConfigurationReader;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -31,6 +34,8 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.SubnodeConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.codesearch.commons.configuration.xml.dto.IndexerUserDto;
 import org.codesearch.commons.configuration.xml.dto.JobDto;
 import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
@@ -44,38 +49,35 @@ import org.codesearch.commons.configuration.xml.dto.TaskDto.TaskType;
  * @author David Froehlich
  * @author Samuel Kogler
  */
-public class XmlConfigurationReader {
+public class XmlConfigurationReader implements ConfigurationReader {
 
+    private static final Logger LOG = Logger.getLogger(XmlConfigurationReader.class);
     /** The XMLConfiguration object that is used to read the properties from the XML-file*/
     private XMLConfiguration config;
     /** The path to the configuration file. */
-    private String configpath = "codesearch_config.xml";
-    /** the singleton instance of this class */
-    private static XmlConfigurationReader theInstance;
-
-    public static synchronized XmlConfigurationReader getInstance() {
-        if (theInstance == null) {
-            theInstance = new XmlConfigurationReader();
-        }
-        return theInstance;
-    }
+    private String configPath = "codesearch_config.xml";
 
     /**
      * creates a new instance of XmlConfigurationReader
+     * @param configPath the classpath of the config file
      */
-    private XmlConfigurationReader() {
+    @Inject
+    public XmlConfigurationReader(@Named("configpath") String configPath) {
+        if (StringUtils.isNotEmpty(configPath)) {
+            this.configPath = configPath;
+        }
+        LOG.debug("Reading config file: " + this.configPath);
+        try {
+            config = new XMLConfiguration(this.configPath);
+        } catch (ConfigurationException ex) {
+            LOG.error("Configuration file could not be read:\n" + ex);
+        }
     }
 
-    /**
-     * returns all users authorized to access the indexer via the web interface
-     * @return the users as a list of IndexerUserDto
-     * @throws ConfigurationException
-     */
-    public List<IndexerUserDto> getIndexerUsers() throws ConfigurationException {
+    /** {@inheritDoc} */
+    @Override
+    public synchronized List<IndexerUserDto> getIndexerUsers() {
         List<IndexerUserDto> users = new LinkedList<IndexerUserDto>();
-        if (config == null) {
-            loadConfigReader();
-        }
         List<HierarchicalConfiguration> userConfig = config.configurationsAt(XmlConfigurationReaderConstants.INDEXER_USERS);
         for (HierarchicalConfiguration hc : userConfig) {
             IndexerUserDto userDto = new IndexerUserDto();
@@ -86,16 +88,10 @@ public class XmlConfigurationReader {
         return users;
     }
 
-    /**
-     * Retrieves a list of all indexer_jobs from the configuration and returns it as a list of JobDto
-     * @return The list of JobDtos
-     * @throws ConfigurationException If the configuration could not be read or the keys were not found
-     */
-    public List<JobDto> getJobs() throws ConfigurationException {
+    /** {@inheritDoc} */
+    @Override
+    public synchronized List<JobDto> getJobs() {
         List<JobDto> jobs = new LinkedList<JobDto>();
-        if (config == null) {
-            loadConfigReader();
-        }
         //read the configuration for the jobs from the config
         List<HierarchicalConfiguration> jobConfig = config.configurationsAt(XmlConfigurationReaderConstants.INDEX_JOB);
         for (HierarchicalConfiguration hc : jobConfig) {
@@ -154,17 +150,8 @@ public class XmlConfigurationReader {
         return jobs;
     }
 
-    /**
-     * returns all repositories which have names that are contained in the parameter
-     * @param repositoryString the list of repositories, split by spaces
-     * @return the list of repositories as dtos
-     * @throws ConfigurationException if the configuration could not be loaded
-     */
-    private List<RepositoryDto> getRepositoryDtosForString(String repositoryString) throws ConfigurationException {
-        if (config == null) {
-            loadConfigReader();
-        }
-        //if no name is specified retrieve all repositories
+    /** {@inheritDoc} */
+    private synchronized List<RepositoryDto> getRepositoryDtosForString(String repositoryString) {
         if (repositoryString == null) {
             return getRepositories();
         }
@@ -175,16 +162,9 @@ public class XmlConfigurationReader {
         return repos;
     }
 
-    /**
-     * Returns the repository dto with the given name
-     * @param name the name of the repository
-     * @return the dto of the repository or null if none was found
-     * @throws ConfigurationException if the configuration could not be loaded
-     */
-    public RepositoryDto getRepositoryByName(String name) throws ConfigurationException {
-        if (config == null) {
-            loadConfigReader();
-        }
+    /** {@inheritDoc} */
+    @Override
+    public synchronized RepositoryDto getRepositoryByName(String name) {
         RepositoryDto repo = null;
         List<HierarchicalConfiguration> repositories = config.configurationsAt(XmlConfigurationReaderConstants.REPOSITORY_LIST);
         for (HierarchicalConfiguration hc : repositories) {
@@ -197,11 +177,8 @@ public class XmlConfigurationReader {
 
     /**
      * retrieves all required data about the given repository from the configuration via the HierarchicalConfiguration and returns it as a RepositoryDto
-     * @param hc
-     * @return
-     * @throws ConfigurationException
      */
-    private RepositoryDto getRepositoryFromConfig(HierarchicalConfiguration hc) throws ConfigurationException {
+    private synchronized RepositoryDto getRepositoryFromConfig(HierarchicalConfiguration hc) {
         RepositoryDto repo = new RepositoryDto();
         //retrieve the repository blacklisted filenames and add all global filenames
         String name = hc.getString(XmlConfigurationReaderConstants.REPOSITORY_NAME);
@@ -235,13 +212,8 @@ public class XmlConfigurationReader {
 
     /**
      * returns a list of all globally whitelisted filenames, so every filename has to match at least one of the whitelist names (only if the whitelist is not empty)
-     * @return
-     * @throws ConfigurationException
      */
-    public List<String> getGlobalWhitelistEntries() throws ConfigurationException {
-        if (config == null) {
-            loadConfigReader();
-        }
+    public synchronized List<String> getGlobalWhitelistEntries() {
         List<String> whitelist = config.getList(XmlConfigurationReaderConstants.GLOBAL_WHITELIST);
         if (whitelist == null) {
             whitelist = new LinkedList<String>();
@@ -251,13 +223,8 @@ public class XmlConfigurationReader {
 
     /**
      * returns a list of all file name patterns that are listed to be ignored on the entire system
-     * @return the list of file names
-     * @throws ConfigurationException if the configuration could not be read or the value is not defined
      */
-    private List<String> getGlobalBlacklistEntries() throws ConfigurationException {
-        if (config == null) {
-            loadConfigReader();
-        }
+    private synchronized List<String> getGlobalBlacklistEntries() {
         List<String> blacklist = config.getList(XmlConfigurationReaderConstants.GLOBAL_BLACKLIST);
         if (blacklist == null) {
             blacklist = new LinkedList<String>();
@@ -265,16 +232,9 @@ public class XmlConfigurationReader {
         return blacklist;
     }
 
-    /**
-     * Returns a list of repositories defined in the configuration.
-     * Checks if the XMLConfiguration is instantiated and, if not, instantiates it.
-     * @return the list of all repositories
-     * @throws ConfigurationException If the config file is either not found or contains invalid data.
-     */
-    public List<RepositoryDto> getRepositories() throws ConfigurationException {
-        if (config == null) {
-            loadConfigReader();
-        }
+    /** {@inheritDoc} */
+    @Override
+    public synchronized List<RepositoryDto> getRepositories() {
         List<RepositoryDto> repositories = new LinkedList<RepositoryDto>();
         List<HierarchicalConfiguration> repositoryConfigs = config.configurationsAt(XmlConfigurationReaderConstants.REPOSITORY_LIST);
         for (HierarchicalConfiguration repositoryConfig : repositoryConfigs) {
@@ -283,55 +243,31 @@ public class XmlConfigurationReader {
         return repositories;
     }
 
-    /**
-     * Retrieves all existing Repository groups 
-     * @return list of all repo groups
-     * @throws ConfigurationException
-     */
-    public List<String> getRepositoryGroups() throws ConfigurationException {
-        if (config == null) {
-            loadConfigReader();
-        }
+    /** {@inheritDoc} */
+    @Override
+    public synchronized List<String> getRepositoryGroups() {
         List<String> groups = new LinkedList<String>();
         groups = Arrays.asList(config.getString(XmlConfigurationReaderConstants.REPOSITORY_GROUP_LIST).split(" "));
         return groups;
     }
 
-    /**
-     * Returns the value of the given single-line property from the configuration file.
-     * @param key the key of the property
-     * @return the value of the property
-     * @throws ConfigurationException If the configuration file does not contain a value for the given key.
-     */
-    public String getSingleLinePropertyValue(final String key) throws ConfigurationException {
-        if (config == null) {
-            loadConfigReader();
-        }
+    /** {@inheritDoc} */
+    @Override
+    public synchronized String getValue(final String key) {
         return config.getString(key);
     }
 
-    /**
-     * Returns the values of all single-line properties that match the given key from the configuration file.
-     * @param key the key for the property
-     * @return a list of the values of the properties
-     * @throws ConfigurationException If the configuration file does not contain a value for the given key
-     */
-    public List<String> getSingleLinePropertyValueList(final String key) throws ConfigurationException {
+    /** {@inheritDoc} */
+    @Override
+    public synchronized  List<String> getValueList(final String key) {
         List<String> values = new LinkedList<String>();
-        if (config == null) {
-            loadConfigReader();
-        }
         values = config.getList(key);
         return values;
     }
 
-    /**
-     * returns a list of the names of all repositories that are in the given group
-     * @param groupName the name of the group
-     * @return the list of the repositories
-     * @throws ConfigurationException if the configuration could not be read
-     */
-    public List<String> getRepositoriesForGroup(String groupName) throws ConfigurationException {
+    /** {@inheritDoc} */
+    @Override
+    public synchronized List<String> getRepositoriesForGroup(String groupName) {
         List<String> repos = new LinkedList<String>();
         for (RepositoryDto repo : getRepositories()) {
             if (repo.getRepositoryGroups().contains(groupName)) {
@@ -339,29 +275,5 @@ public class XmlConfigurationReader {
             }
         }
         return repos;
-    }
-
-    /**
-     * Loads the configuration file from the default or specified path.
-     * @throws ConfigurationException If the configuration file was not found.
-     */
-    private void loadConfigReader() throws ConfigurationException {
-        config = new XMLConfiguration(configpath);
-    }
-
-    public String getConfigpath() {
-        return configpath;
-    }
-
-    public void setConfigpath(final String configpath) {
-        this.configpath = configpath;
-    }
-
-    /**
-     * resets the configpath and the XmlConfiguration object
-     */
-    public void clearConfigurationReader() {
-        this.configpath = null;
-        this.config = null;
     }
 }

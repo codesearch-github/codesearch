@@ -19,10 +19,6 @@
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.codesearch.searcher.server;
 
 import static org.junit.Assert.assertEquals;
@@ -31,16 +27,9 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Level;
 
 
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.log4j.Logger;
 import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
@@ -51,32 +40,9 @@ public class DocumentSearcherTest {
 
     private DocumentSearcher instance;
 
-     /* Logger */
-    private static final Logger LOG = Logger.getLogger(DocumentSearcherTest.class);
 
     public DocumentSearcherTest() {
-        try {
-            instance = new DocumentSearcher(XmlConfigurationReader.getInstance());
-        } catch (ConfigurationException ex) {
-            LOG.error(DocumentSearcherTest.class.getName());
-        }
-
-    }
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
-
-    @Before
-    public void setUp() {
-    }
-
-    @After
-    public void tearDown() {
+        instance = new DocumentSearcher(new XmlConfigurationReader(null));
     }
 
     /**
@@ -84,7 +50,6 @@ public class DocumentSearcherTest {
      */
     @Test
     public void testSearch() throws Exception {
-        LOG.info("search");
         String searchString = "SVN_NAME";
         List result = instance.search(searchString, true, new LinkedList<String>(), new LinkedList<String>());
         assertFalse(result.isEmpty());
@@ -102,8 +67,7 @@ public class DocumentSearcherTest {
     }
 
     @Test
-    public void testParseQuery() throws Exception{
-        LOG.info("parseQuery");
+    public void testParseQuery() throws Exception {
         String searchTerm = "asdf";
         List<String> repositories = new LinkedList<String>();
         repositories.add("testRepo1");
@@ -111,8 +75,6 @@ public class DocumentSearcherTest {
         repositories.add("testRepo3");
         String expectedResult = "content:\"asdf\" AND (repository:testRepo1 OR repository:testRepo2 OR repository:testRepo3)";
         String result = instance.parseQuery(searchTerm, true, repositories, new LinkedList<String>());
-        LOG.info(result);
-        LOG.info(expectedResult);
         assertEquals(expectedResult, result);
         List<String> repositoryGroups = new LinkedList<String>();
         repositoryGroups.add("group1");

@@ -25,7 +25,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
+import org.apache.log4j.Logger;
 
 /**
  * PropertiesManager is a class that provides several methods to access property files.
@@ -33,7 +35,8 @@ import java.util.Properties;
  * @author Stephan Stiboller
  */
 public class PropertiesManager {
-//TODO make PropertiesManager only instanciable through a factory, so only one propertymangager can exist per properties file
+
+    private static final Logger LOG = Logger.getLogger(PropertiesManager.class);
     /** The used Property file. */
     private Properties properties = new Properties();
     /** The property file location. */
@@ -43,9 +46,28 @@ public class PropertiesManager {
      * Creates a new instance of PropertiesManager
      * @param the location of the property file
      */
-    public PropertiesManager(final String propertyFileLocation) throws IOException {
-        this.propertyFileLocation = propertyFileLocation;
-        initProperties();
+    public PropertiesManager(final String propertyFileLocation) {
+        try {
+            this.propertyFileLocation = propertyFileLocation;
+            File f = new File(propertyFileLocation);
+            if (!f.exists()) {
+                f.createNewFile();
+            }
+            properties.load(new FileReader(propertyFileLocation));
+        } catch (IOException ex) {
+            LOG.error("Could not read properties file:\n" + ex);
+        }
+    }
+
+    /**
+     * Creates a new instance of PropertiesManager
+     * @param configFile The configuration file
+     */
+    public PropertiesManager(InputStream configFile) {
+        try {
+            properties.load(configFile);
+        } catch (IOException ex) {
+        }
     }
 
     /**
@@ -65,27 +87,5 @@ public class PropertiesManager {
     public void setPropertyFileValue(final String key, final String value) throws FileNotFoundException, IOException {
         properties.setProperty(key, value);
         properties.store(new FileOutputStream(propertyFileLocation), null);
-    }
-
-    public String getPropertyFileLocation() {
-        return propertyFileLocation;
-    }
-
-    public void setPropertyFileLocation(final String propertyFileLocation) throws IOException {
-        this.propertyFileLocation = propertyFileLocation;
-        initProperties();
-    }
-
-    /**
-     * opens the properties file or creates an empty properties file if it does not exist
-     * @throws IOException
-     */
-    private void initProperties() throws IOException {
-        properties.clear();
-        File f = new File(propertyFileLocation);
-        if (!f.exists()) {
-            f.createNewFile();
-        }
-        properties.load(new FileReader(propertyFileLocation));
     }
 }

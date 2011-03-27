@@ -20,6 +20,7 @@
  */
 package org.codesearch.indexer.tasks;
 
+import com.google.inject.Inject;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -28,6 +29,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.apache.commons.collections.map.MultiValueMap;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
@@ -43,8 +45,8 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.store.FSDirectory;
+import org.codesearch.commons.configuration.ConfigurationReader;
 import org.codesearch.commons.configuration.properties.PropertiesManager;
-import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
 import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 import org.codesearch.commons.constants.IndexConstants;
 import org.codesearch.commons.database.DBAccess;
@@ -60,7 +62,8 @@ import org.codesearch.commons.plugins.lucenefields.LuceneFieldValueException;
 import org.codesearch.commons.plugins.vcs.FileDto;
 import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
 import org.codesearch.commons.plugins.vcs.VersionControlPluginException;
-import org.codesearch.commons.utils.MimeTypeUtil;
+import org.codesearch.commons.utils.mime.MimeTypeUtil;
+import org.codesearch.indexer.exceptions.InvalidIndexLocationException;
 import org.codesearch.indexer.exceptions.TaskExecutionException;
 
 /**
@@ -89,12 +92,31 @@ public class IndexingTask implements Task {
     private boolean codeAnalysisEnabled = false;
     /** the location of the lucene index */
     private String indexLocation = null;
-    /** The config reader used to read the configuration */
-    private XmlConfigurationReader configReader = XmlConfigurationReader.getInstance();
+    
     /* Logger */
     private static final Logger LOG = Logger.getLogger(IndexingTask.class);
     /** the plugins that will be used to create the fields for each document */
     private List<LuceneFieldPlugin> luceneFields = new LinkedList<LuceneFieldPlugin>();
+
+    /** The config reader used to read the configuration */
+    private ConfigurationReader configReader;
+
+    /** The database access object */
+    private DBAccess dba;
+
+    /** The plugin loader. */
+    private PluginLoader pluginLoader;
+    
+
+    @Inject
+    public IndexingTask(ConfigurationReader configReader, DBAccess dba, PluginLoader pluginLoader) {
+        this.configReader = configReader;
+        this.dba = dba;
+        this.pluginLoader = pluginLoader;
+    }
+
+
+
 
     /**
      * executes the task,
@@ -111,7 +133,7 @@ public class IndexingTask implements Task {
             String lastIndexedRevision = propertiesManager.getPropertyFileValue(repository.getName());
             LOG.info("Last indexed revision is: " + lastIndexedRevision);
             // Get the version control plugins
-            versionControlPlugin = PluginLoader.getPlugin(VersionControlPlugin.class, repository.getVersionControlSystem());
+            versionControlPlugin = pluginLoader.getPlugin(VersionControlPlugin.class, repository.getVersionControlSystem());
             versionControlPlugin.setRepository(repository);
             LOG.info("Newest revision is      : " + versionControlPlugin.getRepositoryRevision());
             changedFiles = versionControlPlugin.getChangedFilesSinceRevision(lastIndexedRevision);
@@ -131,19 +153,21 @@ public class IndexingTask implements Task {
                 LOG.info("Starting code analyzing");
                 start = System.currentTimeMillis();
 
-                String lastAnalysisRevision = DBAccess.getLastAnalyzedRevisionOfRepository(repository.getName());
+                String lastAnalysisRevision = dba.getLastAnalyzedRevisionOfRepository(repository.getName());
                 if (!lastAnalysisRevision.equals(lastIndexedRevision)) {
                     retrieveNewFileList = true;
                 } else {
                     retrieveNewFileList = false;
                 }
                 executeCodeAnalysis(retrieveNewFileList, lastAnalysisRevision);
-                DBAccess.setLastAnalyzedRevisionOfRepository(repository.getName(), versionControlPlugin.getRepositoryRevision());
+                dba.setLastAnalyzedRevisionOfRepository(repository.getName(), versionControlPlugin.getRepositoryRevision());
                 duration = System.currentTimeMillis() - start;
                 LOG.info("Code analyzing took " + duration / 1000 + " seconds");
             }
 
-        } catch (org.apache.commons.configuration.ConfigurationException ex) {
+        } catch (InvalidIndexLocationException ex) {
+            LOG.error("Error at indexing: " + ex);
+        } catch (ConfigurationException ex) {
             LOG.error("Error at DatabaseConnection \n" + ex);
         } catch (DatabaseAccessException ex) {
             LOG.error("Error at DatabaseConnection \n" + ex);
@@ -152,9 +176,9 @@ public class IndexingTask implements Task {
         } catch (PluginLoaderException ex) {
             LOG.error("VersionControlPlugin could not be loaded: " + ex);
         } catch (FileNotFoundException ex) {
-            LOG.error("Index not found at task execution" + ex);
+            LOG.error("Index not found at indexing" + ex);
         } catch (IOException ex) {
-            LOG.error("IOException at execution of task: " + ex);
+            LOG.error("IOException occured at indexing: " + ex);
         }
         LOG.info("Finished indexing of repository: " + repository.getName());
     }
@@ -167,57 +191,55 @@ public class IndexingTask implements Task {
      * @throws VersionControlPluginException if no VCP could be loaded for the set repository
      * @throws CodeAnalyzerPluginException if the source code of one of the files could not be analyzed
      */
-    private void executeCodeAnalysis(boolean retrieveNewFileList, String lastAnalysisRevision) throws VersionControlPluginException {
+    private void executeCodeAnalysis(boolean retrieveNewFileList, String lastAnalysisRevision) throws VersionControlPluginException, DatabaseAccessException {
         if (retrieveNewFileList) {
             changedFiles = versionControlPlugin.getChangedFilesSinceRevision(lastAnalysisRevision);
         }
-        //the code analyzer plugin used to analyze the entire repository
-        CodeAnalyzerPlugin plugin = null;
-        //in case a file has the same filetype (and needs the same analyzer) as the file before the plugin will not be loaded a second time
-        String currentFileType = null;
-        String previousFileType = null;
+
+        // For better efficiency, first sort all files by file type and only load plugin once per file type
+        MultiValueMap filetypeMap = new MultiValueMap();
         for (FileDto currentFile : changedFiles) {
-            try {
-                if (currentFile.getFilePath().endsWith(".xml")) {
-                    getClass(); //FIXME
-                }
-                if (currentFile.isDeleted()) {
-                    DBAccess.purgeAllRecordsForFile(currentFile.getFilePath(), repository.getName());
-                    LOG.debug("Deleted all records associated with " + currentFile.getFilePath() + " since it was deleted from the file system");
-                } else {
-                    try {
-                        currentFileType = MimeTypeUtil.guessMimeTypeViaFileEnding(currentFile.getFilePath());
-                    } catch (StringIndexOutOfBoundsException ex) {
-                        //In case the file has no ending no code analyzis will be executed
-                        continue;
-                    }
-                    if (plugin == null || (!currentFileType.equals(previousFileType))) {
-                        //load the appropriate plugin
-                        try {
-                            plugin = PluginLoader.getPlugin(CodeAnalyzerPlugin.class, currentFileType);
-                        } catch (PluginLoaderException ex) {
-                            //in case there is no codeanalyzer plugin for the file ending
-                            continue;
-                        }
-                    }
-                    LOG.debug("Analyzing file: " + currentFile.getFilePath());
-                    plugin.analyzeFile(new String(currentFile.getContent()));
-                    AstNode ast = plugin.getAst();
-                    List<String> typeDeclarations = plugin.getTypeDeclarations();
-                    List<Usage> usages = plugin.getUsages();
-                    List<String> imports = plugin.getImports();
-                    //List<ExternalUsage> externalUsages =
-                    previousFileType = currentFileType;
-                    //add the externalLinks to the FileDto, so they can be parsed after the regular indexing is finished
-                    //write the AST information into the database
-                    DBAccess.setAnalysisDataForFile(currentFile.getFilePath(), repository.getName(), ast, usages, typeDeclarations, imports);
-                }
-            } catch (CodeAnalyzerPluginException ex) {
-                LOG.error("Error while trying to analyze file " + currentFile.getFilePath() + "\n" + ex);
-            } catch (DatabaseAccessException ex) {
-                LOG.error("Error at DatabaseConnection \n" + ex);
+            if (currentFile.isDeleted()) {
+                dba.deleteFile(currentFile.getFilePath(), repository.getName());
+                LOG.debug("Deleted all records associated with " + currentFile.getFilePath() + " since it was deleted from the file system");
+            } else {
+                filetypeMap.put(MimeTypeUtil.guessMimeTypeViaFileEnding(currentFile.getFilePath()), currentFile);
             }
         }
+        filetypeMap.remove(MimeTypeUtil.UNKNOWN);
+        CodeAnalyzerPlugin plugin = null;
+        try {
+            for (Object key : filetypeMap.keySet()) {
+                String filetype = (String) key;
+                LOG.info("Analyzing files with type: " + filetype);
+                try {
+                    plugin = pluginLoader.getPlugin(CodeAnalyzerPlugin.class, filetype);
+
+                    List files = (List) filetypeMap.get(key);
+                    for (Object o : files) {
+                        FileDto currentFile = (FileDto) o;
+                        LOG.debug("Analyzing file: " + currentFile.getFilePath());
+                        try {
+                            plugin.analyzeFile(new String(currentFile.getContent()));
+                            AstNode ast = plugin.getAst();
+                            List<String> typeDeclarations = plugin.getTypeDeclarations();
+                            List<Usage> usages = plugin.getUsages();
+                            List<String> imports = plugin.getImports();
+                            //add the externalLinks to the FileDto, so they can be parsed after the regular indexing is finished
+                            //write the AST information into the database
+                            dba.setAnalysisDataForFile(currentFile.getFilePath(), repository.getName(), ast, usages, typeDeclarations, imports);
+                        } catch (CodeAnalyzerPluginException ex) {
+                            LOG.error("Could not analyze file: " + currentFile.getFilePath() + "\n" + ex);
+                        }
+                    }
+                } catch (PluginLoaderException ex) {
+                    LOG.info("No codeanalyzing plugin found for file type: " + filetype);
+                }
+            }
+        } catch (DatabaseAccessException ex) {
+            LOG.error("Code analyzing could not be executed because the database connection failed: \n" + ex);
+        }
+
     }
 
     /**
@@ -226,12 +248,15 @@ public class IndexingTask implements Task {
      * @throws ConfigurationException if the necessary configuration could not be read from the config file
      * @throws VersionControlPluginException if the current revision could not be determined from the VersionControlPlugin
      */
-    private void executeIndexing() throws IOException, ConfigurationException, VersionControlPluginException, PluginLoaderException {
+    private void executeIndexing() throws IOException, ConfigurationException, VersionControlPluginException, PluginLoaderException, InvalidIndexLocationException {
         if (changedFiles.isEmpty()) {
             LOG.info("Index of repository " + repository.getName() + " is up to date");
             return;
         }
         File dir = new File(indexLocation);
+        if(!(dir.exists() && dir.isDirectory() && dir.canWrite())) {
+            throw new InvalidIndexLocationException("Cannot access index directory at: " + indexLocation);
+        }
         indexDirectory = FSDirectory.open(dir);
 
         clearPreviousDocuments();
@@ -266,7 +291,7 @@ public class IndexingTask implements Task {
      */
     public void initializeIndexWriter(File dir) throws PluginLoaderException {
         PerFieldAnalyzerWrapper analyzer = new PerFieldAnalyzerWrapper(new SimpleAnalyzer());
-        for (LuceneFieldPlugin currentPlugin : PluginLoader.getMultiplePluginsForSingelPurpose(LuceneFieldPlugin.class, "lucene_field_plugin")) {
+        for (LuceneFieldPlugin currentPlugin : pluginLoader.getMultiplePluginsForPurpose(LuceneFieldPlugin.class, "lucene_field_plugin")) {
             luceneFields.add(currentPlugin);
             analyzer.addAnalyzer(currentPlugin.getFieldName(), currentPlugin.getRegularCaseAnalyzer());
             if (currentPlugin.addLowercase()) {

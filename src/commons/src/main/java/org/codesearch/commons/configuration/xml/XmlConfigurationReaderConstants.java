@@ -20,6 +20,7 @@
  */
 package org.codesearch.commons.configuration.xml;
 
+//TODO make this non-static and testable.
 /**
  * This class includes all constants needed to access the global xml-configuration with the config reader.
  * @author Stephan Stiboller

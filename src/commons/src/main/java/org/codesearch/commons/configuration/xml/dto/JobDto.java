@@ -38,6 +38,7 @@ public class JobDto {
     private Calendar startDate;
     /** The interval in which the job will be executed in minutes */
     private int interval;
+
     /**
      * Creates a new instance of JobDto
      */
@@ -69,7 +70,6 @@ public class JobDto {
         this.tasks = tasks;
     }
 
-
     /**
      * Checks whether this job has the same values as the one given as a parameter
      * @param o the JobDto to check
@@ -77,28 +77,27 @@ public class JobDto {
      */
     @Override
     public boolean equals(Object o) {
-        if(!(o instanceof JobDto)) {
+        if (!(o instanceof JobDto)) {
             return false;
         }
-        JobDto other = null;
-        try {
-            other = (JobDto) o;
-            if (other.getInterval() != this.interval) 
+        JobDto other = (JobDto) o;
+        if (other.getInterval() != this.interval) {
+            return false;
+        }
+
+        if (other.getStartDate().getTimeInMillis() != this.startDate.getTimeInMillis()) {
+            return false;
+        }
+
+        if (other.getTasks().size() != this.tasks.size()) {
+            return false;
+        }
+        for (int i = 0; i < this.tasks.size(); i++) {
+            TaskDto task = this.tasks.get(i);
+            if (!task.equals(other.getTasks().get(i))) {
                 return false;
-            
-            if (other.getStartDate().getTimeInMillis() != this.startDate.getTimeInMillis()) 
-                return false;
-            
-            if(other.getTasks().size() != this.tasks.size())
-                return false;
-            for(int i = 0; i < this.tasks.size(); i++){
-                TaskDto task = this.tasks.get(i);
-                if(!task.equals(other.getTasks().get(i)))
-                    return false;
             }
-            return true;
-        } catch (ClassCastException e) {
-            return false;
         }
+        return true;
     }
 }

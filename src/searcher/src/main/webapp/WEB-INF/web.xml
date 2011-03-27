@@ -38,34 +38,17 @@
         <welcome-file>Searcher.html</welcome-file>
     </welcome-file-list>
 
-    <!-- PARAMS -->
-    <context-param>
-        <param-name>log4jConfigLocation</param-name>
-        <param-value>classpath:log4j.properties</param-value>
-    </context-param>
+    <filter>
+        <filter-name>guiceFilter</filter-name>
+        <filter-class>com.google.inject.servlet.GuiceFilter</filter-class>
+    </filter>
 
-    <context-param>
-        <param-name>contextConfigLocation</param-name>
-        <param-value>classpath:org/codesearch/commons/CommonsBeans.xml classpath:org/codesearch/searcher/SearcherBeans.xml</param-value>
-    </context-param>
-
-    <!-- LISTENERS -->
-    <listener>
-        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
-    </listener>
+    <filter-mapping>
+        <filter-name>guiceFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
 
     <listener>
-        <listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>
+        <listener-class>org.codesearch.searcher.server.SearcherGuiceContextListener</listener-class>
     </listener>
-
-    <!-- SERVLETS -->
-    <servlet>
-        <servlet-name>searcherservice</servlet-name>
-        <servlet-class>org.codesearch.searcher.server.rpc.SearcherServiceImpl</servlet-class>
-    </servlet>
-    
-    <servlet-mapping>
-        <servlet-name>searcherservice</servlet-name>
-        <url-pattern>/searcher/searcherservice</url-pattern>
-    </servlet-mapping>
 </web-app>

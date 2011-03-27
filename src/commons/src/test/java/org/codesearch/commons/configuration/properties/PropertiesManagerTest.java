@@ -23,50 +23,17 @@ package org.codesearch.commons.configuration.properties;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.IOException;
-import org.apache.log4j.Logger;
-import org.codesearch.commons.constants.IndexConstants;
-
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 
-/**
- *
- * @author Stephan Stiboller
- */
-//TODO spring
 public class PropertiesManagerTest {
 
     /**
      * The used PropertiesReader instance
      */
-    private PropertiesManager pr;
-
-     /* Logger */
-    private static final Logger LOG = Logger.getLogger(PropertiesManagerTest.class);
+    private PropertiesManager pr = new PropertiesManager(PropertiesManagerTest.class.getClassLoader().getResourceAsStream("revisions.properties"));
 
     public PropertiesManagerTest() {
-    }
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
-
-    @Before
-    public void setUp() throws IOException {
-        
-    }
-
-    @After
-    public void tearDown() {
     }
     
     /**
@@ -74,9 +41,8 @@ public class PropertiesManagerTest {
      */
     @Test
     public void testGetPropertyFileValue() throws Exception {
-        LOG.info("getPropertyFileValue");
         String key = "testrepo1";
-        String expResult = "0";
+        String expResult = "5";
         String result = pr.getPropertyFileValue(key);
         assertEquals(expResult, result);
     }

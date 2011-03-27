@@ -34,7 +34,6 @@
 
     <global-blacklist-filenames>
         <filename>*.jpg</filename>
-        <filename>*.txt</filename>
         <filename>*img*</filename>
         <filename>*.svn*</filename>
         <filename>*.class*</filename>
@@ -46,18 +45,6 @@
             <interval>60</interval>
             <start>2010-8-13-18-0</start>
             <tasks>
-                <task>
-                    <type>index</type>
-                </task>
-            </tasks>
-        </index-job>
-        <index-job>
-            <interval>10080</interval>
-            <start>2010-8-11-18-0</start>
-            <tasks>
-                <task>
-                    <type>clear</type>
-                </task>
                 <task>
                     <type>index</type>
                 </task>

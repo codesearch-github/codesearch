@@ -34,6 +34,7 @@ import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
+import org.codesearch.searcher.shared.SearchResultDto;
 
 /**
  * Presenter for the file view.
@@ -82,8 +83,21 @@ public class FileActivity extends AbstractActivity implements Presenter {
 
     @Override
     public void goToUsage(int usageId) {
-        //FIXME how can i get filepath + repository like this?
-        searcherServiceAsync.getFileForUsageInFile(usageId, repository, filePath, new GetFileCallback());
+        searcherServiceAsync.resolveUsage(usageId, repository, filePath, new ResolveUsageCallback());
+    }
+
+    private class ResolveUsageCallback implements AsyncCallback<SearchResultDto> {
+
+        @Override
+        public void onFailure(Throwable caught) {
+            Window.alert("Could not resolve usage because: \n" + caught.toString());
+        }
+
+        @Override
+        public void onSuccess(SearchResultDto result) {
+            goTo(new FilePlace(result.getRepository(), result.getFilePath(), ""));
+        }
+
     }
     
     private class GetFileCallback implements AsyncCallback<FileDto>  {

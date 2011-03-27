@@ -20,6 +20,7 @@
  */
 package org.codesearch.indexer.tasks;
 
+import com.google.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 
@@ -43,14 +44,21 @@ import org.codesearch.indexer.exceptions.TaskExecutionException;
  */
 public class ClearTask implements Task {
 
+    /** Logger */
+    private static final Logger LOG = Logger.getLogger(ClearTask.class);
     /** Whether code analysis is enabled. */
     private boolean codeAnalysisEnabled;
     /** the location of the index */
     private String indexLocation;
     /** the repository to clear  */
     private RepositoryDto repository;
-    /** Logger */
-    private static final Logger LOG = Logger.getLogger(ClearTask.class);
+    /** The database access object */
+    private DBAccess dba;
+
+    @Inject
+    public ClearTask(DBAccess dba) {
+        this.dba = dba;
+    }
 
     /**
      * executes the task
@@ -78,7 +86,7 @@ public class ClearTask implements Task {
                 }
                 if (codeAnalysisEnabled) {
                     try {
-                        DBAccess.purgeDatabaseEntries();
+                        dba.purgeDatabaseEntries();
                         LOG.info("Cleared code analysis index");
                     } catch (DatabaseAccessException ex) {
                         LOG.error("Could not clear code analysis index: \n" + ex);
@@ -96,8 +104,8 @@ public class ClearTask implements Task {
                 LOG.debug("Deleted " + searcher.getIndexReader().deleteDocuments(term) + " documents for repository " + repository.getName());
                 if (codeAnalysisEnabled) {
                     try {
-                        DBAccess.clearTablesForRepository(repository.getName());
-                        DBAccess.setLastAnalyzedRevisionOfRepository(repository.getName(), "0");
+                        dba.clearTablesForRepository(repository.getName());
+                        dba.setLastAnalyzedRevisionOfRepository(repository.getName(), "0");
                         LOG.info("Cleared code analysis index for repository " + repository.getName());
                     } catch (DatabaseAccessException ex) {
                         LOG.error("Could not clear code analysis index: \n" + ex);

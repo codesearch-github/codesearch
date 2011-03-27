@@ -9,7 +9,7 @@ import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.codesearch.commons.plugins.lucenefields.LuceneFieldPlugin;
 import org.codesearch.commons.plugins.lucenefields.LuceneFieldValueException;
 import org.codesearch.commons.plugins.vcs.FileDto;
-import org.codesearch.commons.utils.MimeTypeUtil;
+import org.codesearch.commons.utils.mime.MimeTypeUtil;
 
 /**
  *

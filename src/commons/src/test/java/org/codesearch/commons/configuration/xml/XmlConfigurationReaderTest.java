@@ -20,7 +20,6 @@
  */
 package org.codesearch.commons.configuration.xml;
 
-import java.util.Collections;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -29,45 +28,28 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.configuration.ConfigurationException;
-import org.apache.log4j.Logger;
+import org.codesearch.commons.configuration.ConfigurationReader;
 import org.codesearch.commons.configuration.xml.dto.JobDto;
 import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 import org.codesearch.commons.configuration.xml.dto.TaskDto;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-/**
- *
- * @author David Froehlich
- */
-//@RunWith(SpringJUnit4ClassRunner.class)
-//@ContextConfiguration(loader = GenericXmlContextLoader.class, locations = {"classpath:org/codesearch/commons/CodesearchCommonsBeans.xml"})
 public class XmlConfigurationReaderTest {
 
-    //   TODO use spring injection
-    //   @Autowired
-    private XmlConfigurationReader configReader = XmlConfigurationReader.getInstance();
-    /* Logger */
-    private static final Logger LOG = Logger.getLogger(XmlConfigurationReaderTest.class);
+    private ConfigurationReader configReader;
 
     public XmlConfigurationReaderTest() {
     }
 
     @Before
-    public void setUp() {
+    public void setUp()
+    {
+        configReader = new XmlConfigurationReader("");
     }
 
-    @After
-    public void tearDown() {
-    }
-
-    /**
-     * Test of getRepositories method, of class XmlConfigurationReader.
-     */
     @Test
     public void testGetRepositories() throws Exception {
-        LOG.info("getRepositories");
         List<String> ignFileNames1 = new LinkedList<String>();
         List<String> repoGroups1 = new LinkedList<String>();
         repoGroups1.add("group1");
@@ -75,53 +57,36 @@ public class XmlConfigurationReaderTest {
 
         ignFileNames1.add("*.xml");
         ignFileNames1.add("*.jpg");
-        ignFileNames1.add("*.txt");
-        ignFileNames1.add("*.PNG");
-        ignFileNames1.add("*.png");
         ignFileNames1.add("*img*");
         ignFileNames1.add("*.svn*");
         ignFileNames1.add("*.class*");
-        
 
-        RepositoryDto repo1 = new RepositoryDto("svnsearch_repo", "svn://portal.htl-kaindorf.at/svnsearch", "feldruebe", "dota!123", true, "SVN", ignFileNames1, new LinkedList<String>(), repoGroups1);
+        RepositoryDto repo1 = new RepositoryDto("svnsearch_repo", "http://portal.htl-kaindorf.at/svnsearch", "feldruebe", "dota!123", true, "SVN", ignFileNames1, new LinkedList<String>(), repoGroups1);
 
         List<String> ignFileNames2 = new LinkedList<String>();
         List<String> repoGroups2 = new LinkedList<String>();
-        repoGroups2.add("group1");
         ignFileNames2.add("*.jpg");
-        ignFileNames2.add("*.txt");
-        ignFileNames2.add("*.PNG");
-        ignFileNames2.add("*.png");
         ignFileNames2.add("*img*");
+        ignFileNames2.add("*generated*");
         ignFileNames2.add("*.svn*");
         ignFileNames2.add("*.class*");
         RepositoryDto repo2 = new RepositoryDto("svn_local", System.getProperty("user.home")+"/workspace/svnsearch", "null", "null", true, "FILESYSTEM", ignFileNames2, new LinkedList<String>(), repoGroups2);
 
         List result = configReader.getRepositories();
-        assertTrue(repo1.equals(result.get(1)));
-        assertTrue(repo2.equals(result.get(2)));
+        assertTrue(repo1.equals(result.get(0)));
+        assertTrue(repo2.equals(result.get(1)));
     }
 
-    /**
-     * Test of getSingleLinePropertyValue method, of class XmlConfigurationReader.
-     */
     @Test
-    public void testGetSingleLinePropertyValue() throws Exception {
-        LOG.info("getSingleLinePropertyValue");
+    public void testGetValue() throws Exception {
         String key = "testproperty";
         String expResult = "asdf";
-        String result = configReader.getSingleLinePropertyValue(key);
+        String result = configReader.getValue(key);
         assertEquals(expResult, result);
     }
 
-    /**
-     * Test of getTasks method, of class XmlConfigurationReader.
-     */
     @Test
     public void testGetJobs() throws ConfigurationException {
-        LOG.info("getJobs");
-        JobDto job1 = new JobDto();
-
         List<String> ignFileNames1 = new LinkedList<String>();
         List<String> repoGroups1 = new LinkedList<String>();
         repoGroups1.add("group1");
@@ -129,45 +94,23 @@ public class XmlConfigurationReaderTest {
 
         ignFileNames1.add("*.xml");
         ignFileNames1.add("*.jpg");
-        ignFileNames1.add("*.txt");
-        ignFileNames1.add("*.PNG");
-        ignFileNames1.add("*.png");
         ignFileNames1.add("*img*");
         ignFileNames1.add("*.svn*");
         ignFileNames1.add("*.class*");
-        RepositoryDto repo1 = new RepositoryDto("svnsearch_repo", "svn://portal.htl-kaindorf.at/svnsearch", "feldruebe", "dota!123", true, "SVN", ignFileNames1, repoGroups1,new LinkedList<String>());
 
-        List<String> ignFileNames2 = new LinkedList<String>();
-        List<String> repoGroups2 = new LinkedList<String>();
-        repoGroups2.add("group1");
-        ignFileNames2.add("*.jpg");
-        ignFileNames2.add("*.txt");
-        ignFileNames2.add("*.PNG");
-        ignFileNames2.add("*.png");
-        ignFileNames2.add("*img*");
-        ignFileNames2.add("*.svn*");
-        ignFileNames2.add("*.class*");
-        RepositoryDto repo2 = new RepositoryDto("svn_local", System.getProperty("user.home")+"/workspace/svnsearch", "null", "null", true, "FILESYSTEM", ignFileNames2, new LinkedList<String>(), repoGroups2);
-
+        RepositoryDto repo1 = new RepositoryDto("svnsearch_repo", "http://portal.htl-kaindorf.at/svnsearch", "feldruebe", "dota!123", true, "SVN", ignFileNames1, new LinkedList<String>(), repoGroups1);
+  
+        JobDto job1 = new JobDto();
         job1.getTasks().add(new TaskDto(repo1, TaskDto.TaskType.index, true));
         job1.setInterval(60);
-        job1.setStartDate(new GregorianCalendar(2010, 7, 13, 18, 0));
-        JobDto job2 = new JobDto();
-
-        job2.getTasks().add(new TaskDto(null, TaskDto.TaskType.clear, true));
-
-        job2.setInterval(10080);
-        job2.setStartDate(new GregorianCalendar(2010, 7, 11, 18, 0));
+        job1.setStartDate(new GregorianCalendar(2010, 8, 13, 18, 0));
 
         List<JobDto> result = configReader.getJobs();
-        assert (result.size() == 2);
         assert (result.get(0).equals(job1));
-        assert (result.get(1).equals(job2));
     }
 
     @Test
     public void testGetRepositoryByName() throws Exception {
-        LOG.info("getRepositoryByName");
         List<String> ignoredFiles = new LinkedList<String>();
         List<String> repoGroups = new LinkedList<String>();
         ignoredFiles.add("*.xml");
@@ -178,13 +121,12 @@ public class XmlConfigurationReaderTest {
     }
 
     @Test
-    public void testGetSingleLinePropertyValueList() throws Exception {
-        LOG.info("getSingleLinePropertyValueList");
+    public void testGetValueList() throws Exception {
         List<String> expResult = new LinkedList<String>();
         expResult.add("1");
         expResult.add("2");
         expResult.add("3");
-        List<String> result = configReader.getSingleLinePropertyValueList("listtest");
+        List<String> result = configReader.getValueList("listTest");
         assertEquals(expResult.get(0), result.get(0));
         assertEquals(expResult.get(1), result.get(1));
         assertEquals(expResult.get(2), result.get(2));

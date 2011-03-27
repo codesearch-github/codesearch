@@ -20,6 +20,7 @@
  */
 package org.codesearch.searcher.server;
 
+import com.google.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
@@ -35,16 +36,13 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
-import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
-import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
+import org.codesearch.commons.configuration.ConfigurationReader;
 import org.codesearch.commons.configuration.xml.XmlConfigurationReaderConstants;
 import org.codesearch.commons.constants.IndexConstants;
 import org.codesearch.searcher.server.util.STAlternativeSuggestor;
-import org.codesearch.searcher.shared.SearcherServiceException;
 import org.codesearch.searcher.shared.SearchResultDto;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Provides methods to search the index.
@@ -66,21 +64,20 @@ public class DocumentSearcher {
     private String indexLocation;
     /** Used completer for search term autocompletion functionality */
     private STAlternativeSuggestor autocompleter;
-
-    @Autowired
-    private XmlConfigurationReader xmlConfigurationReader;
+    private ConfigurationReader configurationReader;
 
     /**
      * Creates a new DocumentSearcher instance
      * @throws ConfigurationException if no value for the key specified in the constant INDEX_LOCATION_KEY could be found in the in the configuration via the XmlConfigurationReader
      * @throws IOException if the index could not be opened
      */
-    public DocumentSearcher(XmlConfigurationReader configReader) throws ConfigurationException {
+    @Inject
+    public DocumentSearcher(ConfigurationReader configurationReader) {
         // Retrieve index location from the configuration
-        indexLocation = configReader.getSingleLinePropertyValue(XmlConfigurationReaderConstants.INDEX_LOCATION);
+        indexLocation = configurationReader.getValue(XmlConfigurationReaderConstants.INDEX_LOCATION);
         LOG.debug("Index location set to: " + indexLocation);
         //TODO make or find proper analyzers for search
-        queryParser = new QueryParser(Version.LUCENE_30, IndexConstants.INDEX_FIELD_CONTENT+"_lc", new LowerCaseWhiteSpaceAnalyzer());
+        queryParser = new QueryParser(Version.LUCENE_30, IndexConstants.INDEX_FIELD_CONTENT + "_lc", new LowerCaseWhiteSpaceAnalyzer());
         queryParser.setAllowLeadingWildcard(true);
         queryParser.setLowercaseExpandedTerms(false);
         queryParserCaseSensitive = new QueryParser(Version.LUCENE_30, IndexConstants.INDEX_FIELD_CONTENT, new WhitespaceAnalyzer());
@@ -102,17 +99,17 @@ public class DocumentSearcher {
      * @throws ParseException if the searchString could not be parsed to a query
      * @throws IOException if the Index could not be read
      */
-    public List<SearchResultDto> search(String searchString, boolean caseSensitive, List<String> repositoryNames, List<String> repositoryGroupNames) throws ParseException, IOException, InvalidIndexException, ConfigurationException {
+    public List<SearchResultDto> search(String searchString, boolean caseSensitive, List<String> repositoryNames, List<String> repositoryGroupNames) throws ParseException, IOException, InvalidIndexException {
         return performLuceneSearch(searchString, caseSensitive, repositoryNames, repositoryGroupNames, 1000);
     }
 
-    public List<String> suggestSearchNames(String searchString, boolean caseSensitive, List<String> repositoryNames, List<String> repositoryGroupNames) throws ParseException, IOException, InvalidIndexException, ConfigurationException {
+    public List<String> suggestSearchNames(String searchString, boolean caseSensitive, List<String> repositoryNames, List<String> repositoryGroupNames) throws ParseException, IOException, InvalidIndexException {
         List<SearchResultDto> results = performLuceneSearch(searchString, caseSensitive, repositoryNames, repositoryGroupNames, 10);
-        
+
         return null;
     }
 
-    private List<SearchResultDto> performLuceneSearch(String searchString, boolean caseSensitive, List<String> repositoryNames, List<String> repositoryGroupNames, int maxResults) throws ParseException, IOException, InvalidIndexException, ConfigurationException {
+    private List<SearchResultDto> performLuceneSearch(String searchString, boolean caseSensitive, List<String> repositoryNames, List<String> repositoryGroupNames, int maxResults) throws ParseException, IOException, InvalidIndexException {
         if (!searcherInitialized) {
             initSearcher();
         }
@@ -122,8 +119,8 @@ public class DocumentSearcher {
         if (caseSensitive) {
             query = queryParserCaseSensitive.parse(finalSearchString);
         } else {
-            finalSearchString = finalSearchString.replace(IndexConstants.INDEX_FIELD_FILEPATH+":", IndexConstants.INDEX_FIELD_FILEPATH+"_lc:").replace(IndexConstants.INDEX_FIELD_CONTENT+":",
-                    IndexConstants.INDEX_FIELD_CONTENT+"_lc:");
+            finalSearchString = finalSearchString.replace(IndexConstants.INDEX_FIELD_FILEPATH + ":", IndexConstants.INDEX_FIELD_FILEPATH + "_lc:").replace(IndexConstants.INDEX_FIELD_CONTENT + ":",
+                    IndexConstants.INDEX_FIELD_CONTENT + "_lc:");
             query = queryParser.parse(finalSearchString.toLowerCase());
         }
 
@@ -150,14 +147,14 @@ public class DocumentSearcher {
      * @param term the search term
      * @return the lucene conform query
      */
-    public String parseQuery(String term, boolean caseSensitive, List<String> repositoryNames, List<String> repositoryGroupNames) throws ConfigurationException {
+    public String parseQuery(String term, boolean caseSensitive, List<String> repositoryNames, List<String> repositoryGroupNames) {
         //TODO rename method, same name as lucene and make private after finished testing
         return appendRepositoriesToQuery(term, repositoryNames, repositoryGroupNames);
     }
 
-    private String appendRepositoriesToQuery(String query, List<String> repositoryNames, List<String> repositoryGroupNames) throws ConfigurationException {
+    private String appendRepositoriesToQuery(String query, List<String> repositoryNames, List<String> repositoryGroupNames) {
         for (String repoGroup : repositoryGroupNames) {
-            for (String repo : xmlConfigurationReader.getRepositoriesForGroup(repoGroup)) {
+            for (String repo : configurationReader.getRepositoriesForGroup(repoGroup)) {
                 repositoryNames.add(repo);
             }
         }

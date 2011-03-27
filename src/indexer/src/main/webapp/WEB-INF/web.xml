@@ -36,11 +36,6 @@
 
     <display-name>Codesearch Indexer</display-name>
 
-    <context-param>
-        <param-name>contextConfigLocation</param-name>
-        <param-value>classpath:org/codesearch/commons/CommonsBeans.xml classpath:org/codesearch/indexer/IndexerBeans.xml</param-value>
-    </context-param>
-
     <listener>
         <listener-class>org.codesearch.indexer.core.IndexerMain</listener-class>
     </listener>

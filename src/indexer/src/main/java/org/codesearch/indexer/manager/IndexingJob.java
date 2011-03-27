@@ -20,12 +20,16 @@
  */
 package org.codesearch.indexer.manager;
 
+import com.google.inject.Inject;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.codesearch.commons.configuration.ConfigurationReader;
 import org.codesearch.commons.configuration.xml.dto.TaskDto;
+import org.codesearch.commons.database.DBAccess;
+import org.codesearch.commons.plugins.PluginLoader;
 import org.codesearch.indexer.exceptions.TaskExecutionException;
 import org.codesearch.indexer.tasks.ClearTask;
 import org.codesearch.indexer.tasks.IndexingTask;
@@ -35,26 +39,39 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
 /**
- * An indexerJob stores one or more tasks and controls their execution
+ * Stores one or more tasks and controls their execution.
  * @author Stiboller Stephan
  * @author David Froehlich
  * @author Samuel Kogler
  */
-public class IndexerJob implements Job {
+public class IndexingJob implements Job {
+
     public static final String FIELD_TERMINATED = "terminated";
     public static final String FIELD_TASKS = "tasks";
     public static final String FIELD_TASKS_FINISHED = "tasks_finished";
     public static final String FIELD_ID = "id";
     public static final String FIELD_CURRENT_TYPE = "type";
     public static final String FIELD_CURRENT_REPOSITORY = "current_repository";
-
+    /** Instantiate a logger */
+    private static final Logger LOG = Logger.getLogger(IndexingJob.class);
     /** Indicates if the thread is terminated or not.
      * If flagged as terminated the job will not start the execution of the next task and terminate itself instead */
     private boolean terminated = false;
     /** List of TaskDtos assigned to this IndexingJob */
     private List<TaskDto> taskList = new LinkedList<TaskDto>();
-    /** Instantiate a logger */
-    private static final Logger LOG = Logger.getLogger(IndexerJob.class);
+    /** The config reader used to read the configuration */
+    private ConfigurationReader configReader;
+    /** The database access object */
+    private DBAccess dba;
+    /** The plugin loader. */
+    private PluginLoader pluginLoader;
+
+    @Inject
+    public IndexingJob(ConfigurationReader configReader, DBAccess dba, PluginLoader pluginLoader) {
+        this.configReader = configReader;
+        this.dba = dba;
+        this.pluginLoader = pluginLoader;
+    }
 
     /**
      * Executes all tasks from the taskList one after another
@@ -63,8 +80,8 @@ public class IndexerJob implements Job {
      */
     @Override
     public void execute(JobExecutionContext jec) throws JobExecutionException { //TODO refactor the task creation, there is no need for a TaskDto
-        LOG.info("Executing IndexerJob");
-        terminated = (Boolean) jec.getJobDetail().getJobDataMap().get(IndexerJob.FIELD_TERMINATED);
+        LOG.info("Executing IndexingJob");
+        terminated = (Boolean) jec.getJobDetail().getJobDataMap().get(FIELD_TERMINATED);
         taskList = (List<TaskDto>) (jec.getJobDetail().getJobDataMap().get(FIELD_TASKS));
         Task task = null;
         Date startDate = new Date();
@@ -76,21 +93,21 @@ public class IndexerJob implements Job {
                 }
                 switch (taskDto.getType()) {
                     case index: {
-                        jec.getJobDetail().getJobDataMap().put(IndexerJob.FIELD_CURRENT_TYPE, "index");
-                        task = new IndexingTask();
+                        jec.getJobDetail().getJobDataMap().put(FIELD_CURRENT_TYPE, "index");
+                        task = new IndexingTask(configReader, dba, pluginLoader);
                         break;
                     }
                     case clear: {
-                        jec.getJobDetail().getJobDataMap().put(IndexerJob.FIELD_CURRENT_TYPE, "clear");
-                        task = new ClearTask();
+                        jec.getJobDetail().getJobDataMap().put(FIELD_CURRENT_TYPE, "clear");
+                        task = new ClearTask(dba);
                         break;
                     }
                 }
-                jec.getJobDetail().getJobDataMap().put(IndexerJob.FIELD_CURRENT_REPOSITORY, taskDto.getRepository().getName());
+                jec.getJobDetail().getJobDataMap().put(FIELD_CURRENT_REPOSITORY, taskDto.getRepository().getName());
                 task.setRepository(taskDto.getRepository());
                 task.setCodeAnalysisEnabled(taskDto.isCodeAnalysisEnabled());
                 task.execute();
-                jec.getJobDetail().getJobDataMap().put(IndexerJob.FIELD_TASKS_FINISHED, i+1);
+                jec.getJobDetail().getJobDataMap().put(FIELD_TASKS_FINISHED, i + 1);
                 LOG.debug("Finished execution of job in " + (new Date().getTime() - startDate.getTime()) / 1000f + " seconds");
             } catch (TaskExecutionException ex) {
                 throw new JobExecutionException("Execution of Task number " + i + " threw an exception" + ex);
