@@ -32,6 +32,8 @@
     <db-name>codesearch</db-name>
     <db-max-connections>100</db-max-connections>
 
+    <searcher-location>http://127.0.0.1:8888/</searcher-location>
+
     <indexer-users>
         <indexer-user>
             <username>hannes</username>
@@ -49,10 +51,6 @@
         <filename>.*\.o</filename>
         <filename>.*\.bin</filename>
     </global-blacklist-filenames>
-
-    <global-whitelist-filenames>
-        <filename>.*java</filename>
-    </global-whitelist-filenames>
 
     <index-location>/tmp/test/</index-location>
     <index-jobs>
@@ -100,9 +98,6 @@
             <repository-groups>
                 <repo-group>group1</repo-group>
             </repository-groups>
-            <whitelist-filenames>
-                <filename>.*DBAccess.*</filename>
-            </whitelist-filenames>
              <blacklist-filenames>
                 <filename>.*\.o</filename>
                 <filename>.*\.pdf</filename>

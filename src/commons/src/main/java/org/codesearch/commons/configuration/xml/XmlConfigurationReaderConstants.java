@@ -1,3 +1,4 @@
+
 /**
  * Copyright 2010 David Froehlich   <david.froehlich@businesssoftware.at>,
  *                Samuel Kogler     <samuel.kogler@gmail.com>,
@@ -30,7 +31,7 @@ public final class XmlConfigurationReaderConstants {
     /** Private constructor so its  not instantiable. */
     private XmlConfigurationReaderConstants () {}
     //GLOBAL CONSTANTS
-
+    public static final String SEARCHER_LOCATION = "searcher-location";
     /** used to store the data of the users authorized to access the indexer via the web interface */
     public static final String INDEXER_USERS = "indexer-users.indexer-user";
     /** used to access the username of a indexing-user */

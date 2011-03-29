@@ -53,7 +53,7 @@ import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
 import org.codesearch.commons.plugins.vcs.VersionControlPluginException;
 import org.codesearch.commons.utils.mime.MimeTypeUtil;
 import org.codesearch.searcher.client.rpc.SearcherService;
-import org.codesearch.searcher.server.DocumentSearcher;
+import org.codesearch.searcher.server.DocumentSearcherImpl;
 import org.codesearch.searcher.server.InvalidIndexException;
 import org.codesearch.searcher.shared.FileDto;
 import org.codesearch.searcher.shared.SearcherServiceException;
@@ -72,7 +72,7 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
     /** The logger. */
     private static final Logger LOG = Logger.getLogger(SearcherServiceImpl.class);
     /** The document searcher used to search the index. */
-    private DocumentSearcher documentSearcher;
+    private DocumentSearcherImpl documentSearcher;
     private ConfigurationReader configurationReader;
     private PluginLoader pluginLoader;
     private DBAccess dba;
@@ -80,7 +80,7 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
     private List<String> repositoryGroups;
 
     @Inject
-    public SearcherServiceImpl(DocumentSearcher documentSearcher, ConfigurationReader configurationReader, PluginLoader pluginLoader, DBAccess dba) {
+    public SearcherServiceImpl(DocumentSearcherImpl documentSearcher, ConfigurationReader configurationReader, PluginLoader pluginLoader, DBAccess dba) {
         this.documentSearcher = documentSearcher;
         this.configurationReader = configurationReader;
         this.pluginLoader = pluginLoader;
@@ -100,6 +100,7 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
         List<SearchResultDto> resultItems = new LinkedList<SearchResultDto>();
         try {
             resultItems = documentSearcher.search(query, caseSensitive, selectedRepositories, selectedRepositoryGroups);
+            LOG.info(documentSearcher.getInitTime());
         } catch (ParseException ex) {
             throw new SearcherServiceException("Invalid search query: \n" + ex);
         } catch (IOException ex) {
@@ -222,7 +223,7 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
         return repositories;
     }
 
-    public void setDocumentSearcher(DocumentSearcher documentSearcher) {
+    public void setDocumentSearcher(DocumentSearcherImpl documentSearcher) {
         this.documentSearcher = documentSearcher;
     }
 

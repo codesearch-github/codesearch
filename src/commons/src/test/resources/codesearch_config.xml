@@ -32,6 +32,8 @@
     <db-name>codesearch</db-name>
     <db-max-connections>100</db-max-connections>
 
+    <searcher-location>http://127.0.0.1:8888/</searcher-location>
+
     <global-blacklist-filenames>
         <filename>*.jpg</filename>
         <filename>*img*</filename>
@@ -78,9 +80,6 @@
             <blacklist-filenames>
                 <filename>*generated*</filename>
             </blacklist-filenames>
-            <whitelist-filenames>
-                <filename>.*DBAccess.*</filename>
-            </whitelist-filenames>
             <code-navigation-enabled>true</code-navigation-enabled>
         </repository>
         <repository>

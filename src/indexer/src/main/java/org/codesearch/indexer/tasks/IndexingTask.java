@@ -24,6 +24,7 @@ import com.google.inject.Inject;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -47,6 +48,7 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.store.FSDirectory;
 import org.codesearch.commons.configuration.ConfigurationReader;
 import org.codesearch.commons.configuration.properties.PropertiesManager;
+import org.codesearch.commons.configuration.xml.XmlConfigurationReaderConstants;
 import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 import org.codesearch.commons.constants.IndexConstants;
 import org.codesearch.commons.database.DBAccess;
@@ -64,6 +66,7 @@ import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
 import org.codesearch.commons.plugins.vcs.VersionControlPluginException;
 import org.codesearch.commons.utils.mime.MimeTypeUtil;
 import org.codesearch.indexer.exceptions.InvalidIndexLocationException;
+import org.codesearch.indexer.exceptions.NotifySearcherException;
 import org.codesearch.indexer.exceptions.TaskExecutionException;
 
 /**
@@ -92,21 +95,16 @@ public class IndexingTask implements Task {
     private boolean codeAnalysisEnabled = false;
     /** the location of the lucene index */
     private String indexLocation = null;
-    
     /* Logger */
     private static final Logger LOG = Logger.getLogger(IndexingTask.class);
     /** the plugins that will be used to create the fields for each document */
     private List<LuceneFieldPlugin> luceneFields = new LinkedList<LuceneFieldPlugin>();
-
     /** The config reader used to read the configuration */
     private ConfigurationReader configReader;
-
     /** The database access object */
     private DBAccess dba;
-
     /** The plugin loader. */
     private PluginLoader pluginLoader;
-    
 
     @Inject
     public IndexingTask(ConfigurationReader configReader, DBAccess dba, PluginLoader pluginLoader) {
@@ -114,9 +112,6 @@ public class IndexingTask implements Task {
         this.dba = dba;
         this.pluginLoader = pluginLoader;
     }
-
-
-
 
     /**
      * executes the task,
@@ -149,6 +144,9 @@ public class IndexingTask implements Task {
             long duration = System.currentTimeMillis() - start;
             LOG.info("Lucene indexing took " + duration / 1000 + " seconds");
 
+            //notify the searcher about the update of the indexer
+            notifySearcher();
+
             if (codeAnalysisEnabled) {
                 LOG.info("Starting code analyzing");
                 start = System.currentTimeMillis();
@@ -164,7 +162,9 @@ public class IndexingTask implements Task {
                 duration = System.currentTimeMillis() - start;
                 LOG.info("Code analyzing took " + duration / 1000 + " seconds");
             }
-
+        } catch (NotifySearcherException ex) {
+            LOG.error("IndexingTask was not able to notify the searcher about the updated index, indexing process aborted\n"
+                    + "the searcher will still work, but changes in the index will not be recognized" + ex);
         } catch (InvalidIndexLocationException ex) {
             LOG.error("Error at indexing: " + ex);
         } catch (ConfigurationException ex) {
@@ -181,6 +181,20 @@ public class IndexingTask implements Task {
             LOG.error("IOException occured at indexing: " + ex);
         }
         LOG.info("Finished indexing of repository: " + repository.getName());
+    }
+
+    /**
+     * retrieves the location of the searcher from the configuration and sends a request, notifying it to re-initialize the searcher
+     * @throws NotifySearcherException in case the connection to the searcher could not be established
+     */
+    private void notifySearcher() throws NotifySearcherException {
+        try {
+            String searcherLocation = configReader.getValue(XmlConfigurationReaderConstants.SEARCHER_LOCATION) + "/updateIndexer"; //TODO move to a constant
+            URL url = new URL(searcherLocation);
+            url.openStream();
+        } catch (IOException ex) {
+            throw new NotifySearcherException();
+        }
     }
 
     /**
@@ -254,7 +268,7 @@ public class IndexingTask implements Task {
             return;
         }
         File dir = new File(indexLocation);
-        if(!(dir.exists() && dir.isDirectory() && dir.canWrite())) {
+        if (!(dir.exists() && dir.isDirectory() && dir.canWrite())) {
             throw new InvalidIndexLocationException("Cannot access index directory at: " + indexLocation);
         }
         indexDirectory = FSDirectory.open(dir);
@@ -396,7 +410,7 @@ public class IndexingTask implements Task {
                 }
             }
         }
-        //check if the filename matches one of the blacklist entries, if yes return true, so the file won't be indexed
+        //check if the filename matches one of the blacklist entries, if yes return false, so the file won't be indexed
         if (matchesElementOnWhitelist) {
             for (String currentBlacklistEntry : repository.getBlacklistEntries()) {
                 p = Pattern.compile(currentBlacklistEntry);

@@ -23,6 +23,10 @@ package org.codesearch.indexer.tasks;
 import org.codesearch.commons.configuration.ConfigurationReader;
 import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
 import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
+import org.codesearch.commons.database.ConnectionPool;
+import org.codesearch.commons.database.ConnectionPoolImpl;
+import org.codesearch.commons.database.DBAccess;
+import org.codesearch.commons.database.DBAccessImpl;
 import org.codesearch.commons.plugins.PluginLoader;
 import org.codesearch.commons.plugins.PluginLoaderImpl;
 import org.junit.Test;
@@ -46,28 +50,16 @@ public class IndexingTaskTest {
     @Test
     public void testExecuteLocal() throws Exception {
         ConfigurationReader configReader = new XmlConfigurationReader(null);
-
+        
         PluginLoader pl = new PluginLoaderImpl();
-        IndexingTask t = new IndexingTask(configReader, null, pl);
+        ConnectionPool cp = new ConnectionPoolImpl(configReader);
+        DBAccess dba = new DBAccessImpl(cp);
+        IndexingTask t = new IndexingTask(configReader, dba, pl);
         t.setIndexLocation("/tmp/test/");
         RepositoryDto repo = configReader.getRepositoryByName("svn_local");
         repo.setUrl(repo.getUrl().replace("$home", System.getProperty("user.home")));
         t.setRepository(repo);
         t.setCodeAnalysisEnabled(false);
-        t.execute();
-    }
-
-    @Test
-    public void testWithCodeAnalysis() throws Exception {
-        ConfigurationReader configReader = new XmlConfigurationReader(null);
-
-        PluginLoader pl = new PluginLoaderImpl();
-        IndexingTask t = new IndexingTask(configReader, null, pl);
-        t.setIndexLocation("/tmp/test/");
-        RepositoryDto repo = configReader.getRepositoryByName("svn_local");
-        repo.setUrl(repo.getUrl().replace("$home", System.getProperty("user.home")));
-        t.setRepository(repo);
-        t.setCodeAnalysisEnabled(true);
         t.execute();
     }
 }

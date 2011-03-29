@@ -38,11 +38,11 @@ import org.junit.Test;
  */
 public class DocumentSearcherTest {
 
-    private DocumentSearcher instance;
+    private DocumentSearcherImpl instance;
 
 
     public DocumentSearcherTest() {
-        instance = new DocumentSearcher(new XmlConfigurationReader(null));
+        instance = new DocumentSearcherImpl(new XmlConfigurationReader(null));
     }
 
     /**

@@ -31,7 +31,6 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import org.apache.log4j.Logger;
 import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
 import org.codesearch.commons.plugins.codeanalyzing.ast.ExternalUsage;
@@ -67,10 +66,10 @@ public class DBAccessImpl implements DBAccess {
     private static final String STMT_RESET_REPOSITORY_REVISIONS = "UPDATE repository SET last_analyzed_revision = '0'";
     private static final String STMT_PURGE_ALL_FILE_RECORDS = "DELETE FROM file";
     private static final String STMT_DELETE_FILE = "DELETE FROM file WHERE file_path = ? AND repository_id = (SELECT repository_id FROM repository where repository_name = ?)";
-    private ConnectionPoolImpl connectionPool;
+    private ConnectionPool connectionPool;
 
     @Inject
-    public DBAccessImpl(ConnectionPoolImpl connectionPool) {
+    public DBAccessImpl(ConnectionPool connectionPool) {
         this.connectionPool = connectionPool;
     }
 
