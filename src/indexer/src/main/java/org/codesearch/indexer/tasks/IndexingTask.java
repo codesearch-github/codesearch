@@ -124,7 +124,7 @@ public class IndexingTask implements Task {
             LOG.info("Starting indexing of repository: " + repository.getName());
             long start = System.currentTimeMillis();
             // Read the index status file
-            propertiesManager = new PropertiesManager(indexLocation + "revisions.properties");//FIXME
+            propertiesManager = new PropertiesManager(indexLocation + IndexConstants.REVISIONS_PROPERTY_FILENAME);
             String lastIndexedRevision = propertiesManager.getPropertyFileValue(repository.getName());
             LOG.info("Last indexed revision is: " + lastIndexedRevision);
             // Get the version control plugins

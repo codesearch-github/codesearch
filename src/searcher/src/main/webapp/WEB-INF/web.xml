@@ -31,9 +31,11 @@
             30
         </session-timeout>
     </session-config>
+    
     <display-name>Codesearch Searcher</display-name>
+    
     <welcome-file-list>
-        <welcome-file>Searcher.html</welcome-file>
+        <welcome-file>index.html</welcome-file>
     </welcome-file-list>
     <!-- SERVLETS -->
 

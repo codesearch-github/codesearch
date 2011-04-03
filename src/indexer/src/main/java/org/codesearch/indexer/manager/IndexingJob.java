@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.codesearch.commons.configuration.ConfigurationReader;
+import org.codesearch.commons.configuration.xml.XmlConfigurationReaderConstants;
 import org.codesearch.commons.configuration.xml.dto.TaskDto;
 import org.codesearch.commons.database.DBAccess;
 import org.codesearch.commons.plugins.PluginLoader;
@@ -80,7 +81,7 @@ public class IndexingJob implements Job {
      */
     @Override
     public void execute(JobExecutionContext jec) throws JobExecutionException { //TODO refactor the task creation, there is no need for a TaskDto
-        LOG.info("Executing IndexingJob");
+        LOG.info("Executing IndexingJob " + jec.getJobDetail().getName());
         terminated = (Boolean) jec.getJobDetail().getJobDataMap().get(FIELD_TERMINATED);
         taskList = (List<TaskDto>) (jec.getJobDetail().getJobDataMap().get(FIELD_TASKS));
         Task task = null;
@@ -106,12 +107,14 @@ public class IndexingJob implements Job {
                 jec.getJobDetail().getJobDataMap().put(FIELD_CURRENT_REPOSITORY, taskDto.getRepository().getName());
                 task.setRepository(taskDto.getRepository());
                 task.setCodeAnalysisEnabled(taskDto.isCodeAnalysisEnabled());
+                task.setIndexLocation(configReader.getValue(XmlConfigurationReaderConstants.INDEX_LOCATION));
                 task.execute();
                 jec.getJobDetail().getJobDataMap().put(FIELD_TASKS_FINISHED, i + 1);
-                LOG.debug("Finished execution of job in " + (new Date().getTime() - startDate.getTime()) / 1000f + " seconds");
             } catch (TaskExecutionException ex) {
                 throw new JobExecutionException("Execution of Task number " + i + " threw an exception" + ex);
             }
         }
+        LOG.debug("Finished execution of job in " + (new Date().getTime() - startDate.getTime()) / 1000f + " seconds");
+        LOG.info("Finished executing IndexingJob " + jec.getJobDetail().getName());
     }
 }

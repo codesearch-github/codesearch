@@ -78,6 +78,12 @@
                 <version>${lucene.version}</version>
             </dependency>
             
+            <dependency>
+                <groupId>org.apache.lucene</groupId>
+                <artifactId>lucene-analyzers</artifactId>
+                <version>${lucene.version}</version>
+            </dependency>
+            
             <!-- QUARTZ SCHEDULING -->
             <dependency>
                 <groupId>org.quartz-scheduler</groupId>
@@ -107,6 +113,12 @@
                 <groupId>jmimemagic</groupId>
                 <artifactId>jmimemagic</artifactId>
                 <version>0.1.2</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.sun.xml.ws</groupId>
+                <artifactId>webservices-rt</artifactId>
+                <version>1.4</version>
             </dependency>
 
             <!-- TEST DEPENDENCIES -->

@@ -85,11 +85,9 @@ public final class XmlConfigurationReaderConstants {
     //JOB CONSTANTS
     /** Used to access a single job */
     public static final String JOB = "job";
-    /** Used to retrieve the interval value of the task*/
-    public static final String JOB_INTERVAL = "interval";
-    /** Used to retrieve the start date of the task */
-    public static final String JOB_START_DATE = "start";
-    /** Used to retrieve the repositories of the task */
+    /** Used to retrieve the cron expression of a job. */
+    public static final String JOB_CRON_EXPRESSION = "cron-expression";
+    /** Used to retrieve the repositories of a job. */
     public static final String JOB_REPOSITORY = "repositories";
 
     //DATABASE CONSTANTS

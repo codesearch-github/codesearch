@@ -32,18 +32,7 @@
     <db-name>codesearch</db-name>
     <db-max-connections>100</db-max-connections>
 
-    <searcher-location>http://127.0.0.1:8888/</searcher-location>
-
-    <indexer-users>
-        <indexer-user>
-            <username>hannes</username>
-            <password>dota!123</password>
-        </indexer-user>
-        <indexer-user>
-            <username>guenther</username>
-            <password>dota!123</password>
-        </indexer-user>
-    </indexer-users>
+    <searcher-location>http://127.0.0.1:8080/codesearch/searcher/</searcher-location>
 
     <global-blacklist-filenames>
         <filename>.*\.svn.*</filename>
@@ -53,24 +42,21 @@
     </global-blacklist-filenames>
 
     <index-location>/tmp/test/</index-location>
+    
     <index-jobs>
-       <index-job>
+        <index-job>
+            <repositories>svn_local</repositories>
+            <cron-expression>0 * * * * ?</cron-expression>
             <tasks>
                 <task>
                     <type>clear</type>
                 </task>
-            </tasks>			
-        </index-job>
-        <index-job>
-            <repositories>svnsearch_repo</repositories>
-            <tasks>
                 <task>
                     <type>index</type>
                 </task>
             </tasks>
-        </index-job> 
+        </index-job>
     </index-jobs>
-    <testproperty>fdsa</testproperty>
     
     <repository-groups>group1 group2</repository-groups>
 
@@ -98,7 +84,7 @@
             <repository-groups>
                 <repo-group>group1</repo-group>
             </repository-groups>
-             <blacklist-filenames>
+            <blacklist-filenames>
                 <filename>.*\.o</filename>
                 <filename>.*\.pdf</filename>
                 <filename>.*\.bin</filename>

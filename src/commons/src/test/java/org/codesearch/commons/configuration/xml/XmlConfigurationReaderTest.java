@@ -43,8 +43,7 @@ public class XmlConfigurationReaderTest {
     }
 
     @Before
-    public void setUp()
-    {
+    public void setUp() {
         configReader = new XmlConfigurationReader("");
     }
 
@@ -70,7 +69,7 @@ public class XmlConfigurationReaderTest {
         ignFileNames2.add("*generated*");
         ignFileNames2.add("*.svn*");
         ignFileNames2.add("*.class*");
-        RepositoryDto repo2 = new RepositoryDto("svn_local", System.getProperty("user.home")+"/workspace/svnsearch", "null", "null", true, "FILESYSTEM", ignFileNames2, new LinkedList<String>(), repoGroups2);
+        RepositoryDto repo2 = new RepositoryDto("svn_local", System.getProperty("user.home") + "/workspace/svnsearch", "null", "null", true, "FILESYSTEM", ignFileNames2, new LinkedList<String>(), repoGroups2);
 
         List result = configReader.getRepositories();
         assertTrue(repo1.equals(result.get(0)));
@@ -99,11 +98,12 @@ public class XmlConfigurationReaderTest {
         ignFileNames1.add("*.class*");
 
         RepositoryDto repo1 = new RepositoryDto("svnsearch_repo", "http://portal.htl-kaindorf.at/svnsearch", "feldruebe", "dota!123", true, "SVN", ignFileNames1, new LinkedList<String>(), repoGroups1);
-  
+
+        System.out.println(repo1.getBlacklistEntries());
+
         JobDto job1 = new JobDto();
+        job1.setCronExpression("*/10 * * * *");
         job1.getTasks().add(new TaskDto(repo1, TaskDto.TaskType.index, true));
-        job1.setInterval(60);
-        job1.setStartDate(new GregorianCalendar(2010, 8, 13, 18, 0));
 
         List<JobDto> result = configReader.getJobs();
         assert (result.get(0).equals(job1));

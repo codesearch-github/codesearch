@@ -37,17 +37,17 @@
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-spellchecker</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-analyzers</artifactId>
-            <version>3.0.2</version>
         </dependency>
 
-        <dependency>
+        <!--dependency>
             <groupId>xerces</groupId>
             <artifactId>xercesImpl</artifactId>
             <version>2.9.1</version>
-        </dependency>
+        </dependency-->
 
         <dependency>
             <groupId>com.google.gwt</groupId>
@@ -75,6 +75,13 @@
         </dependency>
 
         <dependency>
+            <groupId>com.sun.xml.ws</groupId>
+            <artifactId>webservices-rt</artifactId>
+        </dependency>
+
+        <!-- INTERNAL DEPENDENCIES -->
+
+        <dependency>
             <groupId>org.codesearch</groupId>
             <artifactId>DefaultHighlightingPlugin</artifactId>
             <version>0.1-SNAPSHOT</version>
@@ -85,12 +92,7 @@
             <artifactId>commons</artifactId>
             <version>0.1-SNAPSHOT</version>
         </dependency>
-        <dependency>
-            <groupId>com.sun.xml.ws</groupId>
-            <artifactId>webservices-rt</artifactId>
-            <version>1.4</version>
-            <scope>compile</scope>
-        </dependency>
+        
     </dependencies>
 
     <build>
@@ -117,7 +119,7 @@
                 </executions>
                 <configuration>
                     <gwtVersion>${gwt.version}</gwtVersion>
-                    <runTarget>/Searcher.html</runTarget>
+                    <runTarget>/index.html</runTarget>
                     <hostedWebapp>${project.build.directory}/${project.build.finalName}</hostedWebapp>
                     <modules>
                         <module>${project.groupId}.${project.artifactId}.Searcher</module>

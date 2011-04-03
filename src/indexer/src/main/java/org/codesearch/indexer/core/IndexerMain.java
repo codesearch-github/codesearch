@@ -23,6 +23,7 @@ package org.codesearch.indexer.core;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
+import java.util.logging.Level;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
@@ -55,7 +56,7 @@ public class IndexerMain implements ServletContextListener {
 
         try {
             indexingManager = injector.getInstance(IndexingManager.class);
-            indexingManager.startScheduler();
+            indexingManager.start();
         } catch (SchedulerException ex) {
             LOG.error("Problem with scheduler at context initialization: " + ex);
         } catch (ConfigurationException ex) {
@@ -63,9 +64,13 @@ public class IndexerMain implements ServletContextListener {
         }
     }
 
-
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
         sce.getServletContext().removeAttribute(INJECTOR_KEY);
+        try {
+            indexingManager.stop();
+        } catch (SchedulerException ex) {
+            LOG.error("Could not stop the scheduler:\n" + ex);
+        }
     }
 }

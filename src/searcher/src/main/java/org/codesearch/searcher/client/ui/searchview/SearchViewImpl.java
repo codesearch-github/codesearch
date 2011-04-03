@@ -57,6 +57,12 @@ import com.google.gwt.view.client.SelectionChangeEvent;
  */
 public class SearchViewImpl extends Composite implements SearchView {
 
+    // CONSTANTS
+    private static final int PAGE_SIZE = 200;
+    private static final String RELEVANCE_TITLE = "Relevance";
+    private static final String PATH_TITLE = "Path";
+    private static final String REPOSITORY_TITLE = "Repository";
+
     // UIBINDER STUFF
     @UiTemplate("SearchView.ui.xml")
     interface SearchViewUiBinder extends UiBinder<Widget, SearchViewImpl> {
@@ -68,7 +74,7 @@ public class SearchViewImpl extends Composite implements SearchView {
     CellTable<SearchResultDto> resultTable;
     @UiField(provided = true)
     SimplePager resultTablePager;
-    private String currentQuery;
+
     // OTHER UI ELEMENTS
     @UiField
     TextBox searchBox;
@@ -84,6 +90,7 @@ public class SearchViewImpl extends Composite implements SearchView {
     FlowPanel resultView;
     @UiField
     HasValue<Boolean> caseSensitive;
+    
     private Presenter presenter;
 
     public SearchViewImpl() {
@@ -97,7 +104,6 @@ public class SearchViewImpl extends Composite implements SearchView {
     @UiHandler("searchButton")
     void onSearchButton(ClickEvent e) {
         presenter.doSearch();
-        currentQuery = searchBox.getValue();
     }
 
     @UiHandler("searchBox")
@@ -183,7 +189,7 @@ public class SearchViewImpl extends Composite implements SearchView {
     }
 
     private void initResultTable() {
-        resultTable = new CellTable<SearchResultDto>(200);
+        resultTable = new CellTable<SearchResultDto>(PAGE_SIZE);
         resultTable.addColumn(new TextColumn<SearchResultDto>() {
 
             /** {@inheritDoc} */
@@ -191,7 +197,7 @@ public class SearchViewImpl extends Composite implements SearchView {
             public String getValue(SearchResultDto dto) {
                 return String.valueOf(dto.getRelevance());
             }
-        }, "Relevance");
+        }, RELEVANCE_TITLE);
 
         resultTable.addColumn(new TextColumn<SearchResultDto>() {
 
@@ -200,7 +206,7 @@ public class SearchViewImpl extends Composite implements SearchView {
             public String getValue(SearchResultDto object) {
                 return object.getFilePath();
             }
-        }, "Path");
+        }, PATH_TITLE);
         resultTable.addColumn(new TextColumn<SearchResultDto>() {
 
             /** {@inheritDoc} */
@@ -208,7 +214,7 @@ public class SearchViewImpl extends Composite implements SearchView {
             public String getValue(SearchResultDto dto) {
                 return dto.getRepository();
             }
-        }, "Repository");
+        }, REPOSITORY_TITLE);
 
         final NoSelectionModel<SearchResultDto> selectionModel = new NoSelectionModel<SearchResultDto>();
         resultTable.setSelectionModel(selectionModel);
@@ -219,10 +225,11 @@ public class SearchViewImpl extends Composite implements SearchView {
             public void onSelectionChange(SelectionChangeEvent event) {
                 SearchResultDto selected = selectionModel.getLastSelectedObject();
                 if (selected != null) {
-                    presenter.goTo(new FilePlace(selected.getRepository(), selected.getFilePath(), currentQuery));
+                    presenter.goTo(new FilePlace(selected.getRepository(), selected.getFilePath(), searchBox.getValue()));
                 }
             }
         });
+
         // Create a pager to control the table.
         SimplePager.Resources pagerResources = GWT.create(SimplePager.Resources.class);
         resultTablePager = new SimplePager(TextLocation.CENTER, pagerResources, false, 0, true);

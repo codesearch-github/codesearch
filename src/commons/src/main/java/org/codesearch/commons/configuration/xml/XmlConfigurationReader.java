@@ -24,8 +24,6 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import org.codesearch.commons.configuration.ConfigurationReader;
 import java.util.Arrays;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -98,25 +96,15 @@ public class XmlConfigurationReader implements ConfigurationReader {
             //reads job specific values and adds them to the JobDto
             try {
                 JobDto job = new JobDto();
-                int interval;
+                String cronExpression;
                 try {
-                    interval = hc.getInt(XmlConfigurationReaderConstants.JOB_INTERVAL);
+                    cronExpression = hc.getString(XmlConfigurationReaderConstants.JOB_CRON_EXPRESSION);
                 } catch (NoSuchElementException ex) {
                     //in case no interval was specified the job is set to execute only once
-                    interval = 0;
+                    cronExpression = "";
                 }
-                //The start time is stored as a single string seperated by '-' e.g.: YYYY-MM-DD-HH-MM
-                String timeString = hc.getString(XmlConfigurationReaderConstants.JOB_START_DATE);
-                Calendar calc;
-                if (timeString == null) {
-                    calc = GregorianCalendar.getInstance();
-                } else {
-                    String[] timeParts = timeString.split("-");
-                    calc = new GregorianCalendar(Integer.parseInt(timeParts[0]), Integer.parseInt(timeParts[1]) - 1,
-                            Integer.parseInt(timeParts[2]), Integer.parseInt(timeParts[3]), Integer.parseInt(timeParts[4]));
-                }
-                job.setInterval(interval);
-                job.setStartDate(calc);
+
+                job.setCronExpression(cronExpression);
 
                 String repositoryString = hc.getString(XmlConfigurationReaderConstants.JOB_REPOSITORY);
                 //The list of repositories this job is associated with, each task specified in the configuration is created for each of these repositories

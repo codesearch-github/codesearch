@@ -20,46 +20,23 @@
  */
 package org.codesearch.commons.configuration.xml.dto;
 
-import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
+import org.apache.commons.collections.CollectionUtils;
 
 /**
- * DTO storing the information about a single IndexingJob
+ * Represents an Indexing Job.
  * @author David Froehlich
  */
 public class JobDto {
 
     /** A list of all tasks that will be executed in this job */
     private List<TaskDto> tasks;
-    /** The original start date for the job, the job will be executed whenever the start date + an arbitrary count of the interval matches the current time
-     * for instance startDate is 2010-11-11 (a Saturday) at 6:00 pm, and the interval is 10080 (minutes per week), then the job will be executed every saturday at 6:00 pm
-     * if the startDate is 2010-10-13 at 8:00 am and the interval is 60, then the job will be executed every full hour*/
-    private Calendar startDate;
-    /** The interval in which the job will be executed in minutes */
-    private int interval;
+    /** The cron expression for the job. */
+    private String cronExpression;
 
-    /**
-     * Creates a new instance of JobDto
-     */
     public JobDto() {
         tasks = new LinkedList<TaskDto>();
-    }
-
-    public int getInterval() {
-        return interval;
-    }
-
-    public void setInterval(int interval) {
-        this.interval = interval;
-    }
-
-    public Calendar getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(Calendar startDate) {
-        this.startDate = startDate;
     }
 
     public List<TaskDto> getTasks() {
@@ -70,34 +47,48 @@ public class JobDto {
         this.tasks = tasks;
     }
 
-    /**
-     * Checks whether this job has the same values as the one given as a parameter
-     * @param o the JobDto to check
-     * @return true if the JobDtos have the same values
-     */
+    public String getCronExpression() {
+        return cronExpression;
+    }
+
+    public void setCronExpression(String cronExpression) {
+        this.cronExpression = cronExpression;
+    }
+
+    /** {@inheritDoc} */
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof JobDto)) {
             return false;
         }
+
         JobDto other = (JobDto) o;
-        if (other.getInterval() != this.interval) {
-            return false;
-        }
 
-        if (other.getStartDate().getTimeInMillis() != this.startDate.getTimeInMillis()) {
-            return false;
-        }
-
-        if (other.getTasks().size() != this.tasks.size()) {
-            return false;
-        }
-        for (int i = 0; i < this.tasks.size(); i++) {
-            TaskDto task = this.tasks.get(i);
-            if (!task.equals(other.getTasks().get(i))) {
+        if (cronExpression != null) {
+            if (!cronExpression.equals(other.getCronExpression())) {
                 return false;
             }
         }
+
+        if (tasks.size() == other.getTasks().size()) {
+            for (int i = 0; i < tasks.size(); i++) {
+                if (!tasks.get(i).equals(other.getTasks().get(i))) {
+                    return false;
+                }
+            }
+        } else {
+            return false;
+        }
+
         return true;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 13 * hash + (this.tasks != null ? this.tasks.hashCode() : 0);
+        hash = 13 * hash + (this.cronExpression != null ? this.cronExpression.hashCode() : 0);
+        return hash;
     }
 }

@@ -44,8 +44,7 @@
     <index-jobs>
         <index-job>
             <repositories>svnsearch_repo</repositories>
-            <interval>60</interval>
-            <start>2010-8-13-18-0</start>
+            <cron-expression>*/10 * * * * ?</cron-expression>
             <tasks>
                 <task>
                     <type>index</type>

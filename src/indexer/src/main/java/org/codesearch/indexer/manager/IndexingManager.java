@@ -21,7 +21,7 @@
 package org.codesearch.indexer.manager;
 
 import com.google.inject.Inject;
-import com.google.inject.Injector;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -31,6 +31,7 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
 import org.codesearch.commons.configuration.ConfigurationReader;
 import org.codesearch.commons.configuration.xml.dto.JobDto;
+import org.quartz.CronTrigger;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
@@ -38,8 +39,6 @@ import org.quartz.JobExecutionException;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SchedulerFactory;
-import org.quartz.SimpleTrigger;
-import org.quartz.Trigger;
 import org.quartz.spi.JobFactory;
 
 /**
@@ -51,6 +50,7 @@ public final class IndexingManager {
 
     /** Instantiate a logger */
     private static final Logger LOG = Logger.getLogger(IndexingManager.class);
+    private static final String INDEXING_JOB_GROUP_NAME = "INDEXING_JOBS";
     /** The scheduler used to schedule the IndexingJobss */
     private Scheduler scheduler;
     /** The configurated jobs. */
@@ -70,10 +70,10 @@ public final class IndexingManager {
     public Map<Integer, IndexingJobDto> getCurrentStatus() throws SchedulerException {
         Map<Integer, IndexingJobDto> current_jobs = new HashMap<Integer, IndexingJobDto>();
         List<JobExecutionContext> currentlyExecutedJobs = (List<JobExecutionContext>) scheduler.getCurrentlyExecutingJobs();
-        for(JobExecutionContext currentJob : currentlyExecutedJobs) {
+        for (JobExecutionContext currentJob : currentlyExecutedJobs) {
             int index = Integer.parseInt(currentJob.getJobDetail().getJobDataMap().getString(IndexingJob.FIELD_ID));
             int tasksFinished = currentJob.getJobDetail().getJobDataMap().getInt(IndexingJob.FIELD_TASKS_FINISHED);
-            int tasksTotal = ((List)currentJob.getJobDetail().getJobDataMap().get(IndexingJob.FIELD_TASKS)).size();
+            int tasksTotal = ((List) currentJob.getJobDetail().getJobDataMap().get(IndexingJob.FIELD_TASKS)).size();
             Date timeStarted = currentJob.getFireTime();
             String type = currentJob.getJobDetail().getJobDataMap().getString(IndexingJob.FIELD_CURRENT_TYPE);
             String currentlyAccessedRepository = currentJob.getJobDetail().getJobDataMap().getString(IndexingJob.FIELD_CURRENT_REPOSITORY);
@@ -88,32 +88,37 @@ public final class IndexingManager {
      * @throws SchedulerException if a job could not be added to the scheduler or if it could not be started
      * @throws ConfigurationException if the configuration could not be read
      */
-    public void startScheduler() throws SchedulerException, ConfigurationException {
-        LOG.debug("Starting scheduler");
+    public void start() throws SchedulerException, ConfigurationException {
         int i = 0;
         LOG.info("Starting scheduler with " + jobs.size() + " jobs");
 
         for (JobDto job : jobs) {
-            JobDetail jobDetail = new JobDetail("Job" + i, "IndexingJobs", IndexingJob.class);
-            jobDetail.getJobDataMap().put("tasks", job.getTasks());
-            jobDetail.getJobDataMap().put("id", i);
+            JobDetail jobDetail = new JobDetail("Job" + i, INDEXING_JOB_GROUP_NAME, IndexingJob.class);
+            jobDetail.getJobDataMap().put(IndexingJob.FIELD_TASKS, job.getTasks());
+            jobDetail.getJobDataMap().put(IndexingJob.FIELD_ID, i);
+            jobDetail.getJobDataMap().put(IndexingJob.FIELD_TERMINATED, false);
 
-            jobDetail.getJobDataMap().put("terminated", false);
-
-            Trigger trigger;
-            if (job.getInterval() == 0) {
-                LOG.info("setting job for single execution");
-                trigger = new SimpleTrigger("JobTrigger" + i, new Date(job.getStartDate().getTimeInMillis()), null, 0, 0);
-            } else {
-                trigger = new SimpleTrigger("JobTrigger" + i, new Date(job.getStartDate().getTimeInMillis()), null, SimpleTrigger.REPEAT_INDEFINITELY, job.getInterval() * 60000l);
+            try {
+                CronTrigger trigger = new CronTrigger("JobTrigger" + i);
+                trigger.setCronExpression(job.getCronExpression());
+                scheduler.scheduleJob(jobDetail, trigger);
+            } catch (ParseException ex) {
+                LOG.error("Indexing job " + i + " was configured with invalid cron expression:\n" + ex);
             }
-            scheduler.scheduleJob(jobDetail, trigger);
+
             i++;
         }
         scheduler.start();
     }
 
-     /**
+    /**
+     * Stops the scheduler.
+     */
+    public void stop() throws SchedulerException {
+        scheduler.shutdown();
+    }
+
+    /**
      * Flags the job as terminated which causes it to stop after the execution of the current task or throws a JobExecutionException if the task could not be found
      * @param i the id of the job that is to be terminated
      * @throws SchedulerException if there is no job found with the id or if the jobs could not be read from the scheduler

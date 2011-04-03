@@ -19,7 +19,5 @@ public class IndexerGuiceModule extends AbstractModule {
         bind(SchedulerFactory.class).to(StdSchedulerFactory.class).in(Singleton.class);
         bind(JobFactory.class).to(QuartzGuiceJobFactory.class).in(Singleton.class);
         bind(IndexingManager.class).in(Singleton.class);
-        
     }
-
 }

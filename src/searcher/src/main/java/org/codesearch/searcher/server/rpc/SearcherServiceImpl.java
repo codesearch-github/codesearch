@@ -26,7 +26,6 @@ import com.google.inject.Singleton;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Level;
 
 import net.sf.jmimemagic.Magic;
 import net.sf.jmimemagic.MagicException;
