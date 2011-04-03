@@ -132,15 +132,16 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
      * @param originFilePath the filePath of the file that holds the usage
      * @throws DatabaseAccessException
      */
+    @Deprecated
     public void parseLineNumberAndFileNameOfUsage(ExternalVariableOrEnumValueUsage usage, String repository, List<String> fileImports, String originFilePath) throws DatabaseAccessException, DatabaseEntryNotFoundException {
-        String className = usage.getTargetClassName();
-        String targetFilePath = getFilePathOfDeclaration(repository, fileImports, className);
-        usage.setTargetFilePath(targetFilePath);
-        if (targetFilePath == null) {
-            return;
-        }
-        AstNode currentFileNode = DBAccess.getBinaryIndexForFile(targetFilePath, repository);
-        checkChildNodesForVariable(currentFileNode, usage);
+//        String className = usage.getTargetClassName();
+//        String targetFilePath = getFilePathOfDeclaration(repository, fileImports, className);
+//        usage.setTargetFilePath(targetFilePath);
+//        if (targetFilePath == null) {
+//            return;
+//        }
+//        AstNode currentFileNode = DBAccess.getBinaryIndexForFile(targetFilePath, repository);
+//        checkChildNodesForVariable(currentFileNode, usage);
     }
 
 
@@ -150,6 +151,7 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
      * @param node
      * @param usage
      */
+    @Deprecated
     private void checkChildNodesForVariable(AstNode node, ExternalVariableOrEnumValueUsage usage) {
         for (AstNode currentNode : node.getChildNodes()) {
             if (currentNode instanceof VariableNode) {
@@ -171,40 +173,41 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
      * @param originFilePath the filePath of the file that holds the usage
      * @throws DatabaseAccessException
      */
+    @Deprecated
     public void parseLineNumberAndFileNameOfUsage(ExternalMethodUsage usage, String repository, List<String> fileImports, String originFilePath) throws DatabaseAccessException, DatabaseEntryNotFoundException {
-        String className = usage.getTargetClassName();
-        String targetFilePath = getFilePathOfDeclaration(repository, fileImports, className);
-        usage.setTargetFilePath(targetFilePath);
-        if (targetFilePath == null) {
-            return;
-        }
-        AstNode currentFileNode = DBAccess.getBinaryIndexForFile(originFilePath, repository);
-        MethodNode bestMatch = null;
-        int paramCount = usage.getParameters().size();
-        outer:
-        for (AstNode currentNode : currentFileNode.getChildNodes()) {
-            if (currentNode instanceof MethodNode) {
-                MethodNode currentMethodNode = (MethodNode) currentNode;
-                if (currentNode.getName().equals(usage.getReplacedString()) && currentMethodNode.getParameters().size() == usage.getParameters().size()) {
-                    if (bestMatch == null) {
-                        bestMatch = currentMethodNode;
-                    } else {
-                        for (int i = 0; i < paramCount; i++) {
-                            String givenParam = usage.getParameters().get(i);
-                            String currentNodeParam = currentMethodNode.getParameters().get(i).getType();
-                            if (!givenParam.equals(currentNodeParam)) {
-                                continue outer;
-                            }
-                        }
-                        bestMatch = currentMethodNode;
-                    }
-                }
-            }
-        }
-        if (bestMatch != null) {
-            usage.setReferenceLine(bestMatch.getStartLine());
-        }
-        return;
+//        String className = usage.getTargetClassName();
+//        String targetFilePath = getFilePathOfDeclaration(repository, fileImports, className);
+//        usage.setTargetFilePath(targetFilePath);
+//        if (targetFilePath == null) {
+//            return;
+//        }
+//        AstNode currentFileNode = DBAccess.getBinaryIndexForFile(originFilePath, repository);
+//        MethodNode bestMatch = null;
+//        int paramCount = usage.getParameters().size();
+//        outer:
+//        for (AstNode currentNode : currentFileNode.getChildNodes()) {
+//            if (currentNode instanceof MethodNode) {
+//                MethodNode currentMethodNode = (MethodNode) currentNode;
+//                if (currentNode.getName().equals(usage.getReplacedString()) && currentMethodNode.getParameters().size() == usage.getParameters().size()) {
+//                    if (bestMatch == null) {
+//                        bestMatch = currentMethodNode;
+//                    } else {
+//                        for (int i = 0; i < paramCount; i++) {
+//                            String givenParam = usage.getParameters().get(i);
+//                            String currentNodeParam = currentMethodNode.getParameters().get(i).getType();
+//                            if (!givenParam.equals(currentNodeParam)) {
+//                                continue outer;
+//                            }
+//                        }
+//                        bestMatch = currentMethodNode;
+//                    }
+//                }
+//            }
+//        }
+//        if (bestMatch != null) {
+//            usage.setReferenceLine(bestMatch.getStartLine());
+//        }
+//        return;
     }
 
     /**
@@ -215,25 +218,27 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
      * @return the path of the file holding the declaration
      * @throws DatabaseAccessException
      */
+    @Deprecated
     private String getFilePathOfDeclaration(String repository, List<String> fileImports, String className) throws DatabaseAccessException {
-        String targetFilePath;
-        List<String> asteriskImports = new LinkedList<String>();
-        boolean importMatch = false;
-        for (String currentImport : fileImports) {
-            if (currentImport.endsWith("." + className)) {
-                className = currentImport;
-                importMatch = true;
-            } else if (currentImport.endsWith("*")) {
-                asteriskImports.add(currentImport);
-            }
-        }
-        if (!importMatch) {
-            targetFilePath = DBAccess.getFilePathForTypeDeclaration(className, repository, asteriskImports);
-        } else {
-            targetFilePath = DBAccess.getFilePathForTypeDeclaration(className, repository);
-        }
+//        String targetFilePath;
+//        List<String> asteriskImports = new LinkedList<String>();
+//        boolean importMatch = false;
+//        for (String currentImport : fileImports) {
+//            if (currentImport.endsWith("." + className)) {
+//                className = currentImport;
+//                importMatch = true;
+//            } else if (currentImport.endsWith("*")) {
+//                asteriskImports.add(currentImport);
+//            }
+//        }
+//        if (!importMatch) {
+//            targetFilePath = DBAccess.getFilePathForTypeDeclaration(className, repository, asteriskImports);
+//        } else {
+//            targetFilePath = DBAccess.getFilePathForTypeDeclaration(className, repository);
+//        }
+//      return targetFilePath;
 
-        return targetFilePath;
+        return null;
     }
 
     /** {@inheritDoc} */

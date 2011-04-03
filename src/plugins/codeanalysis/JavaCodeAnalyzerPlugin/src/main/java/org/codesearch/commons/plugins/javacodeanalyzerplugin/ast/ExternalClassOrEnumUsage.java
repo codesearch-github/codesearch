@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.codesearch.commons.database.DBAccess;
 import org.codesearch.commons.database.DatabaseAccessException;
+import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
 import org.codesearch.commons.plugins.codeanalyzing.ast.ExternalUsage;
 import org.codesearch.commons.plugins.javacodeanalyzerplugin.JavaCodeAnalyzerPlugin;
 
@@ -40,9 +41,8 @@ public class ExternalClassOrEnumUsage extends ExternalUsage {
 
     /** {@inheritDoc} */
     @Override
-    public void resolveLink(String originFilePath, String repository) throws DatabaseAccessException{
-        JavaCodeAnalyzerPlugin plugin = new JavaCodeAnalyzerPlugin();
-        List<String> imports = DBAccess.getImportsForFile(originFilePath, repository);
-        plugin.parseLineNumberAndFileNameOfUsage(this, repository, imports, originFilePath);
+    public void resolveLink(String targetFilePath, AstNode ast) {
+        super.setTargetFilePath(targetFilePath);
+        super.setReferenceLine(-1);
     }
 }

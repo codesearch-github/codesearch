@@ -144,9 +144,7 @@ public class IndexingTask implements Task {
             long duration = System.currentTimeMillis() - start;
             LOG.info("Lucene indexing took " + duration / 1000 + " seconds");
 
-            //notify the searcher about the update of the indexer
-            notifySearcher();
-
+            
             if (codeAnalysisEnabled) {
                 LOG.info("Starting code analyzing");
                 start = System.currentTimeMillis();
@@ -162,6 +160,9 @@ public class IndexingTask implements Task {
                 duration = System.currentTimeMillis() - start;
                 LOG.info("Code analyzing took " + duration / 1000 + " seconds");
             }
+            //notify the searcher about the update of the indexer
+            notifySearcher();
+
         } catch (NotifySearcherException ex) {
             LOG.error("IndexingTask was not able to notify the searcher about the updated index, indexing process aborted\n"
                     + "the searcher will still work, but changes in the index will not be recognized" + ex);
@@ -189,11 +190,11 @@ public class IndexingTask implements Task {
      */
     private void notifySearcher() throws NotifySearcherException {
         try {
-            String searcherLocation = configReader.getValue(XmlConfigurationReaderConstants.SEARCHER_LOCATION) + "/updateIndexer"; //TODO move to a constant
+            String searcherLocation = configReader.getValue(XmlConfigurationReaderConstants.SEARCHER_LOCATION) + "updateIndexer"; //TODO move to a constant
             URL url = new URL(searcherLocation);
             url.openStream();
         } catch (IOException ex) {
-            throw new NotifySearcherException();
+            throw new NotifySearcherException(ex.toString());
         }
     }
 

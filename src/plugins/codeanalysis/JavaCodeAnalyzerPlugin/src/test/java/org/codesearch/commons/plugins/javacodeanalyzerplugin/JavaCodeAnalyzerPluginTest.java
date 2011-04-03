@@ -89,9 +89,9 @@ public class JavaCodeAnalyzerPluginTest {
 
     @Test
     public void testTEST() throws DatabaseAccessException { //FIXME remove
-        for (Entry<String, AstNode> currEntry : DBAccess.getFilesImportingTargetFile("database.DBAccess", "svn-local").entrySet()) {
-            LOG.info(currEntry.getKey());
-        }
+//        for (Entry<String, AstNode> currEntry : DBAccess.getFilesImportingTargetFile("database.DBAccess", "svn-local").entrySet()) {
+//            LOG.info(currEntry.getKey());
+//        }
 
     }
 

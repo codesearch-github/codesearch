@@ -53,8 +53,6 @@ import org.codesearch.searcher.shared.SearchResultDto;
 @Singleton
 public class DocumentSearcherImpl implements DocumentSearcher {
 
-    private long initDate;
-
     /** The logger. */
     private static final Logger LOG = Logger.getLogger(DocumentSearcherImpl.class);
     /** The parser used for parsing search terms to lucene queries */
@@ -187,8 +185,6 @@ public class DocumentSearcherImpl implements DocumentSearcher {
     }
 
     private synchronized void initSearcher() throws InvalidIndexException {
-        Date nd = new Date();
-        initDate = nd.getTime();
         try {
             if (searcherInitialized) {
                 indexSearcher.close();
@@ -204,10 +200,5 @@ public class DocumentSearcherImpl implements DocumentSearcher {
     @Override
     public synchronized void refreshIndex() throws InvalidIndexException {
         initSearcher();
-    }
-
-    @Override
-    public long getInitTime() {
-        return initDate;
     }
 }

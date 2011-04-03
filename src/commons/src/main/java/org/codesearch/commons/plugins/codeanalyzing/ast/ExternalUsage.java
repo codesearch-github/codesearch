@@ -41,7 +41,7 @@ public abstract class ExternalUsage extends Usage {
      * @param repository the repository holding the file
      * @throws DatabaseAccessException
      */
-    public abstract void resolveLink(String originFilePath, String repository) throws DatabaseAccessException, DatabaseEntryNotFoundException;
+    public abstract void resolveLink(String targetFilePath, AstNode ast);
 
     public String getTargetClassName() {
         return targetClassName;

@@ -26,6 +26,7 @@ import com.google.inject.Singleton;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
 
 import net.sf.jmimemagic.Magic;
 import net.sf.jmimemagic.MagicException;
@@ -100,7 +101,6 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
         List<SearchResultDto> resultItems = new LinkedList<SearchResultDto>();
         try {
             resultItems = documentSearcher.search(query, caseSensitive, selectedRepositories, selectedRepositoryGroups);
-            LOG.info(documentSearcher.getInitTime());
         } catch (ParseException ex) {
             throw new SearcherServiceException("Invalid search query: \n" + ex);
         } catch (IOException ex) {
@@ -193,7 +193,10 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
         LOG.debug("Looking up usage: " + usageId + " in file: " + filePath + "@" + repository);
         try {
             ExternalUsage usage = dba.getUsageForIdInFile(usageId, filePath, repository);
-            usage.resolveLink(filePath, repository);
+            String targetFilePath = getFilePathOfDeclaration(repository, usage.getTargetClassName(), filePath);
+            AstNode ast = getAstOfFileContainingDeclaration(repository, targetFilePath, filePath);
+            
+            usage.resolveLink(targetFilePath, ast);
             LOG.debug(usage.getTargetClassName());
             LOG.debug(usage.getTargetFilePath());
             if (usage.getTargetFilePath() != null) {
@@ -204,11 +207,38 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
                 return searchResultDto;
             }
         } catch (DatabaseEntryNotFoundException ex) {
-            //TODO redirect to current file here, probably return null
+            LOG.error(ex);
         } catch (DatabaseAccessException ex) {
             LOG.error(ex);
         }
         return null;
+    }
+
+    
+    private AstNode getAstOfFileContainingDeclaration(String repository, String targetFilePath, String originFilePath) throws DatabaseAccessException, DatabaseEntryNotFoundException{
+        return dba.getBinaryIndexForFile(targetFilePath, repository);
+    }
+
+    private String getFilePathOfDeclaration(String repository, String className, String originFilePath) throws DatabaseAccessException {
+        List<String> fileImports = dba.getImportsForFile(originFilePath, repository);
+        String targetFilePath;
+        List<String> asteriskImports = new LinkedList<String>();
+        boolean importMatch = false;
+        for (String currentImport : fileImports) {
+            if (currentImport.endsWith("." + className)) {
+                className = currentImport;
+                importMatch = true;
+            } else if (currentImport.endsWith("*")) {
+                asteriskImports.add(currentImport);
+            }
+        }
+        if (!importMatch) {
+            targetFilePath = dba.getFilePathForTypeDeclaration(className, repository, asteriskImports);
+        } else {
+            targetFilePath = dba.getFilePathForTypeDeclaration(className, repository);
+        }
+
+        return targetFilePath;
     }
 
     /** {@inheritDoc} */
@@ -300,4 +330,5 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
         }
         return fileContentBytes;
     }
+
 }

@@ -11,4 +11,8 @@ package org.codesearch.indexer.exceptions;
  */
 public class NotifySearcherException extends Exception{
 
+    public NotifySearcherException(String message) {
+        super(message);
+    }
+
 }

@@ -15,9 +15,6 @@ import org.codesearch.searcher.shared.SearchResultDto;
  * @author David Froehlich
  */
 public interface DocumentSearcher {
-
-    long getInitTime();
-
     /**
      * parses the search term to a lucene conform query keeping in mind the several options
      * @param term the search term

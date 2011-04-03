@@ -49,7 +49,7 @@ public class IndexerMain implements ServletContextListener {
      */
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        Injector injector = Guice.createInjector(new Module[]{new CommonsGuiceModule()});
+        Injector injector = Guice.createInjector(new Module[]{new CommonsGuiceModule(), new IndexerGuiceModule()});
 
         sce.getServletContext().setAttribute(INJECTOR_KEY, injector);
 

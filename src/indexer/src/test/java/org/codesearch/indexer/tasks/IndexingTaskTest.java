@@ -59,7 +59,7 @@ public class IndexingTaskTest {
         RepositoryDto repo = configReader.getRepositoryByName("svn_local");
         repo.setUrl(repo.getUrl().replace("$home", System.getProperty("user.home")));
         t.setRepository(repo);
-        t.setCodeAnalysisEnabled(false);
+        t.setCodeAnalysisEnabled(true);
         t.execute();
     }
 }
