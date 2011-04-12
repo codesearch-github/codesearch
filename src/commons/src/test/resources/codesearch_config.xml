@@ -47,6 +47,9 @@
             <cron-expression>*/10 * * * * ?</cron-expression>
             <tasks>
                 <task>
+                    <type>clear</type>
+                </task>
+                <task>
                     <type>index</type>
                 </task>
             </tasks>
@@ -56,18 +59,17 @@
     <repository-groups>group1 group2 group3 group4</repository-groups>
     <repositories>
         <repository>
-            <name>svnsearch_repo</name>
-            <version-control-system>SVN</version-control-system>
-            <username>feldruebe</username>
-            <password>dota!123</password>
-            <url>http://portal.htl-kaindorf.at/svnsearch</url>
+            <name>codesearch_repo</name>
+            <version-control-system>BZR</version-control-system>
+            <username></username>
+            <password></password>
+            <url>lp:codesearch</url>
             <code-navigation-enabled>true</code-navigation-enabled>
             <blacklist-filenames>
-                <filename>*.xml</filename>
+                <filename>.*\.xml</filename>
             </blacklist-filenames>
             <repository-groups>
                 <repo-group>group1</repo-group>
-                <repo-group>group2</repo-group>
             </repository-groups>
         </repository>
         <repository>

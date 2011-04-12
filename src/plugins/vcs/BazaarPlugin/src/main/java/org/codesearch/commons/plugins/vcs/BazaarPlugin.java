@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Set;
 import org.apache.log4j.Logger;
 import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
+import org.codesearch.commons.plugins.PluginLoaderException;
 import org.codesearch.commons.plugins.vcs.utils.BazaarUtils;
 import org.vcs.bazaar.client.IBazaarLogMessage;
 import org.vcs.bazaar.client.IBazaarStatus;
@@ -49,8 +50,12 @@ public class BazaarPlugin implements VersionControlPlugin {
     /**
      * Creates a new instance of the BazaarPlugin
      */
-    public BazaarPlugin() {
-        bzr_util = BazaarUtils.getInstance();
+    public BazaarPlugin() throws PluginLoaderException {
+        try {
+            bzr_util = BazaarUtils.getInstance();
+        } catch (BazaarClientException ex) {
+            throw new PluginLoaderException("Loading of the BazaarPlugin failed, you probably have to install Bazaar Xml Output\n"+ex);
+        }
     }
 
 

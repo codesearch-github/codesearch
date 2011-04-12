@@ -100,12 +100,12 @@ public class ClearTask implements Task {
                 IndexSearcher searcher = new IndexSearcher(fsd, false);
                 Term term = new Term(IndexConstants.INDEX_FIELD_REPOSITORY, repository.getName());
                 deleteDocumentsFromIndexUsingTerm(term, searcher);
-                searcher.close();
-
                 PropertiesManager propertiesManager = new PropertiesManager(indexLocation + IndexConstants.REVISIONS_PROPERTY_FILENAME);
                 propertiesManager.setPropertyFileValue(repository.getName(), "0");
-
+                
                 LOG.debug("Deleted " + searcher.getIndexReader().deleteDocuments(term) + " documents for repository " + repository.getName());
+                searcher.close();
+
                 if (codeAnalysisEnabled) {
                     try {
                         dba.clearTablesForRepository(repository.getName());
@@ -119,9 +119,9 @@ public class ClearTask implements Task {
         } catch (CorruptIndexException ex) {
             throw new TaskExecutionException("Corrupt index: \n" + ex);
         } catch (IOException ex) {
-            throw new TaskExecutionException("IOException while trying to access the index: \n" + ex);
+            //if there is no index nothing has to be cleared
         }
-        LOG.debug("FInished executing clear task");
+        LOG.debug("Finished executing clear task");
     }
 
     /**

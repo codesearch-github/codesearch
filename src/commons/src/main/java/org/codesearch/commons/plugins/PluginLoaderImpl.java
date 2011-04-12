@@ -22,6 +22,7 @@ package org.codesearch.commons.plugins;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
 
 //TODO implement a common state so the serviceloader is not initialized every time a method is called
@@ -34,6 +35,8 @@ import java.util.ServiceLoader;
  */
 public class PluginLoaderImpl implements PluginLoader {
 
+    private ServiceLoader<Plugin> serviceLoader = ServiceLoader.load(Plugin.class);
+    
     public PluginLoaderImpl() {
     }
 
@@ -50,17 +53,20 @@ public class PluginLoaderImpl implements PluginLoader {
     public synchronized <T extends Plugin> T getPlugin(final Class<T> clazz, final String purpose)
             throws PluginLoaderException {
         Plugin validPlugin = null;
-        ServiceLoader<T> serviceLoader = ServiceLoader.load(clazz);
         for (Plugin plugin : serviceLoader) {
-            String[] purposes = plugin.getPurposes().split(" ");
-            for (String s : purposes) {
-                if (s.equalsIgnoreCase(purpose)) {
-                    if (validPlugin == null) {
-                        validPlugin = plugin;
-                    } else {
-                        throw new PluginLoaderException("Multiple plugins found for purpose " + purpose + " and class " + clazz + " which only supports a single plugin");
+            try {
+                String[] purposes = plugin.getPurposes().split(" ");
+                for (String s : purposes) {
+                    if (s.equalsIgnoreCase(purpose) && clazz.isInstance(plugin)) {
+                        if (validPlugin == null) {
+                            validPlugin = plugin;
+                        } else {
+                            throw new PluginLoaderException("Multiple plugins found for purpose " + purpose + " and class " + clazz + " which only supports a single plugin");
+                        }
                     }
                 }
+            } catch (ServiceConfigurationError ex) {
+                System.out.println(ex.toString());
             }
         }
         if (validPlugin != null) {
@@ -72,7 +78,6 @@ public class PluginLoaderImpl implements PluginLoader {
     @Override
     public synchronized <T extends Plugin> List<T> getMultiplePluginsForPurpose(final Class<T> clazz, final String purpose) throws PluginLoaderException {
         List<T> validPlugins = new LinkedList<T>();
-        ServiceLoader<T> serviceLoader = ServiceLoader.load(clazz);
         for (Plugin plugin : serviceLoader) {
             String[] purposes = plugin.getPurposes().split(" ");
             for (String s : purposes) {

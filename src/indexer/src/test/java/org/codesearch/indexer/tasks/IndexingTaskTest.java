@@ -38,7 +38,6 @@ import org.junit.Test;
  */
 public class IndexingTaskTest {
 
-
     public IndexingTaskTest() {
     }
 
@@ -50,13 +49,19 @@ public class IndexingTaskTest {
     @Test
     public void testExecuteLocal() throws Exception {
         ConfigurationReader configReader = new XmlConfigurationReader(null);
-        
+
         PluginLoader pl = new PluginLoaderImpl();
         ConnectionPool cp = new ConnectionPoolImpl(configReader);
         DBAccess dba = new DBAccessImpl(cp);
+        RepositoryDto repo = configReader.getRepositoryByName("codesearch_repo");
+        ClearTask c = new ClearTask(dba);
+        c.setRepository(repo);
+        c.setIndexLocation("/tmp/test");
+        c.execute();
+
         IndexingTask t = new IndexingTask(configReader, dba, pl);
         t.setIndexLocation("/tmp/test/");
-        RepositoryDto repo = configReader.getRepositoryByName("svn_local");
+
         repo.setUrl(repo.getUrl().replace("$home", System.getProperty("user.home")));
         t.setRepository(repo);
         t.setCodeAnalysisEnabled(true);

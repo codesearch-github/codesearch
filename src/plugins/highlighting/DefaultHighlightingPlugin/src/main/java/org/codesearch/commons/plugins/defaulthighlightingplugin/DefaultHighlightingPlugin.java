@@ -64,16 +64,19 @@ public class DefaultHighlightingPlugin implements HighlightingPlugin {
     /** the mime type for BMP files */
     public static final String BMP = "image/bmp";
 
+    public DefaultHighlightingPlugin() {
+    }
+
     /** {@inheritDoc} */
     @Override
     public String parseToHtml(byte[] content, String mimeType) throws HighlightingPluginException {
         try {
             if (mimeType.equals(JAVA)) {
                 renderer = new JavaXhtmlRenderer();
-            } else if (mimeType.equals(C) || 
-                       mimeType.equals(CPP) ||
-                       mimeType.equals(C_HEADER) ||
-                       mimeType.equals(CPP_HEADER)) {
+            } else if (mimeType.equals(C)
+                    || mimeType.equals(CPP)
+                    || mimeType.equals(C_HEADER)
+                    || mimeType.equals(CPP_HEADER)) {
                 renderer = new CppXhtmlRenderer();
             } else if (mimeType.equals(HTML)) {
                 renderer = new XmlXhtmlRenderer();

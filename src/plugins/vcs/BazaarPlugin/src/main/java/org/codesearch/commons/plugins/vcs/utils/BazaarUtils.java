@@ -48,7 +48,6 @@ import org.vcs.bazaar.client.core.BranchLocation;
 public class BazaarUtils {
     //TODO: use external shh auth client
 
-    
     private static BazaarUtils instance;
     private IBazaarClient bazaarClient;
     private static final Logger LOG = Logger.getLogger(BazaarUtils.class);
@@ -56,19 +55,13 @@ public class BazaarUtils {
     /**
      * Contstructor
      */
-    private BazaarUtils() {
-        try {
-            CommandLineClientFactory.setup(true);
-            BazaarClientFactory.setPreferredClientType(CommandLineClientFactory.CLIENT_TYPE);
-            BazaarClientFactory.setupBestAvailableBackend(true);
-            
-            this.bazaarClient = BazaarClientFactory.createClient(CommandLineClientFactory.CLIENT_TYPE);
+    private BazaarUtils() throws BazaarClientException {
+        CommandLineClientFactory.setup(true);
+        BazaarClientFactory.setPreferredClientType(CommandLineClientFactory.CLIENT_TYPE);
+        BazaarClientFactory.setupBestAvailableBackend(true);
+        this.bazaarClient = BazaarClientFactory.createClient(CommandLineClientFactory.CLIENT_TYPE);
 
-        } catch (BazaarClientException bce) {
-            if (bce.getMessage().equals("bzr-xmloutput >= 0.6.0 plugin not found")) {
-                LOG.debug("xmlplugin failed...");
-            }
-        }
+
     }
 
     /*
@@ -82,7 +75,7 @@ public class BazaarUtils {
     /**
      * Retrieves the singleton instance to use.
      */
-    public static BazaarUtils getInstance() {
+    public static BazaarUtils getInstance() throws BazaarClientException {
         if (instance == null) {
             instance = new BazaarUtils();
         }
@@ -129,11 +122,8 @@ public class BazaarUtils {
             } catch (BazaarClientException ex) {
                 java.util.logging.Logger.getLogger(BazaarUtils.class.getName()).log(Level.SEVERE, null, ex);
             }
-            return branchLocation;
-        } else {
-            return branchLocation;
         }
-
+        return branchLocation;
     }
 
     /**

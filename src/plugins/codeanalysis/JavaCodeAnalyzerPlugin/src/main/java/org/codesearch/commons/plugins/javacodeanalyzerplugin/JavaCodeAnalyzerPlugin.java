@@ -272,9 +272,12 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
             typeDeclarations = uv.getTypeDeclarations();
             imports = uv.getImports();
             Collections.sort(usages);
-
         } catch (ParseException ex) {
             throw new CodeAnalyzerPluginException(ex.getMessage());
+        } catch (NullPointerException ex){
+            usages = Collections.EMPTY_LIST;
+            typeDeclarations = Collections.EMPTY_LIST;
+            imports = Collections.EMPTY_LIST;
         } finally {
             try {
                 bais.close();

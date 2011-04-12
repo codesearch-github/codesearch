@@ -62,18 +62,17 @@
 
     <repositories>
         <repository>
-            <name>svnsearch_repo</name>
-            <version-control-system>SVN</version-control-system>
-            <username>feldruebe</username>
-            <password>dota!123</password>
-            <url>svn://portal.htl-kaindorf.at/svnsearch</url>
+            <name>codesearch_repo</name>
+            <version-control-system>BZR</version-control-system>
+            <username></username>
+            <password></password>
+            <url>lp:codesearch</url>
             <code-navigation-enabled>true</code-navigation-enabled>
             <blacklist-filenames>
                 <filename>.*\.xml</filename>
             </blacklist-filenames>
             <repository-groups>
                 <repo-group>group1</repo-group>
-                <repo-group>group2</repo-group>
             </repository-groups>
         </repository>
         <repository>
@@ -89,7 +88,7 @@
                 <filename>.*\.pdf</filename>
                 <filename>.*\.bin</filename>
             </blacklist-filenames>
-            <url>$home/workspace/svnsearch</url>
+            <url>/home/david/workspace/svnsearch</url>
             <code-navigation-enabled>true</code-navigation-enabled>
         </repository>
     </repositories>
