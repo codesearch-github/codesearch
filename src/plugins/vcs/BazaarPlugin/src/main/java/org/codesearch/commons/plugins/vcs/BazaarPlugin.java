@@ -50,11 +50,11 @@ public class BazaarPlugin implements VersionControlPlugin {
     /**
      * Creates a new instance of the BazaarPlugin
      */
-    public BazaarPlugin() throws PluginLoaderException {
+    public BazaarPlugin() {
         try {
             bzr_util = BazaarUtils.getInstance();
         } catch (BazaarClientException ex) {
-            throw new PluginLoaderException("Loading of the BazaarPlugin failed, you probably have to install Bazaar Xml Output\n"+ex);
+            LOG.error("Loading of the BazaarPlugin failed, you probably have to install Bazaar Xml Output\n"+ex);
         }
     }
 
@@ -67,6 +67,9 @@ public class BazaarPlugin implements VersionControlPlugin {
             bzr_util.setWorkingDirectory(repo.getUrl().substring(6));
         } catch (URISyntaxException ex) {
             throw new VersionControlPluginException(ex.toString());
+        } catch (NullPointerException ex){
+            //in case the bzr_util was never initialized
+            throw new VersionControlPluginException("BazaarUtil was never initialized, please check your installation of Bazaar Xml Output");
         }
     }
 

@@ -162,7 +162,6 @@ public class IndexingTask implements Task {
             }
             //notify the searcher about the update of the indexer
             notifySearcher();
-
         } catch (NotifySearcherException ex) {
             LOG.error("IndexingTask was not able to notify the searcher about the updated index, indexing process aborted\n"
                     + "the searcher will still work, but changes in the index will not be recognized" + ex);
