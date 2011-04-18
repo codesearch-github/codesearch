@@ -21,7 +21,6 @@
 package org.codesearch.commons.plugins.vcs;
 
 import java.io.ByteArrayOutputStream;
-import java.net.URI;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -59,7 +58,6 @@ public class SubversionPlugin implements VersionControlPlugin {
     private static final Logger LOG = Logger.getLogger(SubversionPlugin.class);
     private ISVNAuthenticationManager authManager;
 
-
     /**
      * creates a new instance of SubversionPlugin and sets up all factories required for connections
      */
@@ -87,8 +85,16 @@ public class SubversionPlugin implements VersionControlPlugin {
         try {
             SVNURL svnurl = SVNURL.parseURIDecoded(repository.getUrl().toString());
             svnRepo = SVNRepositoryFactory.create(svnurl);
-            authManager = new BasicAuthenticationManager(repository.getUsername(), repository.getPassword());
-            svnRepo.setAuthenticationManager(authManager);
+            AuthenticationType type = repository.getUsedAuthentication();
+            if (type instanceof BasicAuthentication) {
+                BasicAuthentication basicAuth = (BasicAuthentication) type;
+                authManager = new BasicAuthenticationManager(basicAuth.getUsername(), basicAuth.getPassword());
+                svnRepo.setAuthenticationManager(authManager);
+            } else if (type instanceof SshAuthentication){
+                //TODO add support for ssh files
+            }
+            //TODO test if this works for svn repos without authentication
+
         } catch (SVNException ex) {
             throw new VersionControlPluginException(ex.toString());
         }
@@ -153,7 +159,7 @@ public class SubversionPlugin implements VersionControlPlugin {
                     }
                     if (!fileAlreadyInSet) {
                         FileDto changedFile = getFileForFilePath(filePath);
-                        if(changedFile != null){
+                        if (changedFile != null) {
                             files.add(changedFile);
                         }
                     }

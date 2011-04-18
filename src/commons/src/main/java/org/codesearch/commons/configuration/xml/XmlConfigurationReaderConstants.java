@@ -73,6 +73,20 @@ public final class XmlConfigurationReaderConstants {
     public static final String REPOSITORY_GROUPS = "repository-groups.repo-group";
     /** Used to retrieve the filename-patterns files have to match to be indexed */
     public static final String REPOSITORY_WHITELIST_FILENAMES = "whitelist-filenames.filename";
+    /** Used to retrieve the used authentication method */
+    public static final String REPOSITORY_AUTHENTICATION_DATA = "authentication-data[@type]";
+    /** value for type attribute in authentication-data node in case the repository doesn't need authentication */
+    public static final String REPOSITORY_AUTHENTICATION_DATA_TYPE_NONE = "none";
+    /** value for type attribute in authentication-data node in case the repository supports basic authentication */
+    public static final String REPOSITORY_AUTHENTICATION_DATA_TYPE_BASIC = "basic";
+    /** value for type attribute in authentication-data node in case the repository uses SSH authentication*/
+    public static final String REPOSITORY_AUTHENTICATION_DATA_TYPE_SSH = "ssh";
+    /** used to retrieve the username in case the used authentication is 'basic' */
+    public static final String REPOSITORY_AUTHENTICATION_DATA_USERNAME = "authentication-data.username";
+    /** used to retrieve the password in case the used authentication is 'basic' */
+    public static final String REPOSITORY_AUTHENTICATION_DATA_PASSWORD = "authentication-data.password";
+    /** used to retrieve the location of the SSH file in case the used authentication is 'SSH' */
+    public static final String REPOSITORY_AUTHENTICATION_DATA_SSH_FILE_PATH = "authentication-data.file-path";
 
     //TASK CONSTANTS
     /** Used to access a single task */

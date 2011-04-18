@@ -22,6 +22,7 @@ package org.codesearch.commons.configuration.xml.dto;
 
 import java.util.List;
 import org.apache.commons.collections.CollectionUtils;
+import org.codesearch.commons.plugins.vcs.AuthenticationType;
 
 /**
  * DTO used to store information about a repository specified in the config.xml file
@@ -33,10 +34,6 @@ public class RepositoryDto {
     private String name;
     /** The URL of the repository. */
     private String url;
-    /** The username for this repository. */
-    private String username;
-    /** The password for this repository. */
-    private String password;
     /** Specifies whether the additional index will be created for the repository. */
     private boolean codeNavigationEnabled;
     /** The version control system used for this repository, (for instance SVN or Bazaar),
@@ -48,7 +45,9 @@ public class RepositoryDto {
     private List<String> blacklistEntries;
     /** A list of repository groups this repositorie belongs to */
     private List<String> repositoryGroups;
-
+    /** The authentication type used to access the files in this repository */
+    private AuthenticationType usedAuthentication;
+    
     public RepositoryDto() {
     }
 
@@ -56,19 +55,17 @@ public class RepositoryDto {
      * Creates a new instance of RepositoryDto
      * @param name the unique name of the repository
      * @param url the url used by the VersionControlPlugin to access the repository
-     * @param username the username used by the VersionControlPlugin to access the repository, use null if not required
-     * @param password the password used by the VersionControlPlugin to access the repository, use null if not required
+     * @param usedAuthentication the authentication type used by the plugin
      * @param codeNavigationEnabled determines whether code navigation is enabled for this repository
      * @param versionControlSystem determines which VersionControlSystem is used for the repository, must match the string returned by the getPurpose method of the VersionControlPlugin
      * @param blacklistEntries the list of regex strings representing the filenames of files that will not be indexed
      * @param whitelistEntries the list of regex strings a filename must match in order for the file to be indexed (only one entry has to be matched)
      * @param repositoryGroups the groups this repository belongs to
      */
-    public RepositoryDto(String name, String url, String username, String password, boolean codeNavigationEnabled, String versionControlSystem, List<String> blacklistEntries, List<String> whitelistEntries, List<String> repositoryGroups) {
+    public RepositoryDto(String name, String url, AuthenticationType usedAuthentication, boolean codeNavigationEnabled, String versionControlSystem, List<String> blacklistEntries, List<String> whitelistEntries, List<String> repositoryGroups) {
         this.name = name;
         this.url = url;
-        this.username = username;
-        this.password = password;
+        this.usedAuthentication = usedAuthentication;
         this.codeNavigationEnabled = codeNavigationEnabled;
         this.versionControlSystem = versionControlSystem;
         this.blacklistEntries = blacklistEntries;
@@ -116,28 +113,16 @@ public class RepositoryDto {
         this.url = url;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
     public String getVersionControlSystem() {
         return versionControlSystem;
     }
 
     public void setVersionControlSystem(String versionControlSystem) {
         this.versionControlSystem = versionControlSystem;
+    }
+
+    public AuthenticationType getUsedAuthentication(){
+        return usedAuthentication;
     }
 
     /**

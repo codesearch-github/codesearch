@@ -28,6 +28,8 @@ import java.net.URISyntaxException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
 import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 import org.codesearch.commons.plugins.PluginLoaderException;
@@ -58,13 +60,13 @@ public class BazaarPlugin implements VersionControlPlugin {
         }
     }
 
-
      /** {@inheritDoc} */
     @Override
     public void setRepository(RepositoryDto repo) throws VersionControlPluginException {
         try {
             bl = bzr_util.createBranchLocation(repo.getUrl(), repo.getName(), repo.getPassword());
-            bzr_util.setWorkingDirectory(repo.getUrl().substring(6));
+            //remove protocol pattern
+            bzr_util.setWorkingDirectory("/tmp/test/asdf");
         } catch (URISyntaxException ex) {
             throw new VersionControlPluginException(ex.toString());
         } catch (NullPointerException ex){

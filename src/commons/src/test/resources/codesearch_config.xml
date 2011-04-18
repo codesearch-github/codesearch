@@ -63,8 +63,12 @@
             <version-control-system>BZR</version-control-system>
             <username></username>
             <password></password>
-            <url>lp:codesearch</url>
+            <url>bzr+ssh://bazaar.launchpad.net/~codesearch-dev/codesearch/trunk/</url>
             <code-navigation-enabled>true</code-navigation-enabled>
+            <authentication-data type='basic'>
+                <username>asdf</username>
+                <password>fdsa</password>
+            </authentication-data>
             <blacklist-filenames>
                 <filename>.*\.xml</filename>
             </blacklist-filenames>
@@ -74,29 +78,17 @@
         </repository>
         <repository>
             <name>svn_local</name>
-            <version_control_system>FILESYSTEM</version_control_system>
-            <username>null</username>
-            <password>null</password>
-            <url>$home/workspace/svnsearch</url>
-            <blacklist-filenames>
-                <filename>*generated*</filename>
-            </blacklist-filenames>
-            <code-navigation-enabled>true</code-navigation-enabled>
-        </repository>
-        <repository>
-            <name>testRepo2</name>
-            <username>testUser</username>
-            <password>testPassword</password>
-            <version_control_system>SVN</version_control_system>
-            <url>http://test.org</url>
-            <code-navigation-enabled>false</code-navigation-enabled>
-            <repository-groups>
-                <repo-group>group2</repo-group>
-                <repo-group>group2.2</repo-group>
-            </repository-groups>
+            <version-control-system>FILESYSTEM</version-control-system>
+            <authentication-data type='ssh'><file-path>/tmp/test</file-path></authentication-data>
             <repository-groups>
                 <repo-group>group1</repo-group>
             </repository-groups>
+            <blacklist-filenames>
+                <filename>.*\.o</filename>
+                <filename>.*\.pdf</filename>
+                <filename>.*\.bin</filename>
+            </blacklist-filenames>
+            <url>/home/david/workspace/svnsearch</url>
             <code-navigation-enabled>true</code-navigation-enabled>
         </repository>
     </repositories>

@@ -39,6 +39,10 @@ import org.codesearch.commons.configuration.xml.dto.JobDto;
 import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 import org.codesearch.commons.configuration.xml.dto.TaskDto;
 import org.codesearch.commons.configuration.xml.dto.TaskDto.TaskType;
+import org.codesearch.commons.plugins.vcs.AuthenticationType;
+import org.codesearch.commons.plugins.vcs.BasicAuthentication;
+import org.codesearch.commons.plugins.vcs.NoAuthentication;
+import org.codesearch.commons.plugins.vcs.SshAuthentication;
 
 /**
  * XmlConfigurationReader is a class that provides several methods to access properties.
@@ -187,9 +191,23 @@ public class XmlConfigurationReader implements ConfigurationReader {
         if (repositoryGroups == null) {
             repositoryGroups = new LinkedList<String>();
         }
+
+        //retrieve the used authentication system and fill it with the required data
+        AuthenticationType usedAuthentication = null;
+        String authenticationType = hc.getString(XmlConfigurationReaderConstants.REPOSITORY_AUTHENTICATION_DATA);
+        if(authenticationType.equals("none")){
+            usedAuthentication = new NoAuthentication();
+        } else if (authenticationType.equals("basic")){
+            String username = hc.getString(XmlConfigurationReaderConstants.REPOSITORY_AUTHENTICATION_DATA_USERNAME);
+            String password = hc.getString(XmlConfigurationReaderConstants.REPOSITORY_AUTHENTICATION_DATA_PASSWORD);
+            usedAuthentication = new BasicAuthentication(username, password);
+        } else if (authenticationType.equals("ssh")){
+            String sshFilePath = hc.getString(XmlConfigurationReaderConstants.REPOSITORY_AUTHENTICATION_DATA_SSH_FILE_PATH);
+            usedAuthentication = new SshAuthentication(sshFilePath);
+        }
+        
         repo = new RepositoryDto(name, hc.getString(XmlConfigurationReaderConstants.REPOSITORY_URL),
-                hc.getString(XmlConfigurationReaderConstants.REPOSITORY_USERNAME),
-                hc.getString(XmlConfigurationReaderConstants.REPOSITORY_PASSWORD),
+                usedAuthentication,
                 hc.getBoolean(XmlConfigurationReaderConstants.REPOSITORY_CODE_NAVIGATION_ENABLED),
                 hc.getString(XmlConfigurationReaderConstants.REPOSITORY_VCS),
                 blacklistEntries,

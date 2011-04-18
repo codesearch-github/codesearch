@@ -51,14 +51,10 @@ public class FilesystemPlugin implements VersionControlPlugin {
         try {
             File file = new File(filePath);
             FileDto fileDto = new FileDto();
-
             FileInputStream fis = new FileInputStream(file);
             byte fileContent[] = new byte[(int) file.length()];
             fis.read(fileContent);
             fis.close();
-            //TODO find method to guess this quickly
-            // assume that files are not binary because MIME detection takes too long
-
             fileDto.setFilePath(filePath);
             fileDto.setContent(fileContent);
             fileDto.setBinary(false);

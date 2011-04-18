@@ -32,6 +32,8 @@ import org.codesearch.commons.configuration.ConfigurationReader;
 import org.codesearch.commons.configuration.xml.dto.JobDto;
 import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 import org.codesearch.commons.configuration.xml.dto.TaskDto;
+import org.codesearch.commons.plugins.vcs.BasicAuthentication;
+import org.codesearch.commons.plugins.vcs.NoAuthentication;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -60,7 +62,7 @@ public class XmlConfigurationReaderTest {
         ignFileNames1.add("*.svn*");
         ignFileNames1.add("*.class*");
 
-        RepositoryDto repo1 = new RepositoryDto("svnsearch_repo", "http://portal.htl-kaindorf.at/svnsearch", "feldruebe", "dota!123", true, "SVN", ignFileNames1, new LinkedList<String>(), repoGroups1);
+        RepositoryDto repo1 = new RepositoryDto("svnsearch_repo", "http://portal.htl-kaindorf.at/svnsearch", new BasicAuthentication("feldruebe", "dota!123"), true, "SVN", ignFileNames1, new LinkedList<String>(), repoGroups1);
 
         List<String> ignFileNames2 = new LinkedList<String>();
         List<String> repoGroups2 = new LinkedList<String>();
@@ -69,7 +71,7 @@ public class XmlConfigurationReaderTest {
         ignFileNames2.add("*generated*");
         ignFileNames2.add("*.svn*");
         ignFileNames2.add("*.class*");
-        RepositoryDto repo2 = new RepositoryDto("svn_local", System.getProperty("user.home") + "/workspace/svnsearch", "null", "null", true, "FILESYSTEM", ignFileNames2, new LinkedList<String>(), repoGroups2);
+        RepositoryDto repo2 = new RepositoryDto("svn_local", System.getProperty("user.home") + "/workspace/svnsearch", new NoAuthentication(), true, "FILESYSTEM", ignFileNames2, new LinkedList<String>(), repoGroups2);
 
         List result = configReader.getRepositories();
         assertTrue(repo1.equals(result.get(0)));
@@ -97,7 +99,7 @@ public class XmlConfigurationReaderTest {
         ignFileNames1.add("*.svn*");
         ignFileNames1.add("*.class*");
 
-        RepositoryDto repo1 = new RepositoryDto("svnsearch_repo", "http://portal.htl-kaindorf.at/svnsearch", "feldruebe", "dota!123", true, "SVN", ignFileNames1, new LinkedList<String>(), repoGroups1);
+        RepositoryDto repo1 = new RepositoryDto("svnsearch_repo", "http://portal.htl-kaindorf.at/svnsearch", new BasicAuthentication("feldruebe", "dota!123"), true, "SVN", ignFileNames1, new LinkedList<String>(), repoGroups1);
 
         System.out.println(repo1.getBlacklistEntries());
 
@@ -116,7 +118,7 @@ public class XmlConfigurationReaderTest {
         ignoredFiles.add("*.xml");
         ignoredFiles.add("*.jpg");
         ignoredFiles.add("*.txt");
-        RepositoryDto expResult = new RepositoryDto("testRepo1", "http://test.org", "testUser", "testPassword", true, "SVN", ignoredFiles, new LinkedList<String>(), repoGroups);
+        RepositoryDto expResult = new RepositoryDto("testRepo1", "http://test.org", new NoAuthentication(), true, "SVN", ignoredFiles, new LinkedList<String>(), repoGroups);
         RepositoryDto result = configReader.getRepositoryByName("testRepo1");
     }
 
