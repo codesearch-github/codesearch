@@ -1,3 +1,16 @@
+*
+{
+    font: 16px Verdana, Arial, sans-serif;
+    color: white;
+}
+
+
+html
+{
+    overflow-y: scroll;
+    background: url("img/bg.jpg") top left repeat-x;
+}
+
 body
 {
     padding: 0;
@@ -9,12 +22,18 @@ body
 
 h1
 {
-    font-size: 1.5em;
+    font-size: 1.3em;
+    font-weight: bold;
 }
 
 h2
 {
-    font-size: 1em;
+    font-size: 1.2em;
+}
+
+h3
+{
+    font-size: 1.1em;
 }
 
 #header
@@ -35,6 +54,7 @@ h2
     width: 100%;
     list-style: none;
     padding: 0;
+    font-size: 1.2em;
 }
 
 #menu li
@@ -49,7 +69,6 @@ h2
     border-right: 1px solid #BBBBBB;
     text-decoration: none;
     font-weight: bold;
-    color: black;
 }
 
 #menu li:first-child a
@@ -66,10 +85,11 @@ h2
 {
     color: #0081FF;
 }
+
 #content
 {
-    background-color: #EEEEEE;
-    padding: 1em 1em 1em 1em;
+    padding: 1em 1em 1em 0em;
+    width: 100%;
 }
 
 .news-header

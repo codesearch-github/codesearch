@@ -59,10 +59,10 @@ public class BazaarUtils {
      * Contstructor
      */
     private BazaarUtils() throws BazaarClientException {
-            CommandLineClientFactory.setup(true);
-            BazaarClientFactory.setPreferredClientType(CommandLineClientFactory.CLIENT_TYPE);
-            BazaarClientFactory.setupBestAvailableBackend(true);
-            this.bazaarClient = BazaarClientFactory.createClient(CommandLineClientFactory.CLIENT_TYPE);
+        CommandLineClientFactory.setup(true);
+        BazaarClientFactory.setPreferredClientType(CommandLineClientFactory.CLIENT_TYPE);
+        BazaarClientFactory.setupBestAvailableBackend(true);
+        this.bazaarClient = BazaarClientFactory.createClient(CommandLineClientFactory.CLIENT_TYPE);
     }
 
     /*
@@ -122,7 +122,7 @@ public class BazaarUtils {
         if (autType instanceof BasicAuthentication) {
             BasicAuthentication ba = (BasicAuthentication)autType;
             URI newURI = new URI(uri.getScheme(), ba.getUsername() + ":" + ba.getPassword(), uri.getPath(), uri.getQuery(), uri.getFragment());
-            LOG.debug("URI" + uri.getScheme() + ba.getUsername() + ":" + ba.getPassword() + uri.getPath() + uri.getQuery() + uri.getFragment());
+            LOG.debug("Bazaar Branch URI: " + uri.getScheme() + ba.getUsername() + ":" + ba.getPassword() + uri.getPath() + uri.getQuery() + uri.getFragment());
             branchLocation = new BranchLocation(newURI);
             try {
                 checkout(branchLocation, new File("/tmp/bzr") , new Option("-v"));
@@ -148,7 +148,7 @@ public class BazaarUtils {
      */
     public void checkout(BranchLocation bl, File targetDirectory, Option option) throws BazaarClientException
     {
-        bazaarClient.checkout(bl, targetDirectory, option);
+        bazaarClient.branch(bl, targetDirectory, null, option);
     }
 
     /**

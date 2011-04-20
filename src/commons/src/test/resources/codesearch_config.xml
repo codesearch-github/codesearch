@@ -24,27 +24,29 @@
 
 <root>
     <dbms>mysql</dbms>
-    <db-username>codesearch_db</db-username>
+    <db-username>codesearch</db-username>
     <db-password>dota!123</db-password>
-    <db-driver>org.gjt.mm.mysql.Driver</db-driver>
-    <db-url>localhost</db-url>
+    <db-driver>com.mysql.jdbc.Driver</db-driver>
+    <db-url>127.0.0.1</db-url>
     <db-port-number>3306</db-port-number>
     <db-name>codesearch</db-name>
     <db-max-connections>100</db-max-connections>
 
-    <searcher-location>http://127.0.0.1:8888/</searcher-location>
+    <searcher-location>http://127.0.0.1:8080/codesearch/searcher/</searcher-location>
 
     <global-blacklist-filenames>
-        <filename>*.jpg</filename>
-        <filename>*img*</filename>
-        <filename>*.svn*</filename>
-        <filename>*.class*</filename>
+        <filename>.*\.svn.*</filename>
+        <filename>.*\.class</filename>
+        <filename>.*\.o</filename>
+        <filename>.*\.bin</filename>
     </global-blacklist-filenames>
-    <index-location>/tmp/test</index-location>
+
+    <index-location>/tmp/test/</index-location>
+    
     <index-jobs>
         <index-job>
-            <repositories>svnsearch_repo</repositories>
-            <cron-expression>*/10 * * * * ?</cron-expression>
+            <repositories>svn_local</repositories>
+            <cron-expression>0 * * * * ?</cron-expression>
             <tasks>
                 <task>
                     <type>clear</type>
@@ -55,8 +57,9 @@
             </tasks>
         </index-job>
     </index-jobs>
-    <testproperty>asdf</testproperty>
-    <repository-groups>group1 group2 group3 group4</repository-groups>
+    
+    <repository-groups>group1 group2</repository-groups>
+
     <repositories>
         <repository>
             <name>codesearch_repo</name>
@@ -92,8 +95,4 @@
             <code-navigation-enabled>true</code-navigation-enabled>
         </repository>
     </repositories>
-    <repository-groups>group1,group2,group3</repository-groups>
-    <listTest>1</listTest>
-    <listTest>2</listTest>
-    <listTest>3</listTest>
 </root>

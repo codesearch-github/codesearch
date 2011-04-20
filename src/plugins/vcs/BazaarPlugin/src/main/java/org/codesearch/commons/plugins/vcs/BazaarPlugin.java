@@ -59,7 +59,7 @@ public class BazaarPlugin implements VersionControlPlugin {
     public void setRepository(RepositoryDto repo) throws VersionControlPluginException {
         try {
             bl = bzr_util.createBranchLocation(repo.getUrl(),repo.getUsedAuthentication());
-            bzr_util.setWorkingDirectory("/tmp/test/asdf");
+            bzr_util.setWorkingDirectory("/tmp/");
         } catch (URISyntaxException ex) {
             java.util.logging.Logger.getLogger(BazaarPlugin.class.getName()).log(Level.SEVERE, null, ex);
         } catch (NullPointerException ex){

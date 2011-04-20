@@ -153,7 +153,7 @@ public class SubversionPlugin implements VersionControlPlugin {
                 } else {
                     boolean fileAlreadyInSet = false;
                     for (FileDto currentFile : files) {
-                        if (currentFile.getFilePath().equals(filePath)) {
+                        if (currentFile != null && filePath.equals(currentFile.getFilePath())) {
                             fileAlreadyInSet = true;
                         }
                     }

@@ -25,6 +25,7 @@ doc/user_stories/html
 *.ps
 *.bbl
 *.blg
+*.swp
 doc/thesis/diploma_thesis.pdf
 doc/thesis/test.pdf
 doc/thesis/test.tex

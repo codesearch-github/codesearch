@@ -40,6 +40,11 @@
             <artifactId>log4j</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+        </dependency>
+
 		<!-- Lucene API to create/manage index -->
         <dependency>
             <groupId>org.apache.lucene</groupId>
@@ -52,9 +57,15 @@
         </dependency>
 
 		<!-- Default included plugins -->
+        <!--STARTPLUGINS-->
         <dependency>
             <groupId>org.codesearch</groupId>
             <artifactId>SubversionPlugin</artifactId>
+            <version>0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codesearch</groupId>
+            <artifactId>BazaarPlugin</artifactId>
             <version>0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
@@ -84,11 +95,6 @@
         </dependency>
         <dependency>
             <groupId>org.codesearch</groupId>
-            <artifactId>RepositoryLuceneFieldPlugin</artifactId>
-            <version>0.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.codesearch</groupId>
             <artifactId>FilenameLuceneFieldPlugin</artifactId>
             <version>0.1-SNAPSHOT</version>
         </dependency>
@@ -107,6 +113,7 @@
             <artifactId>DefaultHighlightingPlugin</artifactId>
             <version>0.1-SNAPSHOT</version>
         </dependency>
+        <!--ENDPLUGINS-->
 
         <dependency>
             <groupId>org.codesearch</groupId>
