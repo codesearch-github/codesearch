@@ -28,6 +28,7 @@ import org.vcs.bazaar.client.BazaarRevision;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
@@ -171,14 +172,19 @@ public class BazaarUtils {
      */
     public List<IBazaarLogMessage> getChangesSinceRevison(BranchLocation bl, String revision) throws BazaarClientException, URISyntaxException {
         List<Option> options = new ArrayList<Option>();
-        String revisionRange = revision + "..";
+        String revisionRange = "..";
+        if(!revision.equalsIgnoreCase("0"))
+            revisionRange = revision + "..";
         if (revision != null) {
             options.add(new Option("-r"));
             options.add(new Option(revisionRange));
         }
         options.add(new Option("-v"));
         Option[] optionArray = options.toArray(new Option[options.size()]);
-        return bazaarClient.log(bl, optionArray);
+        List<IBazaarLogMessage> logList = bazaarClient.log(bl, optionArray);
+        if(logList == null)
+            logList = new LinkedList<IBazaarLogMessage>();
+        return logList;
     }
 
     /**

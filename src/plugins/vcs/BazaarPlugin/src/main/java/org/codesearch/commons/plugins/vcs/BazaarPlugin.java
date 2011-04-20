@@ -86,7 +86,7 @@ public class BazaarPlugin implements VersionControlPlugin {
     public Set<FileDto> getChangedFilesSinceRevision(String revision) throws VersionControlPluginException {
         Set<FileDto> files = new HashSet<FileDto>();
         try {
-            LOG.info("bl  " + bl.getURI().toString());
+            LOG.info("Branch location:  " + bl.getURI().toString());
             List<IBazaarLogMessage> iblm = bzr_util.getChangesSinceRevison(bl, revision);
             for (IBazaarLogMessage log : iblm) {
                 for (IBazaarStatus bs : log.getAffectedFiles()) {
@@ -95,7 +95,7 @@ public class BazaarPlugin implements VersionControlPlugin {
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     byte fileContent[] = new byte[(int) bs.getFile().length()];
                     fis.read(fileContent);
-                    FileDto fd = new FileDto(bs.getAbsolutePath(), fileContent, false); //TODO: ADD MIME TYPE...
+                    FileDto fd = new FileDto(bs.getAbsolutePath(), fileContent, false);
                     files.add(fd);
                 }
             }
