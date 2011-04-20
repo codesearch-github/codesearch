@@ -20,7 +20,6 @@
  */
 package org.codesearch.commons.plugins.vcs.utils;
 
-import com.sun.jmx.remote.internal.ClientCommunicatorAdmin;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,6 +31,10 @@ import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+import org.codesearch.commons.plugins.vcs.AuthenticationType;
+import org.codesearch.commons.plugins.vcs.BasicAuthentication;
+import org.codesearch.commons.plugins.vcs.NoAuthentication;
+import org.codesearch.commons.plugins.vcs.SshAuthentication;
 import org.vcs.bazaar.client.BazaarClientFactory;
 import org.vcs.bazaar.client.IBazaarClient;
 import org.vcs.bazaar.client.IBazaarLogMessage;
@@ -47,7 +50,6 @@ import org.vcs.bazaar.client.core.BranchLocation;
  */
 public class BazaarUtils {
     //TODO: use external shh auth client
-
     private static BazaarUtils instance;
     private IBazaarClient bazaarClient;
     private static final Logger LOG = Logger.getLogger(BazaarUtils.class);
@@ -56,12 +58,10 @@ public class BazaarUtils {
      * Contstructor
      */
     private BazaarUtils() throws BazaarClientException {
-        CommandLineClientFactory.setup(true);
-        BazaarClientFactory.setPreferredClientType(CommandLineClientFactory.CLIENT_TYPE);
-        BazaarClientFactory.setupBestAvailableBackend(true);
-        this.bazaarClient = BazaarClientFactory.createClient(CommandLineClientFactory.CLIENT_TYPE);
-
-
+            CommandLineClientFactory.setup(true);
+            BazaarClientFactory.setPreferredClientType(CommandLineClientFactory.CLIENT_TYPE);
+            BazaarClientFactory.setupBestAvailableBackend(true);
+            this.bazaarClient = BazaarClientFactory.createClient(CommandLineClientFactory.CLIENT_TYPE);
     }
 
     /*
@@ -75,9 +75,15 @@ public class BazaarUtils {
     /**
      * Retrieves the singleton instance to use.
      */
-    public static BazaarUtils getInstance() throws BazaarClientException {
+    public static BazaarUtils getInstance() {
         if (instance == null) {
-            instance = new BazaarUtils();
+            try {
+                instance = new BazaarUtils();
+            } catch (BazaarClientException ex) {
+                if (ex.getMessage().equals("bzr-xmloutput >= 0.6.0 plugin not found")) {
+                LOG.error("Loading of the BazaarPlugin failed, Bazaar Xml Output to load succesfully");
+            }
+            }
         }
         return instance;
     }
@@ -109,21 +115,39 @@ public class BazaarUtils {
      * @return BranchLocation
      * @throws URISyntaxException
      */
-    public BranchLocation createBranchLocation(String repositoryUri, String userName, String password) throws URISyntaxException {
+    public BranchLocation createBranchLocation(String repositoryUri, AuthenticationType autType) throws URISyntaxException {
         BranchLocation branchLocation = new BranchLocation(repositoryUri);
         URI uri = branchLocation.getURI();
-        if (!userName.isEmpty() && !password.isEmpty()) {
-            URI newURI = new URI(uri.getScheme(), userName + ":" + password, uri.getPath(), uri.getQuery(), uri.getFragment());
-            LOG.debug("URI" + uri.getScheme() + userName + ":" + password + uri.getPath() + uri.getQuery() + uri.getFragment());
+        if (autType instanceof BasicAuthentication) {
+            BasicAuthentication ba = (BasicAuthentication)autType;
+            URI newURI = new URI(uri.getScheme(), ba.getUsername() + ":" + ba.getPassword(), uri.getPath(), uri.getQuery(), uri.getFragment());
+            LOG.debug("URI" + uri.getScheme() + ba.getUsername() + ":" + ba.getPassword() + uri.getPath() + uri.getQuery() + uri.getFragment());
             branchLocation = new BranchLocation(newURI);
             try {
-                bazaarClient.checkout(branchLocation, new File("/tmp/bzr"), new Option("-v")); //TODO create general directory for checkouts
-                //bazaarClient.revno(branchLocation);
+                checkout(branchLocation, new File("/tmp/bzr") , new Option("-v"));
             } catch (BazaarClientException ex) {
                 java.util.logging.Logger.getLogger(BazaarUtils.class.getName()).log(Level.SEVERE, null, ex);
             }
+            return branchLocation;
+        } else if(autType instanceof SshAuthentication){
+            //TODO add external ssh auth
+            return null;
+        } else {
+            return branchLocation;
         }
-        return branchLocation;
+
+    }
+
+    /**
+     * Performs a checkout to the local system for th egiven BranchLocation
+     *
+     * @param bl target branch location
+     * @param targetDirectory
+     * @param option the checkout option
+     */
+    public void checkout(BranchLocation bl, File targetDirectory, Option option) throws BazaarClientException
+    {
+        bazaarClient.checkout(bl, targetDirectory, option);
     }
 
     /**
@@ -133,7 +157,7 @@ public class BazaarUtils {
      * @throws URISyntaxException
      */
     public BranchLocation createBranchLocation(String repositoryUrl) throws URISyntaxException {
-        return createBranchLocation(repositoryUrl, "", "");
+        return createBranchLocation(repositoryUrl, new NoAuthentication());
     }
 
     /**

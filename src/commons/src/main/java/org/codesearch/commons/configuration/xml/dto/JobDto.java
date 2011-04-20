@@ -22,7 +22,6 @@ package org.codesearch.commons.configuration.xml.dto;
 
 import java.util.LinkedList;
 import java.util.List;
-import org.apache.commons.collections.CollectionUtils;
 
 /**
  * Represents an Indexing Job.

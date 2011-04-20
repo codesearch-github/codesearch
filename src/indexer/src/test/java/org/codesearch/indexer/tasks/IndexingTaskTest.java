@@ -21,6 +21,11 @@
 package org.codesearch.indexer.tasks;
 
 import org.codesearch.commons.configuration.ConfigurationReader;
+
+import java.util.LinkedList;
+import java.util.List;
+import org.apache.log4j.Logger;
+
 import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
 import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 import org.codesearch.commons.database.ConnectionPool;

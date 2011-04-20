@@ -27,6 +27,7 @@ package org.codesearch.commons.plugins.vcs;
 
 import java.net.URISyntaxException;
 import java.util.Set;
+import java.util.logging.Level;
 import org.apache.log4j.Logger;
 import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 import org.junit.Before;
@@ -41,7 +42,7 @@ import static org.junit.Assert.*;
  */
 public class BazaarPluginTest {
 
-    
+    BazaarPlugin plugin = new BazaarPlugin();
     private String path = "lp:codesearch";
      /* Logger */
     private static final Logger LOG = Logger.getLogger(BazaarPluginTest.class);
@@ -51,31 +52,48 @@ public class BazaarPluginTest {
 
     @Before
     public void setUp() throws URISyntaxException, VersionControlPluginException {
-       // plugin.setRepository(new RepositoryDto("", path, "", "", true, "BZR", null, null));
+       // plugin.setRepository(new RepositoryDto("code", path, "", "", false,"BZR", null, null, null));
     }
     
     /**
-     * Test of getFileContentForFilePath method, of class BazaarPlugin.
+     * Test of the remote checkout
      */
     @Test
+    public void testCheckout()
+    {
+        try {
+            plugin.setRepository(new RepositoryDto("code", path, new NoAuthentication(), false, "BZR", null, null, null));
+
+            System.out.println("LOL" + plugin.getRepositoryRevision());
+            
+        } catch (VersionControlPluginException ex) {
+            java.util.logging.Logger.getLogger(BazaarPluginTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
+
+    /**
+     * Test of getFileContentForFilePath method, of class BazaarPlugin.
+     */
+    //@Test
     public void testGetFileContentForFilePath() throws Exception {
-//        LOG.info("getFileContentForFilePath");
-//        String filePath = "/TODO";
-//        byte[] result = plugin.getFileForFilePath(filePath).getContent();
-//        boolean content = false;
-//        if(result != null)
-//            content = true;
-//        assertTrue(content);
+        LOG.info("getFileContentForFilePath");
+        String filePath = "/TODO";
+        byte[] result = plugin.getFileForFilePath(filePath).getContent();
+        boolean content = false;
+        if(result != null)
+            content = true;
+        assertTrue(content);
     }
 
     /**
      * Test of getChangedFilesSinceRevision method, of class BazaarPlugin.
      */
-    @Test
+    //@Test
     public void testGetChangedFilesSinceRevision() throws Exception {
-//        LOG.info("getChangedFilesSinceRevision");
-//        String revision = "1";
-//        boolean expResult = false;
+        LOG.info("getChangedFilesSinceRevision");
+        String revision = "1";
+        boolean expResult = false;
 //        Set<FileDto> result = plugin.getChangedFilesSinceRevision(revision);
 //        if(result != null)
 //            expResult=true;

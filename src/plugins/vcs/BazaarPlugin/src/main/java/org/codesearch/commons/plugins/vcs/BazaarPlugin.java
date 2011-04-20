@@ -28,11 +28,9 @@ import java.net.URISyntaxException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.logging.Level;
 import org.apache.log4j.Logger;
 import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
-import org.codesearch.commons.plugins.PluginLoaderException;
 import org.codesearch.commons.plugins.vcs.utils.BazaarUtils;
 import org.vcs.bazaar.client.IBazaarLogMessage;
 import org.vcs.bazaar.client.IBazaarStatus;
@@ -53,25 +51,19 @@ public class BazaarPlugin implements VersionControlPlugin {
      * Creates a new instance of the BazaarPlugin
      */
     public BazaarPlugin() {
-        try {
             bzr_util = BazaarUtils.getInstance();
-        } catch (BazaarClientException ex) {
-            LOG.error("Loading of the BazaarPlugin failed, you probably have to install Bazaar Xml Output\n"+ex);
-        }
     }
 
      /** {@inheritDoc} */
     @Override
     public void setRepository(RepositoryDto repo) throws VersionControlPluginException {
         try {
-            bl = bzr_util.createBranchLocation(repo.getUrl(), repo.getName(), repo.getPassword());
-            //remove protocol pattern
+            bl = bzr_util.createBranchLocation(repo.getUrl(),repo.getUsedAuthentication());
             bzr_util.setWorkingDirectory("/tmp/test/asdf");
         } catch (URISyntaxException ex) {
-            throw new VersionControlPluginException(ex.toString());
+            java.util.logging.Logger.getLogger(BazaarPlugin.class.getName()).log(Level.SEVERE, null, ex);
         } catch (NullPointerException ex){
-            //in case the bzr_util was never initialized
-            throw new VersionControlPluginException("BazaarUtil was never initialized, please check your installation of Bazaar Xml Output");
+            throw new VersionControlPluginException("BazaarUtil was never initialized, please check your installation of bzr-xmloutput >= 0.6.0 plugin");
         }
     }
 
