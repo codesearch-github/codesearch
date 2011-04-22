@@ -15,11 +15,11 @@
         <module>searcher</module>
     </modules>
 
-    <!-- LIBRARY VERSIONS -->
     <properties>
         <gwt.version>2.2.0</gwt.version>
         <spring.version>3.0.2.RELEASE</spring.version>
         <lucene.version>3.0.2</lucene.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
 
@@ -77,13 +77,13 @@
                 <artifactId>lucene-spellchecker</artifactId>
                 <version>${lucene.version}</version>
             </dependency>
-            
+
             <dependency>
                 <groupId>org.apache.lucene</groupId>
                 <artifactId>lucene-analyzers</artifactId>
                 <version>${lucene.version}</version>
             </dependency>
-            
+
             <!-- QUARTZ SCHEDULING -->
             <dependency>
                 <groupId>org.quartz-scheduler</groupId>

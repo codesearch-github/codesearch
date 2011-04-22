@@ -61,7 +61,7 @@ public class BazaarPlugin implements VersionControlPlugin {
             bl = bzr_util.createBranchLocation(repo.getUrl(),repo.getUsedAuthentication());
             bzr_util.setWorkingDirectory("/tmp/");
         } catch (URISyntaxException ex) {
-            java.util.logging.Logger.getLogger(BazaarPlugin.class.getName()).log(Level.SEVERE, null, ex);
+            LOG.error("Invalid URI: " + ex);
         } catch (NullPointerException ex){
             throw new VersionControlPluginException("BazaarUtil was never initialized, please check your installation of bzr-xmloutput >= 0.6.0 plugin");
         }

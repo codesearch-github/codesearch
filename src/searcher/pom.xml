@@ -17,12 +17,11 @@
     </parent>
 
     <dependencies>
-
         <dependency>
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>
         </dependency>
-        
+
         <dependency>
             <groupId>com.google.inject.extensions</groupId>
             <artifactId>guice-servlet</artifactId>
@@ -32,7 +31,7 @@
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-core</artifactId>
         </dependency>
-        
+
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-spellchecker</artifactId>
@@ -74,11 +73,6 @@
             <artifactId>jmimemagic</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>com.sun.xml.ws</groupId>
-            <artifactId>webservices-rt</artifactId>
-        </dependency>
-
         <!-- INTERNAL DEPENDENCIES -->
 
         <dependency>
@@ -92,7 +86,7 @@
             <artifactId>commons</artifactId>
             <version>0.1-SNAPSHOT</version>
         </dependency>
-        
+
     </dependencies>
 
     <build>
@@ -113,7 +107,6 @@
                         <goals>
                             <goal>compile</goal>
                             <goal>generateAsync</goal>
-                            <goal>test</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -131,16 +124,6 @@
         </plugins>
         <outputDirectory>${project.build.directory}/${project.build.finalName}/WEB-INF/classes</outputDirectory>
     </build>
-    <repositories>
-        <repository>
-            <url>http://download.java.net/maven/2</url>
-            <id>metro</id>
-            <layout>default</layout>
-            <name>Repository for library[metro]</name>
-        </repository>
-    </repositories>
-    <properties>
-    </properties>
 </project>
 
 

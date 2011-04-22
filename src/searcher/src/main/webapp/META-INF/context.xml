@@ -21,4 +21,4 @@
     along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
 
 -->
-<Context antiJARLocking="true" path="/searcher-0.1-SNAPSHOT"/>
+<Context antiJARLocking="true" path="/codesearch/searcher"/>
