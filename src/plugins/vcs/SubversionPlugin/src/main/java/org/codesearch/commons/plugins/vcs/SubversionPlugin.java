@@ -44,6 +44,7 @@ import org.tmatesoft.svn.core.internal.io.fs.FSRepositoryFactory;
 import org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryFactoryImpl;
 import org.tmatesoft.svn.core.io.SVNRepository;
 import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
+import sun.print.CUPSPrinter;
 
 /**
  * A plugin used to access files stored in Subversion repositories.
@@ -57,7 +58,8 @@ public class SubversionPlugin implements VersionControlPlugin {
     private SVNRepository svnRepo;
     private static final Logger LOG = Logger.getLogger(SubversionPlugin.class);
     private ISVNAuthenticationManager authManager;
-
+    private RepositoryDto repository;
+    //TODO make this solution less ugly
     /**
      * creates a new instance of SubversionPlugin and sets up all factories required for connections
      */
@@ -83,6 +85,7 @@ public class SubversionPlugin implements VersionControlPlugin {
     @Override
     public void setRepository(RepositoryDto repository) throws VersionControlPluginException {
         try {
+            this.repository = repository;
             SVNURL svnurl = SVNURL.parseURIDecoded(repository.getUrl().toString());
             svnRepo = SVNRepositoryFactory.create(svnurl);
             AuthenticationType type = repository.getUsedAuthentication();
@@ -90,7 +93,7 @@ public class SubversionPlugin implements VersionControlPlugin {
                 BasicAuthentication basicAuth = (BasicAuthentication) type;
                 authManager = new BasicAuthenticationManager(basicAuth.getUsername(), basicAuth.getPassword());
                 svnRepo.setAuthenticationManager(authManager);
-            } else if (type instanceof SshAuthentication){
+            } else if (type instanceof SshAuthentication) {
                 //TODO add support for ssh files
             }
             //TODO test if this works for svn repos without authentication
@@ -121,6 +124,8 @@ public class SubversionPlugin implements VersionControlPlugin {
             fileDto.setLastAlteration(lastAlterationDate);
             fileDto.setContent(baos.toByteArray());
             fileDto.setBinary(binary);
+            fileDto.setFilePath(filePath);
+            fileDto.setRepository(repository);
             return fileDto;
         } catch (SVNException ex) {
             throw new VersionControlPluginException(ex.toString());
@@ -151,17 +156,10 @@ public class SubversionPlugin implements VersionControlPlugin {
                     deletedFile.setFilePath(filePath);
                     files.add(deletedFile);
                 } else {
-                    boolean fileAlreadyInSet = false;
-                    for (FileDto currentFile : files) {
-                        if (currentFile != null && filePath.equals(currentFile.getFilePath())) {
-                            fileAlreadyInSet = true;
-                        }
-                    }
-                    if (!fileAlreadyInSet) {
-                        FileDto changedFile = getFileForFilePath(filePath);
-                        if (changedFile != null) {
-                            files.add(changedFile);
-                        }
+                    FileDto changedFile = getFileForFilePath(filePath);
+                    LOG.info("file: " + changedFile.getFilePath() + ": " + changedFile.hashCode());
+                    if (changedFile != null) {
+                        files.add(changedFile);
                     }
                 }
             }

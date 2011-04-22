@@ -116,4 +116,21 @@ public class FileDto {
         this.content = content;
         this.binary = binary;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if(o instanceof FileDto){
+            return o.hashCode() == this.hashCode();
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 67 * hash + (this.filePath != null ? this.filePath.hashCode() : 0);
+        return hash;
+    }
+
+
 }

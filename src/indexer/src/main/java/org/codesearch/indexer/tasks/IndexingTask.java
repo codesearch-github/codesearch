@@ -28,6 +28,7 @@ import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.collections.map.MultiValueMap;
@@ -143,8 +144,6 @@ public class IndexingTask implements Task {
             propertiesManager.setPropertyFileValue(repository.getName(), versionControlPlugin.getRepositoryRevision());
             long duration = System.currentTimeMillis() - start;
             LOG.info("Lucene indexing took " + duration / 1000 + " seconds");
-
-            
             if (codeAnalysisEnabled) {
                 LOG.info("Starting code analyzing");
                 start = System.currentTimeMillis();
@@ -179,6 +178,12 @@ public class IndexingTask implements Task {
             LOG.error("Index not found at indexing" + ex);
         } catch (IOException ex) {
             LOG.error("IOException occured at indexing: " + ex);
+        } finally {
+            try {
+                indexWriter.close();
+            } catch (CorruptIndexException ex) {
+            } catch (IOException ex) {
+            }
         }
         LOG.info("Finished indexing of repository: " + repository.getName());
     }
@@ -333,6 +338,9 @@ public class IndexingTask implements Task {
         try {
             int i = 0;
             for (FileDto file : changedFiles) {
+                if(file == null || file.getFilePath() == null){
+                    continue; //TODO find out why this can happen
+                }
                 String fileName;
                 try {
                     fileName = file.getFilePath().substring(file.getFilePath().lastIndexOf("/") + 1);
@@ -353,7 +361,6 @@ public class IndexingTask implements Task {
             }
             indexWriter.commit();
             //indexWriter.optimize(); //TODO check whether optimize makes removing of documents impossible
-            indexWriter.close();
         } catch (ConfigurationException ex) {
             LOG.error("Could not retrieve the list of lucene fields from the config\n" + ex);
         } catch (PluginLoaderException ex) {

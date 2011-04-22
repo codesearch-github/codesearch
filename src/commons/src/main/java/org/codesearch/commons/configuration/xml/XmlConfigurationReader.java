@@ -213,6 +213,7 @@ public class XmlConfigurationReader implements ConfigurationReader {
                 blacklistEntries,
                 whitelistFileNames,
                 repositoryGroups);
+        LOG.info("reading repository from configuration: " + repo.toString());
         return repo;
     }
 

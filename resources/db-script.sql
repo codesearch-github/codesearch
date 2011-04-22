@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Mar 27, 2011 at 12:46 PM
+-- Generation Time: Apr 22, 2011 at 04:50 PM
 -- Server version: 5.1.41
 -- PHP Version: 5.3.1
 
@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS `file` (
   `usages` longblob,
   PRIMARY KEY (`file_id`),
   KEY `repository_id` (`repository_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=4582 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=4960 ;
 
 --
 -- Dumping data for table `file`
@@ -68,10 +68,10 @@ CREATE TABLE IF NOT EXISTS `import` (
 CREATE TABLE IF NOT EXISTS `repository` (
   `repository_id` int(11) NOT NULL AUTO_INCREMENT,
   `repository_name` varchar(255) NOT NULL,
-  `last_analyzed_revision` varchar(255) NOT NULL DEFAULT '''0''',
+  `last_analyzed_revision` varchar(255) NOT NULL DEFAULT '0',
   PRIMARY KEY (`repository_id`),
   UNIQUE KEY `repository_name` (`repository_name`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=4 ;
 
 --
 -- Dumping data for table `repository`
@@ -91,7 +91,7 @@ CREATE TABLE IF NOT EXISTS `type` (
   `repo_id` int(11) NOT NULL,
   PRIMARY KEY (`type_id`),
   KEY `file_id` (`file_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1782 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2432 ;
 
 --
 -- Dumping data for table `type`

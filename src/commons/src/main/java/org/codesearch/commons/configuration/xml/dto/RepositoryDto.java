@@ -180,6 +180,12 @@ public class RepositoryDto {
             return true;
         }
         return false;
+    }
 
+    @Override
+    public String toString() {
+        String retString = "";
+        retString += "Name: "+ name + ", url: "+ url + ", used authentication: "+ usedAuthentication.toString();
+        return retString;
     }
 }

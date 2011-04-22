@@ -62,22 +62,13 @@
 
     <repositories>
         <repository>
-            <name>codesearch_repo</name>
-            <version-control-system>BZR</version-control-system>
-            <username></username>
-            <password></password>
-            <url>bzr+ssh://bazaar.launchpad.net/~codesearch-dev/codesearch/trunk/</url>
-            <code-navigation-enabled>true</code-navigation-enabled>
-            <authentication-data type='basic'>
-                <username>asdf</username>
-                <password>fdsa</password>
-            </authentication-data>
-            <blacklist-filenames>
-                <filename>.*\.xml</filename>
-            </blacklist-filenames>
+            <name>jdownloader-repo</name>
+            <version-control-system>SSH</version-control-system>
             <repository-groups>
                 <repo-group>group1</repo-group>
             </repository-groups>
+            <url>svn://svn.jdownloader.org/jdownloader</url>
+            <code-navigation-enabled>false</code-navigation-enabled>
         </repository>
         <repository>
             <name>svn_local</name>

@@ -107,7 +107,7 @@ public class IndexingJob implements Job {
                 jec.getJobDetail().getJobDataMap().put(FIELD_CURRENT_REPOSITORY, taskDto.getRepository().getName());
                 task.setRepository(taskDto.getRepository());
                 task.setIndexLocation(configReader.getValue(XmlConfigurationReaderConstants.INDEX_LOCATION));
-                task.setCodeAnalysisEnabled(taskDto.isCodeAnalysisEnabled());
+                task.setCodeAnalysisEnabled(taskDto.getRepository().isCodeNavigationEnabled());//TODO move code analyis enabled
                 task.setIndexLocation(configReader.getValue(XmlConfigurationReaderConstants.INDEX_LOCATION));
                 task.execute();
                 jec.getJobDetail().getJobDataMap().put(FIELD_TASKS_FINISHED, i + 1);
