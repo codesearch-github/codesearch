@@ -60,6 +60,7 @@ public class SubversionPlugin implements VersionControlPlugin {
     private ISVNAuthenticationManager authManager;
     private RepositoryDto repository;
     //TODO make this solution less ugly
+
     /**
      * creates a new instance of SubversionPlugin and sets up all factories required for connections
      */
@@ -157,8 +158,9 @@ public class SubversionPlugin implements VersionControlPlugin {
                     files.add(deletedFile);
                 } else {
                     FileDto changedFile = getFileForFilePath(filePath);
-                    LOG.info("file: " + changedFile.getFilePath() + ": " + changedFile.hashCode());
+
                     if (changedFile != null) {
+                        LOG.info("file: " + changedFile.getFilePath() + ": " + changedFile.hashCode());
                         files.add(changedFile);
                     }
                 }

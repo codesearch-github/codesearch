@@ -28,7 +28,6 @@ import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.collections.map.MultiValueMap;
@@ -183,6 +182,8 @@ public class IndexingTask implements Task {
                 indexWriter.close();
             } catch (CorruptIndexException ex) {
             } catch (IOException ex) {
+            } catch (NullPointerException ex){
+                
             }
         }
         LOG.info("Finished indexing of repository: " + repository.getName());
