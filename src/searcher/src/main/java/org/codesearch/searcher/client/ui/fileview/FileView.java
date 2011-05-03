@@ -95,9 +95,10 @@ public interface FileView extends IsWidget {
     void goToLine(int lineNumber);
 
     Presenter getPresenter();
-    
+
     interface Presenter {
         void goTo(Place place);
+        void goBack();
         void goToUsage(int usageId);
     }
 }

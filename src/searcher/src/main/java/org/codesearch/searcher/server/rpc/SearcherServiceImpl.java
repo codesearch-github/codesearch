@@ -24,8 +24,10 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import net.sf.jmimemagic.Magic;
 import net.sf.jmimemagic.MagicException;
@@ -59,6 +61,7 @@ import org.codesearch.searcher.shared.FileDto;
 import org.codesearch.searcher.shared.SearcherServiceException;
 import org.codesearch.searcher.shared.OutlineNode;
 import org.codesearch.searcher.shared.SearchResultDto;
+import org.codesearch.searcher.shared.SearchType;
 import org.codesearch.searcher.shared.SidebarNode;
 
 /**
@@ -96,10 +99,15 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
 
     /** {@inheritDoc} */
     @Override
-    public List<SearchResultDto> doSearch(String query, boolean caseSensitive, List<String> selectedRepositories, List<String> selectedRepositoryGroups) throws SearcherServiceException {
+    public List<SearchResultDto> doSearch(String query, boolean caseSensitive, SearchType searchType, Set<String> selection) throws SearcherServiceException {
         List<SearchResultDto> resultItems = new LinkedList<SearchResultDto>();
         try {
-            resultItems = documentSearcher.search(query, caseSensitive, selectedRepositories, selectedRepositoryGroups);
+            //TODO fix incompatibility
+            if (searchType == SearchType.REPOSITORIES) {
+                resultItems = documentSearcher.search(query, caseSensitive, selection, new HashSet<String>());
+            } else if (searchType == SearchType.REPOSITORY_GROUPS) {
+                resultItems = documentSearcher.search(query, caseSensitive, new HashSet<String>(), selection);
+            }
         } catch (ParseException ex) {
             throw new SearcherServiceException("Invalid search query: \n" + ex);
         } catch (IOException ex) {
@@ -170,9 +178,11 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
                 HighlightingPlugin hlPlugin = pluginLoader.getPlugin(HighlightingPlugin.class, guessedMimeType);
                 String highlightingEscapeStartToken = hlPlugin.getEscapeStartToken();
                 String highlightingEscapeEndToken = hlPlugin.getEscapeEndToken();
-                byte[] parsedFileContent = addUsageLinksToFileContent(vcFile.getContent(), filePath, repository, highlightingEscapeStartToken, highlightingEscapeEndToken);
-                file.setFileContent(hlPlugin.parseToHtml(parsedFileContent, guessedMimeType));
+                //FIXME disabled for demonstraiton
+                //byte[] parsedFileContent = addUsageLinksToFileContent(vcFile.getContent(), filePath, repository, highlightingEscapeStartToken, highlightingEscapeEndToken);
+                file.setFileContent(hlPlugin.parseToHtml(vcFile.getContent(), guessedMimeType));
             } catch (PluginLoaderException ex) {
+                LOG.debug("No suitable highlighting plugin found");
                 // No plugin found, just escape to HTML
                 file.setFileContent(StringEscapeUtils.escapeHtml(new String(vcFile.getContent())));
             }
@@ -194,7 +204,7 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
             ExternalUsage usage = dba.getUsageForIdInFile(usageId, filePath, repository);
             String targetFilePath = getFilePathOfDeclaration(repository, usage.getTargetClassName(), filePath);
             AstNode ast = getAstOfFileContainingDeclaration(repository, targetFilePath, filePath);
-            
+
             usage.resolveLink(targetFilePath, ast);
             LOG.debug(usage.getTargetClassName());
             LOG.debug(usage.getTargetFilePath());
@@ -213,8 +223,7 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
         return null;
     }
 
-    
-    private AstNode getAstOfFileContainingDeclaration(String repository, String targetFilePath, String originFilePath) throws DatabaseAccessException, DatabaseEntryNotFoundException{
+    private AstNode getAstOfFileContainingDeclaration(String repository, String targetFilePath, String originFilePath) throws DatabaseAccessException, DatabaseEntryNotFoundException {
         return dba.getBinaryIndexForFile(targetFilePath, repository);
     }
 
@@ -329,5 +338,4 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
         }
         return fileContentBytes;
     }
-
 }

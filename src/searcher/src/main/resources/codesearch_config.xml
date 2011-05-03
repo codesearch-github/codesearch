@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright 2010 David Froehlich   <david.froehlich@businesssoftware.at>,
+                   Samuel Kogler     <samuel.kogler@gmail.com>,
+                   Stephan Stiboller <stistc06@htlkaindorf.at>
+
+    This file is part of Codesearch.
+
+    Codesearch is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Codesearch is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
+
+-->
+
+<root>
+    <dbms>mysql</dbms>
+    <db-username>codesearch</db-username>
+    <db-password>dota!123</db-password>
+    <db-driver>com.mysql.jdbc.Driver</db-driver>
+    <db-url>127.0.0.1</db-url>
+    <db-port-number>3306</db-port-number>
+    <db-name>codesearch</db-name>
+    <db-max-connections>100</db-max-connections>
+
+    <searcher-location>http://127.0.0.1:8080/codesearch/searcher/</searcher-location>
+
+    <global-blacklist-filenames>
+        <filename>.*\.svn.*</filename>
+        <filename>.*\.class</filename>
+        <filename>.*\.o</filename>
+        <filename>.*\.bin</filename>
+    </global-blacklist-filenames>
+
+    <index-location>/tmp/test/</index-location>
+
+    <index-jobs>
+        <index-job>
+            <repositories>svn_local</repositories>
+            <cron-expression>0 * * * * ?</cron-expression>
+            <tasks>
+                <task>
+                    <type>clear</type>
+                </task>
+                <task>
+                    <type>index</type>
+                </task>
+            </tasks>
+        </index-job>
+    </index-jobs>
+
+    <repository-groups>local main experimental development</repository-groups>
+
+    <repositories>
+        <repository>
+            <name>svn_local</name>
+            <version-control-system>FILESYSTEM</version-control-system>
+            <authentication-data type='none'></authentication-data>
+            <repository-groups>
+                <repo-group>local</repo-group>
+            </repository-groups>
+            <url>$home/workspace/svnsearch</url>
+            <code-navigation-enabled>true</code-navigation-enabled>
+        </repository>
+
+        <repository>
+            <name>codesearch_main</name>
+            <version-control-system>FILESYSTEM</version-control-system>
+            <authentication-data type='none'></authentication-data>
+            <repository-groups>
+                <repo-group>main</repo-group>
+            </repository-groups>
+            <url>$home/workspace/svnsearch</url>
+            <code-navigation-enabled>true</code-navigation-enabled>
+        </repository>
+
+        <repository>
+            <name>codesearch_development</name>
+            <version-control-system>FILESYSTEM</version-control-system>
+            <authentication-data type='none'></authentication-data>
+            <repository-groups>
+                <repo-group>development</repo-group>
+            </repository-groups>
+            <url>$home/workspace/svnsearch</url>
+            <code-navigation-enabled>true</code-navigation-enabled>
+        </repository>
+
+         <repository>
+            <name>codesearch_experimental</name>
+            <version-control-system>FILESYSTEM</version-control-system>
+            <authentication-data type='none'></authentication-data>
+            <repository-groups>
+                <repo-group>experimental</repo-group>
+            </repository-groups>
+            <url>$home/workspace/svnsearch</url>
+            <code-navigation-enabled>true</code-navigation-enabled>
+        </repository>
+
+        <repository>
+            <name>jdownloader_main</name>
+            <version-control-system>FILESYSTEM</version-control-system>
+            <authentication-data type='none'></authentication-data>
+            <repository-groups>
+                <repo-group>main</repo-group>
+            </repository-groups>
+            <url>$home/workspace/svnsearch</url>
+            <code-navigation-enabled>true</code-navigation-enabled>
+        </repository>
+    </repositories>
+</root>

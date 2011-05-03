@@ -32,3 +32,6 @@ doc/thesis/test.tex
 doc/kickoff_presentation/presentation.nav
 doc/kickoff_presentation/presentation.pdf
 doc/kickoff_presentation/presentation.snm
+*.lol
+*.lof
+thesis/diploma_thesis.pdf

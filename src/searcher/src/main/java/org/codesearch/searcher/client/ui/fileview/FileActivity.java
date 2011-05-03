@@ -34,6 +34,8 @@ import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
+import org.codesearch.searcher.client.ui.searchview.SearchPlace;
+import org.codesearch.searcher.shared.SearchType;
 import org.codesearch.searcher.shared.SearchResultDto;
 
 /**
@@ -61,11 +63,11 @@ public class FileActivity extends AbstractActivity implements Presenter {
     public void start(AcceptsOneWidget panel, EventBus eventBus) {
         fileView = clientFactory.getFileView();
         fileView.setPresenter(this);
+        panel.setWidget(fileView.asWidget());
         fileView.setFilePath(filePath);
         fileView.setRepository(repository);
         fileView.connectEventHandlers();
         fileView.setSearchTerm(searchTerm);
-        panel.setWidget(fileView.asWidget());
         searcherServiceAsync.getFile(repository, filePath, new GetFileCallback());
     }
 
@@ -86,6 +88,12 @@ public class FileActivity extends AbstractActivity implements Presenter {
         searcherServiceAsync.resolveUsage(usageId, repository, filePath, new ResolveUsageCallback());
     }
 
+    @Override
+    public void goBack() {
+        //TODO replace default values
+        this.goTo(new SearchPlace(searchTerm, SearchType.REPOSITORIES, null));
+    }
+
     private class ResolveUsageCallback implements AsyncCallback<SearchResultDto> {
 
         @Override
@@ -99,7 +107,7 @@ public class FileActivity extends AbstractActivity implements Presenter {
         }
 
     }
-    
+
     private class GetFileCallback implements AsyncCallback<FileDto>  {
 
         /** {@inheritDoc} */
@@ -114,6 +122,6 @@ public class FileActivity extends AbstractActivity implements Presenter {
             fileView.setFileContent(result.getFileContent(), result.isBinary());
             fileView.setOutline(result.getOutline());
         }
-        
+
     }
 }

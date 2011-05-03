@@ -58,5 +58,4 @@
             <g:FlowPanel ui:field='errorPanel' styleName='{style.errorMessage}' />
         </g:south>
     </g:DockLayoutPanel>
-
 </ui:UiBinder>

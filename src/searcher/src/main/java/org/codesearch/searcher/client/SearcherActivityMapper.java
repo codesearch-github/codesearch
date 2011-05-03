@@ -48,7 +48,8 @@ public class SearcherActivityMapper implements ActivityMapper {
     @Override
     public Activity getActivity(Place place) {
         if(place instanceof SearchPlace) {
-            return new SearchActivity(clientFactory);
+            SearchPlace searchPlace = (SearchPlace) place;
+            return new SearchActivity(clientFactory, searchPlace);
         }
         if(place instanceof FilePlace) {
             FilePlace filePlace = (FilePlace) place;

@@ -29,12 +29,11 @@ import com.google.gwt.activity.shared.ActivityMapper;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.place.shared.Place;
-import com.google.gwt.place.shared.PlaceChangeEvent;
 import com.google.gwt.place.shared.PlaceController;
 import com.google.gwt.place.shared.PlaceHistoryHandler;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
+import org.codesearch.searcher.shared.SearchType;
 
 /**
  * The entry point for the searcher.
@@ -42,14 +41,14 @@ import com.google.gwt.user.client.ui.RootLayoutPanel;
  */
 public class SearcherEntryPoint implements EntryPoint {
 
-    private Place defaultPlace = new SearchPlace();
+    private Place defaultPlace = new SearchPlace("", SearchType.REPOSITORIES, null);
     private RootContainer rootContainer = new RootContainer();
 
     /** {@inheritDoc} */
     @Override
     public void onModuleLoad() {
         Resources.INSTANCE.searcherStyle().ensureInjected();
-        
+
         ClientFactory clientFactory = ClientFactory.getDefaultFactory();
         EventBus eventBus = clientFactory.getEventBus();
         PlaceController placeController = clientFactory.getPlaceController();

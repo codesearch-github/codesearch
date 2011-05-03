@@ -16,6 +16,10 @@
         <version>0.1-SNAPSHOT</version>
     </parent>
 
+    <properties>
+        <webappDirectory>${project.build.directory}/${project.build.finalName}</webappDirectory>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.google.inject</groupId>
@@ -42,20 +46,16 @@
             <artifactId>lucene-analyzers</artifactId>
         </dependency>
 
-        <!--dependency>
-            <groupId>xerces</groupId>
-            <artifactId>xercesImpl</artifactId>
-            <version>2.9.1</version>
-        </dependency-->
-
         <dependency>
             <groupId>com.google.gwt</groupId>
             <artifactId>gwt-user</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>com.google.gwt</groupId>
             <artifactId>gwt-servlet</artifactId>
+            <scope>runtime</scope>
         </dependency>
 
         <dependency>
@@ -69,12 +69,15 @@
         </dependency>
 
         <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>jmimemagic</groupId>
             <artifactId>jmimemagic</artifactId>
         </dependency>
-
         <!-- INTERNAL DEPENDENCIES -->
-
         <dependency>
             <groupId>org.codesearch</groupId>
             <artifactId>DefaultHighlightingPlugin</artifactId>
@@ -90,15 +93,10 @@
     </dependencies>
 
     <build>
+        <!-- Generate compiled stuff in the folder used for developing mode -->
+        <outputDirectory>${webappDirectory}/WEB-INF/classes</outputDirectory>
         <plugins>
-            <plugin>
-                <artifactId>maven-war-plugin</artifactId>
-            </plugin>
-
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-            </plugin>
-
+             <!-- GWT Maven Plugin -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>gwt-maven-plugin</artifactId>
@@ -111,18 +109,27 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <gwtVersion>${gwt.version}</gwtVersion>
-                    <runTarget>/index.html</runTarget>
-                    <hostedWebapp>${project.build.directory}/${project.build.finalName}</hostedWebapp>
-                    <modules>
-                        <module>${project.groupId}.${project.artifactId}.Searcher</module>
-                    </modules>
-                    <style>PRETTY</style>
-                    <copyWebapp>true</copyWebapp>
+                    <runTarget>index.html</runTarget>
+                    <hostedWebapp>${webappDirectory}</hostedWebapp>
+                </configuration>
+            </plugin>
+            <!-- Copy static web files before executing gwt:run -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>exploded</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <webappDirectory>${webappDirectory}</webappDirectory>
                 </configuration>
             </plugin>
         </plugins>
-        <outputDirectory>${project.build.directory}/${project.build.finalName}/WEB-INF/classes</outputDirectory>
     </build>
 </project>
 

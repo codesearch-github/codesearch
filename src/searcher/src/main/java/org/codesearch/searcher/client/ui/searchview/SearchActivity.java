@@ -18,10 +18,8 @@
  * You should have received a copy of the GNU General Public License
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.codesearch.searcher.client.ui.searchview;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import org.codesearch.searcher.client.ClientFactory;
@@ -46,6 +44,88 @@ public class SearchActivity extends AbstractActivity implements SearchView.Prese
     private ClientFactory clientFactory;
     private SearchView searchView;
     private SearcherServiceAsync searcherServiceAsync = GWT.create(SearcherService.class);
+    private SearchPlace searchPlace;
+    private boolean reposLoaded = false;
+    private boolean repoGroupsLoaded = false;
+
+    public SearchActivity(ClientFactory clientFactory, SearchPlace searchPlace) {
+        this.clientFactory = clientFactory;
+        this.searchPlace = searchPlace;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void start(AcceptsOneWidget panel, EventBus eventBus) {
+        searchView = clientFactory.getSearchView();
+        searchView.cleanup();
+        reposLoaded = false;
+        repoGroupsLoaded = false;
+        searchView.setPresenter(this);
+        searchView.setSearchType(searchPlace.getSearchType());
+        searchView.getSearchBox().setValue(searchPlace.getSearchTerm());
+        panel.setWidget(searchView.asWidget());
+        updateRepositories();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void goTo(Place place) {
+        clientFactory.getPlaceController().goTo(place);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void doSearch() {
+        String query = searchView.getSearchBox().getValue();
+        searchPlace.setSearchTerm(query);
+        searchPlace.setSearchType(searchView.getSearchType());
+        searchPlace.setSelection(searchView.getSelection());
+        goTo(new SearchPlace(query, searchView.getSearchType(), searchView.getSelection()));
+    }
+
+    private void search() {
+        if (repoGroupsLoaded && reposLoaded) {
+            searcherServiceAsync.doSearch(searchView.getSearchBox().getValue(), searchView.getCaseSensitive().getValue(),
+                    searchView.getSearchType(), searchView.getSelection(), new DoSearchHandler());
+        }
+    }
+
+    private void updateRepositories() {
+        searcherServiceAsync.getAvailableRepositories(new AsyncCallback<List<String>>() {
+
+            /** {@inheritDoc} */
+            @Override
+            public void onFailure(Throwable caught) {
+                Window.alert("Remote call trying to fetch available repositories failed:\n" + caught);
+            }
+
+            /** {@inheritDoc} */
+            @Override
+            public void onSuccess(List<String> result) {
+                searchView.setAvailableRepositories(result);
+                searchView.setSelection(searchPlace.getSelection());
+                reposLoaded = true;
+                search();
+            }
+        });
+        searcherServiceAsync.getAvailableRepositoryGroups(new AsyncCallback<List<String>>() {
+
+            /** {@inheritDoc} */
+            @Override
+            public void onFailure(Throwable caught) {
+                Window.alert("Remote call trying to fetch available repository groups failed:\n" + caught);
+            }
+
+            /** {@inheritDoc} */
+            @Override
+            public void onSuccess(List<String> result) {
+                searchView.setAvailableRepositoryGroups(result);
+                searchView.setSelection(searchPlace.getSelection());
+                repoGroupsLoaded = true;
+                search();
+            }
+        });
+    }
 
     /**
      * Handles calls to the doSearch RPC method.
@@ -65,89 +145,5 @@ public class SearchActivity extends AbstractActivity implements SearchView.Prese
             searchView.setSearchResults(resultList);
             searchView.getResultsView().setVisible(true);
         }
-    }
-
-    public SearchActivity(ClientFactory clientFactory) {
-        this.clientFactory = clientFactory;
-    }
-
-    /**
-     * Starts the activity.
-     * @param panel
-     * @param eventBus
-     */
-    /** {@inheritDoc} */
-    @Override
-    public void start(AcceptsOneWidget panel, EventBus eventBus) {
-        searchView = clientFactory.getSearchView();
-        searchView.setPresenter(this);
-        updateRepositories();
-        panel.setWidget(searchView.asWidget());
-    }
-
-    /**
-     * Navigate to a new place.
-     * @param place
-     */
-    /** {@inheritDoc} */
-    @Override
-    public void goTo(Place place) {
-        clientFactory.getPlaceController().goTo(place);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void doSearch() {
-        String query = searchView.getSearchBox().getValue();
-        List<String> selectedRepositories = new LinkedList<String>();
-        List<String> selectedRepositoryGroups = new LinkedList<String>();
-        if (searchView.getRepositorySearchType() == SearchView.RepositorySearchType.REPOSITORY) {
-            for (int i = 0; i < searchView.getRepositoryList().getItemCount(); i++) {
-                if (searchView.getRepositoryList().isItemSelected(i)) {
-                    selectedRepositories.add(searchView.getRepositoryList().getItemText(i));
-                }
-            }
-        } else {
-            for (int i = 0; i < searchView.getRepositoryList().getItemCount(); i++) {
-                if (searchView.getRepositoryList().isItemSelected(i)) {
-                    selectedRepositoryGroups.add(searchView.getRepositoryList().getItemText(i));
-                }
-            }
-        }
-        searcherServiceAsync.doSearch(query, searchView.getCaseSensitive().getValue(),
-                selectedRepositories, selectedRepositoryGroups, new DoSearchHandler());
-    }
-
-    private void updateRepositories() {
-        searcherServiceAsync.getAvailableRepositories(new AsyncCallback<List<String>>() {
-
-            /** {@inheritDoc} */
-            @Override
-            public void onFailure(Throwable caught) {
-                Window.alert("Remote call trying to fetch available repositories failed:\n" + caught);
-            }
-
-            /** {@inheritDoc} */
-            @Override
-            public void onSuccess(List<String> result) {
-                searchView.setAvailableRepositories(result);
-            }
-        });
-        searcherServiceAsync.getAvailableRepositoryGroups(new AsyncCallback<List<String>>() {
-
-            /** {@inheritDoc} */
-            @Override
-            public void onFailure(Throwable caught) {
-                Window.alert("Remote call trying to fetch available repository groups failed:\n" + caught);
-            }
-
-            /** {@inheritDoc} */
-            @Override
-            public void onSuccess(List<String> result) {
-                for (String repo : result) {
-                    searchView.setAvailableRepositoryGroups(result);
-                }
-            }
-        });
     }
 }

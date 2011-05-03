@@ -104,14 +104,13 @@
         <g:north size="65">
             <g:HTMLPanel addStyleNames="{style.header}">
                 <div class="{style.controlbar}">
-                    <g:Button ui:field="backButton" text="Back" />
                     <g:Button ui:field="goToLineButton" text="Go to line" />
                     <g:Button ui:field="sidebarButton" text="Sidebar" />
                     <div class="{style.clearfix}"/>
                 </div>
                 <div class="{style.fileinfo}">
                     <g:Label ui:field="repositoryField" addStyleNames="{style.repositoryLabel}" />
-                    <g:Label ui:field="pathField" />
+                    <g:Label ui:field="filenameLabel" />
                     <div class="{style.clearfix}"/>
                 </div>
             </g:HTMLPanel>

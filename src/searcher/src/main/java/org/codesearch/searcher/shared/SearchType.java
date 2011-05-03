@@ -19,31 +19,13 @@
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-.java_type{
-    color: #000000;
-}
-.java_keyword{
-    color: #7F0055; font-weight: bold;
-}
-.java_javadoc_comment{
-    color: #3F5FBF;
-}
-.java_comment{
-    color: #3F7F5F;
-}
-.java_operator{
-    color: #000000;
-}
-.java_plain{
-    color: #000000;
-}
-.java_literal{
-    color: #2A00FF;
-}
+package org.codesearch.searcher.shared;
 
-.java_javadoc_tag{
-    color: #7F9FBF; font-weight: bold;
-}
-.java_separator{
-    color: #000000;
+/**
+ *
+ * @author Samuel Kogler
+ */
+public enum SearchType {
+    REPOSITORIES,
+    REPOSITORY_GROUPS
 }

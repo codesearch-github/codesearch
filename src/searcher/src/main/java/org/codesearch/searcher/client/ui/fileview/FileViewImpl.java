@@ -24,7 +24,6 @@ import java.util.List;
 
 import org.codesearch.searcher.client.ui.fileview.sidebar.Sidebar;
 import org.codesearch.searcher.client.ui.fileview.sidebar.SidebarImpl;
-import org.codesearch.searcher.client.ui.searchview.SearchPlace;
 import org.codesearch.searcher.shared.OutlineNode;
 import org.codesearch.searcher.shared.SidebarNode;
 
@@ -41,6 +40,7 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.Event.NativePreviewEvent;
 import com.google.gwt.user.client.Event.NativePreviewHandler;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -58,8 +58,6 @@ import org.codesearch.searcher.client.ClientFactory;
  * @author Samuel Kogler
  */
 public class FileViewImpl extends Composite implements FileView {
-
-
     //TODO cleanup this class
 
     interface FileViewUiBinder extends UiBinder<Widget, FileViewImpl> {
@@ -80,11 +78,9 @@ public class FileViewImpl extends Composite implements FileView {
     @UiField
     ScrollPanel scrollWrapper;
     @UiField
-    Label pathField;
+    Label filenameLabel;
     @UiField
     Label repositoryField;
-    @UiField
-    HasClickHandlers backButton;
     @UiField
     HasClickHandlers sidebarButton;
     @UiField
@@ -110,11 +106,6 @@ public class FileViewImpl extends Composite implements FileView {
     public FileViewImpl() {
         initWidget(uiBinder.createAndBindUi(this));
         exportJSFunctions();
-    }
-
-    @UiHandler("backButton")
-    void onBack(ClickEvent event) {
-        presenter.goTo(new SearchPlace());
     }
 
     @UiHandler("goToLineButton")
@@ -170,25 +161,30 @@ public class FileViewImpl extends Composite implements FileView {
             highlightSearchTerm(fileContent);
         }
 
-        fileContent = "<pre>" + fileContent + "</pre>";
+        fileContent = "<pre id='fileContent'>" + fileContent + "</pre>";
 
+        HTML html = new HTML(fileContent);
+        fileContentContainer.add(html);
 
-        fileContentContainer.add(new HTML(fileContent));
+        highlight("#fileContent", searchTerm);
     }
+
+    private native void highlight(String selector, String term)/*-{
+    $wnd.jQuery(selector).highlight(term);
+    }-*/;
 
     /** {@inheritDoc} */
     @Override
     public void setSearchTerm(String searchTerm) {
         this.searchTerm = searchTerm;
     }
-    
+
     /**
      * Highlights the search term in the given file content
      * @param fileContent
      */
-    public void highlightSearchTerm(String fileContent)
-    {
-       
+    public void highlightSearchTerm(String fileContent) {
+        //TODO implement
     }
 
     /** {@inheritDoc} */
@@ -212,7 +208,14 @@ public class FileViewImpl extends Composite implements FileView {
     /** {@inheritDoc} */
     @Override
     public void setFilePath(String filePath) {
-        pathField.setText(filePath);
+        if (filePath != null) {
+            String fileName = filePath;
+            if (fileName.contains("/")) {
+                fileName = fileName.substring(filePath.lastIndexOf('/') + 1);
+            }
+            filenameLabel.setText(fileName);
+            filenameLabel.setTitle(filePath);
+        }
     }
 
     /** {@inheritDoc} */
@@ -319,10 +322,8 @@ public class FileViewImpl extends Composite implements FileView {
         public void onPreviewNativeEvent(NativePreviewEvent event) {
             switch (event.getNativeEvent().getCharCode()) {
                 case 'g':
+                    event.consume();
                     goToLineWithDialog();
-                    break;
-                case 'b':
-                    onBack(null);
                     break;
             }
         }

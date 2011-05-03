@@ -30,9 +30,14 @@
         </dependency>
 
         <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
 
 		<!-- Quartz scheduling -->

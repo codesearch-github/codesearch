@@ -20,7 +20,9 @@
  */
 package org.codesearch.searcher.client.ui.searchview;
 
+import org.codesearch.searcher.shared.SearchType;
 import java.util.List;
+import java.util.Set;
 
 import org.codesearch.searcher.client.ui.fileview.FilePlace;
 import org.codesearch.searcher.shared.SearchResultDto;
@@ -29,6 +31,8 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyUpEvent;
+import com.google.gwt.event.logical.shared.SelectionEvent;
+import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -37,6 +41,7 @@ import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.SimplePager.TextLocation;
 import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -49,6 +54,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.NoSelectionModel;
 import com.google.gwt.view.client.SelectionChangeEvent;
+import java.util.HashSet;
 
 /**
  * Implements the functionality of the search page.
@@ -74,7 +80,6 @@ public class SearchViewImpl extends Composite implements SearchView {
     CellTable<SearchResultDto> resultTable;
     @UiField(provided = true)
     SimplePager resultTablePager;
-
     // OTHER UI ELEMENTS
     @UiField
     TextBox searchBox;
@@ -90,8 +95,10 @@ public class SearchViewImpl extends Composite implements SearchView {
     FlowPanel resultView;
     @UiField
     HasValue<Boolean> caseSensitive;
-    
     private Presenter presenter;
+    private SearchType searchType;
+
+    private NumberFormat relevanceFormatter = NumberFormat.getFormat("00.00");
 
     public SearchViewImpl() {
         initResultTable();
@@ -109,7 +116,58 @@ public class SearchViewImpl extends Composite implements SearchView {
     @UiHandler("searchBox")
     void onSearchBoxKeyUp(KeyUpEvent event) {
         if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+            event.preventDefault();
             searchButton.click();
+        }
+    }
+
+    @UiHandler("repositoryTabPanel")
+    void onSearchTypeSelection(SelectionEvent<Integer> e) {
+        int i = repositoryTabPanel.getSelectedIndex();
+        if (i == 0) {
+            searchType = SearchType.REPOSITORIES;
+        } else if (i == 1) {
+            searchType = SearchType.REPOSITORY_GROUPS;
+        }
+    }
+
+    @Override
+    public void cleanup() {
+        repositoryList.setSelectedIndex(-1);
+        repositoryGroupList.setSelectedIndex(-1);
+        searchResultDataProvider.getList().clear();
+        resultTable.redraw();
+        searchBox.setText("");
+        setSearchType(SearchType.REPOSITORIES);
+    }
+
+    @Override
+    public void setSearchType(SearchType searchType) {
+        this.searchType = searchType;
+        if (searchType == SearchType.REPOSITORIES) {
+            repositoryTabPanel.selectTab(0);
+        } else if (searchType == SearchType.REPOSITORY_GROUPS) {
+            repositoryTabPanel.selectTab(1);
+        }
+    }
+
+    @Override
+    public Set<String> getSelection() {
+        if (searchType == SearchType.REPOSITORIES) {
+            return getListSelection(repositoryList);
+        } else if (searchType == SearchType.REPOSITORY_GROUPS) {
+            return getListSelection(repositoryGroupList);
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public void setSelection(Set<String> selection) {
+        if (searchType == SearchType.REPOSITORIES) {
+            updateListSelection(repositoryList, selection);
+        } else if (searchType == SearchType.REPOSITORY_GROUPS) {
+            updateListSelection(repositoryGroupList, selection);
         }
     }
 
@@ -175,11 +233,27 @@ public class SearchViewImpl extends Composite implements SearchView {
 
     /** {@inheritDoc} */
     @Override
-    public RepositorySearchType getRepositorySearchType() {
-        if (repositoryTabPanel.getSelectedIndex() == 0) {
-            return SearchView.RepositorySearchType.REPOSITORY;
-        } else {
-            return SearchView.RepositorySearchType.REPOSITORY_GROUPS;
+    public SearchType getSearchType() {
+        return searchType;
+    }
+
+    private Set<String> getListSelection(ListBox lb) {
+        Set<String> selection = new HashSet<String>();
+        for (int i = 0; i < lb.getItemCount(); i++) {
+            if (lb.isItemSelected(i)) {
+                selection.add(lb.getItemText(i));
+            }
+        }
+        return selection;
+    }
+
+    private void updateListSelection(ListBox lb, Set<String> selection) {
+        for (int i = 0; i < lb.getItemCount(); i++) {
+            if (selection.contains(lb.getItemText(i))) {
+                lb.setItemSelected(i, true);
+            } else {
+                lb.setItemSelected(i, false);
+            }
         }
     }
 
@@ -195,7 +269,7 @@ public class SearchViewImpl extends Composite implements SearchView {
             /** {@inheritDoc} */
             @Override
             public String getValue(SearchResultDto dto) {
-                return String.valueOf(dto.getRelevance());
+                return relevanceFormatter.format(dto.getRelevance());
             }
         }, RELEVANCE_TITLE);
 

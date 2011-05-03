@@ -136,13 +136,12 @@ public class IndexingTask implements Task {
             LOG.info(changedFiles.size() + " files have changed since the last indexing");
 
             boolean retrieveNewFileList = false;
-//            for(String s : repository.getWhitelistEntries()){
-//                System.out.println(s);
-//            }
+
             executeIndexing();
             propertiesManager.setPropertyFileValue(repository.getName(), versionControlPlugin.getRepositoryRevision());
             long duration = System.currentTimeMillis() - start;
             LOG.info("Lucene indexing took " + duration / 1000 + " seconds");
+
             if (codeAnalysisEnabled) {
                 LOG.info("Starting code analyzing");
                 start = System.currentTimeMillis();
@@ -161,8 +160,7 @@ public class IndexingTask implements Task {
             //notify the searcher about the update of the indexer
             notifySearcher();
         } catch (NotifySearcherException ex) {
-            LOG.error("IndexingTask was not able to notify the searcher about the updated index, indexing process aborted\n"
-                    + "the searcher will still work, but changes in the index will not be recognized" + ex);
+            LOG.error("Notification of searcher failed, changes in the index will not be recognized without a restart.\n" + ex);
         } catch (InvalidIndexLocationException ex) {
             LOG.error("Error at indexing: " + ex);
         } catch (ConfigurationException ex) {
@@ -180,10 +178,8 @@ public class IndexingTask implements Task {
         } finally {
             try {
                 indexWriter.close();
-            } catch (CorruptIndexException ex) {
-            } catch (IOException ex) {
-            } catch (NullPointerException ex){
-                
+            } catch (Exception ex) {
+                LOG.error("Could not close the index writer:\n" + ex);
             }
         }
         LOG.info("Finished indexing of repository: " + repository.getName());
@@ -194,12 +190,12 @@ public class IndexingTask implements Task {
      * @throws NotifySearcherException in case the connection to the searcher could not be established
      */
     private void notifySearcher() throws NotifySearcherException {
+        String searcherLocation = configReader.getValue(XmlConfigurationReaderConstants.SEARCHER_LOCATION) + "updateIndexer"; //TODO move to a constant
         try {
-            String searcherLocation = configReader.getValue(XmlConfigurationReaderConstants.SEARCHER_LOCATION) + "updateIndexer"; //TODO move to a constant
             URL url = new URL(searcherLocation);
             url.openStream();
         } catch (IOException ex) {
-            throw new NotifySearcherException(ex.toString());
+            throw new NotifySearcherException("Could not connect to searcher at the configured address: " + searcherLocation + "\n" + ex.toString());
         }
     }
 

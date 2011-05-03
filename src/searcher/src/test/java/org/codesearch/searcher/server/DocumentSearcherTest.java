@@ -25,8 +25,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.util.LinkedList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
@@ -51,35 +52,35 @@ public class DocumentSearcherTest {
     @Test
     public void testSearch() throws Exception {
         String searchString = "SVN_NAME";
-        List result = instance.search(searchString, true, new LinkedList<String>(), new LinkedList<String>());
+        List result = instance.search(searchString, true, new HashSet<String>(), new HashSet<String>());
         assertFalse(result.isEmpty());
         searchString = "svn_name";
-        result = instance.search(searchString, true, new LinkedList<String>(), new LinkedList<String>());
+        result = instance.search(searchString, true, new HashSet<String>(), new HashSet<String>());
         assertTrue(result.isEmpty());
         searchString = "svn_name";
-        result = instance.search(searchString, false, new LinkedList<String>(), new LinkedList<String>());
+        result = instance.search(searchString, false, new HashSet<String>(), new HashSet<String>());
         assertFalse(result.isEmpty());
         searchString = "svn_name";
-        List<String> repoGroups = new LinkedList<String>();
+        Set<String> repoGroups = new HashSet<String>();
         repoGroups.add("group1");
-        result = instance.search(searchString, false, new LinkedList<String>(), repoGroups);
+        result = instance.search(searchString, false, new HashSet<String>(), repoGroups);
         assertFalse(result.isEmpty());
     }
 
     @Test
     public void testParseQuery() throws Exception {
         String searchTerm = "asdf";
-        List<String> repositories = new LinkedList<String>();
+        Set<String> repositories = new HashSet<String>();
         repositories.add("testRepo1");
         repositories.add("testRepo2");
         repositories.add("testRepo3");
         String expectedResult = "content:\"asdf\" AND (repository:testRepo1 OR repository:testRepo2 OR repository:testRepo3)";
-        String result = instance.parseQuery(searchTerm, true, repositories, new LinkedList<String>());
+        String result = instance.parseQuery(searchTerm, true, repositories, new HashSet<String>());
         assertEquals(expectedResult, result);
-        List<String> repositoryGroups = new LinkedList<String>();
+        Set<String> repositoryGroups = new HashSet<String>();
         repositoryGroups.add("group1");
         expectedResult = "content:\"asdf\" AND (repository:svnsearch_repo OR repository:svn_local)";
-        result = instance.parseQuery(searchTerm, true, new LinkedList<String>(), repositoryGroups);
+        result = instance.parseQuery(searchTerm, true, new HashSet<String>(), repositoryGroups);
         assertEquals(expectedResult, result);
     }
 }

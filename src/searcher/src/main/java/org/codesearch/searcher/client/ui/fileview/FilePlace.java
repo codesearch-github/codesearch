@@ -22,11 +22,12 @@ package org.codesearch.searcher.client.ui.fileview;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceTokenizer;
+import org.codesearch.searcher.client.ui.UIConstants;
 
 /**
  * The place token used for the file view.
  * Files are uniquely identified by a file path and a repository name.
- * 
+ *
  * @author Samuel Kogler
  */
 public class FilePlace extends Place {
@@ -58,13 +59,15 @@ public class FilePlace extends Place {
         /** {@inheritDoc} */
         @Override
         public String getToken(FilePlace place) {
-            return place.getFilePath() + "@" + place.getRepository() + "@" + place.getSearchTerm();
+            return place.getFilePath() + UIConstants.URL_TOKEN_SEPARATOR +
+                   place.getRepository() + UIConstants.URL_TOKEN_SEPARATOR +
+                   place.getSearchTerm();
         }
 
         /** {@inheritDoc} */
         @Override
         public FilePlace getPlace(String token) {
-            String[] parts = token.split("@");
+            String[] parts = token.split(UIConstants.URL_TOKEN_SEPARATOR);
             if (parts.length == 3) {
                 try {
                     return new FilePlace(parts[1], parts[0], parts[2]);

@@ -22,6 +22,7 @@
 
 package org.codesearch.searcher.client.ui.searchview;
 
+import org.codesearch.searcher.shared.SearchType;
 import java.util.List;
 
 import org.codesearch.searcher.shared.SearchResultDto;
@@ -31,6 +32,7 @@ import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Panel;
+import java.util.Set;
 
 /**
  * View that allows the entering of a search query,
@@ -42,18 +44,17 @@ public interface SearchView extends IsWidget {
     void setPresenter(Presenter presenter);
     Panel getResultsView();
     void setSearchResults(List<SearchResultDto> results);
+    void setSearchType(SearchType searchType);
+    void setSelection(Set<String> selection);
     void setAvailableRepositories(List<String> repositories);
     void setAvailableRepositoryGroups(List<String> repositoryGroups);
+    void cleanup();
     ListBox getRepositoryList();
     ListBox getRepositoryGroupList();
     HasValue<Boolean> getCaseSensitive();
     HasValue<String> getSearchBox();
-    RepositorySearchType getRepositorySearchType();
-
-    enum RepositorySearchType {
-        REPOSITORY,
-        REPOSITORY_GROUPS
-    };
+    SearchType getSearchType();
+    Set<String> getSelection();
 
     public interface Presenter {
         void goTo(Place place);

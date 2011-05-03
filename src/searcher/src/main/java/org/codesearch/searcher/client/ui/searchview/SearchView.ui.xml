@@ -31,10 +31,20 @@
             border-style: none none solid none;
             border-width: 1px;
         }
+
+        .scrollContainer
+        {
+            position: absolute;
+            left: 2px;
+            right: 2px;
+            top: 2px;
+            bottom: 2px;
+            overflow: auto;
+        }
     </ui:style>
-    <g:DockLayoutPanel unit='EM'>
-        <g:north size='15'>
-            <g:FlowPanel styleName='{style.searchForm}'>
+    <g:HTMLPanel>
+        <div class="{style.scrollContainer}">
+            <div class='{style.searchForm}'>
                 <g:TabLayoutPanel ui:field='repositoryTabPanel' barUnit='EM' barHeight='1.7' height='10em'>
                     <g:tab>
                         <g:header>Repositories</g:header>
@@ -49,15 +59,13 @@
                 <g:TextBox ui:field='searchBox' />
                 <g:Button ui:field='searchButton' text='Search' />
                 <g:CheckBox ui:field='caseSensitive' text='Case Sensitive' />
-            </g:FlowPanel>
-        </g:north>
-        <g:center>
-            <g:ScrollPanel>
+            </div>
+            <div>
                 <g:FlowPanel ui:field='resultView'>
                     <c:CellTable ui:field='resultTable' />
                     <c:SimplePager ui:field='resultTablePager' />
                 </g:FlowPanel>
-            </g:ScrollPanel>
-        </g:center>
-    </g:DockLayoutPanel>
+            </div>
+        </div>
+    </g:HTMLPanel>
 </ui:UiBinder>

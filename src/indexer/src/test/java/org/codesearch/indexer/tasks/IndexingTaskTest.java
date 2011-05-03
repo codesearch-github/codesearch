@@ -20,11 +20,9 @@
  */
 package org.codesearch.indexer.tasks;
 
+import java.util.LinkedList;
 import org.codesearch.commons.configuration.ConfigurationReader;
 
-import java.util.LinkedList;
-import java.util.List;
-import org.apache.log4j.Logger;
 
 import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
 import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
@@ -34,6 +32,8 @@ import org.codesearch.commons.database.DBAccess;
 import org.codesearch.commons.database.DBAccessImpl;
 import org.codesearch.commons.plugins.PluginLoader;
 import org.codesearch.commons.plugins.PluginLoaderImpl;
+import org.codesearch.commons.plugins.vcs.NoAuthentication;
+import org.codesearch.indexer.tasks.ClearTask;
 import org.junit.Test;
 
 /**
@@ -51,6 +51,7 @@ public class IndexingTaskTest {
         //TODO write this test
     }
 
+    //TODO testing very hard, refactor architecture
     @Test
     public void testExecuteLocal() throws Exception {
         ConfigurationReader configReader = new XmlConfigurationReader(null);
@@ -58,12 +59,25 @@ public class IndexingTaskTest {
         PluginLoader pl = new PluginLoaderImpl();
         ConnectionPool cp = new ConnectionPoolImpl(configReader);
         DBAccess dba = new DBAccessImpl(cp);
-        RepositoryDto repo = configReader.getRepositoryByName("local");
-        
+
+        RepositoryDto repo = new RepositoryDto(
+                "svn_local",
+                System.getProperty("user.home") + "/workspace/svnsearch/",
+                new NoAuthentication(),
+                true,
+                "FILESYSTEM",
+                new LinkedList<String>(),
+                new LinkedList<String>(),
+                new LinkedList<String>());
+
+        //RepositoryDto repo = configReader.getRepositoryByName("local");
+        ClearTask c = new ClearTask(dba);
+        c.setIndexLocation("/tmp/test");
+        c.execute();
+
         IndexingTask t = new IndexingTask(configReader, dba, pl);
         t.setIndexLocation("/tmp/test/");
 
-        repo.setUrl(repo.getUrl().replace("$home", System.getProperty("user.home")));
         t.setRepository(repo);
         t.setCodeAnalysisEnabled(true);
         t.execute();

@@ -29,6 +29,8 @@ import org.codesearch.searcher.shared.SearchResultDto;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
+import java.util.Set;
+import org.codesearch.searcher.shared.SearchType;
 
 /**
  * The service used for communication between the GWT javascript client and the server.
@@ -40,12 +42,10 @@ public interface SearcherService extends RemoteService {
      * Executes a lucene search on the server and returns the results as a {@link List} of {@link SearchResultDto}.
      * @param query The given search query.
      * @param caseSensitive Whether the search should be case sensitive.
-     * @param selectedRepositories The list of repositories to be searched in.
-     * @param selectedRepositoryGroups The list of repository groups to be searched in.
      * @return The results as a {@link List} of {@link SearchResultDto}.
      * @throws SearcherServiceException If an exception occurs on the server.
      */
-    List<SearchResultDto> doSearch(String query, boolean caseSensitive, List<String> selectedRepositories, List<String> selectedRepositoryGroups) throws SearcherServiceException;
+    List<SearchResultDto> doSearch(String query, boolean caseSensitive, SearchType searchType, Set<String> selection) throws SearcherServiceException;
 
     /**
      * Returns the repositories that are configured on the server.

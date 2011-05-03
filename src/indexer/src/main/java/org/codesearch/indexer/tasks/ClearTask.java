@@ -94,7 +94,6 @@ public class ClearTask implements Task {
                     }
                 }
             } else { // Clear specific repository from the index
-                LOG.debug("Clearing repository from index: " + repository.getName());
                 File indexDir = new File(indexLocation);
                 FSDirectory fsd = FSDirectory.open(indexDir);
                 IndexSearcher searcher = new IndexSearcher(fsd, false);
@@ -102,7 +101,7 @@ public class ClearTask implements Task {
                 deleteDocumentsFromIndexUsingTerm(term, searcher);
                 PropertiesManager propertiesManager = new PropertiesManager(indexLocation + IndexConstants.REVISIONS_PROPERTY_FILENAME);
                 propertiesManager.setPropertyFileValue(repository.getName(), "0");
-                
+
                 LOG.debug("Deleted " + searcher.getIndexReader().deleteDocuments(term) + " documents for repository " + repository.getName());
                 searcher.close();
 
