@@ -58,7 +58,7 @@ public class IndexingTaskTest {
         PluginLoader pl = new PluginLoaderImpl();
         ConnectionPool cp = new ConnectionPoolImpl(configReader);
         DBAccess dba = new DBAccessImpl(cp);
-        RepositoryDto repo = configReader.getRepositoryByName("jdownloader-repo");
+        RepositoryDto repo = configReader.getRepositoryByName("local");
         ClearTask c = new ClearTask(dba);
         c.setRepository(repo);
         c.setIndexLocation("/tmp/test");
