@@ -23,7 +23,6 @@ package org.codesearch.indexer.core;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
-import java.util.logging.Level;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
