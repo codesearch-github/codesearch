@@ -71,10 +71,8 @@ import japa.parser.ast.stmt.WhileStmt;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
-import org.codesearch.commons.database.DBAccess;
 import org.codesearch.commons.database.DatabaseAccessException;
 import org.codesearch.commons.database.DatabaseEntryNotFoundException;
 import org.codesearch.commons.plugins.codeanalyzing.CodeAnalyzerPlugin;

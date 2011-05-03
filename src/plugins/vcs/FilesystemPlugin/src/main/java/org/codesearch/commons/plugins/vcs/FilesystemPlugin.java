@@ -95,7 +95,11 @@ public class FilesystemPlugin implements VersionControlPlugin {
     /** {@inheritDoc} */
     @Override
     public String getRepositoryRevision() throws VersionControlPluginException {
+        try {
         return Long.toString(getHighestLastModifiedDateFromDirectory(new File(repository.getUrl())));
+        }catch (NullPointerException ex){
+            throw new VersionControlPluginException("The directory specified as a local repository could not be opened: "+ repository.getUrl());
+        }
     }
 
     /**

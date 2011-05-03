@@ -48,7 +48,7 @@ public class JavaCodeAnalyzerPluginTest {
     private static int count = 0;
     private static int uncommentedMethods = 0;
     private JavaCodeAnalyzerPlugin plugin = new JavaCodeAnalyzerPlugin();
-     /* Logger */
+    /* Logger */
     private static final Logger LOG = Logger.getLogger(JavaCodeAnalyzerPluginTest.class);
 
 //    /**
@@ -68,46 +68,76 @@ public class JavaCodeAnalyzerPluginTest {
      */
     @Test
     public void testAnalyzeFile() throws Exception {
-        LOG.info("analyzeFile");
+//        LOG.info("analyzeFile");
+//        String fileContent = "";
+//        BufferedReader br = new BufferedReader(new FileReader("/home/david/workspace/codesearch/src/commons/src/main/java/org/codesearch/commons/CommonsGuiceModule.java"));
+//
+//        while (br.ready()) {
+//            fileContent += br.readLine() + "\n";
+//        }
+////        LOG.info(fileContent);
+//        plugin.analyzeFile(fileContent);
+//        soutChildNodes(plugin.getAst());
+//    }
+//
+//    private void soutChildNodes(AstNode ast) {
+//        for (AstNode currentChild : ast.getChildNodes()) {
+//            LOG.info(currentChild.getName() + "\n");
+//            soutChildNodes(currentChild);
+//        }
+    }
+
+    @Test
+    public void addUsageLinksToFileContent() throws FileNotFoundException, IOException, CodeAnalyzerPluginException {
         String fileContent = "";
-        BufferedReader br = new BufferedReader(new FileReader("/home/david/workspace/codesearch/src/commons/src/main/java/org/codesearch/commons/plugins/codeanalyzing/ast/Visibility.java"));
+        BufferedReader br = new BufferedReader(new FileReader("/home/david/workspace/codesearch/src/commons/src/main/java/org/codesearch/commons/CommonsGuiceModule.java"));
+        
+        String hlEscapeStartToken = "_begin_escape_";
+        String hlEscapeEndToken = "_end_escape_";
+        while (br.ready()) {
+            fileContent += br.readLine() + "\n";
+        }
+        LOG.info("analyzeFile");
+        
 
         while (br.ready()) {
             fileContent += br.readLine() + "\n";
         }
 //        LOG.info(fileContent);
         plugin.analyzeFile(fileContent);
-        soutChildNodes(plugin.getAst());
-    }
+        List<Usage> usages = plugin.getUsages();
+        String resultString = "";
 
-    private void soutChildNodes(AstNode ast){
-        for(AstNode currentChild : ast.getChildNodes()){
-            LOG.info(currentChild.getName() + "\n");
-            soutChildNodes(currentChild);
+        String[] contentLines = fileContent.split("\n");
+        int usageIndex = 0;
+        outer:
+        for (int lineNumber = 1; lineNumber <= contentLines.length; lineNumber++) {
+            String currentLine = contentLines[lineNumber - 1];
+            while (usageIndex < usages.size()) {
+                Usage currentUsage = usages.get(usageIndex);
+                if (currentUsage.getStartLine() == lineNumber) {
+                    int startColumn = currentUsage.getStartColumn();
+                    String preamble = currentLine.substring(0, startColumn - 1); //-1
+                    String javaScriptEvent = "";
+                    if (currentUsage instanceof ExternalUsage) {
+                        javaScriptEvent = "goToUsage(" + usageIndex + ");";
+                    } else {
+                        javaScriptEvent = "goToLine(" + currentUsage.getReferenceLine() + ");";
+                    }
+                    String anchorBegin = hlEscapeStartToken + "<a class='testLink' onclick='" + javaScriptEvent + "'>" + hlEscapeEndToken;
+                    String anchorEnd = hlEscapeStartToken + "</a>" + hlEscapeEndToken;
+                    String remainingLine = currentLine.substring(startColumn - 1 + currentUsage.getReplacedString().length());
+                    currentLine = preamble + anchorBegin + currentUsage.getReplacedString() + anchorEnd + remainingLine;
+                    usageIndex++;
+                } else {
+                    resultString += currentLine + "\n";
+                    continue outer;
+                }
+            }
+            resultString += currentLine + "\n";
         }
-    }
-
-    @Test
-    public void testTEST() throws DatabaseAccessException { //FIXME remove
-//        for (Entry<String, AstNode> currEntry : DBAccess.getFilesImportingTargetFile("database.DBAccess", "svn-local").entrySet()) {
-//            LOG.info(currEntry.getKey());
-//        }
-
-    }
-
-    @Test
-    public void testParseExternalLinks() throws Exception {
-//        String fileContent = "";
-//        BufferedReader br = new BufferedReader(new FileReader("/home/david/workspace/svnsearch/WakMusic/src/java/servlets/AddEvent.java"));
-//        while (br.ready()) {
-//            fileContent += br.readLine() + "\n";
-//        }
-//        RepositoryDto repo = new RepositoryDto("test", "test", "test", "test", true, "SVN", null, null);
-//        plugin = new JavaCodeAnalyzerPlugin();
-//        plugin.analyzeFile(fileContent, repo);
-//        List<ExternalLink> externalLinks = plugin.getExternalLinks();
-//        List<String> imports = plugin.getImports();
-//        List<ExternalUsage> usages = plugin.parseExternalLinks(fileContent, imports, externalLinks, "svn_local");
+        resultString = resultString.substring(0, resultString.length() - 1); //Truncates the last \n char
+        System.out.println(resultString);
     }
 
     public void iterateChildNodes(AstNode node) {
@@ -119,13 +149,13 @@ public class JavaCodeAnalyzerPluginTest {
 
     @Test
     public void testIntegrationOfUsages() throws Exception {
-        doStuff();
+    //    doStuff();
     }
 
     private void doStuff() throws CodeAnalyzerPluginException, DatabaseAccessException, FileNotFoundException, IOException {
         BufferedReader br = new BufferedReader(new FileReader("/home/david/workspace/svnsearch/svncommons/SvnSearchBean.java"));
         String fileContent = "";
-        while(br.ready()){
+        while (br.ready()) {
             fileContent += br.readLine() + "\n";
         }
         plugin = new JavaCodeAnalyzerPlugin();
@@ -143,7 +173,7 @@ public class JavaCodeAnalyzerPluginTest {
             String currentLine = contentLines[lineNumber - 1];
             while (usageIndex < usages.size()) {
                 Usage currentUsage = usages.get(usageIndex);
-                if(usageIndex == 566){
+                if (usageIndex == 566) {
                     getClass();
                 }
                 if (currentUsage.getStartLine() == lineNumber) {

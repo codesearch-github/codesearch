@@ -119,9 +119,11 @@ public class AnalyzerUtil {
         List<String> paramTypes = new LinkedList<String>();
         int scopeColumn = n.getBeginColumn();
         VariableNode scopeObject = getVariableDeclarationForUsage(n.getBeginLine(), scopeName, n);
-        if (scopeObject == null) { //the method is a static method from another class
+        if (scopeObject == null) { //the method is a static method from another class, and is not simply the return type of some other methods method call
             className = scopeName;
-            usages.add(new ExternalClassOrEnumUsage(scopeColumn, lineNumber, className.length(), className, className));
+            if (!scopeName.contains(".")) {
+                usages.add(new ExternalClassOrEnumUsage(scopeColumn, lineNumber, className.length(), className, className));
+            }
         } else { //the method is called from an object in the class
             className = scopeObject.getType();
             //       usages.add(new Usage(n.getBeginColumn(), lineNumber, scopeName.length(), scopeObject.getStartLine(), scopeName));
