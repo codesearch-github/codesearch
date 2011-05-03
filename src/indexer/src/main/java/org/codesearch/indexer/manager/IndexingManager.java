@@ -39,6 +39,8 @@ import org.quartz.JobExecutionException;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SchedulerFactory;
+import org.quartz.SimpleTrigger;
+import org.quartz.Trigger;
 import org.quartz.spi.JobFactory;
 
 /**
@@ -99,8 +101,14 @@ public final class IndexingManager {
             jobDetail.getJobDataMap().put(IndexingJob.FIELD_TERMINATED, false);
 
             try {
-                CronTrigger trigger = new CronTrigger("JobTrigger" + i);
-                trigger.setCronExpression(job.getCronExpression());
+                Trigger trigger = null;
+                if (job.getCronExpression() == null) {
+                    trigger = new SimpleTrigger("JobTrigger" + i);
+                } else {
+                    trigger = new CronTrigger("JobTrigger" + i);
+                    ((CronTrigger)trigger).setCronExpression(job.getCronExpression());
+                }
+
                 scheduler.scheduleJob(jobDetail, trigger);
             } catch (ParseException ex) {
                 LOG.error("Indexing job " + i + " was configured with invalid cron expression:\n" + ex);
