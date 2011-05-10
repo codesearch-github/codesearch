@@ -137,12 +137,12 @@ public class DefaultHighlightingPlugin implements HighlightingPlugin {
     /** {@inheritDoc} */
     @Override
     public String getEscapeStartToken() {
-        return " _begin_µ_escape_";
+        return " _begin_"+"µ_escape_"; //The token is split into 2 string so this file can be viewed without the string triggering highlighting plugin
     }
 
     /** {@inheritDoc} */
     @Override
     public String getEscapeEndToken() {
-        return " _end_µ_escape_";
+        return " _end_"+"µ_escape_"; //The token is split into 2 string so this file can be viewed without the string triggering highlighting plugin
     }
 }
