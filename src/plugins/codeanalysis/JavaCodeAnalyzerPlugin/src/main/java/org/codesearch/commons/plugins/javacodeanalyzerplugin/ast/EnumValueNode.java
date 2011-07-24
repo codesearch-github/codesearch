@@ -18,12 +18,6 @@
  * You should have received a copy of the GNU General Public License
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package org.codesearch.commons.plugins.javacodeanalyzerplugin.ast;
 
 import java.util.Collections;
@@ -31,29 +25,40 @@ import java.util.List;
 import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
 
 /**
- *
+ * ASTNode that represents the value of an enum in the source code
  * @author David Froehlich
  */
-public class EnumValueNode extends AstNode{
+public class EnumValueNode extends AstNode {
 
+    /** {@inheritDoc} */
     @Override
     public String getOutlineName() {
         return "";
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean showInOutline() {
         return false;
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<AstNode> getChildNodes() {
         return Collections.emptyList();
     }
 
+    /** {@inheritDoc} */
     @Override
     public String getModifiers() {
         return "";
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof EnumValueNode) {
+            return super.equals(obj);
+        }
+        return false;
+    }
 }

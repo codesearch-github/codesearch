@@ -32,8 +32,11 @@ import org.codesearch.commons.plugins.codeanalyzing.ast.CompoundNode;
  */
 public class ClassNode extends CompoundNode {
 
+    /** the ASTNodes of all methods declared in the file */
     private List<MethodNode> methods = new LinkedList<MethodNode>();
+    /** the ASTNodes of all attributes in the file */
     private List<VariableNode> attributes = new LinkedList<VariableNode>();
+    /** the ASTNodes of all enums declared in the file */
     private List<EnumNode> enums = new LinkedList<EnumNode>();
 
     public List<EnumNode> getEnums() {
@@ -89,5 +92,13 @@ public class ClassNode extends CompoundNode {
         } catch (NullPointerException ex) {
             return ""; //FIXME
         }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof ClassNode){
+            return super.equals(obj);
+        }
+        return false;
     }
 }

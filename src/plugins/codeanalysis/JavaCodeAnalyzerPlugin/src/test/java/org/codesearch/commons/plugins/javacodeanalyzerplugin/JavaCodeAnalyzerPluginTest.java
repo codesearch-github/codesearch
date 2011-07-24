@@ -1,262 +1,202 @@
-/**
- * Copyright 2010 David Froehlich   <david.froehlich@businesssoftware.at>,
- *                Samuel Kogler     <samuel.kogler@gmail.com>,
- *                Stephan Stiboller <stistc06@htlkaindorf.at>
- *
- * This file is part of Codesearch.
- *
- * Codesearch is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Codesearch is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
  */
 package org.codesearch.commons.plugins.javacodeanalyzerplugin;
 
-import japa.parser.ParseException;
-import japa.parser.ast.body.MethodDeclaration;
-import japa.parser.ast.visitor.VoidVisitorAdapter;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.List;
-import java.util.Map.Entry;
+import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.ClassNode;
 import org.apache.log4j.Logger;
-import org.codesearch.commons.database.DBAccess;
-import org.codesearch.commons.database.DatabaseAccessException;
+import java.util.List;
 import org.codesearch.commons.plugins.codeanalyzing.CodeAnalyzerPluginException;
 import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
-import org.codesearch.commons.plugins.codeanalyzing.ast.ExternalUsage;
-import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
+import org.codesearch.commons.plugins.codeanalyzing.ast.Visibility;
+import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.ExternalClassOrEnumUsage;
+import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.FileNode;
+import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.MethodNode;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 /**
  *
- * @author David Froehlich
+ * @author david
  */
 public class JavaCodeAnalyzerPluginTest {
-
-    private static int count = 0;
-    private static int uncommentedMethods = 0;
-    private JavaCodeAnalyzerPlugin plugin = new JavaCodeAnalyzerPlugin();
     /* Logger */
-    private static final Logger LOG = Logger.getLogger(JavaCodeAnalyzerPluginTest.class);
 
-//    /**
-//     * Test of getAstForCurrentFile method, of class JavaCodeAnalyzerPlugin.
-//     */
-//    public void testGetAstForCurrentFile() throws Exception {
-//        LOG.info("getAstForCurrentFile");
-//        JavaCodeAnalyzerPlugin instance = new JavaCodeAnalyzerPlugin();
-//        Map expResult = null;
-//        Map result = instance.getAstForCurrentFile();
-//        assertEquals(expResult, result);
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
-//    }
+    private static final Logger LOG = Logger.getLogger(JavaCodeAnalyzerPluginTest.class);
+    private String repository = "test";
+
+    public JavaCodeAnalyzerPluginTest() {
+    }
+
+    @BeforeClass
+    public static void setUpClass() throws Exception {
+    }
+
+    @AfterClass
+    public static void tearDownClass() throws Exception {
+    }
+
+    @Before
+    public void setUp() {
+    }
+
+    @After
+    public void tearDown() {
+    }
+
+    //all analysis tests
+    @Test
+    public void testBasicAnalysis() throws CodeAnalyzerPluginException {
+        JavaCodeAnalyzerPlugin instance = new JavaCodeAnalyzerPlugin();
+        
+        //create mock source code
+        String content = "";
+        content += "package foopackage;\n";
+        content += "\n";
+        content += "public class Foo {\n";
+        content += "  public Foo(){\n";
+        content += "  }\n";
+        content += "}\n";
+        
+        //create expected result
+        FileNode expResult = new FileNode();
+        
+        ClassNode classNode = new ClassNode();
+        classNode.setStartLine(3);
+        classNode.setStartPositionInLine(1);
+        classNode.setName("Foo");
+        classNode.setVisibility(Visibility.PUBLIC);
+        
+        MethodNode constructor = new MethodNode();
+        constructor.setStartLine(4);
+        constructor.setConstructor(true);
+        constructor.setName("Foo");
+        constructor.setVisibility(Visibility.PUBLIC);
+        constructor.setStartPositionInLine(3);
+        classNode.getMethods().add(constructor);
+        expResult.getClasses().add(classNode);
+        instance.analyzeFile(content);
+        FileNode result = (FileNode) instance.getAst();
+        
+        assertEquals(expResult, result);
+        
+    }
+
+    /**
+     * Test of parseLineNumberAndFileNameOfUsage method, of class JavaCodeAnalyzerPlugin.
+     */
+    @Test
+    public void testParseLineNumberAndFileNameOfUsage() throws Exception {
+        System.out.println("parseLineNumberAndFileNameOfUsage");
+        ExternalClassOrEnumUsage usage = null;
+        String repository = "";
+        List<String> fileImports = null;
+        String originFilePath = "";
+        JavaCodeAnalyzerPlugin instance = new JavaCodeAnalyzerPlugin();
+        instance.parseLineNumberAndFileNameOfUsage(usage, repository, fileImports, originFilePath);
+        // TODO review the generated test code and remove the default call to fail.
+        fail("The test case is a prototype.");
+    }
+
     /**
      * Test of analyzeFile method, of class JavaCodeAnalyzerPlugin.
      */
     @Test
     public void testAnalyzeFile() throws Exception {
-//        LOG.info("analyzeFile");
-//        String fileContent = "";
-//        BufferedReader br = new BufferedReader(new FileReader("/home/david/workspace/codesearch/src/commons/src/main/java/org/codesearch/commons/CommonsGuiceModule.java"));
-//
-//        while (br.ready()) {
-//            fileContent += br.readLine() + "\n";
-//        }
-////        LOG.info(fileContent);
-//        plugin.analyzeFile(fileContent);
-//        soutChildNodes(plugin.getAst());
-//    }
-//
-//    private void soutChildNodes(AstNode ast) {
-//        for (AstNode currentChild : ast.getChildNodes()) {
-//            LOG.info(currentChild.getName() + "\n");
-//            soutChildNodes(currentChild);
-//        }
-    }
-
-    @Test
-    public void addUsageLinksToFileContent() throws FileNotFoundException, IOException, CodeAnalyzerPluginException {
+        System.out.println("analyzeFile");
         String fileContent = "";
-        BufferedReader br = new BufferedReader(new FileReader("/home/david/workspace/codesearch/src/commons/src/main/java/org/codesearch/commons/CommonsGuiceModule.java"));
-        
-        String hlEscapeStartToken = "_begin_escape_";
-        String hlEscapeEndToken = "_end_escape_";
-        while (br.ready()) {
-            fileContent += br.readLine() + "\n";
-        }
-        LOG.info("analyzeFile");
-        
-
-        while (br.ready()) {
-            fileContent += br.readLine() + "\n";
-        }
-//        LOG.info(fileContent);
-        plugin.analyzeFile(fileContent);
-        List<Usage> usages = plugin.getUsages();
-        String resultString = "";
-
-        String[] contentLines = fileContent.split("\n");
-        int usageIndex = 0;
-        outer:
-        for (int lineNumber = 1; lineNumber <= contentLines.length; lineNumber++) {
-            String currentLine = contentLines[lineNumber - 1];
-            while (usageIndex < usages.size()) {
-                Usage currentUsage = usages.get(usageIndex);
-                if (currentUsage.getStartLine() == lineNumber) {
-                    int startColumn = currentUsage.getStartColumn();
-                    String preamble = currentLine.substring(0, startColumn - 1); //-1
-                    String javaScriptEvent = "";
-                    if (currentUsage instanceof ExternalUsage) {
-                        javaScriptEvent = "goToUsage(" + usageIndex + ");";
-                    } else {
-                        javaScriptEvent = "goToLine(" + currentUsage.getReferenceLine() + ");";
-                    }
-                    String anchorBegin = hlEscapeStartToken + "<a class='testLink' onclick='" + javaScriptEvent + "'>" + hlEscapeEndToken;
-                    String anchorEnd = hlEscapeStartToken + "</a>" + hlEscapeEndToken;
-                    String remainingLine = currentLine.substring(startColumn - 1 + currentUsage.getReplacedString().length());
-                    currentLine = preamble + anchorBegin + currentUsage.getReplacedString() + anchorEnd + remainingLine;
-                    usageIndex++;
-                } else {
-                    resultString += currentLine + "\n";
-                    continue outer;
-                }
-            }
-            resultString += currentLine + "\n";
-        }
-        resultString = resultString.substring(0, resultString.length() - 1); //Truncates the last \n char
-        System.out.println(resultString);
+        JavaCodeAnalyzerPlugin instance = new JavaCodeAnalyzerPlugin();
+        instance.analyzeFile(fileContent);
+        // TODO review the generated test code and remove the default call to fail.
+        fail("The test case is a prototype.");
     }
 
-    public void iterateChildNodes(AstNode node) {
-        for (AstNode childNode : node.getChildNodes()) {
-            iterateChildNodes(childNode);
-        }
-        LOG.info(node.getModifiers());
-    }
-
+    /**
+     * Test of getPurposes method, of class JavaCodeAnalyzerPlugin.
+     */
     @Test
-    public void testIntegrationOfUsages() throws Exception {
-    //    doStuff();
+    public void testGetPurposes() {
+        System.out.println("getPurposes");
+        JavaCodeAnalyzerPlugin instance = new JavaCodeAnalyzerPlugin();
+        String expResult = "";
+        String result = instance.getPurposes();
+        assertEquals(expResult, result);
+        // TODO review the generated test code and remove the default call to fail.
+        fail("The test case is a prototype.");
     }
 
-    private void doStuff() throws CodeAnalyzerPluginException, DatabaseAccessException, FileNotFoundException, IOException {
-        BufferedReader br = new BufferedReader(new FileReader("/home/david/workspace/svnsearch/svncommons/SvnSearchBean.java"));
-        String fileContent = "";
-        while (br.ready()) {
-            fileContent += br.readLine() + "\n";
-        }
-        plugin = new JavaCodeAnalyzerPlugin();
-        plugin.analyzeFile(fileContent);
-
-//        iterateChildNodes(plugin.getAst());
-        String resultString = "";
-        String hlEscapeStartToken = "";
-        List<Usage> usages = plugin.getUsages();
-        String hlEscapeEndToken = "";
-        String[] contentLines = fileContent.split("\n");
-        int usageIndex = 0;
-        outer:
-        for (int lineNumber = 1; lineNumber <= contentLines.length; lineNumber++) {
-            String currentLine = contentLines[lineNumber - 1];
-            while (usageIndex < usages.size()) {
-                Usage currentUsage = usages.get(usageIndex);
-                if (usageIndex == 566) {
-                    getClass();
-                }
-                if (currentUsage.getStartLine() == lineNumber) {
-                    int startColumn = currentUsage.getStartColumn();
-
-                    String preamble = null;
-                    try {
-                        preamble = currentLine.substring(0, startColumn - 1);
-                    } catch (StringIndexOutOfBoundsException ex) {
-                        throw new DatabaseAccessException("asdf");
-                    }
-
-                    String javaScriptEvent = "";
-                    if (currentUsage instanceof ExternalUsage) {
-                        javaScriptEvent = "goToUsage(" + usageIndex + ");";
-                    } else {
-                        int referenceLine = currentUsage.getReferenceLine();
-                        javaScriptEvent = "goToLine(" + (referenceLine + 1) + ");";
-                    }
-                    String anchorBegin = hlEscapeStartToken + "<a class='testLink' onclick='" + javaScriptEvent + "'>" + hlEscapeEndToken;
-                    String anchorEnd = hlEscapeStartToken + "</a>" + hlEscapeEndToken;
-                    String remainingLine = currentLine.substring(startColumn - 1 + currentUsage.getReplacedString().length());
-                    currentLine = preamble + anchorBegin + currentUsage.getReplacedString() + anchorEnd + remainingLine;
-
-                    usageIndex++;
-                } else {
-                    resultString += currentLine + "\n";
-                    continue outer;
-                }
-            }
-            resultString += currentLine + "\n";
-        }
-        resultString = resultString.substring(0, resultString.length() - 1);
-        LOG.info(resultString);
+    /**
+     * Test of getVersion method, of class JavaCodeAnalyzerPlugin.
+     */
+    @Test
+    public void testGetVersion() {
+        System.out.println("getVersion");
+        JavaCodeAnalyzerPlugin instance = new JavaCodeAnalyzerPlugin();
+        String expResult = "";
+        String result = instance.getVersion();
+        assertEquals(expResult, result);
+        // TODO review the generated test code and remove the default call to fail.
+        fail("The test case is a prototype.");
     }
 
-//            for (File child : file.listFiles()) {
-//                checkContentOfFile(child);
-//            }
-//        } else {
-//            String truncFileName = file.getAbsolutePath().replaceAll("/home/david/codesearch/", "");
-//            if (file.getAbsolutePath().endsWith(".java") && !file.getAbsolutePath().contains("searcher") && !file.getAbsolutePath().contains("/test/") && !file.getAbsolutePath().contains("jhighlight") && !file.getAbsolutePath().contains("resources")) {
-//                CompletionVisitor cv = new CompletionVisitor();
-//                CompilationUnit cu = JavaParser.parse(file);
-//                cu.accept(cv, truncFileName);
-//            }
-//        }
-    public void checkContentOfFile(File file) throws FileNotFoundException, IOException, CodeAnalyzerPluginException, ParseException, DatabaseAccessException, Exception {
-//        if (file.isDirectory()) {
-//            for (File child : file.listFiles()) {
-//                checkContentOfFile(child);
-//            }
-//        } else {
-//            if (file.getAbsolutePath().endsWith(".java") && !file.getAbsolutePath().contains("jhighlight") && !file.getAbsolutePath().contains("generated")) {
-//                String fileContent = "";
-//                BufferedReader br = new BufferedReader(new FileReader(file));
-//                while (br.ready()) {
-//                    fileContent += br.readLine() + "\n";
-//                }
-//                if (file.getAbsolutePath().equals("/home/david/workspace/codesearch/src/searcher/target/.generated/com/google/gwt/user/cellview/client/CellTable_TemplateImpl.java")) {
-//                    getClass();
-//                }
-//                try {
-//                    doStuff(fileContent);
-//                } catch (DatabaseAccessException ex) {
-//                    getClass();
-//                }
-//            }
-//        }
+    /**
+     * Test of getTypeDeclarations method, of class JavaCodeAnalyzerPlugin.
+     */
+    @Test
+    public void testGetTypeDeclarations() throws Exception {
+        System.out.println("getTypeDeclarations");
+        JavaCodeAnalyzerPlugin instance = new JavaCodeAnalyzerPlugin();
+        List expResult = null;
+        List result = instance.getTypeDeclarations();
+        assertEquals(expResult, result);
+        // TODO review the generated test code and remove the default call to fail.
+        fail("The test case is a prototype.");
     }
 
-    class CompletionVisitor extends VoidVisitorAdapter {
+    /**
+     * Test of getUsages method, of class JavaCodeAnalyzerPlugin.
+     */
+    @Test
+    public void testGetUsages() throws Exception {
+        System.out.println("getUsages");
+        JavaCodeAnalyzerPlugin instance = new JavaCodeAnalyzerPlugin();
+        List expResult = null;
+        List result = instance.getUsages();
+        assertEquals(expResult, result);
+        // TODO review the generated test code and remove the default call to fail.
+        fail("The test case is a prototype.");
+    }
 
-        @Override
-        public void visit(MethodDeclaration n, Object arg) {
-            super.visit(n, arg);
-            if (n.getEndLine() - n.getBeginLine() < 3) {
-                return;
-            }
-            if (n.getJavaDoc() == null) {
-                uncommentedMethods++;
-                LOG.info("Method " + n.getName() + " at line " + n.getBeginLine() + " in file " + (String) arg + " is not commented #" + uncommentedMethods);
-            }
-        }
+    /**
+     * Test of getImports method, of class JavaCodeAnalyzerPlugin.
+     */
+    @Test
+    public void testGetImports() {
+        System.out.println("getImports");
+        JavaCodeAnalyzerPlugin instance = new JavaCodeAnalyzerPlugin();
+        List expResult = null;
+        List result = instance.getImports();
+        assertEquals(expResult, result);
+        // TODO review the generated test code and remove the default call to fail.
+        fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of getAst method, of class JavaCodeAnalyzerPlugin.
+     */
+    @Test
+    public void testGetAst() {
+        System.out.println("getAst");
+        JavaCodeAnalyzerPlugin instance = new JavaCodeAnalyzerPlugin();
+        AstNode expResult = null;
+        AstNode result = instance.getAst();
+        assertEquals(expResult, result);
+        // TODO review the generated test code and remove the default call to fail.
+        fail("The test case is a prototype.");
     }
 }

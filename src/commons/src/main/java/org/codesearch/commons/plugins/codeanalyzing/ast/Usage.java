@@ -24,14 +24,21 @@ package org.codesearch.commons.plugins.codeanalyzing.ast;
 import java.io.Serializable;
 
 /**
- *
+ * represents the usage of a code element (variable, classe, enum, etc.) in the source code
+ * 
  * @author David Froehlich
  */
 public class Usage implements Comparable<Usage>, Serializable {
+    /** the length of the usage in characters */
     protected int length;
+    /** the column at which the usage starts in the original file */
     protected int startColumn;
+    /** the line number of the usage in the original file */
     protected int startLine;
+    /** the line number of the element that is referenced */
     protected int referenceLine;
+    /** the string that in the additional file that will be replaced by the usage link
+     usually the name of the element */
     protected String replacedString;
 
     public Usage(){
@@ -86,6 +93,12 @@ public class Usage implements Comparable<Usage>, Serializable {
         this.replacedString = replacedString;
     }
 
+    /**
+     * returns 0 if both usages have the exact same position (line and column)
+     * can be used to sort ascending by line number and then descending by column
+     * @param other the usage to compare this one with
+     * @return 
+     */
     @Override
     public int compareTo(Usage other){
         if(this.startLine == other.startLine){

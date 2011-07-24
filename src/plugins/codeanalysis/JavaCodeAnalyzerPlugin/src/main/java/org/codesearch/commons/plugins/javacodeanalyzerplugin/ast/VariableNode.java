@@ -85,4 +85,13 @@ public class VariableNode extends AstNode {
     public String getModifiers() {
         return "variable " + visibility.toString();
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof VariableNode) {
+            VariableNode other = (VariableNode) obj;
+            return super.equals(obj) && (other.attribute == this.attribute) && (other.type.equals(this.type));
+        }
+        return false;
+    }
 }

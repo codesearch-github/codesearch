@@ -123,92 +123,6 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
     }
 
     /**
-     * sets the lineNumber and the targetFilePath for the variable usage
-     * @param usage the usage that is parsed
-     * @param repository the repository holding the files
-     * @param fileImports the imports in the file that holds the usage
-     * @param originFilePath the filePath of the file that holds the usage
-     * @throws DatabaseAccessException
-     */
-    @Deprecated
-    public void parseLineNumberAndFileNameOfUsage(ExternalVariableOrEnumValueUsage usage, String repository, List<String> fileImports, String originFilePath) throws DatabaseAccessException, DatabaseEntryNotFoundException {
-//        String className = usage.getTargetClassName();
-//        String targetFilePath = getFilePathOfDeclaration(repository, fileImports, className);
-//        usage.setTargetFilePath(targetFilePath);
-//        if (targetFilePath == null) {
-//            return;
-//        }
-//        AstNode currentFileNode = DBAccess.getBinaryIndexForFile(targetFilePath, repository);
-//        checkChildNodesForVariable(currentFileNode, usage);
-    }
-
-
-    /**
-     * recursively checks all child nodes of this node for the values of the usage
-     * if it finds the declarations sets the referenceLineNumber of the usage to the start line of the declaration
-     * @param node
-     * @param usage
-     */
-    @Deprecated
-    private void checkChildNodesForVariable(AstNode node, ExternalVariableOrEnumValueUsage usage) {
-        for (AstNode currentNode : node.getChildNodes()) {
-            if (currentNode instanceof VariableNode) {
-                VariableNode currentVariable = (VariableNode) currentNode;
-                if (currentVariable.getName().equals(usage.getReplacedString()) && currentVariable.getVisibility() != Visibility.DEFAULT) { //FIXME
-                    usage.setReferenceLine(currentVariable.getStartLine());
-                    return;
-                }
-            }
-            checkChildNodesForVariable(currentNode, usage);
-        }
-    }
-
-    /**
-     * sets the lineNumber and the targetFilePath for the method usage
-     * @param usage the usage that is parsed
-     * @param repository the repository holding the files
-     * @param fileImports the imports in the file that holds the usage
-     * @param originFilePath the filePath of the file that holds the usage
-     * @throws DatabaseAccessException
-     */
-    @Deprecated
-    public void parseLineNumberAndFileNameOfUsage(ExternalMethodUsage usage, String repository, List<String> fileImports, String originFilePath) throws DatabaseAccessException, DatabaseEntryNotFoundException {
-//        String className = usage.getTargetClassName();
-//        String targetFilePath = getFilePathOfDeclaration(repository, fileImports, className);
-//        usage.setTargetFilePath(targetFilePath);
-//        if (targetFilePath == null) {
-//            return;
-//        }
-//        AstNode currentFileNode = DBAccess.getBinaryIndexForFile(originFilePath, repository);
-//        MethodNode bestMatch = null;
-//        int paramCount = usage.getParameters().size();
-//        outer:
-//        for (AstNode currentNode : currentFileNode.getChildNodes()) {
-//            if (currentNode instanceof MethodNode) {
-//                MethodNode currentMethodNode = (MethodNode) currentNode;
-//                if (currentNode.getName().equals(usage.getReplacedString()) && currentMethodNode.getParameters().size() == usage.getParameters().size()) {
-//                    if (bestMatch == null) {
-//                        bestMatch = currentMethodNode;
-//                    } else {
-//                        for (int i = 0; i < paramCount; i++) {
-//                            String givenParam = usage.getParameters().get(i);
-//                            String currentNodeParam = currentMethodNode.getParameters().get(i).getType();
-//                            if (!givenParam.equals(currentNodeParam)) {
-//                                continue outer;
-//                            }
-//                        }
-//                        bestMatch = currentMethodNode;
-//                    }
-//                }
-//            }
-//        }
-//        if (bestMatch != null) {
-//            usage.setReferenceLine(bestMatch.getStartLine());
-//        }
-//        return;
-    }
-
-    /**
      * returns the file path of the file declaring the given class
      * @param repository the repository holding the file
      * @param fileImports the list of imports in the source file, these will be searched through
@@ -216,6 +130,7 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
      * @return the path of the file holding the declaration
      * @throws DatabaseAccessException
      */
+    //TODO find out why this method is used
     @Deprecated
     private String getFilePathOfDeclaration(String repository, List<String> fileImports, String className) throws DatabaseAccessException {
 //        String targetFilePath;
@@ -237,11 +152,6 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
 //      return targetFilePath;
 
         return null;
-    }
-
-    /** {@inheritDoc} */
-    public FileNode getFileNode() {
-        return fileNode;
     }
 
     /** {@inheritDoc} */
@@ -339,6 +249,7 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
         newClass.setStartLine(startLine);
         newClass.setStartPositionInLine(type.getBeginColumn());
         newClass.setNodeLength(nodeLength);
+        newClass.setVisibility(util.getVisibilityFromModifier(type.getModifiers()));
         fileNode.getClasses().add(newClass);
         //iterate all methods and attributes in class
         if (type.getMembers() != null) {

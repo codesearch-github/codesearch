@@ -109,6 +109,12 @@ public class MethodNode extends CompoundNode {
     public String getModifiers() {
         return "method " + visibility.toString();
     }
-
-
+    @Override
+    public boolean equals(Object obj){
+        if(obj instanceof MethodNode){
+            MethodNode other = (MethodNode) obj;
+            return super.equals(obj) && (other.isConstructor() == this.isConstructor());
+        }
+        return false;
+    }
 }

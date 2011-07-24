@@ -19,22 +19,20 @@
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.codesearch.commons.plugins.codeanalyzing.ast;
 
 import org.codesearch.commons.database.DatabaseAccessException;
-import org.codesearch.commons.database.DatabaseEntryNotFoundException;
 
 /**
- *
+ * Represents a usage in the source code that points outside of the current file
+ * Note that the targetFilePath and the referenceLine will not be set until the resolveLink method is called
+ * This is due to performance improvement
  * @author David Froehlich
  */
 public abstract class ExternalUsage extends Usage {
-
+    /** the name of the class holding the referenced element */
     protected String targetClassName;
+    /** the path of the file containing the class with the referenced element */
     protected String targetFilePath;
 
     public ExternalUsage() {
@@ -57,7 +55,7 @@ public abstract class ExternalUsage extends Usage {
     }
 
     /**
-     * sets the targetFilePath and the reference line for the usage
+     * sets the targetFilePath and the referenceLine for the usage
      * @param originFilePath the file containing the usage
      * @param repository the repository holding the file
      * @throws DatabaseAccessException

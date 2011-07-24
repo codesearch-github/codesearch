@@ -112,4 +112,27 @@ public abstract class AstNode implements Serializable, Comparable<AstNode> {
     public void setParentLineDeclaration(int parentLineDeclaration) {
         this.parentLineDeclaration = parentLineDeclaration;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof AstNode) {
+            AstNode other = (AstNode) obj;
+            if (other.getStartLine() == this.getStartLine() && other.getStartPositionInLine() == this.getStartPositionInLine()) {
+                try {
+                    if ((other.getName() == null && this.getName() == null) || other.getName().equals(this.getName())) {
+
+                        if ((this.getVisibility() == null && other.getVisibility() == null) || this.visibility == other.getVisibility()) {
+                            if (other.getChildNodes().equals(this.getChildNodes())) {
+                                return true;
+                            }
+                        }
+
+                    }
+                } catch (NullPointerException ex) {
+                    //in case only one of the modifiers was null, return false 4 lines later
+                }
+            }
+        }
+        return false;
+    }
 }

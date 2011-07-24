@@ -77,4 +77,13 @@ public class FileNode extends CompoundNode {
         return null;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof FileNode){
+            return super.equals(obj);
+        }
+        return false;
+    }
+
+    
 }
