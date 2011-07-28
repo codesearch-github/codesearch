@@ -95,7 +95,7 @@ public class IndexingJob implements Job {
                 switch (taskDto.getType()) {
                     case index: {
                         jec.getJobDetail().getJobDataMap().put(FIELD_CURRENT_TYPE, "index");
-                        task = new IndexingTask(configReader, dba, pluginLoader);
+                        task = new IndexingTask(dba, pluginLoader, configReader.getValue(XmlConfigurationReaderConstants.SEARCHER_LOCATION));
                         break;
                     }
                     case clear: {

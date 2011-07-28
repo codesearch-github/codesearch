@@ -76,16 +76,13 @@ public class SearchActivity extends AbstractActivity implements SearchView.Prese
     /** {@inheritDoc} */
     @Override
     public void doSearch() {
-        String query = searchView.getSearchBox().getValue();
-        searchPlace.setSearchTerm(query);
-        searchPlace.setSearchType(searchView.getSearchType());
-        searchPlace.setSelection(searchView.getSelection());
-        goTo(new SearchPlace(query, searchView.getSearchType(), searchView.getSelection()));
+        goTo(new SearchPlace(searchView.getSearchBox().getValue(), searchView.getSearchType(), searchView.getSelection()));
     }
 
     private void search() {
-        if (repoGroupsLoaded && reposLoaded) {
-            searcherServiceAsync.doSearch(searchView.getSearchBox().getValue(), searchView.getCaseSensitive().getValue(),
+        String query = searchView.getSearchBox().getValue();
+        if (repoGroupsLoaded && reposLoaded && !query.trim().isEmpty()) {
+            searcherServiceAsync.doSearch(query, searchView.getCaseSensitive().getValue(),
                     searchView.getSearchType(), searchView.getSelection(), new DoSearchHandler());
         }
     }

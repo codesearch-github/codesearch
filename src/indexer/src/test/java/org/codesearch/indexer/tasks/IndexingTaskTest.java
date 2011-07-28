@@ -20,20 +20,19 @@
  */
 package org.codesearch.indexer.tasks;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.LinkedList;
+import org.apache.commons.io.FileUtils;
 import org.codesearch.commons.configuration.ConfigurationReader;
 
 
 import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
 import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
-import org.codesearch.commons.database.ConnectionPool;
-import org.codesearch.commons.database.ConnectionPoolImpl;
 import org.codesearch.commons.database.DBAccess;
-import org.codesearch.commons.database.DBAccessImpl;
 import org.codesearch.commons.plugins.PluginLoader;
 import org.codesearch.commons.plugins.PluginLoaderImpl;
 import org.codesearch.commons.plugins.vcs.NoAuthentication;
-import org.codesearch.indexer.tasks.ClearTask;
 import org.junit.Test;
 
 /**
@@ -43,7 +42,13 @@ import org.junit.Test;
  */
 public class IndexingTaskTest {
 
+//    private String testIndexDir = "src/test/resources/testindex";
+    private String testIndexDir = "/tmp/test";
+    private String testRepoDir = "src/test/resources/testrepo";
+
     public IndexingTaskTest() {
+        File f = new File(testIndexDir);
+        f.mkdir();
     }
 
     @Test
@@ -51,18 +56,16 @@ public class IndexingTaskTest {
         //TODO write this test
     }
 
-    //TODO testing very hard, refactor architecture
     @Test
     public void testExecuteLocal() throws Exception {
         ConfigurationReader configReader = new XmlConfigurationReader(null);
 
         PluginLoader pl = new PluginLoaderImpl();
-        ConnectionPool cp = new ConnectionPoolImpl(configReader);
-        DBAccess dba = new DBAccessImpl(cp);
+        DBAccess dba = new MockDatabaseImpl();
 
         RepositoryDto repo = new RepositoryDto(
-                "svn_local",
-                System.getProperty("user.home") + "/workspace/svnsearch/",
+                "local_repo",
+                testRepoDir,
                 new NoAuthentication(),
                 true,
                 "FILESYSTEM",
@@ -70,16 +73,25 @@ public class IndexingTaskTest {
                 new LinkedList<String>(),
                 new LinkedList<String>());
 
-        //RepositoryDto repo = configReader.getRepositoryByName("local");
         ClearTask c = new ClearTask(dba);
-        c.setIndexLocation("/tmp/test");
+        c.setIndexLocation(testIndexDir);
         c.execute();
 
-        IndexingTask t = new IndexingTask(configReader, dba, pl);
-        t.setIndexLocation("/tmp/test/");
+        IndexingTask t = new IndexingTask(dba, pl, "");
+        t.setIndexLocation(testIndexDir);
 
         t.setRepository(repo);
         t.setCodeAnalysisEnabled(true);
         t.execute();
+    }
+
+    @Test
+    public void cleanup() {
+        File ti = new File(testIndexDir);
+        try {
+            FileUtils.deleteDirectory(ti);
+        } catch (IOException ex) {
+            System.out.println("Deleting index files failed");
+        }
     }
 }

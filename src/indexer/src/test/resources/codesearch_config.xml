@@ -45,7 +45,7 @@
     
     <index-jobs>
         <index-job>
-            <repositories>svn_local</repositories>
+            <repositories>local_repo</repositories>
             <cron-expression>0 * * * * ?</cron-expression>
             <tasks>
                 <task>
@@ -62,7 +62,7 @@
 
     <repositories>
         <repository>
-            <name>svn_local</name>
+            <name>local_repo</name>
             <version-control-system>FILESYSTEM</version-control-system>
             <authentication-data type='none'>
             </authentication-data>

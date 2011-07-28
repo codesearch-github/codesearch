@@ -30,10 +30,7 @@ import java.util.List;
 import java.util.Set;
 
 import net.sf.jmimemagic.Magic;
-import net.sf.jmimemagic.MagicException;
 import net.sf.jmimemagic.MagicMatch;
-import net.sf.jmimemagic.MagicMatchNotFoundException;
-import net.sf.jmimemagic.MagicParseException;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
@@ -161,16 +158,12 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
                 MagicMatch magicMatch;
                 try {
                     magicMatch = Magic.getMagicMatch(vcFile.getContent());
-                    LOG.debug("MAGIC DETECT: " + magicMatch.getMimeType());
+                    LOG.debug("File type detected via Magic detection: " + magicMatch.getMimeType());
                     if (magicMatch.getMimeType().startsWith("text/")) {
                         file.setBinary(false);
                     }
-                } catch (MagicParseException ex) {
-                    LOG.debug("NO MAGIC MATCH"); //TODO add a better log entry
-                } catch (MagicMatchNotFoundException ex) {
-                    LOG.debug("NO MAGIC MATCH");
-                } catch (MagicException ex) {
-                    LOG.debug("NO MAGIC MATCH");
+                } catch (Exception ex) {
+                    LOG.debug("Magic file type detection unsuccessful.");
                 }
             }
 
@@ -178,9 +171,9 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
                 HighlightingPlugin hlPlugin = pluginLoader.getPlugin(HighlightingPlugin.class, guessedMimeType);
                 String highlightingEscapeStartToken = hlPlugin.getEscapeStartToken();
                 String highlightingEscapeEndToken = hlPlugin.getEscapeEndToken();
-                //FIXME disabled for demonstraiton
-                //byte[] parsedFileContent = addUsageLinksToFileContent(vcFile.getContent(), filePath, repository, highlightingEscapeStartToken, highlightingEscapeEndToken);
-                file.setFileContent(hlPlugin.parseToHtml(vcFile.getContent(), guessedMimeType));
+
+                byte[] parsedFileContent = addUsageLinksToFileContent(vcFile.getContent(), filePath, repository, highlightingEscapeStartToken, highlightingEscapeEndToken);
+                file.setFileContent(hlPlugin.parseToHtml(parsedFileContent, guessedMimeType));
             } catch (PluginLoaderException ex) {
                 LOG.debug("No suitable highlighting plugin found");
                 // No plugin found, just escape to HTML

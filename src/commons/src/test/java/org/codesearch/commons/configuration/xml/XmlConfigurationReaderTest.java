@@ -71,7 +71,7 @@ public class XmlConfigurationReaderTest {
         ignFileNames2.add("*generated*");
         ignFileNames2.add("*.svn*");
         ignFileNames2.add("*.class*");
-        RepositoryDto repo2 = new RepositoryDto("svn_local", System.getProperty("user.home") + "/workspace/svnsearch", new NoAuthentication(), true, "FILESYSTEM", ignFileNames2, new LinkedList<String>(), repoGroups2);
+        RepositoryDto repo2 = new RepositoryDto("local_repo", System.getProperty("user.home") + "/workspace/svnsearch", new NoAuthentication(), true, "FILESYSTEM", ignFileNames2, new LinkedList<String>(), repoGroups2);
 
         List result = configReader.getRepositories();
         assertTrue(repo1.equals(result.get(0)));

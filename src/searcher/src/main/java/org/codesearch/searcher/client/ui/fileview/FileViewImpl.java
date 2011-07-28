@@ -99,7 +99,7 @@ public class FileViewImpl extends Composite implements FileView {
     private boolean focusDivVisible;
     private String searchTerm;
     /** Whether or not the sidebar is visible. */
-    private boolean sidebarVisible;
+    private boolean sidebarVisible = false;
     /** The list of displayed sidebars in this view. */
     private List<Sidebar> shownSidebars = new LinkedList<Sidebar>();
 
@@ -125,10 +125,9 @@ public class FileViewImpl extends Composite implements FileView {
         lineNumbersContainer.clear();
         shownSidebars.clear();
         updateSidebar();
-        if (sidebarVisible) {
-            toggleSidebar();
-        }
         lineCount = 0;
+        sidebarVisible = false;
+        showSidebar(sidebarVisible);
         showFocusDiv(false);
     }
 
@@ -265,14 +264,17 @@ public class FileViewImpl extends Composite implements FileView {
     }-*/;
 
     private void toggleSidebar() {
-        if (sidebarVisible) {
-            splitWrapper.remove(sidebarTabPanel);
-            sidebarVisible = false;
-        } else {
+        sidebarVisible = !sidebarVisible;
+        showSidebar(sidebarVisible);
+    }
+
+    private void showSidebar(boolean show) {
+        if (show) {
             splitWrapper.clear();
             splitWrapper.addWest(sidebarTabPanel, 300);
             splitWrapper.add(scrollWrapper);
-            sidebarVisible = true;
+        } else {
+            splitWrapper.remove(sidebarTabPanel);
         }
         splitWrapper.animate(100);
     }

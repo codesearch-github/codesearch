@@ -99,16 +99,15 @@ public class IndexingTask implements Task {
     private static final Logger LOG = Logger.getLogger(IndexingTask.class);
     /** the plugins that will be used to create the fields for each document */
     private List<LuceneFieldPlugin> luceneFields = new LinkedList<LuceneFieldPlugin>();
-    /** The config reader used to read the configuration */
-    private ConfigurationReader configReader;
     /** The database access object */
     private DBAccess dba;
     /** The plugin loader. */
     private PluginLoader pluginLoader;
+    private String searcherUpdatePath;
 
     @Inject
-    public IndexingTask(ConfigurationReader configReader, DBAccess dba, PluginLoader pluginLoader) {
-        this.configReader = configReader;
+    public IndexingTask(DBAccess dba, PluginLoader pluginLoader, String searcherUpdatePath) {
+        this.searcherUpdatePath = searcherUpdatePath;
         this.dba = dba;
         this.pluginLoader = pluginLoader;
     }
@@ -160,7 +159,7 @@ public class IndexingTask implements Task {
             //notify the searcher about the update of the indexer
             notifySearcher();
         } catch (NotifySearcherException ex) {
-            LOG.error("Notification of searcher failed, changes in the index will not be recognized without a restart.\n" + ex);
+            LOG.warn("Notification of searcher failed, changes in the index will not be recognized without a restart.\n" + ex);
         } catch (InvalidIndexLocationException ex) {
             LOG.error("Error at indexing: " + ex);
         } catch (ConfigurationException ex) {
@@ -190,12 +189,11 @@ public class IndexingTask implements Task {
      * @throws NotifySearcherException in case the connection to the searcher could not be established
      */
     private void notifySearcher() throws NotifySearcherException {
-        String searcherLocation = configReader.getValue(XmlConfigurationReaderConstants.SEARCHER_LOCATION) + "updateIndexer"; //TODO move to a constant
         try {
-            URL url = new URL(searcherLocation);
+            URL url = new URL(searcherUpdatePath);
             url.openStream();
         } catch (IOException ex) {
-            throw new NotifySearcherException("Could not connect to searcher at the configured address: " + searcherLocation + "\n" + ex.toString());
+            throw new NotifySearcherException("Could not connect to searcher at the configured address: " + searcherUpdatePath + "\n" + ex.toString());
         }
     }
 

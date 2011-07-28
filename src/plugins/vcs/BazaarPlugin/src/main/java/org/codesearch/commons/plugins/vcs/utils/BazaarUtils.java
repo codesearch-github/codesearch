@@ -81,9 +81,7 @@ public class BazaarUtils {
             try {
                 instance = new BazaarUtils();
             } catch (BazaarClientException ex) {
-                if (ex.getMessage().equals("bzr-xmloutput >= 0.6.0 plugin not found")) {
-                LOG.error("Loading of the BazaarPlugin failed, Bazaar Xml Output to load succesfully");
-            }
+                LOG.error("Loading of the BazaarPlugin failed: " + ex.getMessage());
             }
         }
         return instance;
@@ -109,9 +107,9 @@ public class BazaarUtils {
      * Creates a new BranchLocation for the given repositoryUrl and
      * if the username and password are not empty it will use them to
      * authenticate.
-     * 
+     *
      * @param repositoryUrl
-     * @param userName 
+     * @param userName
      * @param password
      * @return BranchLocation
      * @throws URISyntaxException

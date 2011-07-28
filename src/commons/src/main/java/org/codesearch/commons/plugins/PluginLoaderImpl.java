@@ -25,10 +25,9 @@ import java.util.List;
 import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
 
-//TODO implement a common state so the serviceloader is not initialized every time a method is called
 /**
  * A class that provides access to dynamically loaded plugins.
- * 
+ *
  * @author Stiboller Stephan
  * @author David Froehlich
  * @author Samuel Kogler
@@ -36,14 +35,14 @@ import java.util.ServiceLoader;
 public class PluginLoaderImpl implements PluginLoader {
 
     private ServiceLoader<Plugin> serviceLoader = ServiceLoader.load(Plugin.class);
-    
+
     public PluginLoaderImpl() {
     }
 
     /**
      * returns a plugin for the given purpose. Searches through all loaded plugins and finds the one with the given
      * purpose.
-     * 
+     *
      * @param purpose the purpose of the plugin
      * @return the plugin matching the purpose
      * @throws Exception if no plugin was found with the purpose

@@ -33,7 +33,6 @@ sed -i 's/ENDPLUGINS-->/<!--ENDPLUGINS-->/' commons/pom.xml
 
 find plugins -iname "pom.xml" -execdir mvn clean install -DskipTests=true \;
 
-
 cd commons
 mvn clean install -DskipTests=true
 cd ..

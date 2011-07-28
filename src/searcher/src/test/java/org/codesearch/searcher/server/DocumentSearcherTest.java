@@ -79,7 +79,7 @@ public class DocumentSearcherTest {
         assertEquals(expectedResult, result);
         Set<String> repositoryGroups = new HashSet<String>();
         repositoryGroups.add("group1");
-        expectedResult = "content:\"asdf\" AND (repository:svnsearch_repo OR repository:svn_local)";
+        expectedResult = "content:\"asdf\" AND (repository:svnsearch_repo OR repository:local_repo)";
         result = instance.parseQuery(searchTerm, true, new HashSet<String>(), repositoryGroups);
         assertEquals(expectedResult, result);
     }

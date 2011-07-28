@@ -41,7 +41,7 @@ public class DBAccessTest {
     @Test
     public void testSetAnalysisDataForFile() throws Exception {
 //        String filePath = "asdf";
-//        String repository = "svn_local";
+//        String repository = "local_repo";
 //        List<String> types = new LinkedList<String>();
 //        List<String> imports = new LinkedList<String>();
 //        AstNode mockAstNode = new MockAstNode();
@@ -58,7 +58,7 @@ public class DBAccessTest {
     @Test
     public void testSerializeObject() throws Exception {
 //        String filePath = "asdf";
-//        String repository = "svn_local";
+//        String repository = "local_repo";
 //        List<Usage> usages = new LinkedList<Usage>();
 //        usages.add(new Usage(0, 0, 0, 0, ""));
 //        dbAccess.setAnalysisDataForFile(filePath, repository, usages, Collections.EMPTY_LIST, Collections.EMPTY_LIST);
@@ -104,7 +104,7 @@ public class DBAccessTest {
     @Test
     public void testEnsureThatRecordExists() throws Exception {
 //        String filePath = "asdf";
-//        String repository = "svn_local";
+//        String repository = "local_repo";
 //        System.out.println(dbAccess.ensureThatRecordExists(filePath, repository));
     }
 }
