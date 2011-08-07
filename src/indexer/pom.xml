@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.codesearch</groupId>
-    <artifactId>indexer</artifactId>
+    <artifactId>codesearch-indexer</artifactId>
     <name>Codesearch: Indexer</name>
 
     <packaging>war</packaging>
@@ -40,6 +40,11 @@
             <scope>provided</scope>
         </dependency>
 
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+        </dependency>
+
 		<!-- Quartz scheduling -->
         <dependency>
             <groupId>org.quartz-scheduler</groupId>
@@ -58,20 +63,9 @@
 
         <dependency>
             <groupId>org.codesearch</groupId>
-            <artifactId>commons</artifactId>
+            <artifactId>codesearch-commons</artifactId>
             <version>0.1-SNAPSHOT</version>
         </dependency>
+
     </dependencies>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-war-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
 </project>

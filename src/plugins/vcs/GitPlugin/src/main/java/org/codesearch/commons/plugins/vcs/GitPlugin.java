@@ -27,14 +27,15 @@ package org.codesearch.commons.plugins.vcs;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 import org.apache.log4j.Logger;
 import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 import org.codesearch.commons.plugins.vcs.utils.GitUtils;
 import org.eclipse.jgit.errors.AmbiguousObjectException;
 import org.eclipse.jgit.errors.MissingObjectException;
+import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.lib.RepositoryBuilder;
 
@@ -44,9 +45,11 @@ import org.eclipse.jgit.lib.RepositoryBuilder;
  */
 public class GitPlugin implements VersionControlPlugin {
 
-    private Repository repository;
-    private GitUtils gitUtil;
     private static final Logger LOG = Logger.getLogger(GitPlugin.class);
+    private Repository currentGitRepository;
+    private RepositoryDto currentRepository;
+    private GitUtils gitUtil;
+    private File cacheDirectory = new File("/tmp/codesearch/git/");
 
     /**
      * Sets up a new Instance of the GitPlugin
@@ -58,14 +61,15 @@ public class GitPlugin implements VersionControlPlugin {
     /** {@inheritDoc} */
     @Override
     public void setRepository(RepositoryDto repo) throws VersionControlPluginException {
+        this.currentRepository = repo;
+        LOG.debug("Git repository set to: " + currentRepository.getName());
         try {
-            LOG.debug("Git repository set to: " + repository);
             RepositoryBuilder builder = new RepositoryBuilder();
-            builder.setGitDir(new File(repo.getUrl()));
+            builder.setWorkTree(new File(cacheDirectory, currentRepository.getName()));
             builder.readEnvironment(); // scans environment GIT_* variables
             builder.findGitDir();
             builder.setup();
-            repository = builder.build();
+            currentGitRepository = builder.build();
         } catch (IllegalArgumentException ex) {
             throw new VersionControlPluginException(ex.toString());
         } catch (IOException ex) {
@@ -77,7 +81,7 @@ public class GitPlugin implements VersionControlPlugin {
     @Override
     public Set<FileDto> getChangedFilesSinceRevision(String revision) throws VersionControlPluginException {
         try {
-            return gitUtil.getChangedFilesSinceRevision(repository, revision);
+            return gitUtil.getChangedFilesSinceRevision(currentGitRepository, revision);
         } catch (IOException ex) {
             throw new VersionControlPluginException(ex.toString());
         }
@@ -87,7 +91,7 @@ public class GitPlugin implements VersionControlPlugin {
     @Override
     public FileDto getFileForFilePath(String filePath) throws VersionControlPluginException {
         try {
-            return gitUtil.retrieveFile(repository, filePath, Integer.valueOf(getRepositoryRevision()));
+            return gitUtil.retrieveFile(currentGitRepository, filePath, Integer.valueOf(getRepositoryRevision()));
         } catch (AmbiguousObjectException ex) {
             throw new VersionControlPluginException(ex.toString());
         } catch (MissingObjectException ex) {
@@ -101,11 +105,11 @@ public class GitPlugin implements VersionControlPlugin {
     @Override
     public String getRepositoryRevision() throws VersionControlPluginException {
         try {
-            return String.valueOf(gitUtil.retrieveHeadRevisionForRepository(repository));
+            return currentGitRepository.resolve(Constants.HEAD).getName();
         } catch (AmbiguousObjectException ex) {
-            throw new VersionControlPluginException(ex.toString());
+            throw new VersionControlPluginException("" + ex);
         } catch (IOException ex) {
-            throw new VersionControlPluginException(ex.toString());
+            throw new VersionControlPluginException("" + ex);
         }
     }
 
@@ -124,5 +128,9 @@ public class GitPlugin implements VersionControlPlugin {
     @Override
     public List<String> getFilesInDirectory(String directoryPath) throws VersionControlPluginException {
         throw new UnsupportedOperationException("Not supported yet."); //TODO impl
+    }
+
+    @Override
+    public void setCacheDirectory(String directoryPath) throws VersionControlPluginException {
     }
 }

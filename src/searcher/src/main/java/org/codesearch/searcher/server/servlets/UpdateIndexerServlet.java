@@ -27,7 +27,6 @@ package org.codesearch.searcher.server.servlets;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.io.File;
 import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -71,7 +70,7 @@ public class UpdateIndexerServlet extends HttpServlet {
         }
     }
 
-    /** 
+    /**
      * Handles the HTTP <code>POST</code> method.
      * @param request servlet request
      * @param response servlet response
@@ -83,7 +82,7 @@ public class UpdateIndexerServlet extends HttpServlet {
             throws ServletException, IOException {
     }
 
-    /** 
+    /**
      * Returns a short description of the servlet.
      * @return a String containing servlet description
      */

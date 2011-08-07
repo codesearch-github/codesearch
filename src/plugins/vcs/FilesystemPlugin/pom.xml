@@ -15,8 +15,7 @@
         <artifactId>codesearch</artifactId>
         <version>0.1-SNAPSHOT</version>
     </parent>
-    
-    <url>http://maven.apache.org</url>
+
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
@@ -31,7 +30,7 @@
 
         <dependency>
             <groupId>org.codesearch</groupId>
-            <artifactId>commons</artifactId>
+            <artifactId>codesearch-commons</artifactId>
             <version>0.1-SNAPSHOT</version>
         </dependency>
     </dependencies>

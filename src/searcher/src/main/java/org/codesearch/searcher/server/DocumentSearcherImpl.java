@@ -32,6 +32,7 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.WhitespaceAnalyzer;
 import org.apache.lucene.document.Document;
+import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
@@ -39,11 +40,9 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.FSDirectory;
-import org.apache.lucene.util.Version;
 import org.codesearch.commons.configuration.ConfigurationReader;
 import org.codesearch.commons.configuration.xml.XmlConfigurationReaderConstants;
 import org.codesearch.commons.constants.IndexConstants;
-import org.codesearch.searcher.server.util.STAlternativeSuggestor;
 import org.codesearch.searcher.shared.SearchResultDto;
 
 @Singleton
@@ -61,8 +60,6 @@ public class DocumentSearcherImpl implements DocumentSearcher {
     private boolean searcherInitialized = false;
     /** The location of the index. **/
     private String indexLocation;
-    /** Used completer for search term autocompletion functionality */
-    private STAlternativeSuggestor autocompleter;
     /** The used configuration reader. */
     private ConfigurationReader configurationReader;
 
@@ -76,11 +73,12 @@ public class DocumentSearcherImpl implements DocumentSearcher {
         // Retrieve index location from the configuration
         indexLocation = configurationReader.getValue(XmlConfigurationReaderConstants.INDEX_LOCATION);
         LOG.debug("Index location set to: " + indexLocation);
+        //FIXME critical: use analyzers and fields provided by plugins!
         //TODO make or find proper analyzers for search
-        queryParser = new QueryParser(Version.LUCENE_30, IndexConstants.INDEX_FIELD_CONTENT + "_lc", new LowerCaseWhiteSpaceAnalyzer());
+        queryParser = new QueryParser(IndexConstants.LUCENE_VERSION, IndexConstants.INDEX_FIELD_CONTENT + "_lc", new LowerCaseWhiteSpaceAnalyzer());
         queryParser.setAllowLeadingWildcard(true);
         queryParser.setLowercaseExpandedTerms(false);
-        queryParserCaseSensitive = new QueryParser(Version.LUCENE_30, IndexConstants.INDEX_FIELD_CONTENT, new WhitespaceAnalyzer());
+        queryParserCaseSensitive = new QueryParser(IndexConstants.LUCENE_VERSION, IndexConstants.INDEX_FIELD_CONTENT, new WhitespaceAnalyzer());
         queryParserCaseSensitive.setAllowLeadingWildcard(true);
         queryParserCaseSensitive.setLowercaseExpandedTerms(false);
         try {
@@ -137,7 +135,14 @@ public class DocumentSearcherImpl implements DocumentSearcher {
     /** {@inheritDoc} */
     @Override
     public synchronized void refreshIndex() throws InvalidIndexException {
-        initSearcher();
+        try {
+            // Calling reopen instead of new initialization for performance reasons
+            indexSearcher = new IndexSearcher(indexSearcher.getIndexReader().reopen(true));
+        } catch (CorruptIndexException ex) {
+            throw new InvalidIndexException("Could not refresh the index because it is corrupt: " + ex);
+        } catch (IOException ex) {
+            throw new InvalidIndexException("Could not refresh the index: " + ex);
+        }
     }
 
     private synchronized List<SearchResultDto> performLuceneSearch(String searchString, boolean caseSensitive, Set<String> repositoryNames, Set<String> repositoryGroupNames, int maxResults) throws ParseException, IOException, InvalidIndexException {

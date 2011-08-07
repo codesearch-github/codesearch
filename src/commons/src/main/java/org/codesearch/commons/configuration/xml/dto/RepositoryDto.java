@@ -47,7 +47,7 @@ public class RepositoryDto {
     private List<String> repositoryGroups;
     /** The authentication type used to access the files in this repository */
     private AuthenticationType usedAuthentication;
-    
+
     public RepositoryDto() {
     }
 
@@ -119,6 +119,10 @@ public class RepositoryDto {
 
     public void setVersionControlSystem(String versionControlSystem) {
         this.versionControlSystem = versionControlSystem;
+    }
+
+    public void setUsedAuthentication(AuthenticationType usedAuthentication) {
+        this.usedAuthentication = usedAuthentication;
     }
 
     public AuthenticationType getUsedAuthentication(){

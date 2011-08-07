@@ -44,7 +44,6 @@ import org.tmatesoft.svn.core.internal.io.fs.FSRepositoryFactory;
 import org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryFactoryImpl;
 import org.tmatesoft.svn.core.io.SVNRepository;
 import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
-import sun.print.CUPSPrinter;
 
 /**
  * A plugin used to access files stored in Subversion repositories.
@@ -54,9 +53,9 @@ import sun.print.CUPSPrinter;
  */
 public class SubversionPlugin implements VersionControlPlugin {
 
+    private static final Logger LOG = Logger.getLogger(SubversionPlugin.class);
     /** The repository that is currently accessed. */
     private SVNRepository svnRepo;
-    private static final Logger LOG = Logger.getLogger(SubversionPlugin.class);
     private ISVNAuthenticationManager authManager;
     private RepositoryDto repository;
     //TODO make this solution less ugly
@@ -90,15 +89,17 @@ public class SubversionPlugin implements VersionControlPlugin {
             SVNURL svnurl = SVNURL.parseURIDecoded(repository.getUrl().toString());
             svnRepo = SVNRepositoryFactory.create(svnurl);
             AuthenticationType type = repository.getUsedAuthentication();
-            if (type instanceof BasicAuthentication) {
+
+            if (type instanceof NoAuthentication) {
+                //Nothing needs to be done
+            } else if (type instanceof BasicAuthentication) {
                 BasicAuthentication basicAuth = (BasicAuthentication) type;
                 authManager = new BasicAuthenticationManager(basicAuth.getUsername(), basicAuth.getPassword());
                 svnRepo.setAuthenticationManager(authManager);
-            } else if (type instanceof SshAuthentication) {
+            } else {
                 //TODO add support for ssh files
+                throw new VersionControlPluginException("SSH authentication not yet supported.");
             }
-            //TODO test if this works for svn repos without authentication
-
         } catch (SVNException ex) {
             throw new VersionControlPluginException(ex.toString());
         }
@@ -191,7 +192,12 @@ public class SubversionPlugin implements VersionControlPlugin {
         return fileNames;
     }
 
-    class ListDirectoryDirEntryHandler implements ISVNDirEntryHandler {
+    @Override
+    public void setCacheDirectory(String directoryPath) {
+        // Does not need local cache directory.
+    }
+
+    private class ListDirectoryDirEntryHandler implements ISVNDirEntryHandler {
 
         List<String> fileNames;
 

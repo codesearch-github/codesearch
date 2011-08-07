@@ -23,8 +23,10 @@ package org.codesearch.indexer.core;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Singleton;
+import org.apache.log4j.Logger;
 import org.codesearch.indexer.manager.IndexingManager;
-import org.quartz.SchedulerFactory;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
 import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.spi.JobFactory;
 
@@ -35,9 +37,15 @@ import org.quartz.spi.JobFactory;
  */
 public class IndexerGuiceModule extends AbstractModule {
 
+    public static Logger LOG = Logger.getLogger(IndexerGuiceModule.class);
+
     @Override
     protected void configure() {
-        bind(SchedulerFactory.class).to(StdSchedulerFactory.class).in(Singleton.class);
+        try {
+            bind(Scheduler.class).toInstance(StdSchedulerFactory.getDefaultScheduler());
+        } catch (SchedulerException ex) {
+            LOG.error("Could not instantiate scheduler: " + ex);
+        }
         bind(JobFactory.class).to(QuartzGuiceJobFactory.class).in(Singleton.class);
         bind(IndexingManager.class).in(Singleton.class);
     }

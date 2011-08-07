@@ -1,0 +1,58 @@
+<root>
+    <dbms>mysql</dbms>
+    <db-username></db-username>
+    <db-password></db-password>
+    <db-driver></db-driver>
+    <db-url></db-url>
+    <db-port-number>3306</db-port-number>
+    <db-name>codesearch</db-name>
+    <db-max-connections>100</db-max-connections>
+
+    <searcher-location>http://127.0.0.1:8080/searcher/</searcher-location>
+    <version-control-cache-directory>/var/cache/codesearch/vcs/</version-control-cache-directory>
+
+    <global-blacklist-filenames>
+        <filename>.*\.class</filename>
+        <filename>.*\.o</filename>
+        <filename>.*\.bin</filename>
+    </global-blacklist-filenames>
+
+    <index-location>/var/index/</index-location>
+
+    <index-jobs>
+        <index-job>
+            <repositories>rpgunnamed</repositories>
+            <tasks>
+                <task>
+                    <type>index</type>
+                </task>
+            </tasks>
+            <cronExpression>0 0 * * * ?</cronExpression>
+        </index-job>
+    </index-jobs>
+
+    <repository-groups>group1 group2</repository-groups>
+
+    <repositories>
+        <repository>
+            <name>rpgunnamed</name>
+            <version-control-system>GIT</version-control-system>
+            <authentication-data type='none'></authentication-data>
+            <url>git://rpgunnamed.git.sourceforge.net/gitroot/rpgunnamed/rpgunnamed</url>
+            <code-navigation-enabled>false</code-navigation-enabled>
+            <repository-groups>
+                <repo-group>group1</repo-group>
+            </repository-groups>
+        </repository>
+        <repository>
+            <name>jdownloader</name>
+            <version-control-system>SVN</version-control-system>
+            <authentication-data type='none'></authentication-data>
+            <url>svn://svn.jdownloader.org/jdownloader</url>
+            <code-navigation-enabled>true</code-navigation-enabled>
+            <repository-groups>
+                <repo-group>group1</repo-group>
+            </repository-groups>
+        </repository>
+    </repositories>
+</root>

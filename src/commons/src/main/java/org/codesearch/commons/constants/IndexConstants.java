@@ -30,7 +30,7 @@ import org.apache.lucene.util.Version;
  */
 public final class IndexConstants {
       /** Lucene version used */
-    public static final Version LUCENE_VERSION = Version.LUCENE_30;
+    public static final Version LUCENE_VERSION = Version.LUCENE_33;
     public static final String INDEX_FIELD_REPOSITORY="repository";
     public static final String INDEX_FIELD_FILEPATH="filepath";
     public static final String INDEX_FIELD_CONTENT="content";
@@ -40,6 +40,6 @@ public final class IndexConstants {
     public static final String REVISIONS_PROPERTY_FILENAME = "revisions.properties";
 
     private IndexConstants(){
-        
+
     }
 }

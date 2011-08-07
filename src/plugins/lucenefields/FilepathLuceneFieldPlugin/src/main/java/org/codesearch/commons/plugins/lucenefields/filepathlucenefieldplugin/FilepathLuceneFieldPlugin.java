@@ -19,18 +19,14 @@
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package org.codesearch.commons.plugins.lucenefields.filepathlucenefieldplugin;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.SimpleAnalyzer;
+import org.codesearch.commons.constants.IndexConstants;
 import org.codesearch.commons.plugins.lucenefields.LuceneFieldPlugin;
 import org.codesearch.commons.plugins.lucenefields.LuceneFieldValueException;
-import org.codesearch.commons.plugins.lucenefields.contentlucenefieldplugin.LetterAnalyzer;
+import org.codesearch.commons.plugins.lucenefields.LetterAnalyzer;
 import org.codesearch.commons.plugins.vcs.FileDto;
 /**
  *
@@ -44,11 +40,13 @@ public class FilepathLuceneFieldPlugin extends LuceneFieldPlugin {
      * @return
      * @throws LuceneFieldValueException
      */
+    @Override
     public String getFieldValue(FileDto fileDto) throws LuceneFieldValueException {
         return fileDto.getFilePath();
     }
 
     /** {@inheritDoc} */
+    @Override
     public String getPurposes() {
         return "lucene_field_plugin";
     }
@@ -57,6 +55,7 @@ public class FilepathLuceneFieldPlugin extends LuceneFieldPlugin {
      * returns true
      * @return
      */
+    @Override
     public boolean isAnalyzed() {
         return true;
     }
@@ -65,25 +64,30 @@ public class FilepathLuceneFieldPlugin extends LuceneFieldPlugin {
      * returns true
      * @return
      */
+    @Override
     public boolean isStored() {
         return true;
     }
 
     /** {@inheritDoc} */
+    @Override
     public boolean addLowercase() {
         return true;
     }
 
+    @Override
     public String getFieldName() {
         return "filepath";
     }
 
+    @Override
     public Analyzer getRegularCaseAnalyzer() {
         return new LetterAnalyzer();
     }
 
+    @Override
     public Analyzer getLowerCaseAnalyzer() {
-        return new SimpleAnalyzer();
+        return new SimpleAnalyzer(IndexConstants.LUCENE_VERSION);
     }
 
 }

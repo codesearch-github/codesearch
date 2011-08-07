@@ -23,15 +23,14 @@ package org.codesearch.commons.configuration.xml;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.codesearch.commons.configuration.ConfigurationReader;
+import org.codesearch.commons.configuration.xml.dto.IndexingTaskType;
 import org.codesearch.commons.configuration.xml.dto.JobDto;
 import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
-import org.codesearch.commons.configuration.xml.dto.TaskDto;
 import org.codesearch.commons.plugins.vcs.BasicAuthentication;
 import org.codesearch.commons.plugins.vcs.NoAuthentication;
 import org.junit.Before;
@@ -51,31 +50,27 @@ public class XmlConfigurationReaderTest {
 
     @Test
     public void testGetRepositories() throws Exception {
+        RepositoryDto repo1 = getTestRepo();
+
+        List result = configReader.getRepositories();
+        assert (repo1.equals(result.get(0)));
+    }
+
+    private RepositoryDto getTestRepo() {
         List<String> ignFileNames1 = new LinkedList<String>();
         List<String> repoGroups1 = new LinkedList<String>();
         repoGroups1.add("group1");
-        repoGroups1.add("group2");
 
-        ignFileNames1.add("*.xml");
-        ignFileNames1.add("*.jpg");
-        ignFileNames1.add("*img*");
         ignFileNames1.add("*.svn*");
-        ignFileNames1.add("*.class*");
+        ignFileNames1.add("*.class");
+        ignFileNames1.add("*.o");
+        ignFileNames1.add("*.bin");
 
-        RepositoryDto repo1 = new RepositoryDto("svnsearch_repo", "http://portal.htl-kaindorf.at/svnsearch", new BasicAuthentication("feldruebe", "dota!123"), true, "SVN", ignFileNames1, new LinkedList<String>(), repoGroups1);
-
-        List<String> ignFileNames2 = new LinkedList<String>();
-        List<String> repoGroups2 = new LinkedList<String>();
-        ignFileNames2.add("*.jpg");
-        ignFileNames2.add("*img*");
-        ignFileNames2.add("*generated*");
-        ignFileNames2.add("*.svn*");
-        ignFileNames2.add("*.class*");
-        RepositoryDto repo2 = new RepositoryDto("local_repo", System.getProperty("user.home") + "/workspace/svnsearch", new NoAuthentication(), true, "FILESYSTEM", ignFileNames2, new LinkedList<String>(), repoGroups2);
-
-        List result = configReader.getRepositories();
-        assertTrue(repo1.equals(result.get(0)));
-        assertTrue(repo2.equals(result.get(1)));
+        RepositoryDto repo1 = new RepositoryDto("jdownloader-repo",
+                "svn://svn.jdownloader.org/jdownloader",
+                new NoAuthentication(), true,
+                "SVN", ignFileNames1, new LinkedList<String>(), repoGroups1);
+        return repo1;
     }
 
     @Test
@@ -88,24 +83,12 @@ public class XmlConfigurationReaderTest {
 
     @Test
     public void testGetJobs() throws ConfigurationException {
-        List<String> ignFileNames1 = new LinkedList<String>();
-        List<String> repoGroups1 = new LinkedList<String>();
-        repoGroups1.add("group1");
-        repoGroups1.add("group2");
-
-        ignFileNames1.add("*.xml");
-        ignFileNames1.add("*.jpg");
-        ignFileNames1.add("*img*");
-        ignFileNames1.add("*.svn*");
-        ignFileNames1.add("*.class*");
-
-        RepositoryDto repo1 = new RepositoryDto("svnsearch_repo", "http://portal.htl-kaindorf.at/svnsearch", new BasicAuthentication("feldruebe", "dota!123"), true, "SVN", ignFileNames1, new LinkedList<String>(), repoGroups1);
-
+        RepositoryDto repo1 = getTestRepo();
         System.out.println(repo1.getBlacklistEntries());
 
         JobDto job1 = new JobDto();
-        job1.setCronExpression("*/10 * * * *");
-        job1.getTasks().add(new TaskDto(repo1, TaskDto.TaskType.index, true));
+        job1.setCronExpression("0 * * * * ?");
+        job1.getTasks().add(IndexingTaskType.INDEX);
 
         List<JobDto> result = configReader.getJobs();
         assert (result.get(0).equals(job1));
@@ -113,13 +96,9 @@ public class XmlConfigurationReaderTest {
 
     @Test
     public void testGetRepositoryByName() throws Exception {
-        List<String> ignoredFiles = new LinkedList<String>();
-        List<String> repoGroups = new LinkedList<String>();
-        ignoredFiles.add("*.xml");
-        ignoredFiles.add("*.jpg");
-        ignoredFiles.add("*.txt");
-        RepositoryDto expResult = new RepositoryDto("testRepo1", "http://test.org", new NoAuthentication(), true, "SVN", ignoredFiles, new LinkedList<String>(), repoGroups);
-        RepositoryDto result = configReader.getRepositoryByName("testRepo1");
+        RepositoryDto repo1 = getTestRepo();
+        RepositoryDto repo2 = configReader.getRepositoryByName("jdownloader-repo");
+        assertEquals(repo1, repo2);
     }
 
     @Test

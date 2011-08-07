@@ -26,7 +26,7 @@
 
 package org.codesearch.commons.plugins;
 
-import java.util.List;
+import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
 import org.codesearch.commons.plugins.codeanalyzing.CodeAnalyzerPlugin;
 import org.codesearch.commons.plugins.highlighting.HighlightingPlugin;
 import org.codesearch.commons.plugins.lucenefields.LuceneFieldPlugin;
@@ -36,14 +36,13 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  *
  * @author David Froehlich
  */
 public class PluginLoaderImplTest {
-    private PluginLoaderImpl pl = new PluginLoaderImpl();
+    private PluginLoaderImpl pl = new PluginLoaderImpl(new XmlConfigurationReader(""));
     public PluginLoaderImplTest() {
     }
 

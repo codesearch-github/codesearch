@@ -20,10 +20,18 @@
  */
 package org.codesearch.commons.plugins;
 
+import com.google.inject.Inject;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.codesearch.commons.configuration.ConfigurationReader;
+import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
+import org.codesearch.commons.configuration.xml.XmlConfigurationReaderConstants;
+import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
+import org.codesearch.commons.plugins.vcs.VersionControlPluginException;
 
 /**
  * A class that provides access to dynamically loaded plugins.
@@ -35,8 +43,11 @@ import java.util.ServiceLoader;
 public class PluginLoaderImpl implements PluginLoader {
 
     private ServiceLoader<Plugin> serviceLoader = ServiceLoader.load(Plugin.class);
+    private ConfigurationReader configurationReader;
 
-    public PluginLoaderImpl() {
+    @Inject
+    public PluginLoaderImpl(ConfigurationReader configurationReader) {
+        this.configurationReader = configurationReader;
     }
 
     /**
@@ -68,7 +79,17 @@ public class PluginLoaderImpl implements PluginLoader {
                 System.out.println(ex.toString());
             }
         }
+        //FIXME: very hackish, but I could not think of a better way ATM
         if (validPlugin != null) {
+            if (validPlugin instanceof VersionControlPlugin) {
+                VersionControlPlugin vcsPlugin = (VersionControlPlugin) validPlugin;
+                try {
+                    vcsPlugin.setCacheDirectory(configurationReader.getValue(XmlConfigurationReaderConstants.VERSION_CONTROL_CACHE_DIR));
+                } catch (VersionControlPluginException ex) {
+                    throw new PluginLoaderException("VersionControlPlugin failed to load because an invalid cache directory was specified: " + ex);
+                }
+            }
+
             return (T) validPlugin;
         }
         throw new PluginLoaderException("No Plugin found for purpose: " + purpose + " and Class: " + clazz);

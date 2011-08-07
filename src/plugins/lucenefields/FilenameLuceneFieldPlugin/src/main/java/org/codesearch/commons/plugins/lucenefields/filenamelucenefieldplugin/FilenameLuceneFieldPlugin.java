@@ -19,17 +19,14 @@
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.codesearch.commons.plugins.lucenefields.filenamelucenefieldplugin;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.SimpleAnalyzer;
+import org.codesearch.commons.constants.IndexConstants;
 import org.codesearch.commons.plugins.lucenefields.LuceneFieldPlugin;
 import org.codesearch.commons.plugins.lucenefields.LuceneFieldValueException;
-import org.codesearch.commons.plugins.lucenefields.contentlucenefieldplugin.LetterAnalyzer;
+import org.codesearch.commons.plugins.lucenefields.LetterAnalyzer;
 import org.codesearch.commons.plugins.vcs.FileDto;
 
 /**
@@ -38,6 +35,7 @@ import org.codesearch.commons.plugins.vcs.FileDto;
  */
 public class FilenameLuceneFieldPlugin extends LuceneFieldPlugin {
     /** {@inhertDoc} */
+    @Override
     public String getFieldValue(FileDto fileDto) throws LuceneFieldValueException {
         try {
             return fileDto.getFilePath().substring(fileDto.getFilePath().lastIndexOf("/"));
@@ -48,30 +46,36 @@ public class FilenameLuceneFieldPlugin extends LuceneFieldPlugin {
     }
 
     /** {@inhertDoc} */
+    @Override
     public boolean isAnalyzed() {
         return true;
     }
 
     /** {@inhertDoc} */
+    @Override
     public boolean addLowercase() {
         return true;
     }
 
     /** {@inhertDoc} */
+    @Override
     public boolean isStored() {
         return true;
     }
 
     /** {@inhertDoc} */
+    @Override
     public String getFieldName() {
         return "filename";
     }
 
+    @Override
     public Analyzer getRegularCaseAnalyzer() {
         return new LetterAnalyzer();
     }
 
+    @Override
     public Analyzer getLowerCaseAnalyzer() {
-        return new SimpleAnalyzer();
+        return new SimpleAnalyzer(IndexConstants.LUCENE_VERSION);
     }
 }

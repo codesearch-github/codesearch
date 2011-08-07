@@ -31,7 +31,10 @@ public final class XmlConfigurationReaderConstants {
     /** Private constructor so its  not instantiable. */
     private XmlConfigurationReaderConstants () {}
     //GLOBAL CONSTANTS
+    /** The URL to the searcher web application, used to notify the searcher of changes to the index. */
     public static final String SEARCHER_LOCATION = "searcher-location";
+    /** used to store local checkouts/clones of the configured repositories. */
+    public static final String VERSION_CONTROL_CACHE_DIR = "version-control-cache-directory";
     /** used to store the data of the users authorized to access the indexer via the web interface */
     public static final String INDEXER_USERS = "indexer-users.indexer-user";
     /** used to access the username of a indexing-user */
@@ -95,7 +98,7 @@ public final class XmlConfigurationReaderConstants {
     public static final String TASK_TYPE = "type";
     /** Used to find out whether an indexing job is set to also add code-navigation specific fields */
     public static final String CODE_NAVIGATION_ENABLED = "code-navigation-enabled";
-    
+
     //JOB CONSTANTS
     /** Used to access a single job */
     public static final String JOB = "job";

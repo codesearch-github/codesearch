@@ -23,12 +23,15 @@ package org.codesearch.indexer.tasks;
 import com.google.inject.Inject;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.apache.lucene.index.CorruptIndexException;
+import org.apache.lucene.index.StaleReaderException;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.store.FSDirectory;
+import org.apache.lucene.store.LockObtainFailedException;
 import org.codesearch.commons.configuration.properties.PropertiesManager;
 import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 import org.codesearch.commons.constants.IndexConstants;
@@ -37,8 +40,8 @@ import org.codesearch.commons.database.DatabaseAccessException;
 import org.codesearch.indexer.exceptions.TaskExecutionException;
 
 /**
- * Clears either the index of a single repository or deletes the entire index.
- * If the repositoryName is not set, the entire index is cleared.
+ * Clears the index of the specified repositories.
+ * If none are specified, deletes the entire index.
  * @author David Froehlich
  * @author Samuel Kogler
  */
@@ -46,12 +49,10 @@ public class ClearTask implements Task {
 
     /** Logger */
     private static final Logger LOG = Logger.getLogger(ClearTask.class);
-    /** Whether code analysis is enabled. */
-    private boolean codeAnalysisEnabled;
     /** the location of the index */
     private String indexLocation;
     /** the repository to clear  */
-    private RepositoryDto repository;
+    private List<RepositoryDto> repositories;
     /** The database access object */
     private DBAccess dba;
 
@@ -67,70 +68,88 @@ public class ClearTask implements Task {
      */
     @Override
     public void execute() throws TaskExecutionException {
-        LOG.debug("Executing clear task");
-        try {
-            if (repository == null) { // Clear the whole index
-                File indexDir = new File(indexLocation);
-                boolean deleteSuccess = true;
-                if (indexDir.listFiles() != null) {
-                    for (File f : indexDir.listFiles()) {
-                        if (!f.delete()) {
-                            LOG.error("Could not delete file: " + f.getName());
-                            deleteSuccess = false;
-                        }
+        if (repositories == null || repositories.isEmpty()) { // Clear the whole index
+            LOG.info("Clearing the whole index");
+            File indexDir = new File(indexLocation);
+            boolean deleteSuccess = true;
+            if (indexDir.listFiles() != null) {
+                for (File f : indexDir.listFiles()) {
+                    if (!f.delete()) {
+                        LOG.error("Could not delete file: " + f.getName());
+                        deleteSuccess = false;
                     }
                 }
-                if (deleteSuccess) {
-                    LOG.debug("Successfully cleared index");
-                } else {
-                    LOG.error("Could not delete all index files");
-                }
-                if (codeAnalysisEnabled) {
-                    try {
-                        dba.purgeDatabaseEntries();
-                        LOG.debug("Cleared code analysis index");
-                    } catch (DatabaseAccessException ex) {
-                        LOG.error("Could not clear code analysis index: \n" + ex);
-                    }
-                }
-            } else { // Clear specific repository from the index
+            }
+            if (deleteSuccess) {
+                LOG.debug("Successfully cleared index");
+            } else {
+                LOG.error("Could not delete all index files");
+            }
+            try {
+                dba.purgeDatabaseEntries();
+                LOG.debug("Cleared code analysis index");
+            } catch (DatabaseAccessException ex) {
+                LOG.warn("Could not clear code analysis index: \n" + ex);
+            }
+        } else { // Clear specific repository from the index
+            StringBuilder repos = new StringBuilder();
+            for (RepositoryDto repositoryDto : repositories) {
+                repos.append(repositoryDto.getName()).append(" ");
+            }
+            LOG.info("Clearing index for repositories: " + repos.toString().trim());
+            IndexSearcher searcher = null;
+            try {
                 File indexDir = new File(indexLocation);
                 FSDirectory fsd = FSDirectory.open(indexDir);
-                IndexSearcher searcher = new IndexSearcher(fsd, false);
-                Term term = new Term(IndexConstants.INDEX_FIELD_REPOSITORY, repository.getName());
-                deleteDocumentsFromIndexUsingTerm(term, searcher);
-                PropertiesManager propertiesManager = new PropertiesManager(indexLocation + IndexConstants.REVISIONS_PROPERTY_FILENAME);
-                propertiesManager.setPropertyFileValue(repository.getName(), "0");
+                searcher = new IndexSearcher(fsd, false);
 
-                LOG.debug("Deleted " + searcher.getIndexReader().deleteDocuments(term) + " documents for repository " + repository.getName());
-                searcher.close();
+                for (RepositoryDto repositoryDto : repositories) {
+                    Term term = new Term(IndexConstants.INDEX_FIELD_REPOSITORY, repositoryDto.getName());
 
-                if (codeAnalysisEnabled) {
+                    LOG.debug("Deleting documents where field '" + term.field() + "' is '" + term.text() + "'");
+                    int deleteCount = 0;
                     try {
-                        dba.clearTablesForRepository(repository.getName());
-                        dba.setLastAnalyzedRevisionOfRepository(repository.getName(), "0");
-                        LOG.debug("Cleared code analysis index for repository " + repository.getName());
+                         deleteCount = searcher.getIndexReader().deleteDocuments(term);
+                    } catch (IOException ex) {
+                        LOG.error("Error encountered while clearing index: " + ex);
+                    }
+
+                    PropertiesManager propertiesManager = new PropertiesManager(indexLocation + IndexConstants.REVISIONS_PROPERTY_FILENAME);
+                    propertiesManager.setPropertyFileValue(repositoryDto.getName(), "0");
+
+                    LOG.debug("Cleared " + deleteCount + " documents for repository " + repositoryDto.getName());
+                }
+            } catch (CorruptIndexException ex) {
+                LOG.error("Could not clear index because it is corrupt: \n" + ex);
+            } catch (LockObtainFailedException ex) {
+                LOG.error("Could not clear index because it is locked.");
+            } catch (StaleReaderException ex) {
+                LOG.error("The index was modified by another program/instance while clearing.");
+            } catch (IOException ex) {
+                //if there is no index nothing has to be cleared
+            } finally {
+                if (searcher != null) {
+                    try {
+                        searcher.close();
+                    } catch (IOException ex) {
+                    }
+                }
+            }
+
+            for (RepositoryDto repositoryDto : repositories) {
+                if (repositoryDto.isCodeNavigationEnabled()) {
+                    try {
+                        dba.clearTablesForRepository(repositoryDto.getName());
+                        dba.setLastAnalyzedRevisionOfRepository(repositoryDto.getName(), "0");
+                        LOG.debug("Cleared code analysis index for repository " + repositoryDto.getName());
                     } catch (DatabaseAccessException ex) {
                         LOG.error("Could not clear code analysis index: \n" + ex);
                     }
                 }
             }
-        } catch (CorruptIndexException ex) {
-            throw new TaskExecutionException("Corrupt index: \n" + ex);
-        } catch (IOException ex) {
-            //if there is no index nothing has to be cleared
         }
-        LOG.debug("Finished executing clear task");
-    }
 
-    /**
-     * Removes all documents related to the used Term
-     * @param term The term
-     * @throws IOException
-     */
-    private void deleteDocumentsFromIndexUsingTerm(Term term, IndexSearcher indexSearcher) throws IOException {
-        LOG.debug("Deleting documents where field '" + term.field() + "' is '" + term.text() + "'");
-        indexSearcher.getIndexReader().deleteDocuments(term);
+        LOG.info("Finished clearing index");
     }
 
     @Override
@@ -139,12 +158,7 @@ public class ClearTask implements Task {
     }
 
     @Override
-    public void setRepository(RepositoryDto repository) {
-        this.repository = repository;
-    }
-
-    @Override
-    public void setCodeAnalysisEnabled(boolean codeAnalysisEnabled) {
-        this.codeAnalysisEnabled = codeAnalysisEnabled;
+    public void setRepositories(List<RepositoryDto> repositories) {
+        this.repositories = repositories;
     }
 }

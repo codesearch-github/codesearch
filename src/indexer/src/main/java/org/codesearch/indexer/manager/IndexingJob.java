@@ -28,7 +28,8 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.codesearch.commons.configuration.ConfigurationReader;
 import org.codesearch.commons.configuration.xml.XmlConfigurationReaderConstants;
-import org.codesearch.commons.configuration.xml.dto.TaskDto;
+import org.codesearch.commons.configuration.xml.dto.IndexingTaskType;
+import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 import org.codesearch.commons.database.DBAccess;
 import org.codesearch.commons.plugins.PluginLoader;
 import org.codesearch.indexer.exceptions.TaskExecutionException;
@@ -47,10 +48,12 @@ import org.quartz.JobExecutionException;
  */
 public class IndexingJob implements Job {
 
-    public static final String FIELD_TERMINATED = "terminated";
-    public static final String FIELD_TASKS = "tasks";
-    public static final String FIELD_TASKS_FINISHED = "tasks_finished";
     public static final String FIELD_ID = "id";
+    public static final String FIELD_TASKS = "tasks";
+    public static final String FIELD_REPOSITORIES = "repositories";
+
+    public static final String FIELD_TERMINATED = "terminated";
+    public static final String FIELD_TASKS_FINISHED = "tasks_finished";
     public static final String FIELD_CURRENT_TYPE = "type";
     public static final String FIELD_CURRENT_REPOSITORY = "current_repository";
     /** Instantiate a logger */
@@ -59,13 +62,15 @@ public class IndexingJob implements Job {
      * If flagged as terminated the job will not start the execution of the next task and terminate itself instead */
     private boolean terminated = false;
     /** List of TaskDtos assigned to this IndexingJob */
-    private List<TaskDto> taskList = new LinkedList<TaskDto>();
+    private List<IndexingTaskType> taskList = new LinkedList<IndexingTaskType>();
     /** The config reader used to read the configuration */
     private ConfigurationReader configReader;
     /** The database access object */
     private DBAccess dba;
     /** The plugin loader. */
     private PluginLoader pluginLoader;
+    /** The affected repositories. */
+    private List<RepositoryDto> repositories;
 
     @Inject
     public IndexingJob(ConfigurationReader configReader, DBAccess dba, PluginLoader pluginLoader) {
@@ -81,33 +86,30 @@ public class IndexingJob implements Job {
      */
     @Override
     public void execute(JobExecutionContext jec) throws JobExecutionException { //TODO refactor the task creation, there is no need for a TaskDto
-        LOG.info("Executing IndexingJob " + jec.getJobDetail().getName());
+        LOG.info("Executing IndexingJob " + jec.getJobDetail().getKey().getName());
         terminated = (Boolean) jec.getJobDetail().getJobDataMap().get(FIELD_TERMINATED);
-        taskList = (List<TaskDto>) (jec.getJobDetail().getJobDataMap().get(FIELD_TASKS));
+        taskList = (List<IndexingTaskType>) (jec.getJobDetail().getJobDataMap().get(FIELD_TASKS));
+        repositories = (List<RepositoryDto>) (jec.getJobDetail().getJobDataMap().get(FIELD_REPOSITORIES));
         Task task = null;
         Date startDate = new Date();
         for (int i = 0; i < taskList.size(); i++) {
             try {
-                TaskDto taskDto = taskList.get(i);
                 if (terminated) {
                     throw new JobExecutionException("Job was terminated after successful execution of " + i + " of " + taskList.size() + " tasks");
                 }
-                switch (taskDto.getType()) {
-                    case index: {
-                        jec.getJobDetail().getJobDataMap().put(FIELD_CURRENT_TYPE, "index");
+                IndexingTaskType currentTask = taskList.get(i);
+                jec.getJobDetail().getJobDataMap().put(FIELD_CURRENT_TYPE, currentTask);
+                switch (currentTask) {
+                    case INDEX: {
                         task = new IndexingTask(dba, pluginLoader, configReader.getValue(XmlConfigurationReaderConstants.SEARCHER_LOCATION));
                         break;
                     }
-                    case clear: {
-                        jec.getJobDetail().getJobDataMap().put(FIELD_CURRENT_TYPE, "clear");
+                    case CLEAR: {
                         task = new ClearTask(dba);
                         break;
                     }
                 }
-                jec.getJobDetail().getJobDataMap().put(FIELD_CURRENT_REPOSITORY, taskDto.getRepository().getName());
-                task.setRepository(taskDto.getRepository());
-                task.setIndexLocation(configReader.getValue(XmlConfigurationReaderConstants.INDEX_LOCATION));
-                task.setCodeAnalysisEnabled(taskDto.getRepository().isCodeNavigationEnabled());//TODO move code analyis enabled
+                task.setRepositories(repositories);
                 task.setIndexLocation(configReader.getValue(XmlConfigurationReaderConstants.INDEX_LOCATION));
                 task.execute();
                 jec.getJobDetail().getJobDataMap().put(FIELD_TASKS_FINISHED, i + 1);
@@ -116,6 +118,15 @@ public class IndexingJob implements Job {
             }
         }
         LOG.debug("Finished execution of job in " + (new Date().getTime() - startDate.getTime()) / 1000f + " seconds");
-        LOG.info("Finished executing IndexingJob " + jec.getJobDetail().getName());
+        LOG.info("Finished execution of IndexingJob " + jec.getJobDetail().getKey().getName());
     }
+
+    public List<RepositoryDto> getRepositories() {
+        return repositories;
+    }
+
+    public void setRepositories(List<RepositoryDto> repositories) {
+        this.repositories = repositories;
+    }
+
 }

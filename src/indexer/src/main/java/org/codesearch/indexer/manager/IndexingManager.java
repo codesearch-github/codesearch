@@ -26,21 +26,22 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
 import org.codesearch.commons.configuration.ConfigurationReader;
 import org.codesearch.commons.configuration.xml.dto.JobDto;
-import org.quartz.CronTrigger;
+import org.quartz.CronScheduleBuilder;
+import org.quartz.JobBuilder;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
-import org.quartz.SchedulerFactory;
-import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
+import org.quartz.TriggerBuilder;
 import org.quartz.spi.JobFactory;
 
 /**
@@ -52,7 +53,6 @@ public final class IndexingManager {
 
     /** Instantiate a logger */
     private static final Logger LOG = Logger.getLogger(IndexingManager.class);
-    private static final String INDEXING_JOB_GROUP_NAME = "INDEXING_JOBS";
     /** The scheduler used to schedule the IndexingJobss */
     private Scheduler scheduler;
     /** The configurated jobs. */
@@ -63,9 +63,9 @@ public final class IndexingManager {
      * @throws SchedulerException In case the scheduler could not be instantiated
      */
     @Inject
-    public IndexingManager(ConfigurationReader configurationReader, SchedulerFactory sf, JobFactory jobFactory) throws SchedulerException {
+    public IndexingManager(ConfigurationReader configurationReader, Scheduler scheduler, JobFactory jobFactory) throws SchedulerException {
         jobs = configurationReader.getJobs();
-        scheduler = sf.getScheduler();
+        this.scheduler = scheduler;
         scheduler.setJobFactory(jobFactory);
     }
 
@@ -95,23 +95,24 @@ public final class IndexingManager {
         LOG.info("Starting scheduler with " + jobs.size() + " jobs");
 
         for (JobDto job : jobs) {
-            JobDetail jobDetail = new JobDetail("Job" + i, INDEXING_JOB_GROUP_NAME, IndexingJob.class);
-            jobDetail.getJobDataMap().put(IndexingJob.FIELD_TASKS, job.getTasks());
-            jobDetail.getJobDataMap().put(IndexingJob.FIELD_ID, i);
-            jobDetail.getJobDataMap().put(IndexingJob.FIELD_TERMINATED, false);
+            JobDataMap jdm = new JobDataMap();
+            jdm.put(IndexingJob.FIELD_ID, i);
+            jdm.put(IndexingJob.FIELD_TASKS, job.getTasks());
+            jdm.put(IndexingJob.FIELD_REPOSITORIES, job.getRepositories());
+            jdm.put(IndexingJob.FIELD_TERMINATED, false);
+            JobDetail jobDetail = JobBuilder.newJob(IndexingJob.class).withIdentity("Job" + i, Scheduler.DEFAULT_GROUP).usingJobData(jdm).build();
 
             try {
                 Trigger trigger = null;
                 if (job.getCronExpression() == null) {
-                    trigger = new SimpleTrigger("JobTrigger" + i);
+                    trigger = TriggerBuilder.newTrigger().forJob(jobDetail).startNow().build();
                 } else {
-                    trigger = new CronTrigger("JobTrigger" + i);
-                    ((CronTrigger)trigger).setCronExpression(job.getCronExpression());
+                    trigger = TriggerBuilder.newTrigger().forJob(jobDetail).withSchedule(CronScheduleBuilder.cronSchedule(job.getCronExpression())).build();
                 }
 
                 scheduler.scheduleJob(jobDetail, trigger);
             } catch (ParseException ex) {
-                LOG.error("Indexing job " + i + " was configured with invalid cron expression:\n" + ex);
+                LOG.error("Indexing job " + i + "for repository ---" + " was configured with invalid cron expression:\n" + ex);
             }
 
             i++;
@@ -122,8 +123,13 @@ public final class IndexingManager {
     /**
      * Stops the scheduler.
      */
-    public void stop() throws SchedulerException {
-        scheduler.shutdown();
+    public void stop() {
+        try {
+            scheduler.shutdown();
+            Thread.sleep(1000);
+        } catch (Exception ex) {
+            LOG.warn("Quartz scheduler failed to shutdown: " + ex);
+        }
     }
 
     /**

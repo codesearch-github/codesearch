@@ -140,4 +140,9 @@ public class FilesystemPlugin implements VersionControlPlugin {
         File f = new File(directoryPath);
         return Arrays.asList(f.list());
     }
+
+    @Override
+    public void setCacheDirectory(String directoryPath) throws VersionControlPluginException {
+        // Not needed
+    }
 }

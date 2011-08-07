@@ -23,6 +23,7 @@ package org.codesearch.indexer.tasks;
 import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
+import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.codesearch.commons.configuration.ConfigurationReader;
 
@@ -60,7 +61,7 @@ public class IndexingTaskTest {
     public void testExecuteLocal() throws Exception {
         ConfigurationReader configReader = new XmlConfigurationReader(null);
 
-        PluginLoader pl = new PluginLoaderImpl();
+        PluginLoader pl = new PluginLoaderImpl(configReader);
         DBAccess dba = new MockDatabaseImpl();
 
         RepositoryDto repo = new RepositoryDto(
@@ -73,15 +74,16 @@ public class IndexingTaskTest {
                 new LinkedList<String>(),
                 new LinkedList<String>());
 
+        List<RepositoryDto> repos = new LinkedList<RepositoryDto>();
+        repos.add(repo);
+
         ClearTask c = new ClearTask(dba);
         c.setIndexLocation(testIndexDir);
         c.execute();
 
         IndexingTask t = new IndexingTask(dba, pl, "");
         t.setIndexLocation(testIndexDir);
-
-        t.setRepository(repo);
-        t.setCodeAnalysisEnabled(true);
+        t.setRepositories(repos);
         t.execute();
     }
 

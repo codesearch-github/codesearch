@@ -19,11 +19,6 @@
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package org.codesearch.commons.plugins.lucenefields;
 
 import org.apache.lucene.analysis.Analyzer;
@@ -54,7 +49,7 @@ public abstract class LuceneFieldPlugin implements Plugin {
     /**
      * determines whether the content of the field should also be stored in another field as lowercase
      * if true the IndexingTask will create an additional field with the _lc at the end storing the content of the field in lowercase
-     * @return 
+     * @return
      */
     public abstract boolean addLowercase();
 
@@ -69,7 +64,7 @@ public abstract class LuceneFieldPlugin implements Plugin {
      * @return
      */
     public abstract String getFieldName();
-    
+
     /**
      * returns the analyzer used for this field in regular case
      * @return

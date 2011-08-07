@@ -42,48 +42,35 @@
     </global-blacklist-filenames>
 
     <index-location>/tmp/test/</index-location>
-    
+
     <index-jobs>
         <index-job>
-            <repositories>local_repo</repositories>
+            <repositories>jdownloader-repo</repositories>
             <cron-expression>0 * * * * ?</cron-expression>
             <tasks>
-                <task>
-                    <type>clear</type>
-                </task>
                 <task>
                     <type>index</type>
                 </task>
             </tasks>
         </index-job>
     </index-jobs>
-    
-    <repository-groups>group1 group2</repository-groups>
+
+    <repository-groups>group1</repository-groups>
 
     <repositories>
         <repository>
             <name>jdownloader-repo</name>
-            <version-control-system>SSH</version-control-system>
+            <version-control-system>SVN</version-control-system>
             <repository-groups>
                 <repo-group>group1</repo-group>
             </repository-groups>
             <url>svn://svn.jdownloader.org/jdownloader</url>
-            <code-navigation-enabled>false</code-navigation-enabled>
-        </repository>
-        <repository>
-            <name>local_repo</name>
-            <version-control-system>FILESYSTEM</version-control-system>
-            <authentication-data type='ssh'><file-path>/tmp/test</file-path></authentication-data>
-            <repository-groups>
-                <repo-group>group1</repo-group>
-            </repository-groups>
-            <blacklist-filenames>
-                <filename>.*\.o</filename>
-                <filename>.*\.pdf</filename>
-                <filename>.*\.bin</filename>
-            </blacklist-filenames>
-            <url>/home/david/workspace/svnsearch</url>
             <code-navigation-enabled>true</code-navigation-enabled>
         </repository>
     </repositories>
+
+    <testproperty>asdf</testproperty>
+    <listTest>1</listTest>
+    <listTest>2</listTest>
+    <listTest>3</listTest>
 </root>

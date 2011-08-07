@@ -29,21 +29,22 @@ import java.util.List;
  */
 public class JobDto {
 
-    /** A list of all tasks that will be executed in this job */
-    private List<TaskDto> tasks;
+    /** The affected repositories. */
+    private List<RepositoryDto> repositories;
     /** The cron expression for the job. */
     private String cronExpression;
+    /** A list of all tasks that will be executed in this job */
+    private List<IndexingTaskType> tasks = new LinkedList<IndexingTaskType>();
 
     public JobDto() {
-        tasks = new LinkedList<TaskDto>();
     }
 
-    public List<TaskDto> getTasks() {
-        return tasks;
+    public List<RepositoryDto> getRepositories() {
+        return repositories;
     }
 
-    public void setTasks(List<TaskDto> tasks) {
-        this.tasks = tasks;
+    public void setRepositories(List<RepositoryDto> repositories) {
+        this.repositories = repositories;
     }
 
     public String getCronExpression() {
@@ -54,40 +55,42 @@ public class JobDto {
         this.cronExpression = cronExpression;
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof JobDto)) {
-            return false;
-        }
+    public List<IndexingTaskType> getTasks() {
+        return tasks;
+    }
 
-        JobDto other = (JobDto) o;
-
-        if (cronExpression != null) {
-            if (!cronExpression.equals(other.getCronExpression())) {
-                return false;
-            }
-        }
-
-        if (tasks.size() == other.getTasks().size()) {
-            for (int i = 0; i < tasks.size(); i++) {
-                if (!tasks.get(i).equals(other.getTasks().get(i))) {
-                    return false;
-                }
-            }
-        } else {
-            return false;
-        }
-
-        return true;
+    public void setTasks(List<IndexingTaskType> tasks) {
+        this.tasks = tasks;
     }
 
     /** {@inheritDoc} */
     @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final JobDto other = (JobDto) obj;
+        if (this.tasks != other.tasks && (this.tasks == null || !this.tasks.equals(other.tasks))) {
+            return false;
+        }
+        if ((this.cronExpression == null) ? (other.cronExpression != null) : !this.cronExpression.equals(other.cronExpression)) {
+            return false;
+        }
+        if (this.repositories != other.repositories && (this.repositories == null || !this.repositories.equals(other.repositories))) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
     public int hashCode() {
-        int hash = 5;
-        hash = 13 * hash + (this.tasks != null ? this.tasks.hashCode() : 0);
-        hash = 13 * hash + (this.cronExpression != null ? this.cronExpression.hashCode() : 0);
+        int hash = 7;
+        hash = 37 * hash + (this.repositories != null ? this.repositories.hashCode() : 0);
+        hash = 37 * hash + (this.cronExpression != null ? this.cronExpression.hashCode() : 0);
+        hash = 37 * hash + (this.tasks != null ? this.tasks.hashCode() : 0);
         return hash;
     }
 }

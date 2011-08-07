@@ -35,10 +35,9 @@ import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.codesearch.commons.configuration.xml.dto.IndexerUserDto;
+import org.codesearch.commons.configuration.xml.dto.IndexingTaskType;
 import org.codesearch.commons.configuration.xml.dto.JobDto;
 import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
-import org.codesearch.commons.configuration.xml.dto.TaskDto;
-import org.codesearch.commons.configuration.xml.dto.TaskDto.TaskType;
 import org.codesearch.commons.plugins.vcs.AuthenticationType;
 import org.codesearch.commons.plugins.vcs.BasicAuthentication;
 import org.codesearch.commons.plugins.vcs.NoAuthentication;
@@ -113,25 +112,14 @@ public class XmlConfigurationReader implements ConfigurationReader {
                 String repositoryString = hc.getString(XmlConfigurationReaderConstants.JOB_REPOSITORY);
                 //The list of repositories this job is associated with, each task specified in the configuration is created for each of these repositories
                 List<RepositoryDto> repositoriesForJob = getRepositoryDtosForString(repositoryString);
+                job.setRepositories(repositoriesForJob);
                 //Read the tasks per job from the configuration
                 List<SubnodeConfiguration> subConf = hc.configurationsAt(XmlConfigurationReaderConstants.TASK_LIST);
-                List<TaskDto> tasks = new LinkedList<TaskDto>();
+                List<IndexingTaskType> tasks = new LinkedList<IndexingTaskType>();
 
                 for (SubnodeConfiguration sc : subConf) {
-                    TaskType type = null;
-//                    boolean codeAnalysisEnabled = sc.getBoolean(XmlConfigurationReaderConstants.CODE_NAVIGATION_ENABLED);
-                    if (sc.getString(XmlConfigurationReaderConstants.TASK_TYPE).equals("index")) {
-                        type = TaskType.index;
-                    } else if (sc.getString(XmlConfigurationReaderConstants.TASK_TYPE).equals("clear")) {
-                        type = TaskType.clear;
-                    }
-                    if (type == TaskType.clear && repositoryString == null) {
-                        tasks.add(new TaskDto(null, type, true));
-                    } else {
-                        for (RepositoryDto repository : repositoriesForJob) {
-                            tasks.add(new TaskDto(repository, type, true));
-                        }
-                    }
+                    String value = sc.getString(XmlConfigurationReaderConstants.TASK_TYPE).toUpperCase();
+                    tasks.add(IndexingTaskType.valueOf(value));
                 }
                 job.setTasks(tasks);
                 jobs.add(job);
@@ -195,17 +183,18 @@ public class XmlConfigurationReader implements ConfigurationReader {
         //retrieve the used authentication system and fill it with the required data
         AuthenticationType usedAuthentication = null;
         String authenticationType = hc.getString(XmlConfigurationReaderConstants.REPOSITORY_AUTHENTICATION_DATA);
-        if(authenticationType.equals("none")){
+
+        if (authenticationType == null || authenticationType.trim().isEmpty() || authenticationType.equals("none")) {
             usedAuthentication = new NoAuthentication();
-        } else if (authenticationType.equals("basic")){
+        } else if (authenticationType.equals("basic")) {
             String username = hc.getString(XmlConfigurationReaderConstants.REPOSITORY_AUTHENTICATION_DATA_USERNAME);
             String password = hc.getString(XmlConfigurationReaderConstants.REPOSITORY_AUTHENTICATION_DATA_PASSWORD);
             usedAuthentication = new BasicAuthentication(username, password);
-        } else if (authenticationType.equals("ssh")){
+        } else if (authenticationType.equals("ssh")) {
             String sshFilePath = hc.getString(XmlConfigurationReaderConstants.REPOSITORY_AUTHENTICATION_DATA_SSH_FILE_PATH);
             usedAuthentication = new SshAuthentication(sshFilePath);
         }
-        
+
         repo = new RepositoryDto(name, hc.getString(XmlConfigurationReaderConstants.REPOSITORY_URL),
                 usedAuthentication,
                 hc.getBoolean(XmlConfigurationReaderConstants.REPOSITORY_CODE_NAVIGATION_ENABLED),
@@ -266,7 +255,7 @@ public class XmlConfigurationReader implements ConfigurationReader {
 
     /** {@inheritDoc} */
     @Override
-    public synchronized  List<String> getValueList(final String key) {
+    public synchronized List<String> getValueList(final String key) {
         List<String> values = new LinkedList<String>();
         values = config.getList(key);
         return values;

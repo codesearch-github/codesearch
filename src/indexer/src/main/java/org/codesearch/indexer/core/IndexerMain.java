@@ -66,10 +66,6 @@ public class IndexerMain implements ServletContextListener {
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
         sce.getServletContext().removeAttribute(INJECTOR_KEY);
-        try {
-            indexingManager.stop();
-        } catch (SchedulerException ex) {
-            LOG.error("Could not stop the scheduler:\n" + ex);
-        }
+        indexingManager.stop();
     }
 }

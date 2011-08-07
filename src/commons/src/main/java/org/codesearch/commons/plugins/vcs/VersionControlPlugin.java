@@ -68,4 +68,11 @@ public interface VersionControlPlugin extends Plugin {
      * @throws VersionControlPluginException
      */
     List<String> getFilesInDirectory(String directoryPath) throws VersionControlPluginException;
+
+    /**
+     * Sets the cache directory where the plugin can checkout/store the configured repositories.
+     * @param directoryPath The specified directory
+     * @throws VersionControlPluginException if the directory is invalid
+     */
+    void setCacheDirectory(String directoryPath) throws VersionControlPluginException;
 }

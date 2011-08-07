@@ -33,20 +33,20 @@ import org.apache.lucene.analysis.ngram.EdgeNGramTokenFilter;
 import org.apache.lucene.analysis.ngram.EdgeNGramTokenFilter.Side;
 import org.apache.lucene.analysis.standard.StandardFilter;
 import org.apache.lucene.analysis.standard.StandardTokenizer;
-import org.apache.lucene.util.Version;
+import org.codesearch.commons.constants.IndexConstants;
 
 /**
  * A custom analyzer used for autocompletion
  * @author zeheron
  */
-public class STAutocompleteLuceneAnalyzer extends Analyzer {
+public final class STAutocompleteLuceneAnalyzer extends Analyzer {
 
     /** {@inheritDoc} */
     @Override
     public TokenStream tokenStream(String string, Reader reader) {
-        TokenStream result = new StandardTokenizer(Version.LUCENE_30, reader);
-        result = new StandardFilter(result);
-        result = new LowerCaseFilter(result);
+        TokenStream result = new StandardTokenizer(IndexConstants.LUCENE_VERSION, reader);
+        result = new StandardFilter(IndexConstants.LUCENE_VERSION, result);
+        result = new LowerCaseFilter(IndexConstants.LUCENE_VERSION, result);
         result = new EdgeNGramTokenFilter(
                 result, Side.FRONT, 1, 20);
 

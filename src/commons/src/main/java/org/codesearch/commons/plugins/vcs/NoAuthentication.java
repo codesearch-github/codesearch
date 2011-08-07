@@ -31,6 +31,11 @@ package org.codesearch.commons.plugins.vcs;
  * (if the repository is public)
  * @author David Froehlich
  */
-public class NoAuthentication implements AuthenticationType{
+public class NoAuthentication implements AuthenticationType {
+
+    @Override
+    public boolean equals(Object obj) {
+        return (obj instanceof NoAuthentication);
+    }
 
 }

@@ -19,27 +19,23 @@
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-package org.codesearch.commons.plugins.lucenefields.contentlucenefieldplugin;
+package org.codesearch.commons.plugins.lucenefields;
 
 import java.io.Reader;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.LetterTokenizer;
 import org.apache.lucene.analysis.TokenStream;
+import org.codesearch.commons.constants.IndexConstants;
 
 /**
  *
  * @author David Froehlich
  */
-public class LetterAnalyzer extends Analyzer {
+public final class LetterAnalyzer extends Analyzer {
 
     /** {@inheritDoc} */
     @Override
     public TokenStream tokenStream(final String fieldName, final Reader reader) {
-        return new LetterTokenizer(reader);
+        return new LetterTokenizer(IndexConstants.LUCENE_VERSION, reader);
     }
 }

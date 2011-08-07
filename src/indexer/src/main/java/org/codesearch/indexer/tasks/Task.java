@@ -20,6 +20,7 @@
  */
 package org.codesearch.indexer.tasks;
 
+import java.util.List;
 import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 import org.codesearch.indexer.exceptions.TaskExecutionException;
 
@@ -37,16 +38,10 @@ public interface Task {
     void execute() throws TaskExecutionException;
 
     /**
-     * Sets the repository this task should handle.
-     * @param repository The repository
+     * Sets the repositories this task should handle.
+     * @param repositories The list of repositories
      */
-    void setRepository(RepositoryDto repository);
-
-    /**
-     * Sets whether code analysis is enabled.
-     * @param codeAnalysisEnabled Whether code analysis is enabled
-     */
-    void setCodeAnalysisEnabled(boolean codeAnalysisEnabled);
+    void setRepositories(List<RepositoryDto> repositories);
 
     /**
      * Sets the location of the index.
