@@ -109,7 +109,7 @@ public class SubversionPlugin implements VersionControlPlugin {
     @Override
     public FileDto getFileForFilePath(String filePath) throws VersionControlPluginException {
         try {
-            LOG.debug("Retrieving file: " + filePath);
+            LOG.debug("Retrieving and checking file: " + filePath);
             FileDto fileDto = new FileDto();
             SVNNodeKind nodeKind = svnRepo.checkPath(filePath, -1);
             if (nodeKind != SVNNodeKind.FILE) {
@@ -161,8 +161,10 @@ public class SubversionPlugin implements VersionControlPlugin {
                     FileDto changedFile = getFileForFilePath(filePath);
 
                     if (changedFile != null) {
-                        LOG.info("file: " + changedFile.getFilePath() + ": " + changedFile.hashCode());
+                        LOG.info("Add file to indexing list: " + changedFile.getFilePath());
                         files.add(changedFile);
+                    } else {
+                        LOG.info("File "+ filePath + " has not been added since it has been removed from the repository");
                     }
                 }
             }

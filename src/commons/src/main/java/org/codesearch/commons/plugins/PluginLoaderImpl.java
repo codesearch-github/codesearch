@@ -20,15 +20,13 @@
  */
 package org.codesearch.commons.plugins;
 
+import java.util.Iterator;
 import com.google.inject.Inject;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.codesearch.commons.configuration.ConfigurationReader;
-import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
 import org.codesearch.commons.configuration.xml.XmlConfigurationReaderConstants;
 import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
 import org.codesearch.commons.plugins.vcs.VersionControlPluginException;
@@ -63,6 +61,8 @@ public class PluginLoaderImpl implements PluginLoader {
     public synchronized <T extends Plugin> T getPlugin(final Class<T> clazz, final String purpose)
             throws PluginLoaderException {
         Plugin validPlugin = null;
+        Iterator iter = serviceLoader.iterator();
+        
         for (Plugin plugin : serviceLoader) {
             try {
                 String[] purposes = plugin.getPurposes().split(" ");

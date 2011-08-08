@@ -109,6 +109,8 @@ public class FilesystemPlugin implements VersionControlPlugin {
      */
     private long getHighestLastModifiedDateFromDirectory(File dir) {
         long lastModified = 0;
+        boolean exists = dir.exists();
+        boolean isDir = dir.isDirectory();
         for (File f : dir.listFiles()) {
             long lastMod;
             if (f.isDirectory()) {

@@ -56,9 +56,11 @@ public class IndexingJob implements Job {
     public static final String FIELD_TASKS_FINISHED = "tasks_finished";
     public static final String FIELD_CURRENT_TYPE = "type";
     public static final String FIELD_CURRENT_REPOSITORY = "current_repository";
+    public static final String INDEXING_JOB_GROUP_NAME = "INDEXING_JOBS";
+    public static final String INDEXING_JOB_TRIGGER_GROUP_NAME = "INDEXING_JOB_TRIGGER";
     /** Instantiate a logger */
     private static final Logger LOG = Logger.getLogger(IndexingJob.class);
-    /** Indicates if the thread is terminated or not.
+    /** Indicates whether the thread is terminated or not.
      * If flagged as terminated the job will not start the execution of the next task and terminate itself instead */
     private boolean terminated = false;
     /** List of TaskDtos assigned to this IndexingJob */
@@ -85,9 +87,9 @@ public class IndexingJob implements Job {
      * @throws JobExecutionException if the execution of a task was not successful or if the job was terminated
      */
     @Override
-    public void execute(JobExecutionContext jec) throws JobExecutionException { //TODO refactor the task creation, there is no need for a TaskDto
-        LOG.info("Executing IndexingJob " + jec.getJobDetail().getKey().getName());
+    public void execute(JobExecutionContext jec) throws JobExecutionException {
         terminated = (Boolean) jec.getJobDetail().getJobDataMap().get(FIELD_TERMINATED);
+        LOG.info("Executing IndexingJob " + jec.getJobDetail().getKey().getName() + " with " + taskList.size() + " tasks");
         taskList = (List<IndexingTaskType>) (jec.getJobDetail().getJobDataMap().get(FIELD_TASKS));
         repositories = (List<RepositoryDto>) (jec.getJobDetail().getJobDataMap().get(FIELD_REPOSITORIES));
         Task task = null;

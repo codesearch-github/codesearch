@@ -40,6 +40,7 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
+import org.quartz.SimpleScheduleBuilder;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.quartz.spi.JobFactory;
@@ -67,6 +68,7 @@ public final class IndexingManager {
         jobs = configurationReader.getJobs();
         this.scheduler = scheduler;
         scheduler.setJobFactory(jobFactory);
+        scheduler.getListenerManager().addTriggerListener(new IndexingJobTriggerListener(scheduler, 5 * 60 * 1000)); // 5 minutes
     }
 
     public Map<Integer, IndexingJobDto> getCurrentStatus() throws SchedulerException {
@@ -109,7 +111,10 @@ public final class IndexingManager {
                 } else {
                     trigger = TriggerBuilder.newTrigger().forJob(jobDetail).withSchedule(CronScheduleBuilder.cronSchedule(job.getCronExpression())).build();
                 }
-
+                
+                //trigger.setJobName("Job"+i);
+                //trigger.setJobGroup(IndexingJob.INDEXING_JOB_GROUP_NAME);
+                //addTriggerListener(IndexingJobTriggerListener.LISTENER_NAME);
                 scheduler.scheduleJob(jobDetail, trigger);
             } catch (ParseException ex) {
                 LOG.error("Indexing job " + i + "for repository ---" + " was configured with invalid cron expression:\n" + ex);

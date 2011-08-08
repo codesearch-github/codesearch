@@ -2,6 +2,7 @@ package org.codesearch.indexer.tasks;
 
 import java.util.List;
 import java.util.Map;
+import org.apache.log4j.Logger;
 import org.codesearch.commons.database.DBAccess;
 import org.codesearch.commons.database.DatabaseAccessException;
 import org.codesearch.commons.database.DatabaseEntryNotFoundException;
@@ -14,7 +15,7 @@ import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
  * @author Samuel Kogler
  */
 public class MockDatabaseImpl implements DBAccess {
-
+    
     @Override
     public void clearTablesForRepository(String repoName) throws DatabaseAccessException {
         System.out.println("clearing repo: " + repoName);
