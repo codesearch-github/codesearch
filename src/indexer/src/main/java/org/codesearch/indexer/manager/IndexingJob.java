@@ -51,9 +51,10 @@ public class IndexingJob implements Job {
     public static final String FIELD_ID = "id";
     public static final String FIELD_TASKS = "tasks";
     public static final String FIELD_REPOSITORIES = "repositories";
-
     public static final String FIELD_TERMINATED = "terminated";
+    public static final String FIELD_CLEAR_INDEX = "clear_index";
     public static final String FIELD_TASKS_FINISHED = "tasks_finished";
+    @Deprecated
     public static final String FIELD_CURRENT_TYPE = "type";
     public static final String FIELD_CURRENT_REPOSITORY = "current_repository";
     public static final String INDEXING_JOB_GROUP_NAME = "INDEXING_JOBS";
@@ -62,9 +63,8 @@ public class IndexingJob implements Job {
     private static final Logger LOG = Logger.getLogger(IndexingJob.class);
     /** Indicates whether the thread is terminated or not.
      * If flagged as terminated the job will not start the execution of the next task and terminate itself instead */
+    @Deprecated
     private boolean terminated = false;
-    /** List of TaskDtos assigned to this IndexingJob */
-    private List<IndexingTaskType> taskList = new LinkedList<IndexingTaskType>();
     /** The config reader used to read the configuration */
     private ConfigurationReader configReader;
     /** The database access object */
@@ -73,6 +73,8 @@ public class IndexingJob implements Job {
     private PluginLoader pluginLoader;
     /** The affected repositories. */
     private List<RepositoryDto> repositories;
+    /** whether or not the index should be cleared for the specified repositories before indexing */
+    private boolean clearIndex;
 
     @Inject
     public IndexingJob(ConfigurationReader configReader, DBAccess dba, PluginLoader pluginLoader) {
@@ -88,37 +90,32 @@ public class IndexingJob implements Job {
      */
     @Override
     public void execute(JobExecutionContext jec) throws JobExecutionException {
-        terminated = (Boolean) jec.getJobDetail().getJobDataMap().get(FIELD_TERMINATED);
-        LOG.info("Executing IndexingJob " + jec.getJobDetail().getKey().getName() + " with " + taskList.size() + " tasks");
-        taskList = (List<IndexingTaskType>) (jec.getJobDetail().getJobDataMap().get(FIELD_TASKS));
         repositories = (List<RepositoryDto>) (jec.getJobDetail().getJobDataMap().get(FIELD_REPOSITORIES));
-        Task task = null;
+        clearIndex = (Boolean) (jec.getJobDetail().getJobDataMap().get(FIELD_CLEAR_INDEX));
+        LOG.info("Executing IndexingJob " + jec.getJobDetail().getKey().getName() + " indexing " + repositories.size() + " repositories");
+
         Date startDate = new Date();
-        for (int i = 0; i < taskList.size(); i++) {
-            try {
-                if (terminated) {
-                    throw new JobExecutionException("Job was terminated after successful execution of " + i + " of " + taskList.size() + " tasks");
-                }
-                IndexingTaskType currentTask = taskList.get(i);
-                jec.getJobDetail().getJobDataMap().put(FIELD_CURRENT_TYPE, currentTask);
-                switch (currentTask) {
-                    case INDEX: {
-                        task = new IndexingTask(dba, pluginLoader, configReader.getValue(XmlConfigurationReaderConstants.SEARCHER_LOCATION));
-                        break;
-                    }
-                    case CLEAR: {
-                        task = new ClearTask(dba);
-                        break;
-                    }
-                }
-                task.setRepositories(repositories);
-                task.setIndexLocation(configReader.getValue(XmlConfigurationReaderConstants.INDEX_LOCATION));
-                task.execute();
-                jec.getJobDetail().getJobDataMap().put(FIELD_TASKS_FINISHED, i + 1);
-            } catch (TaskExecutionException ex) {
-                throw new JobExecutionException("Execution of Task number " + i + " threw an exception" + ex);
+
+        try {
+            if (clearIndex) {
+                LOG.info("Clearing index for specified repositories");
+                //clear the index of data associated to the specified repositories
+                Task clearTask = new ClearTask(dba);
+                clearTask.setRepositories(repositories);
+                clearTask.setIndexLocation(configReader.getValue(XmlConfigurationReaderConstants.INDEX_LOCATION));
+                clearTask.execute();
             }
+
+            //execution of regular indexing job
+
+            Task indexingTask = new IndexingTask(dba, pluginLoader, configReader.getValue(XmlConfigurationReaderConstants.SEARCHER_LOCATION));
+            indexingTask.setRepositories(repositories);
+            indexingTask.setIndexLocation(configReader.getValue(XmlConfigurationReaderConstants.INDEX_LOCATION));
+            indexingTask.execute();
+        } catch (TaskExecutionException ex) {
+            throw new JobExecutionException("Execution of IndexingJob threw an exception" + ex);
         }
+
         LOG.debug("Finished execution of job in " + (new Date().getTime() - startDate.getTime()) / 1000f + " seconds");
         LOG.info("Finished execution of IndexingJob " + jec.getJobDetail().getKey().getName());
     }
@@ -131,4 +128,7 @@ public class IndexingJob implements Job {
         this.repositories = repositories;
     }
 
+    public void setClear(boolean clearIndex) {
+        this.clearIndex = clearIndex;
+    }
 }

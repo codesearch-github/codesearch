@@ -20,7 +20,6 @@
  */
 package org.codesearch.commons.configuration.xml.dto;
 
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -33,8 +32,8 @@ public class JobDto {
     private List<RepositoryDto> repositories;
     /** The cron expression for the job. */
     private String cronExpression;
-    /** A list of all tasks that will be executed in this job */
-    private List<IndexingTaskType> tasks = new LinkedList<IndexingTaskType>();
+    /** whether the index will be cleared before indexing */
+    private boolean clearIndex;
 
     public JobDto() {
     }
@@ -55,12 +54,12 @@ public class JobDto {
         this.cronExpression = cronExpression;
     }
 
-    public List<IndexingTaskType> getTasks() {
-        return tasks;
+    public boolean isClearIndex() {
+        return clearIndex;
     }
 
-    public void setTasks(List<IndexingTaskType> tasks) {
-        this.tasks = tasks;
+    public void setClearIndex(boolean clearIndex) {
+        this.clearIndex = clearIndex;
     }
 
     /** {@inheritDoc} */
@@ -73,7 +72,7 @@ public class JobDto {
             return false;
         }
         final JobDto other = (JobDto) obj;
-        if (this.tasks != other.tasks && (this.tasks == null || !this.tasks.equals(other.tasks))) {
+        if (this.clearIndex != other.clearIndex) {
             return false;
         }
         if ((this.cronExpression == null) ? (other.cronExpression != null) : !this.cronExpression.equals(other.cronExpression)) {
@@ -90,7 +89,6 @@ public class JobDto {
         int hash = 7;
         hash = 37 * hash + (this.repositories != null ? this.repositories.hashCode() : 0);
         hash = 37 * hash + (this.cronExpression != null ? this.cronExpression.hashCode() : 0);
-        hash = 37 * hash + (this.tasks != null ? this.tasks.hashCode() : 0);
         return hash;
     }
 }

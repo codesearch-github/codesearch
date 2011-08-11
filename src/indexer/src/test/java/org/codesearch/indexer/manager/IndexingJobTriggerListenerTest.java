@@ -15,7 +15,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.codesearch.commons.configuration.xml.dto.IndexingTaskType;
 import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
-import org.codesearch.commons.configuration.xml.dto.TaskDto;
 import org.codesearch.commons.plugins.vcs.AuthenticationType;
 import org.codesearch.commons.plugins.vcs.NoAuthentication;
 import org.junit.After;

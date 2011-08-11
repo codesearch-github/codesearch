@@ -52,6 +52,7 @@ public final class XmlConfigurationReaderConstants {
     /** Used to retrieve all repositories in the xml-config file */
     public static final String REPOSITORY_LIST = "repositories.repository";
     /** Used to retrieve all tasks in the xml-config file */
+    @Deprecated
     public static final String TASK_LIST = "tasks.task";
     //REPOSITORY GROUP CONSTANT
     /** Used to retrieve the repository group list */
@@ -106,7 +107,9 @@ public final class XmlConfigurationReaderConstants {
     public static final String JOB_CRON_EXPRESSION = "cron-expression";
     /** Used to retrieve the repositories of a job. */
     public static final String JOB_REPOSITORY = "repositories";
-
+    /** Clear index before indexing? */
+    public static final String JOB_CLEAR = "clear";
+    
     //DATABASE CONSTANTS
     public static final String DB_USERNAME = "db-username";
     public static final String DB_PASSWORD = "db-password";

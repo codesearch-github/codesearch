@@ -23,8 +23,6 @@ package org.codesearch.indexer.manager;
 import java.util.Date;
 import java.util.List;
 import org.apache.log4j.Logger;
-import org.codesearch.commons.configuration.xml.dto.IndexingTaskType;
-import org.codesearch.commons.configuration.xml.dto.TaskDto;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.Scheduler;
@@ -71,37 +69,37 @@ public class IndexingJobTriggerListener extends TriggerListenerSupport {
                 //TODO make check if currently executing job has redundant tasks
                 //in case another indexing job is currently running
                 //check for common tasks and remove those from the new jobs list
-                
-                List<IndexingTaskType> jobTasks = (List<IndexingTaskType>) oldDetail.getJobDataMap().get(IndexingJob.FIELD_TASKS);
-                
-                List<TaskDto> otherJobsTasks = (List<TaskDto>) currentlyExecutingJobs.get(0).getJobDetail().getJobDataMap().get(IndexingJob.FIELD_TASKS);
-                
-                for (TaskDto currentTask : otherJobsTasks) {
-                    if (jobTasks.contains(currentTask)) {
-                        jobTasks.remove(currentTask);
-                        LOG.info("Removed IndexingTask " + currentTask.toString() + " from IndexingJob since an indexing process with the same target repository is currently being executed");
-                    }
-                }
-                if (jobTasks.isEmpty()) {
-                    LOG.info("No tasks left for execution of IndexingJob, cancelled execution");
-                    oldDetail.getJobDataMap().put(IndexingJob.FIELD_TERMINATED, true);
-                } else {
-                    LOG.info("Execution of IndexingJob aborted, another IndexingJob is currently running, will try to delay execution by " + this.delayTime / 1000 + " seconds");
-                    //create trigger by using the methods included via the static import
-                    JobDetail newJobDetail = (JobDetail) newJob()
-                            .withIdentity(oldDetail.getKey())
-                            .usingJobData(oldDetail.getJobDataMap());
-
-                    Trigger newTrigger = (Trigger) newTrigger()
-                            .withIdentity("re_trigg_" + new Date().getTime())
-                            .startAt(new Date(trigger.getStartTime().getTime() + this.delayTime))
-                            .forJob(newJobDetail.getKey()).build();
-
-                    //since scheduler.reschedule doesn't work at this point a new job is created
-                    scheduler.scheduleJob(newJobDetail, newTrigger);
-                }
-                LOG.info("Execution of IndexingJob aborted, another IndexingJob is currently running, will try to delay execution by " + this.delayTime / 1000 + " seconds");
+//                
+//                List<IndexingTaskType> jobTasks = (List<IndexingTaskType>) oldDetail.getJobDataMap().get(IndexingJob.FIELD_TASKS);
+//                
+//                List<TaskDto> otherJobsTasks = (List<TaskDto>) currentlyExecutingJobs.get(0).getJobDetail().getJobDataMap().get(IndexingJob.FIELD_TASKS);
+//                
+//                for (TaskDto currentTask : otherJobsTasks) {
+//                    if (jobTasks.contains(currentTask)) {
+//                        jobTasks.remove(currentTask);
+//                        LOG.info("Removed IndexingTask " + currentTask.toString() + " from IndexingJob since an indexing process with the same target repository is currently being executed");
+//                    }
+//                }
+//                if (jobTasks.isEmpty()) {
+//                    LOG.info("No tasks left for execution of IndexingJob, cancelled execution");
+//                    oldDetail.getJobDataMap().put(IndexingJob.FIELD_TERMINATED, true);
+//                } else {
+//                    LOG.info("Execution of IndexingJob aborted, another IndexingJob is currently running, will try to delay execution by " + this.delayTime / 1000 + " seconds");
 //                    //create trigger by using the methods included via the static import
+//                    JobDetail newJobDetail = (JobDetail) newJob()
+//                            .withIdentity(oldDetail.getKey())
+//                            .usingJobData(oldDetail.getJobDataMap());
+//
+//                    Trigger newTrigger = (Trigger) newTrigger()
+//                            .withIdentity("re_trigg_" + new Date().getTime())
+//                            .startAt(new Date(trigger.getStartTime().getTime() + this.delayTime))
+//                            .forJob(newJobDetail.getKey()).build();
+//
+//                    //since scheduler.reschedule doesn't work at this point a new job is created
+//                    scheduler.scheduleJob(newJobDetail, newTrigger);
+//                }
+                LOG.info("Execution of IndexingJob aborted, another IndexingJob is currently running, will try to delay execution by " + this.delayTime / 1000 + " seconds");
+                    //create trigger by using the methods included via the static import
                     JobDetail newJobDetail = newJob(oldDetail.getJobClass())
                             .withIdentity("re_job_" + new Date().getTime())
                             .usingJobData(oldDetail.getJobDataMap())

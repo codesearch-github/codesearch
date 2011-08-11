@@ -27,7 +27,7 @@ import java.util.Date;
  * DTO used to store information needed to display all indexing jobs in the web interface
  * @author David Froehlich
  */
-public class IndexingJobDto {
+public class IndexingJobStatus {
     private String currentType;
     private Date timeStarted;
     private int tasksTotal;
@@ -54,7 +54,7 @@ public class IndexingJobDto {
         return timeStarted;
     }
 
-    public IndexingJobDto(String currentType, Date timeStarted, int tasksTotal, int tasksFinished, String currentRepository) {
+    public IndexingJobStatus(String currentType, Date timeStarted, int tasksTotal, int tasksFinished, String currentRepository) {
         this.currentType = currentType;
         this.timeStarted = timeStarted;
         this.tasksTotal = tasksTotal;

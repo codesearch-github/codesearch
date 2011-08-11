@@ -113,15 +113,8 @@ public class XmlConfigurationReader implements ConfigurationReader {
                 //The list of repositories this job is associated with, each task specified in the configuration is created for each of these repositories
                 List<RepositoryDto> repositoriesForJob = getRepositoryDtosForString(repositoryString);
                 job.setRepositories(repositoriesForJob);
-                //Read the tasks per job from the configuration
-                List<SubnodeConfiguration> subConf = hc.configurationsAt(XmlConfigurationReaderConstants.TASK_LIST);
-                List<IndexingTaskType> tasks = new LinkedList<IndexingTaskType>();
-
-                for (SubnodeConfiguration sc : subConf) {
-                    String value = sc.getString(XmlConfigurationReaderConstants.TASK_TYPE).toUpperCase();
-                    tasks.add(IndexingTaskType.valueOf(value));
-                }
-                job.setTasks(tasks);
+                boolean clearIndex = hc.getBoolean(XmlConfigurationReaderConstants.JOB_CLEAR);
+                job.setClearIndex(clearIndex);
                 jobs.add(job);
             } catch (NullPointerException ex) {
                 return jobs;

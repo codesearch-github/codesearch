@@ -22,12 +22,8 @@
     <index-jobs>
         <index-job>
             <repositories>rpgunnamed</repositories>
-            <tasks>
-                <task>
-                    <type>index</type>
-                </task>
-            </tasks>
             <cronExpression>0 0 * * * ?</cronExpression>
+            <clear>false</clear>
         </index-job>
     </index-jobs>
 

@@ -71,8 +71,8 @@ public final class IndexingManager {
         scheduler.getListenerManager().addTriggerListener(new IndexingJobTriggerListener(scheduler, 5 * 60 * 1000)); // 5 minutes
     }
 
-    public Map<Integer, IndexingJobDto> getCurrentStatus() throws SchedulerException {
-        Map<Integer, IndexingJobDto> current_jobs = new HashMap<Integer, IndexingJobDto>();
+    public Map<Integer, IndexingJobStatus> getCurrentStatus() throws SchedulerException {
+        Map<Integer, IndexingJobStatus> current_jobs = new HashMap<Integer, IndexingJobStatus>();
         List<JobExecutionContext> currentlyExecutedJobs = (List<JobExecutionContext>) scheduler.getCurrentlyExecutingJobs();
         for (JobExecutionContext currentJob : currentlyExecutedJobs) {
             int index = Integer.parseInt(currentJob.getJobDetail().getJobDataMap().getString(IndexingJob.FIELD_ID));
@@ -81,7 +81,7 @@ public final class IndexingManager {
             Date timeStarted = currentJob.getFireTime();
             String type = currentJob.getJobDetail().getJobDataMap().getString(IndexingJob.FIELD_CURRENT_TYPE);
             String currentlyAccessedRepository = currentJob.getJobDetail().getJobDataMap().getString(IndexingJob.FIELD_CURRENT_REPOSITORY);
-            IndexingJobDto currentDto = new IndexingJobDto(type, timeStarted, tasksTotal, tasksFinished, currentlyAccessedRepository);
+            IndexingJobStatus currentDto = new IndexingJobStatus(type, timeStarted, tasksTotal, tasksFinished, currentlyAccessedRepository);
             current_jobs.put(index, currentDto);
         }
         return current_jobs;
@@ -99,9 +99,9 @@ public final class IndexingManager {
         for (JobDto job : jobs) {
             JobDataMap jdm = new JobDataMap();
             jdm.put(IndexingJob.FIELD_ID, i);
-            jdm.put(IndexingJob.FIELD_TASKS, job.getTasks());
             jdm.put(IndexingJob.FIELD_REPOSITORIES, job.getRepositories());
             jdm.put(IndexingJob.FIELD_TERMINATED, false);
+            jdm.put(IndexingJob.FIELD_CLEAR_INDEX, job.isClearIndex());
             JobDetail jobDetail = JobBuilder.newJob(IndexingJob.class).withIdentity("Job" + i, Scheduler.DEFAULT_GROUP).usingJobData(jdm).build();
 
             try {
@@ -142,6 +142,7 @@ public final class IndexingManager {
      * @param i the id of the job that is to be terminated
      * @throws SchedulerException if there is no job found with the id or if the jobs could not be read from the scheduler
      */
+    @Deprecated
     public void terminateJob(int i) throws SchedulerException {
         List<JobExecutionContext> currentlyExecutedJobs = (List<JobExecutionContext>) scheduler.getCurrentlyExecutingJobs();
         for (JobExecutionContext jec : currentlyExecutedJobs) {

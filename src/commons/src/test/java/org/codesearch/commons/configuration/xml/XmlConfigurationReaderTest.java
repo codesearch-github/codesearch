@@ -88,7 +88,6 @@ public class XmlConfigurationReaderTest {
 
         JobDto job1 = new JobDto();
         job1.setCronExpression("0 * * * * ?");
-        job1.getTasks().add(IndexingTaskType.INDEX);
 
         List<JobDto> result = configReader.getJobs();
         assert (result.get(0).equals(job1));
