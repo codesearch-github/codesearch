@@ -61,23 +61,27 @@ public class PluginLoaderImpl implements PluginLoader {
     public synchronized <T extends Plugin> T getPlugin(final Class<T> clazz, final String purpose)
             throws PluginLoaderException {
         Plugin validPlugin = null;
-        Iterator iter = serviceLoader.iterator();
-        
-        for (Plugin plugin : serviceLoader) {
-            try {
-                String[] purposes = plugin.getPurposes().split(" ");
-                for (String s : purposes) {
-                    if (s.equalsIgnoreCase(purpose) && clazz.isInstance(plugin)) {
-                        if (validPlugin == null) {
-                            validPlugin = plugin;
-                        } else {
-                            throw new PluginLoaderException("Multiple plugins found for purpose " + purpose + " and class " + clazz + " which only supports a single plugin");
+
+
+        for (Object object : serviceLoader) {
+            if (object instanceof Plugin) {
+                Plugin plugin = (Plugin) object;
+                try {
+                    String[] purposes = plugin.getPurposes().split(" ");
+                    for (String s : purposes) {
+                        if (s.equalsIgnoreCase(purpose) && clazz.isInstance(plugin)) {
+                            if (validPlugin == null) {
+                                validPlugin = plugin;
+                            } else {
+                                throw new PluginLoaderException("Multiple plugins found for purpose " + purpose + " and class " + clazz + " which only supports a single plugin");
+                            }
                         }
                     }
+                } catch (ServiceConfigurationError ex) {
+                    System.out.println(ex.toString());
                 }
-            } catch (ServiceConfigurationError ex) {
-                System.out.println(ex.toString());
             }
+
         }
         //FIXME: very hackish, but I could not think of a better way ATM
         if (validPlugin != null) {
