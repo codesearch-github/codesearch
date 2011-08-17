@@ -20,6 +20,8 @@
  */
 package org.codesearch.commons.plugins.vcs;
 
+import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
+
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -33,7 +35,6 @@ import java.util.List;
 import java.util.Set;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
-import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 
 /**
  * A plugin used to access files stored in Git repositories.
@@ -88,11 +89,16 @@ public class GitLocalPlugin implements VersionControlPlugin {
     @Override
     public FileDto getFileForFilePath(String filePath) throws VersionControlPluginException {
         byte[] fileContent = executeGitCommand("show", "HEAD:" + filePath);
+        String[] logEntry = new String(executeGitCommand("log", "-1", "--pretty=\"format:%H$$$%an\"", filePath)).split("$$$");
+        String lastRevision = logEntry[0];
+        String lastAuthor = logEntry[1];
 
         FileDto file = new FileDto();
         file.setContent(fileContent);
         file.setRepository(currentRepository);
         file.setFilePath(filePath);
+        file.setLastAlteration(lastRevision);
+        file.setLastAuthor(lastAuthor);
         return file;
     }
 

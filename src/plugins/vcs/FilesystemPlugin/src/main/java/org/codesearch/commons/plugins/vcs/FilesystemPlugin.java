@@ -20,6 +20,8 @@
  */
 package org.codesearch.commons.plugins.vcs;
 
+import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -27,7 +29,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 
 /**
  * A VersionControlPlugin used to access files from the file system

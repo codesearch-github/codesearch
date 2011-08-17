@@ -26,13 +26,13 @@
              xmlns:g="urn:import:com.google.gwt.user.client.ui"
              xmlns:c="urn:import:com.google.gwt.user.cellview.client">
     <ui:style>
-        .searchForm
+        .search-form
         {
             border-style: none none solid none;
             border-width: 1px;
         }
 
-        .scrollContainer
+        .scroll-container
         {
             position: absolute;
             left: 2px;
@@ -41,31 +41,54 @@
             bottom: 2px;
             overflow: auto;
         }
+
+        .filter-title
+        {
+            text-weight: bold;
+        }
+        
+        .reset-filter-button
+        {
+			margin-top: 10px;	
+		}
     </ui:style>
-    <g:HTMLPanel>
-        <div class="{style.scrollContainer}">
-            <div class='{style.searchForm}'>
-                <g:TabLayoutPanel ui:field='repositoryTabPanel' barUnit='EM' barHeight='1.7' height='10em'>
-                    <g:tab>
-                        <g:header>Repositories</g:header>
-                        <g:ListBox ui:field='repositoryList' visibleItemCount='6' multipleSelect='true' width='20em' />
-                    </g:tab>
-                    <g:tab>
-                        <g:header>Repository Groups</g:header>
-                        <g:ListBox ui:field='repositoryGroupList' visibleItemCount='6' multipleSelect='true' width='20em' />
-                    </g:tab>
-                </g:TabLayoutPanel>
-                <g:Label text='Search for:' />
-                <g:TextBox ui:field='searchBox' />
-                <g:Button ui:field='searchButton' text='Search' />
-                <g:CheckBox ui:field='caseSensitive' text='Case Sensitive' />
-            </div>
-            <div>
-                <g:FlowPanel ui:field='resultView'>
-                    <c:CellTable ui:field='resultTable' />
-                    <c:SimplePager ui:field='resultTablePager' />
-                </g:FlowPanel>
-            </div>
+    <g:HTMLPanel addStyleNames="{style.scroll-container}">
+        <div class='{style.search-form}'>
+            <g:TabLayoutPanel ui:field='repositoryTabPanel' barUnit='EM' barHeight='1.7' height='10em'>
+                <g:tab>
+                    <g:header>Repositories</g:header>
+                    <g:ListBox ui:field='repositoryList' visibleItemCount='6' multipleSelect='true' width='20em' />
+                </g:tab>
+                <g:tab>
+                    <g:header>Repository Groups</g:header>
+                    <g:ListBox ui:field='repositoryGroupList' visibleItemCount='6' multipleSelect='true' width='20em' />
+                </g:tab>
+            </g:TabLayoutPanel>
+            <g:Label text='Search for:' />
+            <g:TextBox ui:field='searchBox' />
+            <g:Button ui:field='searchButton' text='Search' />
+            <g:CheckBox ui:field='caseSensitive' text='Case Sensitive' />
+        </div>
+        <div>
+            <g:Label ui:field='resultStatusLabel' />
+            <g:FlowPanel ui:field='resultView'>
+                <g:DisclosurePanel ui:field='filterPanel'>
+                    <g:header>Filters</g:header>
+                    <g:HTMLPanel>
+                        <div>
+                            <span class='{style.filter-title}'>File endings</span>
+                            <g:HorizontalPanel ui:field='fileEndingFilterPanel' />
+                        </div>
+                        <div>
+                            <span class='{style.filter-title}'>Repositories</span>
+                            <g:HorizontalPanel ui:field='repositoryFilterPanel' />
+                        </div>
+                        <g:Button addStyleNames='{style.reset-filter-button}' ui:field="resetAllFiltersButton" text="Reset all filters"/>
+                    </g:HTMLPanel>
+                </g:DisclosurePanel>
+                <c:CellTable ui:field='resultTable' />
+                <c:SimplePager ui:field='resultTablePager' />
+            </g:FlowPanel>
         </div>
     </g:HTMLPanel>
 </ui:UiBinder>

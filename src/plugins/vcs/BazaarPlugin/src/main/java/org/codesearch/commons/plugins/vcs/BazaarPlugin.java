@@ -20,6 +20,8 @@
  */
 package org.codesearch.commons.plugins.vcs;
 
+import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,10 +32,9 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
-import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 import org.vcs.bazaar.client.BazaarClientFactory;
 import org.vcs.bazaar.client.BazaarRevision;
 import org.vcs.bazaar.client.BazaarStatusKind;

@@ -25,11 +25,10 @@
  */
 package org.codesearch.commons.plugins.vcs;
 
+import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 import java.net.URISyntaxException;
-import java.util.Set;
 import java.util.logging.Level;
 import org.apache.log4j.Logger;
-import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -54,7 +53,7 @@ public class BazaarPluginTest {
     public void setUp() throws URISyntaxException, VersionControlPluginException {
        // plugin.setRepository(new RepositoryDto("code", path, "", "", false,"BZR", null, null, null));
     }
-    
+
     /**
      * Test of the remote checkout
      */
@@ -65,7 +64,7 @@ public class BazaarPluginTest {
             plugin.setRepository(new RepositoryDto("code", path, new NoAuthentication(), false, "BZR", null, null, null));
 
             System.out.println("LOL" + plugin.getRepositoryRevision());
-            
+
         } catch (VersionControlPluginException ex) {
             java.util.logging.Logger.getLogger(BazaarPluginTest.class.getName()).log(Level.SEVERE, null, ex);
         }

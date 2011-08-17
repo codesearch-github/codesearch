@@ -42,6 +42,11 @@
                 <version>1.6</version>
             </dependency>
             <dependency>
+                <groupId>commons-collections</groupId>
+                <artifactId>commons-collections</artifactId>
+                <version>3.2.1</version>
+            </dependency>
+            <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
                 <version>3.0</version>
@@ -67,7 +72,6 @@
                 <groupId>com.google.gwt</groupId>
                 <artifactId>gwt-servlet</artifactId>
                 <version>${gwt.version}</version>
-                <scope>compile</scope>
             </dependency>
             <!-- APACHE LUCENE -->
             <dependency>

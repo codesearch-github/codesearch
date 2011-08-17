@@ -27,7 +27,7 @@ import java.io.Serializable;
  * @author David Froehlich
  */
 public class SearchResultDto implements Serializable {
-    /** The path to the result file. */
+	/** The path to the result file. */
     private String filePath;
     /** The repository. */
     private String repository;

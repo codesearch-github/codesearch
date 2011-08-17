@@ -3,9 +3,9 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.codesearch</groupId>
+
     <artifactId>GitLocalPlugin</artifactId>
-    <version>0.1-SNAPSHOT</version>
+
 
     <name>Git Local Plugin</name>
     <description>A plugin for codesearch used to access files stored in Subversion repositories.</description>

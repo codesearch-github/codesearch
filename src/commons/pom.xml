@@ -3,11 +3,9 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.codesearch</groupId>
     <artifactId>codesearch-commons</artifactId>
     <name>Codesearch: Commons</name>
     <packaging>jar</packaging>
-    <version>0.1-SNAPSHOT</version>
 
     <parent>
         <groupId>org.codesearch</groupId>
@@ -23,7 +21,6 @@
         </dependency>
 
 		<!-- NORMAL DEPENDENCIES -->
-
         <dependency>
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>

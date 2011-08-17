@@ -139,8 +139,13 @@ public class SearchActivity extends AbstractActivity implements SearchView.Prese
         /** {@inheritDoc} */
         @Override
         public void onSuccess(List<SearchResultDto> resultList) {
-            searchView.setSearchResults(resultList);
-            searchView.getResultsView().setVisible(true);
+            if (resultList != null) {
+                searchView.setResultStatusMessage(resultList.size() + " results found.");
+                if (resultList.size() != 0) {
+                    searchView.setSearchResults(resultList);
+                    searchView.getResultsView().setVisible(true);
+                }
+            }
         }
     }
 }

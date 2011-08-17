@@ -4,10 +4,10 @@
  */
 package org.codesearch.commons.plugins.vcs;
 
+import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;

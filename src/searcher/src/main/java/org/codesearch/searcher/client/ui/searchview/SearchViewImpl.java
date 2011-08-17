@@ -20,18 +20,24 @@
  */
 package org.codesearch.searcher.client.ui.searchview;
 
-import org.codesearch.searcher.shared.SearchType;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
 import org.codesearch.searcher.client.ui.fileview.FilePlace;
 import org.codesearch.searcher.shared.SearchResultDto;
+import org.codesearch.searcher.shared.SearchType;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.logical.shared.SelectionEvent;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -41,20 +47,20 @@ import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.SimplePager.TextLocation;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.DisclosurePanel;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasValue;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.TabLayoutPanel;
-import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.client.ui.ToggleButton;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.NoSelectionModel;
 import com.google.gwt.view.client.SelectionChangeEvent;
-import java.util.HashSet;
 
 /**
  * Implements the functionality of the search page.
@@ -68,6 +74,7 @@ public class SearchViewImpl extends Composite implements SearchView {
     private static final String RELEVANCE_TITLE = "Relevance";
     private static final String PATH_TITLE = "Path";
     private static final String REPOSITORY_TITLE = "Repository";
+    private static final String REVISION_TITLE = "Revision";
 
     // UIBINDER STUFF
     @UiTemplate("SearchView.ui.xml")
@@ -82,7 +89,7 @@ public class SearchViewImpl extends Composite implements SearchView {
     SimplePager resultTablePager;
     // OTHER UI ELEMENTS
     @UiField
-    TextBox searchBox;
+    HasValue<String> searchBox;
     @UiField
     Button searchButton;
     @UiField
@@ -95,17 +102,29 @@ public class SearchViewImpl extends Composite implements SearchView {
     FlowPanel resultView;
     @UiField
     HasValue<Boolean> caseSensitive;
+    @UiField
+    DisclosurePanel filterPanel;
+    @UiField
+    Panel repositoryFilterPanel;
+    @UiField
+    Panel fileEndingFilterPanel;
+    @UiField
+    Label resultStatusLabel;
+    @UiField
+    Button resetAllFiltersButton = new Button("Reset all filters");
+    
     private Presenter presenter;
     private SearchType searchType;
-
     private NumberFormat relevanceFormatter = NumberFormat.getFormat("00.00");
+    private List<SearchResultDto> unfilteredResults;
 
     public SearchViewImpl() {
         initResultTable();
         initWidget(uiBinder.createAndBindUi(this));
         repositoryTabPanel.selectTab(0);
-        updateRepositoryDisplay();
-        resultView.setVisible(true);
+        resultView.setVisible(false);
+        repositoryList.clear();
+        repositoryGroupList.clear();
     }
 
     @UiHandler("searchButton")
@@ -130,6 +149,17 @@ public class SearchViewImpl extends Composite implements SearchView {
             searchType = SearchType.REPOSITORY_GROUPS;
         }
     }
+    
+    @UiHandler("resetAllFiltersButton")
+    void onResetFilters(ClickEvent e) {
+    	for (Widget w : fileEndingFilterPanel) {
+			((ToggleButton)w).setDown(false);
+		}
+		for (Widget w : repositoryFilterPanel) {
+			((ToggleButton)w).setDown(false);
+		}
+		searchResultDataProvider.setList(new ArrayList<SearchResultDto>(unfilteredResults));
+    }
 
     @Override
     public void cleanup() {
@@ -137,8 +167,13 @@ public class SearchViewImpl extends Composite implements SearchView {
         repositoryGroupList.setSelectedIndex(-1);
         searchResultDataProvider.getList().clear();
         resultTable.redraw();
-        searchBox.setText("");
+        resultView.setVisible(false);
+        resultStatusLabel.setVisible(false);
+        searchBox.setValue("");
+        resultStatusLabel.setText("");
         setSearchType(SearchType.REPOSITORIES);
+        fileEndingFilterPanel.clear();
+        repositoryFilterPanel.clear();
     }
 
     @Override
@@ -180,7 +215,39 @@ public class SearchViewImpl extends Composite implements SearchView {
     /** {@inheritDoc} */
     @Override
     public void setSearchResults(List<SearchResultDto> results) {
+        unfilteredResults = new ArrayList<SearchResultDto>(results);
         searchResultDataProvider.setList(results);
+
+        Set<String> fileEndings = new HashSet<String>();
+        Set<String> repos = new HashSet<String>();
+
+        for (SearchResultDto result : results) {
+            int pos = result.getFilePath().lastIndexOf('.');
+            if (pos != -1) {
+                fileEndings.add(result.getFilePath().substring(pos + 1).toLowerCase());
+            }
+            repos.add(result.getRepository());
+        }
+
+        ToggleButton bt = null;
+        for (String fileEnding : fileEndings) {
+            bt = new ToggleButton(fileEnding);
+            bt.addValueChangeHandler(new FilterHandler());
+            fileEndingFilterPanel.add(bt);
+        }
+        for (String repo : repos) {
+            bt = new ToggleButton(repo);
+            bt.addValueChangeHandler(new FilterHandler());
+            repositoryFilterPanel.add(bt);
+        }
+    }
+
+    @Override
+    public void setResultStatusMessage(String message) {
+        if (!resultStatusLabel.isVisible()) {
+            resultStatusLabel.setVisible(true);
+        }
+        resultStatusLabel.setText(message);
     }
 
     /** {@inheritDoc} */
@@ -257,11 +324,6 @@ public class SearchViewImpl extends Composite implements SearchView {
         }
     }
 
-    private void updateRepositoryDisplay() {
-        repositoryList.clear();
-        repositoryGroupList.clear();
-    }
-
     private void initResultTable() {
         resultTable = new CellTable<SearchResultDto>(PAGE_SIZE);
         resultTable.addColumn(new TextColumn<SearchResultDto>() {
@@ -290,6 +352,15 @@ public class SearchViewImpl extends Composite implements SearchView {
             }
         }, REPOSITORY_TITLE);
 
+        resultTable.addColumn(new TextColumn<SearchResultDto>() {
+
+            /** {@inheritDoc} */
+            @Override
+            public String getValue(SearchResultDto dto) {
+                return dto.getRevision();
+            }
+        }, REVISION_TITLE);
+
         final NoSelectionModel<SearchResultDto> selectionModel = new NoSelectionModel<SearchResultDto>();
         resultTable.setSelectionModel(selectionModel);
         selectionModel.addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
@@ -310,5 +381,54 @@ public class SearchViewImpl extends Composite implements SearchView {
         resultTablePager.setDisplay(resultTable);
         searchResultDataProvider = new ListDataProvider<SearchResultDto>();
         searchResultDataProvider.addDataDisplay(resultTable);
+    }
+
+    private class FilterHandler implements ValueChangeHandler<Boolean> {
+
+        public FilterHandler() {
+        }
+
+        @Override
+        public void onValueChange(ValueChangeEvent<Boolean> event) {
+            Set<String> fileEndingFilters = new HashSet<String>();
+            Set<String> repoFilters = new HashSet<String>();
+
+            Iterator<Widget> iter = fileEndingFilterPanel.iterator();
+            while (iter.hasNext()) {
+                ToggleButton bt = (ToggleButton) iter.next();
+                if (bt.isDown()) {
+                    fileEndingFilters.add(bt.getText());
+                }
+            }
+
+            iter = repositoryFilterPanel.iterator();
+            while (iter.hasNext()) {
+                ToggleButton bt = (ToggleButton) iter.next();
+                if (bt.isDown()) {
+                    repoFilters.add(bt.getText());
+                }
+            }
+
+            List<SearchResultDto> results = new ArrayList<SearchResultDto>(unfilteredResults);
+
+            for (int i = (results.size()-1); i >= 0; i--) {
+                SearchResultDto result = results.get(i);
+                if (!fileEndingFilters.isEmpty()) {
+                    int pos = result.getFilePath().lastIndexOf('.');
+                    if (pos != -1) {
+                        String resultFileEnding = result.getFilePath().substring(pos + 1);
+                        if (!fileEndingFilters.contains(resultFileEnding.toLowerCase())) {
+                            results.remove(i);
+                        }
+                    }
+                }
+
+                if (!repoFilters.isEmpty() && !repoFilters.contains(result.getRepository())) {
+                    results.remove(i);
+                }
+            }
+
+            searchResultDataProvider.setList(results);
+        }
     }
 }

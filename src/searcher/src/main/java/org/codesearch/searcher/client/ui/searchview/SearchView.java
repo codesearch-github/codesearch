@@ -44,6 +44,7 @@ public interface SearchView extends IsWidget {
     void setPresenter(Presenter presenter);
     Panel getResultsView();
     void setSearchResults(List<SearchResultDto> results);
+    void setResultStatusMessage(String message);
     void setSearchType(SearchType searchType);
     void setSelection(Set<String> selection);
     void setAvailableRepositories(List<String> repositories);
