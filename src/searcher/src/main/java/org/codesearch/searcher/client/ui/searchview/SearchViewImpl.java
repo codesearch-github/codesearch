@@ -32,9 +32,9 @@ import org.codesearch.searcher.shared.SearchType;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyUpEvent;
+import com.google.gwt.event.logical.shared.OpenEvent;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
@@ -112,11 +112,11 @@ public class SearchViewImpl extends Composite implements SearchView {
     Label resultStatusLabel;
     @UiField
     Button resetAllFiltersButton = new Button("Reset all filters");
-    
     private Presenter presenter;
     private SearchType searchType;
     private NumberFormat relevanceFormatter = NumberFormat.getFormat("00.00");
     private List<SearchResultDto> unfilteredResults;
+    private boolean filtersInitialized;
 
     public SearchViewImpl() {
         initResultTable();
@@ -149,16 +149,53 @@ public class SearchViewImpl extends Composite implements SearchView {
             searchType = SearchType.REPOSITORY_GROUPS;
         }
     }
-    
+
+    /**
+     * Parses the search results and creates the filter buttons when expanding
+     * the filters panel.
+     * @param e
+     */
+    @UiHandler("filterPanel")
+    void onFiltersOpen(OpenEvent<DisclosurePanel> e) {
+        if (!filtersInitialized) {
+            unfilteredResults = new ArrayList<SearchResultDto>(searchResultDataProvider.getList());
+
+            Set<String> fileEndings = new HashSet<String>();
+            Set<String> repos = new HashSet<String>();
+
+            for (SearchResultDto result : unfilteredResults) {
+                int pos = result.getFilePath().lastIndexOf('.');
+                if (pos != -1) {
+                    fileEndings.add(result.getFilePath().substring(pos + 1).toLowerCase());
+                }
+                repos.add(result.getRepository());
+            }
+
+            ToggleButton bt = null;
+            for (String fileEnding : fileEndings) {
+                bt = new ToggleButton(fileEnding);
+                bt.addValueChangeHandler(new FilterHandler());
+                fileEndingFilterPanel.add(bt);
+            }
+            for (String repo : repos) {
+                bt = new ToggleButton(repo);
+                bt.addValueChangeHandler(new FilterHandler());
+                repositoryFilterPanel.add(bt);
+            }
+
+            filtersInitialized = true;
+        }
+    }
+
     @UiHandler("resetAllFiltersButton")
     void onResetFilters(ClickEvent e) {
-    	for (Widget w : fileEndingFilterPanel) {
-			((ToggleButton)w).setDown(false);
-		}
-		for (Widget w : repositoryFilterPanel) {
-			((ToggleButton)w).setDown(false);
-		}
-		searchResultDataProvider.setList(new ArrayList<SearchResultDto>(unfilteredResults));
+        for (Widget w : fileEndingFilterPanel) {
+            ((ToggleButton) w).setDown(false);
+        }
+        for (Widget w : repositoryFilterPanel) {
+            ((ToggleButton) w).setDown(false);
+        }
+        searchResultDataProvider.setList(new ArrayList<SearchResultDto>(unfilteredResults));
     }
 
     @Override
@@ -215,31 +252,8 @@ public class SearchViewImpl extends Composite implements SearchView {
     /** {@inheritDoc} */
     @Override
     public void setSearchResults(List<SearchResultDto> results) {
-        unfilteredResults = new ArrayList<SearchResultDto>(results);
+        filtersInitialized = false;
         searchResultDataProvider.setList(results);
-
-        Set<String> fileEndings = new HashSet<String>();
-        Set<String> repos = new HashSet<String>();
-
-        for (SearchResultDto result : results) {
-            int pos = result.getFilePath().lastIndexOf('.');
-            if (pos != -1) {
-                fileEndings.add(result.getFilePath().substring(pos + 1).toLowerCase());
-            }
-            repos.add(result.getRepository());
-        }
-
-        ToggleButton bt = null;
-        for (String fileEnding : fileEndings) {
-            bt = new ToggleButton(fileEnding);
-            bt.addValueChangeHandler(new FilterHandler());
-            fileEndingFilterPanel.add(bt);
-        }
-        for (String repo : repos) {
-            bt = new ToggleButton(repo);
-            bt.addValueChangeHandler(new FilterHandler());
-            repositoryFilterPanel.add(bt);
-        }
     }
 
     @Override
@@ -411,7 +425,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 
             List<SearchResultDto> results = new ArrayList<SearchResultDto>(unfilteredResults);
 
-            for (int i = (results.size()-1); i >= 0; i--) {
+            for (int i = (results.size() - 1); i >= 0; i--) {
                 SearchResultDto result = results.get(i);
                 if (!fileEndingFilters.isEmpty()) {
                     int pos = result.getFilePath().lastIndexOf('.');

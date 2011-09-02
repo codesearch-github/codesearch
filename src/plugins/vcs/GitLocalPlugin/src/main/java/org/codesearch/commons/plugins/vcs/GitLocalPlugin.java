@@ -72,16 +72,21 @@ public class GitLocalPlugin implements VersionControlPlugin {
 
         if (branchDirectory.isDirectory()) {
             LOG.info("It seems repository " + repo.getName() + " is already cloned locally, trying to pull new changes...");
-            executeGitCommand("pull", repo.getUrl());
-        } else {
-            branchDirectory.mkdirs();
-            LOG.info("Cloning repository " + repo.getName() + " ...");
-
-            if (repo.getUsedAuthentication() instanceof NoAuthentication) {
-                executeGitCommand("clone", repo.getUrl(), branchDirectory.getAbsolutePath());
-            } else {
-                throw new VersionControlPluginException("Authentication not supported yet.");
+            try { 
+                executeGitCommand("pull");
+                return;
+            } catch(VersionControlPluginException ex) {
+                LOG.warn("Existent directory not a valid git repository, removing...");
             }
+        }
+
+        branchDirectory.mkdirs();
+        LOG.info("Cloning repository " + repo.getName() + " ...");
+
+        if (repo.getUsedAuthentication() instanceof NoAuthentication) {
+            executeGitCommand("clone", repo.getUrl(), branchDirectory.getAbsolutePath());
+        } else {
+            throw new VersionControlPluginException("Authentication not supported yet.");
         }
     }
 
