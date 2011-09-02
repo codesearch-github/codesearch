@@ -434,6 +434,8 @@ public class SearchViewImpl extends Composite implements SearchView {
                         if (!fileEndingFilters.contains(resultFileEnding.toLowerCase())) {
                             results.remove(i);
                         }
+                    } else {
+                        results.remove(i);
                     }
                 }
 
