@@ -41,7 +41,7 @@ import org.codesearch.searcher.shared.SearchType;
  */
 public class SearcherEntryPoint implements EntryPoint {
 
-    private Place defaultPlace = new SearchPlace("", SearchType.REPOSITORIES, null);
+    private Place defaultPlace = new SearchPlace("", SearchType.REPOSITORIES, null, 200);
     private RootContainer rootContainer = new RootContainer();
 
     /** {@inheritDoc} */

@@ -92,8 +92,8 @@ public class DocumentSearcherImpl implements DocumentSearcher {
 
     /** {@inheritDoc} */
     @Override
-    public synchronized List<SearchResultDto> search(String searchString, boolean caseSensitive, Set<String> repositoryNames, Set<String> repositoryGroupNames) throws ParseException, IOException, InvalidIndexException {
-        return performLuceneSearch(searchString, caseSensitive, repositoryNames, repositoryGroupNames, 1000);
+    public synchronized List<SearchResultDto> search(String searchString, boolean caseSensitive, Set<String> repositoryNames, Set<String> repositoryGroupNames, int maxResults) throws ParseException, IOException, InvalidIndexException {
+        return performLuceneSearch(searchString, caseSensitive, repositoryNames, repositoryGroupNames, maxResults);
     }
 
     /** {@inheritDoc} */

@@ -96,14 +96,14 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
 
     /** {@inheritDoc} */
     @Override
-    public List<SearchResultDto> doSearch(String query, boolean caseSensitive, SearchType searchType, Set<String> selection) throws SearcherServiceException {
+    public List<SearchResultDto> doSearch(String query, boolean caseSensitive, SearchType searchType, Set<String> selection, int maxResults) throws SearcherServiceException {
         List<SearchResultDto> resultItems = new LinkedList<SearchResultDto>();
         try {
             //TODO fix incompatibility
             if (searchType == SearchType.REPOSITORIES) {
-                resultItems = documentSearcher.search(query, caseSensitive, selection, new HashSet<String>());
+                resultItems = documentSearcher.search(query, caseSensitive, selection, new HashSet<String>(), maxResults);
             } else if (searchType == SearchType.REPOSITORY_GROUPS) {
-                resultItems = documentSearcher.search(query, caseSensitive, new HashSet<String>(), selection);
+                resultItems = documentSearcher.search(query, caseSensitive, new HashSet<String>(), selection, maxResults);
             }
         } catch (ParseException ex) {
             throw new SearcherServiceException("Invalid search query: \n" + ex);

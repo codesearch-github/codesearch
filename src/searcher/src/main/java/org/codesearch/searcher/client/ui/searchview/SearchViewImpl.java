@@ -31,6 +31,7 @@ import org.codesearch.searcher.shared.SearchResultDto;
 import org.codesearch.searcher.shared.SearchType;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyUpEvent;
@@ -61,6 +62,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.NoSelectionModel;
 import com.google.gwt.view.client.SelectionChangeEvent;
+import java.util.Calendar;
 
 /**
  * Implements the functionality of the search page.
@@ -74,7 +76,7 @@ public class SearchViewImpl extends Composite implements SearchView {
     private static final String RELEVANCE_TITLE = "Relevance";
     private static final String PATH_TITLE = "Path";
     private static final String REPOSITORY_TITLE = "Repository";
-    private static final String REVISION_TITLE = "Revision";
+    private static final String REVISION_TITLE = "Last Revision";
 
     // UIBINDER STUFF
     @UiTemplate("SearchView.ui.xml")
@@ -92,6 +94,8 @@ public class SearchViewImpl extends Composite implements SearchView {
     HasValue<String> searchBox;
     @UiField
     Button searchButton;
+    @UiField
+    ListBox maxResults;
     @UiField
     TabLayoutPanel repositoryTabPanel;
     @UiField
@@ -117,10 +121,13 @@ public class SearchViewImpl extends Composite implements SearchView {
     private NumberFormat relevanceFormatter = NumberFormat.getFormat("00.00");
     private List<SearchResultDto> unfilteredResults;
     private boolean filtersInitialized;
+    private boolean repositoriesInitialized;
+    private boolean repositoryGroupsInitialized;
 
     public SearchViewImpl() {
         initResultTable();
         initWidget(uiBinder.createAndBindUi(this));
+        maxResults.setSelectedIndex(1);
         repositoryTabPanel.selectTab(0);
         resultView.setVisible(false);
         repositoryList.clear();
@@ -267,6 +274,7 @@ public class SearchViewImpl extends Composite implements SearchView {
     /** {@inheritDoc} */
     @Override
     public void setAvailableRepositories(List<String> repositories) {
+        repositoriesInitialized = true;
         repositoryList.clear();
         for (String repo : repositories) {
             repositoryList.addItem(repo);
@@ -276,9 +284,22 @@ public class SearchViewImpl extends Composite implements SearchView {
     /** {@inheritDoc} */
     @Override
     public void setAvailableRepositoryGroups(List<String> repositoryGroups) {
+        repositoryGroupsInitialized = true;
         repositoryGroupList.clear();
         for (String repo : repositoryGroups) {
             repositoryGroupList.addItem(repo);
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void setMaxResults(int maxResults) {
+        for (int i = 0; i < this.maxResults.getItemCount(); i++) {
+            int value = Integer.parseInt(this.maxResults.getItemText(i));
+            if (value == maxResults) {
+                this.maxResults.setSelectedIndex(i);
+                return;
+            }
         }
     }
 
@@ -316,6 +337,18 @@ public class SearchViewImpl extends Composite implements SearchView {
     @Override
     public SearchType getSearchType() {
         return searchType;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public int getMaxResults() {
+        return Integer.parseInt(maxResults.getItemText(maxResults.getSelectedIndex()));
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean isInitialized() {
+        return repositoriesInitialized && repositoryGroupsInitialized;
     }
 
     private Set<String> getListSelection(ListBox lb) {

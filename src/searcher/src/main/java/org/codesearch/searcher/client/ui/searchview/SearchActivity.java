@@ -34,6 +34,8 @@ import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Presenter for the search view.
@@ -41,12 +43,11 @@ import com.google.gwt.user.client.ui.AcceptsOneWidget;
  */
 public class SearchActivity extends AbstractActivity implements SearchView.Presenter {
 
+    private static final Logger LOG = Logger.getLogger(SearchActivity.class.getName());
     private ClientFactory clientFactory;
     private SearchView searchView;
     private SearcherServiceAsync searcherServiceAsync = GWT.create(SearcherService.class);
     private SearchPlace searchPlace;
-    private boolean reposLoaded = false;
-    private boolean repoGroupsLoaded = false;
 
     public SearchActivity(ClientFactory clientFactory, SearchPlace searchPlace) {
         this.clientFactory = clientFactory;
@@ -57,14 +58,18 @@ public class SearchActivity extends AbstractActivity implements SearchView.Prese
     @Override
     public void start(AcceptsOneWidget panel, EventBus eventBus) {
         searchView = clientFactory.getSearchView();
-        searchView.cleanup();
-        reposLoaded = false;
-        repoGroupsLoaded = false;
         searchView.setPresenter(this);
         searchView.setSearchType(searchPlace.getSearchType());
         searchView.getSearchBox().setValue(searchPlace.getSearchTerm());
+        searchView.setMaxResults(searchPlace.getMaxResults());
         panel.setWidget(searchView.asWidget());
-        updateRepositories();
+        if (!searchView.isInitialized()) {
+            LOG.log(Level.INFO, "Retrieving repository information.");
+            updateRepositories();
+        } else {
+            searchView.setSelection(searchPlace.getSelection());
+            search();
+        }
     }
 
     /** {@inheritDoc} */
@@ -76,14 +81,16 @@ public class SearchActivity extends AbstractActivity implements SearchView.Prese
     /** {@inheritDoc} */
     @Override
     public void doSearch() {
-        goTo(new SearchPlace(searchView.getSearchBox().getValue(), searchView.getSearchType(), searchView.getSelection()));
+        goTo(new SearchPlace(searchView.getSearchBox().getValue(), searchView.getSearchType(), searchView.getSelection(), searchView.getMaxResults()));
     }
 
     private void search() {
         String query = searchView.getSearchBox().getValue();
-        if (repoGroupsLoaded && reposLoaded && !query.trim().isEmpty()) {
+        if (searchView.isInitialized() && !query.trim().isEmpty()) {
+            LOG.log(Level.INFO, "Executing search");
+
             searcherServiceAsync.doSearch(query, searchView.getCaseSensitive().getValue(),
-                    searchView.getSearchType(), searchView.getSelection(), new DoSearchHandler());
+                    searchView.getSearchType(), searchView.getSelection(), searchView.getMaxResults(), new DoSearchHandler());
         }
     }
 
@@ -101,7 +108,6 @@ public class SearchActivity extends AbstractActivity implements SearchView.Prese
             public void onSuccess(List<String> result) {
                 searchView.setAvailableRepositories(result);
                 searchView.setSelection(searchPlace.getSelection());
-                reposLoaded = true;
                 search();
             }
         });
@@ -118,10 +124,14 @@ public class SearchActivity extends AbstractActivity implements SearchView.Prese
             public void onSuccess(List<String> result) {
                 searchView.setAvailableRepositoryGroups(result);
                 searchView.setSelection(searchPlace.getSelection());
-                repoGroupsLoaded = true;
                 search();
             }
         });
+    }
+
+    @Override
+    public void onStop() {
+        searchView.cleanup();
     }
 
     /**
@@ -141,7 +151,7 @@ public class SearchActivity extends AbstractActivity implements SearchView.Prese
         public void onSuccess(List<SearchResultDto> resultList) {
             if (resultList != null) {
                 searchView.setResultStatusMessage(resultList.size() + " results found.");
-                if (resultList.size() != 0) {
+                if (!resultList.isEmpty()) {
                     searchView.setSearchResults(resultList);
                     searchView.getResultsView().setVisible(true);
                 }

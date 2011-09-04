@@ -46,10 +46,10 @@
         {
             text-weight: bold;
         }
-        
+
         .reset-filter-button
         {
-			margin-top: 10px;	
+			margin-top: 10px;
 		}
     </ui:style>
     <g:HTMLPanel addStyleNames="{style.scroll-container}">
@@ -68,6 +68,12 @@
             <g:TextBox ui:field='searchBox' />
             <g:Button ui:field='searchButton' text='Search' />
             <g:CheckBox ui:field='caseSensitive' text='Case Sensitive' />
+            <g:Label text='Max. results:' />
+            <g:ListBox ui:field='maxResults'>
+                <g:item>200</g:item>
+                <g:item>500</g:item>
+                <g:item>1000</g:item>
+            </g:ListBox>
         </div>
         <div>
             <g:Label ui:field='resultStatusLabel' />

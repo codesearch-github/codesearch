@@ -47,6 +47,7 @@ public interface SearchView extends IsWidget {
     void setResultStatusMessage(String message);
     void setSearchType(SearchType searchType);
     void setSelection(Set<String> selection);
+    void setMaxResults(int maxResults);
     void setAvailableRepositories(List<String> repositories);
     void setAvailableRepositoryGroups(List<String> repositoryGroups);
     void cleanup();
@@ -56,6 +57,8 @@ public interface SearchView extends IsWidget {
     HasValue<String> getSearchBox();
     SearchType getSearchType();
     Set<String> getSelection();
+    int getMaxResults();
+    boolean isInitialized();
 
     public interface Presenter {
         void goTo(Place place);

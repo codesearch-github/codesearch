@@ -89,12 +89,6 @@ public class FileActivity extends AbstractActivity implements Presenter {
         searcherServiceAsync.resolveUsage(usageId, repository, filePath, new ResolveUsageCallback());
     }
 
-    @Override
-    public void goBack() {
-        //TODO replace default values
-        this.goTo(new SearchPlace(searchTerm, SearchType.REPOSITORIES, null));
-    }
-
     private class ResolveUsageCallback implements AsyncCallback<SearchResultDto> {
 
         @Override

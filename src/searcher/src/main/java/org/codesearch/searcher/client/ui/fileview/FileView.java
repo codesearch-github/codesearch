@@ -98,7 +98,6 @@ public interface FileView extends IsWidget {
 
     interface Presenter {
         void goTo(Place place);
-        void goBack();
         void goToUsage(int usageId);
     }
 }

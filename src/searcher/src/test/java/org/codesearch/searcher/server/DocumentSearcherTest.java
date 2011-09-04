@@ -52,18 +52,18 @@ public class DocumentSearcherTest {
     @Test
     public void testSearch() throws Exception {
         String searchString = "SVN_NAME";
-        List result = instance.search(searchString, true, new HashSet<String>(), new HashSet<String>());
+        List result = instance.search(searchString, true, new HashSet<String>(), new HashSet<String>(), 500);
         assertFalse(result.isEmpty());
         searchString = "svn_name";
-        result = instance.search(searchString, true, new HashSet<String>(), new HashSet<String>());
+        result = instance.search(searchString, true, new HashSet<String>(), new HashSet<String>(), 500);
         assertTrue(result.isEmpty());
         searchString = "svn_name";
-        result = instance.search(searchString, false, new HashSet<String>(), new HashSet<String>());
+        result = instance.search(searchString, false, new HashSet<String>(), new HashSet<String>(), 500);
         assertFalse(result.isEmpty());
         searchString = "svn_name";
         Set<String> repoGroups = new HashSet<String>();
         repoGroups.add("group1");
-        result = instance.search(searchString, false, new HashSet<String>(), repoGroups);
+        result = instance.search(searchString, false, new HashSet<String>(), repoGroups, 500);
         assertFalse(result.isEmpty());
     }
 

@@ -45,7 +45,7 @@ public interface SearcherService extends RemoteService {
      * @return The results as a {@link List} of {@link SearchResultDto}.
      * @throws SearcherServiceException If an exception occurs on the server.
      */
-    List<SearchResultDto> doSearch(String query, boolean caseSensitive, SearchType searchType, Set<String> selection) throws SearcherServiceException;
+    List<SearchResultDto> doSearch(String query, boolean caseSensitive, SearchType searchType, Set<String> selection, int maxResults) throws SearcherServiceException;
 
     /**
      * Returns the repositories that are configured on the server.

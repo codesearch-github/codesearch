@@ -52,7 +52,7 @@ public interface DocumentSearcher {
      * @throws ParseException if the searchString could not be parsed to a query
      * @throws IOException if the Index could not be read
      */
-    List<SearchResultDto> search(String searchString, boolean caseSensitive, Set<String> repositoryNames, Set<String> repositoryGroupNames) throws ParseException, IOException, InvalidIndexException;
+    List<SearchResultDto> search(String searchString, boolean caseSensitive, Set<String> repositoryNames, Set<String> repositoryGroupNames, int maxResults) throws ParseException, IOException, InvalidIndexException;
 
     List<String> suggestSearchNames(String searchString, boolean caseSensitive, Set<String> repositoryNames, Set<String> repositoryGroupNames) throws ParseException, IOException, InvalidIndexException;
 

@@ -20,6 +20,7 @@
  */
 package org.codesearch.searcher.client.ui.searchview;
 
+import com.google.gwt.http.client.URL;
 import org.codesearch.searcher.shared.SearchType;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceTokenizer;
@@ -37,10 +38,12 @@ public class SearchPlace extends Place {
     private String searchTerm;
     private Set<String> selection;
     private SearchType searchType;
+    private int maxResults;
 
-    public SearchPlace(String searchTerm, SearchType searchType, Set<String> selection) {
+    public SearchPlace(String searchTerm, SearchType searchType, Set<String> selection, int maxResults) {
         this.searchTerm = searchTerm;
         this.searchType = searchType;
+        this.maxResults = maxResults;
         if (selection == null) {
             this.selection = new HashSet<String>();
         } else {
@@ -72,6 +75,14 @@ public class SearchPlace extends Place {
         this.searchType = searchType;
     }
 
+    public int getMaxResults() {
+        return maxResults;
+    }
+
+    public void setMaxResults(int maxResults) {
+        this.maxResults = maxResults;
+    }
+
     public static class Tokenizer implements PlaceTokenizer<SearchPlace> {
 
         /** {@inheritDoc} */
@@ -79,37 +90,73 @@ public class SearchPlace extends Place {
         public String getToken(SearchPlace place) {
             StringBuilder sb = new StringBuilder();
 
-            sb.append(place.getSearchTerm());
+            sb.append("term=");
+            sb.append(escape(place.getSearchTerm()));
+
             sb.append(UIConstants.URL_TOKEN_SEPARATOR);
 
-            sb.append(place.getSearchType().toString());
+            sb.append("searchType=");
+            sb.append(escape(place.getSearchType().toString()));
+
             sb.append(UIConstants.URL_TOKEN_SEPARATOR);
 
-            for (String string : place.getSelection()) {
-                sb.append(string);
-                sb.append(',');
+            sb.append("selection=");
+            if (place.getSelection() != null && !place.getSelection().isEmpty()) {
+                for (String string : place.getSelection()) {
+                    sb.append(escape(string));
+                    sb.append(',');
+                }
+                sb.deleteCharAt(sb.length() - 1);
             }
-            sb.deleteCharAt(sb.length() - 1);
+            sb.append(UIConstants.URL_TOKEN_SEPARATOR);
+            sb.append("maxResults=");
+            sb.append(place.getMaxResults());
             return sb.toString();
+        }
+
+        private String escape(String term) {
+            term = term.replaceAll(UIConstants.URL_TOKEN_SEPARATOR, "%40");
+            term = term.replaceAll(",", "%2C");
+            return term;
+        }
+
+        private String unescape(String term) {
+            term = term.replaceAll("%40", UIConstants.URL_TOKEN_SEPARATOR);
+            term = term.replaceAll("%2C", ",");
+            return term;
         }
 
         /** {@inheritDoc} */
         @Override
         public SearchPlace getPlace(String token) {
             try {
-                String searchTerm;
-                SearchType searchType;
-                Set<String> selection;
+                String searchTerm = "";
+                SearchType searchType = SearchType.REPOSITORIES;
+                Set<String> selection = new HashSet<String>();
+                int maxResults = 200;
 
                 String[] tokens = token.split(UIConstants.URL_TOKEN_SEPARATOR);
-                if (tokens.length == 3) {
-                    searchTerm = tokens[0];
-                    searchType = SearchType.valueOf(tokens[1]);
-                    selection = new HashSet<String>();
-                    if (tokens[2] != null) {
-                        selection.addAll(Arrays.asList(tokens[2].split(",")));
+                if (tokens.length == 4) {
+                    for (String t : tokens) {
+                        if (t.indexOf('=') == -1) {
+                            return null;
+                        }
+                        String value = unescape(t.substring(t.indexOf('=') + 1));
+                        if (t.startsWith("term=")) {
+                            searchTerm = value;
+                        } else if (t.startsWith("searchType=")) {
+                            searchType = SearchType.valueOf(value);
+                        } else if (t.startsWith("selection=")) {
+                            if (value != null && !value.isEmpty()) {
+                                for(String v : value.split(",")) {
+                                    selection.add(unescape(v));
+                                }
+                            }
+                        } else if (t.startsWith("maxResults=")) {
+                            maxResults = Integer.parseInt(value);
+                        }
                     }
-                    return new SearchPlace(searchTerm, searchType, selection);
+                    return new SearchPlace(searchTerm, searchType, selection, maxResults);
                 }
 
             } catch (IllegalArgumentException ex) {

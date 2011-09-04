@@ -12,7 +12,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 public interface SearcherServiceAsync {
 
 	void doSearch(String query, boolean caseSensitive, SearchType searchType,
-			Set<String> selection, AsyncCallback<List<SearchResultDto>> callback);
+			Set<String> selection, int maxResults, AsyncCallback<List<SearchResultDto>> callback);
 
 	void getAvailableRepositories(AsyncCallback<List<String>> callback);
 
