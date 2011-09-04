@@ -32,7 +32,6 @@ import org.codesearch.searcher.client.ui.UIUtils;
  *
  * @author Samuel Kogler
  */
-@Prefix("file")
 public class FilePlace extends Place {
 
     private String repository;
@@ -57,6 +56,7 @@ public class FilePlace extends Place {
         return searchTerm;
     }
 
+    @Prefix("file")
     public static class Tokenizer implements PlaceTokenizer<FilePlace> {
 
         /** {@inheritDoc} */

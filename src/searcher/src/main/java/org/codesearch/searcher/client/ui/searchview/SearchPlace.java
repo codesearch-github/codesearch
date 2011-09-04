@@ -33,7 +33,6 @@ import org.codesearch.searcher.client.ui.UIUtils;
  * The place token used for the search view.
  * @author Samuel Kogler
  */
-@Prefix("search")
 public class SearchPlace extends Place {
 
     private String searchTerm;
@@ -84,6 +83,7 @@ public class SearchPlace extends Place {
         this.maxResults = maxResults;
     }
 
+    @Prefix("search")
     public static class Tokenizer implements PlaceTokenizer<SearchPlace> {
 
         /** {@inheritDoc} */
