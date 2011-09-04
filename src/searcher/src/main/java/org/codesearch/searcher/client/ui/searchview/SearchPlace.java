@@ -20,14 +20,13 @@
  */
 package org.codesearch.searcher.client.ui.searchview;
 
-import com.google.gwt.http.client.URL;
 import org.codesearch.searcher.shared.SearchType;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceTokenizer;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import org.codesearch.searcher.client.ui.UIConstants;
+import org.codesearch.searcher.client.ui.UIUtils;
 
 /**
  * The place token used for the search view.
@@ -91,19 +90,17 @@ public class SearchPlace extends Place {
             StringBuilder sb = new StringBuilder();
 
             sb.append("term=");
-            sb.append(escape(place.getSearchTerm()));
+            sb.append(UIUtils.escape(place.getSearchTerm()));
 
             sb.append(UIConstants.URL_TOKEN_SEPARATOR);
-
             sb.append("searchType=");
-            sb.append(escape(place.getSearchType().toString()));
+            sb.append(UIUtils.escape(place.getSearchType().toString()));
 
             sb.append(UIConstants.URL_TOKEN_SEPARATOR);
-
             sb.append("selection=");
             if (place.getSelection() != null && !place.getSelection().isEmpty()) {
                 for (String string : place.getSelection()) {
-                    sb.append(escape(string));
+                    sb.append(UIUtils.escape(string));
                     sb.append(',');
                 }
                 sb.deleteCharAt(sb.length() - 1);
@@ -114,17 +111,7 @@ public class SearchPlace extends Place {
             return sb.toString();
         }
 
-        private String escape(String term) {
-            term = term.replaceAll(UIConstants.URL_TOKEN_SEPARATOR, "%40");
-            term = term.replaceAll(",", "%2C");
-            return term;
-        }
 
-        private String unescape(String term) {
-            term = term.replaceAll("%40", UIConstants.URL_TOKEN_SEPARATOR);
-            term = term.replaceAll("%2C", ",");
-            return term;
-        }
 
         /** {@inheritDoc} */
         @Override
@@ -141,19 +128,19 @@ public class SearchPlace extends Place {
                         if (t.indexOf('=') == -1) {
                             return null;
                         }
-                        String value = unescape(t.substring(t.indexOf('=') + 1));
+                        String value = t.substring(t.indexOf('=') + 1);
                         if (t.startsWith("term=")) {
-                            searchTerm = value;
+                            searchTerm = UIUtils.unescape(value);
                         } else if (t.startsWith("searchType=")) {
-                            searchType = SearchType.valueOf(value);
+                            searchType = SearchType.valueOf(UIUtils.unescape(value));
                         } else if (t.startsWith("selection=")) {
                             if (value != null && !value.isEmpty()) {
                                 for(String v : value.split(",")) {
-                                    selection.add(unescape(v));
+                                    selection.add(UIUtils.unescape(v));
                                 }
                             }
                         } else if (t.startsWith("maxResults=")) {
-                            maxResults = Integer.parseInt(value);
+                            maxResults = Integer.parseInt(UIUtils.unescape(value));
                         }
                     }
                     return new SearchPlace(searchTerm, searchType, selection, maxResults);

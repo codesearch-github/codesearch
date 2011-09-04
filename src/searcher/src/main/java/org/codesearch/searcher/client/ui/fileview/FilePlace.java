@@ -23,6 +23,7 @@ package org.codesearch.searcher.client.ui.fileview;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceTokenizer;
 import org.codesearch.searcher.client.ui.UIConstants;
+import org.codesearch.searcher.client.ui.UIUtils;
 
 /**
  * The place token used for the file view.
@@ -59,21 +60,53 @@ public class FilePlace extends Place {
         /** {@inheritDoc} */
         @Override
         public String getToken(FilePlace place) {
-            return place.getFilePath() + UIConstants.URL_TOKEN_SEPARATOR +
-                   place.getRepository() + UIConstants.URL_TOKEN_SEPARATOR +
-                   place.getSearchTerm();
+
+            StringBuilder sb = new StringBuilder();
+
+            sb.append("path=");
+            sb.append(UIUtils.escape(place.getFilePath()));
+
+            sb.append(UIConstants.URL_TOKEN_SEPARATOR);
+            sb.append("repository=");
+            sb.append(UIUtils.escape(place.getRepository()));
+
+            sb.append(UIConstants.URL_TOKEN_SEPARATOR);
+            sb.append("term=");
+            sb.append(UIUtils.escape(place.getSearchTerm()));
+
+            return sb.toString();
         }
 
         /** {@inheritDoc} */
         @Override
         public FilePlace getPlace(String token) {
+
             String[] parts = token.split(UIConstants.URL_TOKEN_SEPARATOR);
-            if (parts.length == 3) {
-                try {
-                    return new FilePlace(parts[1], parts[0], parts[2]);
-                } catch (NumberFormatException ex) {
+            if (parts.length >= 2) { // path and repo are required
+                String path = "";
+                String repository = "";
+                String term = "";
+
+                for (String t : parts) {
+                    if (t.indexOf('=') == -1) {
+                        return null;
+                    }
+                    String value = UIUtils.unescape(t.substring(t.indexOf('=') + 1));
+
+                    if (t.startsWith("repository=")) {
+                        repository = value;
+                    } else if (t.startsWith("path=")) {
+                        path = value;
+                    } else if (t.startsWith("term=")) {
+                        term = value;
+                    }
+                }
+
+                if(path.isEmpty() || repository.isEmpty()) {
                     return null;
                 }
+
+                return new FilePlace(repository, path, term);
             }
             return null;
         }

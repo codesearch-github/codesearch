@@ -40,7 +40,6 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.Event.NativePreviewEvent;
 import com.google.gwt.user.client.Event.NativePreviewHandler;
-import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -106,6 +105,7 @@ public class FileViewImpl extends Composite implements FileView {
     public FileViewImpl() {
         initWidget(uiBinder.createAndBindUi(this));
         exportJSFunctions();
+        showSidebar(false);
     }
 
     @UiHandler("goToLineButton")
@@ -157,15 +157,15 @@ public class FileViewImpl extends Composite implements FileView {
                 lineNumber.addClickHandler(new LineNumberClickHandler(i + 1));
                 lineNumbersContainer.add(lineNumber);
             }
-            highlightSearchTerm(fileContent);
         }
 
         fileContent = "<pre id='fileContent'>" + fileContent + "</pre>";
 
         HTML html = new HTML(fileContent);
         fileContentContainer.add(html);
-
-        highlight("#fileContent", searchTerm);
+        if (searchTerm != null && !searchTerm.isEmpty()) {
+            highlight("#fileContent", searchTerm);
+        }
     }
 
     private native void highlight(String selector, String term)/*-{
@@ -176,14 +176,6 @@ public class FileViewImpl extends Composite implements FileView {
     @Override
     public void setSearchTerm(String searchTerm) {
         this.searchTerm = searchTerm;
-    }
-
-    /**
-     * Highlights the search term in the given file content
-     * @param fileContent
-     */
-    public void highlightSearchTerm(String fileContent) {
-        //TODO implement
     }
 
     /** {@inheritDoc} */

@@ -28,5 +28,6 @@ package org.codesearch.searcher.client.ui;
 public class UIConstants {
     private UIConstants() {}
 
-    public static final String URL_TOKEN_SEPARATOR = "@";
+    public static final String URL_TOKEN_SEPARATOR = "&";
+    public static final String URL_TOKEN_ESCAPE = "%26";
 }

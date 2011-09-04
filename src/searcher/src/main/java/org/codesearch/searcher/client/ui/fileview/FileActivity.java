@@ -34,8 +34,6 @@ import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
-import org.codesearch.searcher.client.ui.searchview.SearchPlace;
-import org.codesearch.searcher.shared.SearchType;
 import org.codesearch.searcher.shared.SearchResultDto;
 
 /**
@@ -63,7 +61,6 @@ public class FileActivity extends AbstractActivity implements Presenter {
     public void start(AcceptsOneWidget panel, EventBus eventBus) {
         fileView = clientFactory.getFileView();
         fileView.setPresenter(this);
-        fileView.cleanup();
         panel.setWidget(fileView.asWidget());
         fileView.setFilePath(filePath);
         fileView.setRepository(repository);
