@@ -22,6 +22,7 @@ package org.codesearch.searcher.client.ui.fileview;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceTokenizer;
+import com.google.gwt.place.shared.Prefix;
 import org.codesearch.searcher.client.ui.UIConstants;
 import org.codesearch.searcher.client.ui.UIUtils;
 
@@ -31,6 +32,7 @@ import org.codesearch.searcher.client.ui.UIUtils;
  *
  * @author Samuel Kogler
  */
+@Prefix("file")
 public class FilePlace extends Place {
 
     private String repository;

@@ -23,6 +23,7 @@ package org.codesearch.searcher.client.ui.searchview;
 import org.codesearch.searcher.shared.SearchType;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceTokenizer;
+import com.google.gwt.place.shared.Prefix;
 import java.util.HashSet;
 import java.util.Set;
 import org.codesearch.searcher.client.ui.UIConstants;
@@ -32,6 +33,7 @@ import org.codesearch.searcher.client.ui.UIUtils;
  * The place token used for the search view.
  * @author Samuel Kogler
  */
+@Prefix("search")
 public class SearchPlace extends Place {
 
     private String searchTerm;
