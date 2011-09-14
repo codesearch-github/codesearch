@@ -41,7 +41,6 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.store.FSDirectory;
 import org.codesearch.commons.configuration.properties.PropertiesManager;
@@ -135,7 +134,9 @@ public class IndexingTask implements Task {
                 init();
                 int i = 0;
                 for (RepositoryDto repository : repositories) {
-                    job.setCurrentRepository(i);
+                    if (job != null) {
+                        job.setCurrentRepository(i);
+                    }
                     try {
                         LOG.info("Indexing repository: " + repository.getName());
                         long start = System.currentTimeMillis();

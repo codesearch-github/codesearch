@@ -77,7 +77,7 @@ public final class IndexingManager {
         this.historyListener = new IndexingJobHistoryListener();
         
         scheduler.setJobFactory(jobFactory);
-        scheduler.getListenerManager().addTriggerListener(new IndexingJobTriggerListener(scheduler, 5 * 60 * 1000),
+        scheduler.getListenerManager().addTriggerListener(new IndexingJobTriggerListener(5 * 60 * 1000),
                 EverythingMatcher.allTriggers()); // delay by 5 minutes if a job is currently running
         scheduler.getListenerManager().addJobListener(historyListener, EverythingMatcher.allJobs());
         start();
@@ -124,7 +124,7 @@ public final class IndexingManager {
 
     public List<JobStatus> getRunningJobs() throws SchedulerException {
         List<JobStatus> runningJobs = new LinkedList<JobStatus>();
-        List<JobExecutionContext> currentlyExecutedJobs = (List<JobExecutionContext>) scheduler.getCurrentlyExecutingJobs();
+        List<JobExecutionContext> currentlyExecutedJobs = scheduler.getCurrentlyExecutingJobs();
         for (JobExecutionContext currentJob : currentlyExecutedJobs) {
             JobDataMap jobDataMap = currentJob.getJobDetail().getJobDataMap();
 

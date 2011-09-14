@@ -15,7 +15,7 @@ import org.quartz.JobExecutionException;
  * The time at which the job finished can be retrieved via the JobExecutionContext
  * @author david
  */
-public class MockIndexingJob implements Job{
+public class MockIndexingJob implements Job {
     public static final String TIME_FINISHED = "time finished";
     private static final Logger LOG = Logger.getLogger(MockIndexingJob.class);
     @Override

@@ -1,22 +1,16 @@
 /**
- * Copyright 2010 David Froehlich   <david.froehlich@businesssoftware.at>,
- *                Samuel Kogler     <samuel.kogler@gmail.com>,
- *                Stephan Stiboller <stistc06@htlkaindorf.at>
- *
+ * Copyright 2010 David Froehlich <david.froehlich@businesssoftware.at>, Samuel Kogler <samuel.kogler@gmail.com>, Stephan Stiboller
+ * <stistc06@htlkaindorf.at>
+ * 
  * This file is part of Codesearch.
- *
- * Codesearch is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Codesearch is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
+ * 
+ * Codesearch is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * 
+ * Codesearch is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with Codesearch. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.codesearch.commons.configuration.xml.dto;
 
@@ -26,6 +20,7 @@ import org.codesearch.commons.plugins.vcs.AuthenticationType;
 
 /**
  * DTO used to store information about a repository specified in the config.xml file
+ * 
  * @author David Froehlich
  */
 public class RepositoryDto {
@@ -36,8 +31,10 @@ public class RepositoryDto {
     private String url;
     /** Specifies whether the additional index will be created for the repository. */
     private boolean codeNavigationEnabled;
-    /** The version control system used for this repository, (for instance SVN or Bazaar),
-     * must match the purpose attribute of the corresponding version control plugin */
+    /**
+     * The version control system used for this repository, (for instance SVN or Bazaar), must match the purpose attribute of the
+     * corresponding version control plugin
+     */
     private String versionControlSystem;
     /** A list of file name patterns that the files that will be indexed have to match (every file has to match at least one of the entries */
     private List<String> whitelistEntries;
@@ -53,16 +50,20 @@ public class RepositoryDto {
 
     /**
      * Creates a new instance of RepositoryDto
+     * 
      * @param name the unique name of the repository
      * @param url the url used by the VersionControlPlugin to access the repository
      * @param usedAuthentication the authentication type used by the plugin
      * @param codeNavigationEnabled determines whether code navigation is enabled for this repository
-     * @param versionControlSystem determines which VersionControlSystem is used for the repository, must match the string returned by the getPurpose method of the VersionControlPlugin
+     * @param versionControlSystem determines which VersionControlSystem is used for the repository, must match the string returned by the
+     *            getPurpose method of the VersionControlPlugin
      * @param blacklistEntries the list of regex strings representing the filenames of files that will not be indexed
-     * @param whitelistEntries the list of regex strings a filename must match in order for the file to be indexed (only one entry has to be matched)
+     * @param whitelistEntries the list of regex strings a filename must match in order for the file to be indexed (only one entry has to be
+     *            matched)
      * @param repositoryGroups the groups this repository belongs to
      */
-    public RepositoryDto(String name, String url, AuthenticationType usedAuthentication, boolean codeNavigationEnabled, String versionControlSystem, List<String> blacklistEntries, List<String> whitelistEntries, List<String> repositoryGroups) {
+    public RepositoryDto(String name, String url, AuthenticationType usedAuthentication, boolean codeNavigationEnabled,
+            String versionControlSystem, List<String> blacklistEntries, List<String> whitelistEntries, List<String> repositoryGroups) {
         this.name = name;
         this.url = url;
         this.usedAuthentication = usedAuthentication;
@@ -125,7 +126,7 @@ public class RepositoryDto {
         this.usedAuthentication = usedAuthentication;
     }
 
-    public AuthenticationType getUsedAuthentication(){
+    public AuthenticationType getUsedAuthentication() {
         return usedAuthentication;
     }
 
@@ -137,8 +138,8 @@ public class RepositoryDto {
     }
 
     /**
-     * Return the repository list as a single string
-     * the groups are spearated with a whitespace
+     * Return the repository list as a single string the groups are spearated with a whitespace
+     * 
      * @return repository list as a single string separated by whitspaces
      */
     public String getRepositoryGroupsAsString() {
@@ -158,38 +159,30 @@ public class RepositoryDto {
 
     /**
      * compares this RepositoryDto with the given one
+     * 
      * @param o the RepositoryDto to compare
      * @return true if all the attributes are equal
      */
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof RepositoryDto)) {
+        if (o == null || !(o instanceof RepositoryDto)) {
             return false;
         }
         RepositoryDto other = (RepositoryDto) o;
-        if (this.getName().equals(other.getName()) &&
-            this.isCodeNavigationEnabled() == other.isCodeNavigationEnabled() &&
-            this.blacklistEntries.size() == other.getBlacklistEntries().size() &&
-            this.whitelistEntries.size() == other.getWhitelistEntries().size() &&
-            this.repositoryGroups.size() == other.getRepositoryGroups().size()) {
-            if (!CollectionUtils.isEqualCollection(this.blacklistEntries, other.getBlacklistEntries())) {
-                return false;
-            }
-            if (!CollectionUtils.isEqualCollection(this.whitelistEntries, other.getWhitelistEntries())) {
-                return false;
-            }
-            if (!CollectionUtils.isEqualCollection(this.repositoryGroups, other.repositoryGroups)) {
-                return false;
-            }
-            return true;
+        if(name == null || other.getName() == null){
+            return false;
         }
-        return false;
+        if (name.equals(other.getName())) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @Override
     public String toString() {
         String retString = "";
-        retString += "Name: "+ name + ", url: "+ url + ", used authentication: "+ usedAuthentication.toString();
+        retString += "Name: " + name + ", url: " + url + ", used authentication: " + usedAuthentication.toString();
         return retString;
     }
 }

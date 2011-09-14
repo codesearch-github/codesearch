@@ -1,22 +1,16 @@
 /**
- * Copyright 2010 David Froehlich   <david.froehlich@businesssoftware.at>,
- *                Samuel Kogler     <samuel.kogler@gmail.com>,
- *                Stephan Stiboller <stistc06@htlkaindorf.at>
- *
+ * Copyright 2010 David Froehlich <david.froehlich@businesssoftware.at>, Samuel Kogler <samuel.kogler@gmail.com>, Stephan Stiboller
+ * <stistc06@htlkaindorf.at>
+ * 
  * This file is part of Codesearch.
- *
- * Codesearch is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Codesearch is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
+ * 
+ * Codesearch is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * 
+ * Codesearch is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with Codesearch. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.codesearch.indexer.server.tasks;
 
@@ -42,8 +36,8 @@ import org.codesearch.indexer.server.manager.IndexingJob;
 import com.google.inject.Inject;
 
 /**
- * Clears the index of the specified repositories.
- * If none are specified, deletes the entire index.
+ * Clears the index of the specified repositories. If none are specified, deletes the entire index.
+ * 
  * @author David Froehlich
  * @author Samuel Kogler
  */
@@ -53,7 +47,7 @@ public class ClearTask implements Task {
     private static final Logger LOG = Logger.getLogger(ClearTask.class);
     /** the location of the index */
     private String indexLocation;
-    /** the repository to clear  */
+    /** the repository to clear */
     private List<RepositoryDto> repositories;
     /** The database access object */
     private DBAccess dba;
@@ -66,8 +60,8 @@ public class ClearTask implements Task {
     }
 
     /**
-     * executes the task
-     * deletes all index files and resets the lastIndexingRevision of all repositories
+     * executes the task deletes all index files and resets the lastIndexingRevision of all repositories
+     * 
      * @throws TaskExecutionException
      */
     @Override
@@ -109,14 +103,16 @@ public class ClearTask implements Task {
 
                 int index = 0;
                 for (RepositoryDto repositoryDto : repositories) {
-                    // set the status
-                    job.setCurrentRepository(index);
+                    if (job != null) {
+                        // set the status
+                        job.setCurrentRepository(index);
+                    }
                     Term term = new Term(IndexConstants.INDEX_FIELD_REPOSITORY, repositoryDto.getName());
 
                     LOG.debug("Deleting documents where field '" + term.field() + "' is '" + term.text() + "'");
                     int deleteCount = 0;
                     try {
-                         deleteCount = searcher.getIndexReader().deleteDocuments(term);
+                        deleteCount = searcher.getIndexReader().deleteDocuments(term);
                     } catch (IOException ex) {
                         LOG.error("Error encountered while clearing index: " + ex);
                     }
@@ -134,7 +130,7 @@ public class ClearTask implements Task {
             } catch (StaleReaderException ex) {
                 LOG.error("The index was modified by another program/instance while clearing.");
             } catch (IOException ex) {
-                //if there is no index nothing has to be cleared
+                // if there is no index nothing has to be cleared
             } finally {
                 if (searcher != null) {
                     try {

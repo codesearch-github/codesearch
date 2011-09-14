@@ -20,21 +20,21 @@
  */
 package org.codesearch.indexer.tasks;
 
-import org.codesearch.indexer.server.tasks.IndexingTask;
 import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+
 import org.apache.commons.io.FileUtils;
 import org.codesearch.commons.configuration.ConfigurationReader;
-
-
 import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
 import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 import org.codesearch.commons.database.DBAccess;
 import org.codesearch.commons.plugins.PluginLoader;
 import org.codesearch.commons.plugins.PluginLoaderImpl;
 import org.codesearch.commons.plugins.vcs.NoAuthentication;
+import org.codesearch.indexer.server.tasks.ClearTask;
+import org.codesearch.indexer.server.tasks.IndexingTask;
 import org.junit.Test;
 
 /**
@@ -51,11 +51,6 @@ public class IndexingTaskTest {
     public IndexingTaskTest() {
         File f = new File(testIndexDir);
         f.mkdir();
-    }
-
-    @Test
-    public void testExecute() throws Exception {
-        //TODO write this test
     }
 
     @Test
@@ -78,10 +73,9 @@ public class IndexingTaskTest {
         List<RepositoryDto> repos = new LinkedList<RepositoryDto>();
         repos.add(repo);
 
-        // FIXME update this test
-//        ClearTask c = new ClearTask(dba);
-//        c.setIndexLocation(testIndexDir);
-//        c.execute();
+        ClearTask c = new ClearTask(dba);
+        c.setIndexLocation(testIndexDir);
+        c.execute();
 
         IndexingTask t = new IndexingTask(dba, pl, "");
         t.setIndexLocation(testIndexDir);
