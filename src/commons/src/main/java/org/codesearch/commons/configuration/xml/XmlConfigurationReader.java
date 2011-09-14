@@ -20,9 +20,6 @@
  */
 package org.codesearch.commons.configuration.xml;
 
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
-import org.codesearch.commons.configuration.ConfigurationReader;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -30,18 +27,20 @@ import java.util.NoSuchElementException;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.HierarchicalConfiguration;
-import org.apache.commons.configuration.SubnodeConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.codesearch.commons.configuration.ConfigurationReader;
 import org.codesearch.commons.configuration.xml.dto.IndexerUserDto;
-import org.codesearch.commons.configuration.xml.dto.IndexingTaskType;
 import org.codesearch.commons.configuration.xml.dto.JobDto;
 import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 import org.codesearch.commons.plugins.vcs.AuthenticationType;
 import org.codesearch.commons.plugins.vcs.BasicAuthentication;
 import org.codesearch.commons.plugins.vcs.NoAuthentication;
 import org.codesearch.commons.plugins.vcs.SshAuthentication;
+
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
 
 /**
  * XmlConfigurationReader is a class that provides several methods to access properties.

@@ -1,0 +1,83 @@
+<!--
+
+    Copyright 2010 David Froehlich   <david.froehlich@businesssoftware.at>,
+                   Samuel Kogler     <samuel.kogler@gmail.com>,
+                   Stephan Stiboller <stistc06@htlkaindorf.at>
+
+    This file is part of Codesearch.
+
+    Codesearch is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Codesearch is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
+
+-->
+
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+             xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:d="urn:import:com.google.gwt.dom.client" xmlns:a="urn:import:com.google.gwt.dev.asm">
+    <ui:with field='res' type='org.codesearch.indexer.client.Resources'/>
+    <ui:style>
+        .header
+        {
+        	border-style: none none solid none;
+        	border-width: 1px;
+        	width: 100%;
+        	overflow: hidden;
+        }
+        
+        .header > *
+        {
+			float: left;
+		}
+        
+        .menu
+        {
+			float: left;
+			padding: 5px 0px;
+			border: 1px solid gray;
+			margin-top: 5px;
+		}
+		
+		.menu-link a
+		{
+			display: block;
+			padding-left: 20px;
+			padding-right: 20px;
+		}
+		
+		.content
+		{
+			float: left;
+			padding: 5px;
+		}
+		
+		.title
+		{
+			font-weight: bold;
+			font-size: 18pt;
+			margin-left: 20px;
+			margin-top: 4px;
+		}
+		
+    </ui:style>
+    <g:HTMLPanel>
+    <g:FlowPanel addStyleNames="{style.header}">
+    	<g:Image resource="{res.logo}" /> <g:Label text="Index Admin" addStyleNames="{style.title}" />
+    </g:FlowPanel>
+    <g:FlowPanel addStyleNames="{style.menu}">
+    	<g:Hyperlink text="Dashboard" targetHistoryToken="dashboard:" addStyleNames="{style.menu-link}" />
+    	<g:Hyperlink text="View Log" targetHistoryToken="log:" addStyleNames="{style.menu-link}" />
+    </g:FlowPanel>
+    <g:SimplePanel ui:field="contentPanel" addStyleNames="{style.content}"/>
+    
+    </g:HTMLPanel>
+    
+</ui:UiBinder>

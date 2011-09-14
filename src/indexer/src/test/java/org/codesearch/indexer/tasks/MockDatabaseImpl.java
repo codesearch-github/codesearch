@@ -2,7 +2,6 @@ package org.codesearch.indexer.tasks;
 
 import java.util.List;
 import java.util.Map;
-import org.apache.log4j.Logger;
 import org.codesearch.commons.database.DBAccess;
 import org.codesearch.commons.database.DatabaseAccessException;
 import org.codesearch.commons.database.DatabaseEntryNotFoundException;
