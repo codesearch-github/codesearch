@@ -20,7 +20,6 @@
  */
 package org.codesearch.commons.plugins.vcs;
 
-import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -35,6 +34,8 @@ import java.util.List;
 import java.util.Set;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
+import org.codesearch.commons.validator.ValidationException;
 
 /**
  * A plugin used to access files stored in Git repositories.
@@ -261,5 +262,10 @@ public class GitLocalPlugin implements VersionControlPlugin {
         if (!cacheDirectory.isDirectory() && cacheDirectory.canWrite()) {
             throw new VersionControlPluginException("Invalid cache directory specified: " + directoryPath);
         }
+    }
+
+    @Override
+    public void validate() throws ValidationException {
+        //TODO add validation logic
     }
 }

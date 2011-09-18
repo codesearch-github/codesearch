@@ -38,6 +38,8 @@ import org.codesearch.commons.plugins.vcs.AuthenticationType;
 import org.codesearch.commons.plugins.vcs.BasicAuthentication;
 import org.codesearch.commons.plugins.vcs.NoAuthentication;
 import org.codesearch.commons.plugins.vcs.SshAuthentication;
+import org.codesearch.commons.validator.ValidationException;
+import org.codesearch.commons.validator.XmlConfigurationValidator;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -69,6 +71,7 @@ public class XmlConfigurationReader implements ConfigurationReader {
         LOG.debug("Reading config file: " + this.configPath);
         try {
             config = new XMLConfiguration(this.configPath);
+            config.load();
         } catch (ConfigurationException ex) {
             LOG.error("Configuration file could not be read:\n" + ex);
         }
@@ -263,5 +266,12 @@ public class XmlConfigurationReader implements ConfigurationReader {
             }
         }
         return repos;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void validateConfiguration() throws ValidationException {
+        new XmlConfigurationValidator(this.config).validateConfiguration();
+        
     }
 }

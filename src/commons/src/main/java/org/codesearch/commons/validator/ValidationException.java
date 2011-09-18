@@ -19,18 +19,20 @@
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.codesearch.commons.plugins.vcs;
-
-import org.apache.log4j.Logger;
-
+package org.codesearch.commons.validator;
 
 /**
- *
+ * Exception that can be thrown during the validation process on startup
  * @author David Froehlich
  */
-public class FilesystemPluginTest {
-
-     /* Logger */
-    private static final Logger LOG = Logger.getLogger(FilesystemPluginTest.class);
-   
+public class ValidationException extends Exception {
+    
+    public ValidationException() {
+        
+    }
+    
+    public ValidationException(String msg) {
+        super(msg);
+    }
+    
 }

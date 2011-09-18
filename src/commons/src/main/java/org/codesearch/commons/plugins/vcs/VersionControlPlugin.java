@@ -26,6 +26,7 @@ import java.util.Set;
 import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 
 import org.codesearch.commons.plugins.Plugin;
+import org.codesearch.commons.validator.ValidationException;
 
 /**
  * Base for all version control plugins.
@@ -46,14 +47,14 @@ public interface VersionControlPlugin extends Plugin {
      * @param filePath The file path relative to the current repository URL
      * @return The retrieved file
      */
-    FileDto getFileForFilePath(String filePath) throws VersionControlPluginException;
+    FileDto getFileDtoForFileIdentifier(FileIdentifier fileInfo) throws VersionControlPluginException;
 
     /**
      * Returns a list of changed files since the given revision.
      * @param revision The given revision
      * @return The changed files
      */
-    Set<FileDto> getChangedFilesSinceRevision(String revision) throws VersionControlPluginException;
+    Set<FileIdentifier> getChangedFilesSinceRevision(String revision) throws VersionControlPluginException;
 
     /**
      * Extracts and returns the revision number of the currently set revision.
@@ -62,7 +63,7 @@ public interface VersionControlPlugin extends Plugin {
     String getRepositoryRevision() throws VersionControlPluginException;
 
     /**
-     * returns a list of all files in the directory (not recursively)
+     * returns a list of the names of all files in the directory (not recursively)
      * @param directoryPath the path of the directory
      * @return the files as a list of Strings
      * @throws VersionControlPluginException
@@ -75,4 +76,11 @@ public interface VersionControlPlugin extends Plugin {
      * @throws VersionControlPluginException if the directory is invalid
      */
     void setCacheDirectory(String directoryPath) throws VersionControlPluginException;
+    
+    /**
+     * validates whether the plugin will be usable and a connection to the specified repository can be established
+     * aborts all further executions if an exception is thrown
+     * @throws ValidationException 
+     */
+    void validate() throws ValidationException;
 }

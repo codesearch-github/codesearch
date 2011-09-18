@@ -66,6 +66,7 @@ public class IndexerGuiceModule extends ServletModule {
         } catch (IOException e) {
             LOG.error("Could not find configuration file 'quartz.properties':\n" + e);
         }
+        
         bind(JobFactory.class).to(QuartzGuiceJobFactory.class).in(Singleton.class);
         bind(IndexingManager.class).in(Singleton.class);
         serve("/dashboard.rpc").with(DashboardServiceImpl.class);

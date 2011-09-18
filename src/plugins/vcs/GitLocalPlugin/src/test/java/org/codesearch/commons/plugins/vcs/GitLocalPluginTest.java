@@ -54,7 +54,7 @@ public class GitLocalPluginTest {
     public void testGetFileForFilePath() throws Exception {
         System.out.println("getFileForFilePath");
         String filePath = "LICENSE";
-        FileDto result = plugin.getFileForFilePath(filePath);
+        FileIdentifier result = plugin.getFileForFilePath(filePath);
 
         System.out.println("File path: " + result.getFilePath());
         System.out.println("Binary: " + result.isBinary());
@@ -69,12 +69,12 @@ public class GitLocalPluginTest {
     public void testGetChangedFilesSinceRevision() throws Exception {
         System.out.println("getChangedFilesSinceRevision");
         String revision = "0";
-        Set<FileDto> changes = plugin.getChangedFilesSinceRevision(revision);
+        Set<FileIdentifier> changes = plugin.getChangedFilesSinceRevision(revision);
         System.out.println("changes returned");
         assertNotNull(changes);
         assert (!changes.isEmpty());
         System.out.println("Changed files since revision 0: ");
-        for (FileDto fileDto : changes) {
+        for (FileIdentifier fileDto : changes) {
             System.out.println(fileDto.getFilePath());
         }
     }

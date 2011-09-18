@@ -20,15 +20,17 @@
  */
 package org.codesearch.commons.plugins.vcs;
 
-import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
+import org.codesearch.commons.validator.ValidationException;
 
 /**
  * A VersionControlPlugin used to access files from the file system
@@ -47,32 +49,26 @@ public class FilesystemPlugin implements VersionControlPlugin {
 
     /** {@inheritDoc} */
     @Override
-    public FileDto getFileForFilePath(String filePath) throws VersionControlPluginException {
-
+    public FileDto getFileDtoForFileIdentifier(FileIdentifier identifier) throws VersionControlPluginException {
         try {
-            File file = new File(filePath);
-            FileDto fileDto = new FileDto();
+            File file = new File(identifier.getFilePath());
             FileInputStream fis = new FileInputStream(file);
             byte fileContent[] = new byte[(int) file.length()];
             fis.read(fileContent);
             fis.close();
-            fileDto.setFilePath(filePath);
-            fileDto.setContent(fileContent);
-            fileDto.setBinary(false);
-            fileDto.setFilePath(filePath);
-            fileDto.setRepository(repository);
+            FileDto fileDto = new FileDto(identifier.getFilePath(), "unknown", new Date(file.lastModified()).toString(), fileContent, repository, false);
             return fileDto;
         } catch (IOException ex) {
             throw new VersionControlPluginException("File could not be opened: \n" + ex);
         } catch (NullPointerException ex) {
-            return null;
+            throw new VersionControlPluginException("File not found: \n" + ex);
         }
     }
 
     /** {@inheritDoc} */
     @Override
-    public Set<FileDto> getChangedFilesSinceRevision(String revision) throws VersionControlPluginException {
-        Set<FileDto> files = new HashSet<FileDto>();
+    public Set<FileIdentifier> getChangedFilesSinceRevision(String revision) throws VersionControlPluginException {
+        Set<FileIdentifier> files = new HashSet();
         addChangedFilesFromDirectoryToSet(files, new File(repository.getUrl()), Long.parseLong(revision));
         return files;
     }
@@ -83,12 +79,12 @@ public class FilesystemPlugin implements VersionControlPlugin {
      * @param directory the current directory
      * @param lastModified the time of last indexing
      */
-    private void addChangedFilesFromDirectoryToSet(Set<FileDto> files, File directory, long lastModified) throws VersionControlPluginException {
-        for (File f : directory.listFiles()) {
-            if (f.isDirectory()) {
-                addChangedFilesFromDirectoryToSet(files, f, lastModified);
-            } else if (f.lastModified() > lastModified) {
-                files.add(getFileForFilePath(f.getAbsolutePath()));
+    private void addChangedFilesFromDirectoryToSet(Set<FileIdentifier> files, File directory, long lastModified) throws VersionControlPluginException {
+        for (File currentFile : directory.listFiles()) {
+            if (currentFile.isDirectory()) {
+                addChangedFilesFromDirectoryToSet(files, currentFile, lastModified);
+            } else if (currentFile.lastModified() > lastModified) {
+                files.add(new FileIdentifier(currentFile.getAbsolutePath(), false, false, repository));
             }
         }
     }
@@ -110,8 +106,6 @@ public class FilesystemPlugin implements VersionControlPlugin {
      */
     private long getHighestLastModifiedDateFromDirectory(File dir) {
         long lastModified = 0;
-        boolean exists = dir.exists();
-        boolean isDir = dir.isDirectory();
         for (File f : dir.listFiles()) {
             long lastMod;
             if (f.isDirectory()) {
@@ -147,5 +141,16 @@ public class FilesystemPlugin implements VersionControlPlugin {
     @Override
     public void setCacheDirectory(String directoryPath) throws VersionControlPluginException {
         // Not needed
+    }
+
+    @Override
+    public void validate() throws ValidationException {
+        if(repository == null){
+            throw new ValidationException("No repository specified, you need to specify a repository before calling the validate method");
+        }
+        File f = new File(repository.getUrl());
+        if(!f.exists() || !f.isDirectory()){
+            throw new ValidationException("Directory specified as a filesystem repository is not valid");
+        }
     }
 }

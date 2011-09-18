@@ -72,7 +72,7 @@ public class SubversionPluginTest {
    //     sp.setRepository(new URI("svn://portal.htl-kaindorf.at/svnsearch"), "feldruebe", "dota!123");
         Set result = sp.getChangedFilesSinceRevision(revision);
         Iterator iter = result.iterator();
-        FileDto file = (FileDto) iter.next();
+        FileIdentifier file = (FileIdentifier) iter.next();
         assert (file.getFilePath().endsWith("testfile.txt"));
     }
 
@@ -83,7 +83,8 @@ public class SubversionPluginTest {
     public void testGetFileContentForFilePath() throws Exception {
         LOG.info("getFileContentForFilePath");
         String filePath = "/svnsearch/trunk/src/main/java/com/bearingpoint/ta/svnsearch/testfile.txt";
-        String result = new String(sp.getFileForFilePath(filePath).getContent());
+        FileIdentifier identifier = new FileIdentifier(filePath, true, true, null);
+        String result = new String(sp.getFileDtoForFileIdentifier(identifier).getContent());
         assert (result.equals("test"));
     }
 

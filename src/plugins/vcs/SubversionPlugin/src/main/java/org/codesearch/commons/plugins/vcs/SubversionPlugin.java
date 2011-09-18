@@ -29,6 +29,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import org.apache.log4j.Logger;
+import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
+import org.codesearch.commons.validator.ValidationException;
 import org.tmatesoft.svn.core.ISVNDirEntryHandler;
 import org.tmatesoft.svn.core.SVNDirEntry;
 import org.tmatesoft.svn.core.SVNException;
@@ -84,32 +86,15 @@ public class SubversionPlugin implements VersionControlPlugin {
 
     /** {@inheritDoc} */
     @Override
-    public void setRepository(RepositoryDto repository) throws VersionControlPluginException {
-        try {
-            this.repository = repository;
-            SVNURL svnurl = SVNURL.parseURIDecoded(repository.getUrl().toString());
-            svnRepo = SVNRepositoryFactory.create(svnurl);
-            AuthenticationType type = repository.getUsedAuthentication();
-
-            if (type instanceof NoAuthentication) {
-                //Nothing needs to be done
-            } else if (type instanceof BasicAuthentication) {
-                BasicAuthentication basicAuth = (BasicAuthentication) type;
-                authManager = new BasicAuthenticationManager(basicAuth.getUsername(), basicAuth.getPassword());
-                svnRepo.setAuthenticationManager(authManager);
-            } else {
-                //TODO add support for ssh files
-                throw new VersionControlPluginException("SSH authentication not yet supported.");
-            }
-        } catch (SVNException ex) {
-            throw new VersionControlPluginException(ex.toString());
-        }
+    public void setRepository(RepositoryDto repository) {
+        this.repository = repository;
     }
 
     /** {@inheritDoc} */
     @Override
-    public FileDto getFileForFilePath(String filePath) throws VersionControlPluginException {
+    public FileDto getFileDtoForFileIdentifier(FileIdentifier identifier) throws VersionControlPluginException {
         try {
+            String filePath = identifier.getFilePath();
             LOG.debug("Retrieving and checking file: " + filePath);
             FileDto fileDto = new FileDto();
             SVNNodeKind nodeKind = svnRepo.checkPath(filePath, -1);
@@ -137,40 +122,35 @@ public class SubversionPlugin implements VersionControlPlugin {
 
     /** {@inheritDoc} */
     @Override
-    public Set<FileDto> getChangedFilesSinceRevision(String revision) throws VersionControlPluginException {
-        Set<FileDto> files = new HashSet();
+    public Set<FileIdentifier> getChangedFilesSinceRevision(String revision) throws VersionControlPluginException {
+        Set<FileIdentifier> identifiers = new HashSet();
         List logs = null;
         try {
             logs = (LinkedList) svnRepo.log(new String[]{}, null, Long.parseLong(revision) + 1, -1, true, false);
         } catch (NullPointerException e) {
             throw new VersionControlPluginException("No repository specified");
         } catch (SVNException ex) {
-            logs = new LinkedList();
+            return identifiers;
         }
         for (int i = 0; i < logs.size(); i++) {
             SVNLogEntry entry = (SVNLogEntry) logs.get(i);
             Iterator entryIterator = entry.getChangedPaths().values().iterator();
             while (entryIterator.hasNext()) {
                 SVNLogEntryPath currentPath = (SVNLogEntryPath) entryIterator.next();
+                
+                //attribute values for the new fileIdentifier
                 String filePath = currentPath.getPath();
+                boolean deleted = false;
                 if (currentPath.getType() == 'D') { //The file has been deleted
-                    FileDto deletedFile = new FileDto();
-                    deletedFile.setDeleted(true);
-                    deletedFile.setFilePath(filePath);
-                    files.add(deletedFile);
-                } else {
-                    FileDto changedFile = getFileForFilePath(filePath);
-
-                    if (changedFile != null) {
-                        LOG.info("Add file to indexing list: " + changedFile.getFilePath());
-                        files.add(changedFile);
-                    } else {
-                        LOG.info("File "+ filePath + " has not been added since it has been removed from the repository");
-                    }
+                    deleted = true;
                 }
+                
+                identifiers.add(new FileIdentifier(filePath, false, deleted, repository));
+                LOG.info("Add file to indexing list: " + filePath);
+
             }
         }
-        return files;
+        return identifiers;
     }
 
     /**{@inheritDoc }*/
@@ -198,6 +178,39 @@ public class SubversionPlugin implements VersionControlPlugin {
     @Override
     public void setCacheDirectory(String directoryPath) {
         // Does not need local cache directory.
+    }
+
+    private void establishConnectionToRepo() throws VersionControlPluginException {
+        if (repository == null) {
+            throw new VersionControlPluginException("No repository specified, you need to specify a repository before calling the validate method");
+        }
+        try {
+            SVNURL svnurl = SVNURL.parseURIDecoded(repository.getUrl().toString());
+            svnRepo = SVNRepositoryFactory.create(svnurl);
+            AuthenticationType type = repository.getUsedAuthentication();
+
+            if (type instanceof NoAuthentication) {
+                //Nothing needs to be done
+            } else if (type instanceof BasicAuthentication) {
+                BasicAuthentication basicAuth = (BasicAuthentication) type;
+                authManager = new BasicAuthenticationManager(basicAuth.getUsername(), basicAuth.getPassword());
+                svnRepo.setAuthenticationManager(authManager);
+            } else {
+                //TODO add support for ssh files
+                throw new VersionControlPluginException("SSH authentication not yet supported.");
+            }
+        } catch (SVNException ex) {
+            throw new VersionControlPluginException("Connection to specified repository could not be established:\n" + ex);
+        }
+    }
+
+    @Override
+    public void validate() throws ValidationException {
+        try {
+            establishConnectionToRepo();
+        } catch (VersionControlPluginException ex) {
+            throw new ValidationException("Connection to repository could not be established:\n" + ex);
+        }
     }
 
     private class ListDirectoryDirEntryHandler implements ISVNDirEntryHandler {

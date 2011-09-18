@@ -27,13 +27,19 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.codesearch.commons.configuration.xml.dto.IndexerUserDto;
 import org.codesearch.commons.configuration.xml.dto.JobDto;
 import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
+import org.codesearch.commons.validator.ValidationException;
 
 /**
  * Provides access to the program configuration.
  * @author Samuel Kogler
  */
 public interface ConfigurationReader {
-
+ 
+    /**
+     * validates if the configuration is usable
+     */
+    void validateConfiguration() throws ValidationException;
+    
     /**
      * returns all users authorized to access the indexer via the web interface
      * @return the users as a list of IndexerUserDto
