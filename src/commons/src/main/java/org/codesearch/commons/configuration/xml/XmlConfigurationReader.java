@@ -39,7 +39,6 @@ import org.codesearch.commons.plugins.vcs.BasicAuthentication;
 import org.codesearch.commons.plugins.vcs.NoAuthentication;
 import org.codesearch.commons.plugins.vcs.SshAuthentication;
 import org.codesearch.commons.validator.ValidationException;
-import org.codesearch.commons.validator.XmlConfigurationValidator;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -263,12 +262,5 @@ public class XmlConfigurationReader implements ConfigurationReader {
             }
         }
         return repos;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void validateConfiguration() throws ValidationException {
-        new XmlConfigurationValidator(this.config).validateConfiguration();
-
     }
 }
