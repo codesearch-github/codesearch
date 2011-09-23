@@ -76,13 +76,7 @@ public class BazaarPluginTest {
      */
     //@Test
     public void testGetFileContentForFilePath() throws Exception {
-        LOG.info("getFileContentForFilePath");
-        String filePath = "/TODO";
-        byte[] result = plugin.getFileForFilePath(filePath).getContent();
-        boolean content = false;
-        if(result != null)
-            content = true;
-        assertTrue(content);
+//TODO
     }
 
     /**

@@ -99,28 +99,25 @@ public class XmlConfigurationReader implements ConfigurationReader {
         List<HierarchicalConfiguration> jobConfig = config.configurationsAt(XmlConfigurationReaderConstants.INDEX_JOB);
         for (HierarchicalConfiguration hc : jobConfig) {
             //reads job specific values and adds them to the JobDto
+            JobDto job = new JobDto();
+            String cronExpression;
             try {
-                JobDto job = new JobDto();
-                String cronExpression;
-                try {
-                    cronExpression = hc.getString(XmlConfigurationReaderConstants.JOB_CRON_EXPRESSION);
-                } catch (NoSuchElementException ex) {
-                    //in case no interval was specified the job is set to execute only once
-                    cronExpression = "";
-                }
-
-                job.setCronExpression(cronExpression);
-
-                String repositoryString = hc.getString(XmlConfigurationReaderConstants.JOB_REPOSITORY);
-                //The list of repositories this job is associated with, each task specified in the configuration is created for each of these repositories
-                List<RepositoryDto> repositoriesForJob = getRepositoryDtosForString(repositoryString);
-                job.setRepositories(repositoriesForJob);
-                boolean clearIndex = hc.getBoolean(XmlConfigurationReaderConstants.JOB_CLEAR);
-                job.setClearIndex(clearIndex);
-                jobs.add(job);
-            } catch (NullPointerException ex) {
-                return jobs;
+                cronExpression = hc.getString(XmlConfigurationReaderConstants.JOB_CRON_EXPRESSION);
+            } catch (NoSuchElementException ex) {
+                //in case no interval was specified the job is set to execute only once
+                cronExpression = "";
             }
+
+            job.setCronExpression(cronExpression);
+
+            String repositoryString = hc.getString(XmlConfigurationReaderConstants.JOB_REPOSITORY);
+            //The list of repositories this job is associated with, each task specified in the configuration is created for each of these repositories
+            List<RepositoryDto> repositoriesForJob = getRepositoryDtosForString(repositoryString);
+            job.setRepositories(repositoriesForJob);
+            boolean clearIndex = hc.getBoolean(XmlConfigurationReaderConstants.JOB_CLEAR);
+            job.setClearIndex(clearIndex);
+            jobs.add(job);
+
         }
         return jobs;
     }
@@ -272,6 +269,6 @@ public class XmlConfigurationReader implements ConfigurationReader {
     @Override
     public void validateConfiguration() throws ValidationException {
         new XmlConfigurationValidator(this.config).validateConfiguration();
-        
+
     }
 }

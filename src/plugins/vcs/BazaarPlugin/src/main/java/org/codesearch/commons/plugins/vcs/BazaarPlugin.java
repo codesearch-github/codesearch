@@ -35,6 +35,7 @@ import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+import org.codesearch.commons.validator.ValidationException;
 import org.vcs.bazaar.client.BazaarClientFactory;
 import org.vcs.bazaar.client.BazaarRevision;
 import org.vcs.bazaar.client.BazaarStatusKind;
@@ -57,6 +58,7 @@ public class BazaarPlugin implements VersionControlPlugin {
     private File cacheDirectory = new File("/tmp/codesearch/bzr/");
     private BranchLocation branchLocation;
     private File branchDirectory;
+    private RepositoryDto repository;
 
     /**
      * Creates a new instance of the BazaarPlugin
@@ -76,6 +78,7 @@ public class BazaarPlugin implements VersionControlPlugin {
     /** {@inheritDoc} */
     @Override
     public void setRepository(RepositoryDto repo) throws VersionControlPluginException {
+        this.repository = repo;
         try {
             branchLocation = new BranchLocation(repo.getUrl());
             branchDirectory = new File(cacheDirectory.getAbsolutePath() + "/" + repo.getName());
@@ -111,14 +114,14 @@ public class BazaarPlugin implements VersionControlPlugin {
 
     /** {@inheritDoc} */
     @Override
-    public FileDto getFileForFilePath(String filePath) throws VersionControlPluginException {
+    public FileDto getFileDtoForFileIdentifier(FileIdentifier identifier) throws VersionControlPluginException {
         try {
             int revisionNumber = Integer.parseInt(getRepositoryRevision());
-            LOG.debug("Retrieving revision " + revisionNumber + " of file: " + filePath);
+            LOG.debug("Retrieving revision " + revisionNumber + " of file: " + identifier.getFilePath());
 
             BazaarRevision bRevision = BazaarRevision.getRevision(revisionNumber);
-            InputStream in = bazaarClient.cat(new File(filePath), bRevision);
-            return new FileDto(filePath, IOUtils.toByteArray(in), true);
+            InputStream in = bazaarClient.cat(new File(identifier.getFilePath()), bRevision);
+            return new FileDto(identifier.getFilePath(), "<unknown>", "<unknown>", IOUtils.toByteArray(in), repository, true);
         } catch (BazaarClientException ex) {
             throw new VersionControlPluginException(ex.toString());
         } catch (IOException ex) {
@@ -128,33 +131,27 @@ public class BazaarPlugin implements VersionControlPlugin {
 
     /** {@inheritDoc} */
     @Override
-    public Set<FileDto> getChangedFilesSinceRevision(String revision) throws VersionControlPluginException {
+    public Set<FileIdentifier> getChangedFilesSinceRevision(String revision) throws VersionControlPluginException {
         try {
             LOG.info("Getting changes since revision " + revision + " for repository at " + branchDirectory);
-            Set<FileDto> files = new HashSet<FileDto>();
+            Set<FileIdentifier> files = new HashSet();
             List<IBazaarLogMessage> iblm = getChangesSinceRevison(revision);
             LOG.info(iblm.size() + " new revisions");
             for (IBazaarLogMessage log : iblm) {
                 LOG.debug("Getting changes for revision: " + log.getRevision());
                 for (IBazaarStatus bs : log.getAffectedFiles(true)) {
                     LOG.debug("File " + bs.getPath() + " has status: " + bs.getShortStatus());
-
+                    String filePath = "<not set>";
+                    boolean deleted = false;
                     if (bs.contains(BazaarStatusKind.CREATED) || bs.contains(BazaarStatusKind.MODIFIED)) {
-                        LOG.debug("File changed: " + bs.getPath());
-                        files.add(getFileForFilePath(bs.getPath()));
+                        filePath = bs.getPath();
                     } else if (bs.contains(BazaarStatusKind.RENAMED)) {
-                        LOG.debug("File moved: " + bs.getPreviousPath() + " => " + bs.getPath());
-                        FileDto file = new FileDto();
-                        file.setFilePath(bs.getPreviousPath());
-                        file.setDeleted(true);
-                        files.add(file);
-                        files.add(getFileForFilePath(bs.getPath()));
+                        filePath = bs.getPreviousPath();
                     } else if (bs.contains(BazaarStatusKind.DELETED)) {
-                        LOG.debug("File deleted: " + bs.getFile().getPath());
-                        FileDto file = new FileDto();
-                        file.setFilePath(bs.getFile().getPath());
-                        file.setDeleted(true);
-                    }
+                         filePath = bs.getFile().getPath();
+                    } 
+                    //assume all files are not binary
+                    files.add(new FileIdentifier(filePath, false, deleted, repository));
                 }
             }
             return files;
@@ -222,5 +219,10 @@ public class BazaarPlugin implements VersionControlPlugin {
         if (!cacheDirectory.isDirectory() && cacheDirectory.canWrite()) {
             throw new VersionControlPluginException("Invalid cache directory specified: " + directoryPath);
         }
+    }
+
+    @Override
+    public void validate() throws ValidationException {
+        //TODO add validation logic
     }
 }

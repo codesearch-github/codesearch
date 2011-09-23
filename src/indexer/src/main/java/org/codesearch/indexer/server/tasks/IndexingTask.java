@@ -67,6 +67,8 @@ import org.codesearch.indexer.server.exceptions.TaskExecutionException;
 import org.codesearch.indexer.server.manager.IndexingJob;
 
 import com.google.inject.Inject;
+import java.util.ConcurrentModificationException;
+import java.util.Iterator;
 import org.codesearch.commons.plugins.vcs.FileDto;
 
 /**
@@ -155,9 +157,7 @@ public class IndexingTask implements Task {
                         // clear the index of the old verions of the files
                         deleteFilesFromIndex(changedFiles);
                         if (repository.isCodeNavigationEnabled()) {
-
                             deleteFilesFromDatabase(changedFiles);
-
                         }
                         // check whether the changed files should be indexed
                         removeNotToBeIndexedFiles(changedFiles);
@@ -170,16 +170,16 @@ public class IndexingTask implements Task {
                                 if (repository.isCodeNavigationEnabled()) {
                                     LOG.info("Starting code analyzing");
                                     start = System.currentTimeMillis();
+                                    String lastAnalysisRevision = dba.getLastAnalyzedRevisionOfRepository(repository.getName());
+                                    if (!lastAnalysisRevision.equals(lastIndexedRevision)) {
+                                        throw new TaskExecutionException("The code informaiton in the database is not at the same revision as the regular indexed information\n"
+                                                + "The index of the repository must be cleared via a ClearTask");
+                                    }
+                                    executeCodeAnalysisForFile(currentDto);
+                                    dba.setLastAnalyzedRevisionOfRepository(repository.getName(), versionControlPlugin.getRepositoryRevision());
+                                    duration = System.currentTimeMillis() - start;
+                                    LOG.info("Code analyzing took " + duration / 1000 + " seconds");
                                 }
-                                String lastAnalysisRevision = dba.getLastAnalyzedRevisionOfRepository(repository.getName());
-                                if (!lastAnalysisRevision.equals(lastIndexedRevision)) {
-                                    throw new TaskExecutionException("The code informaiton in the database is not at the same revision as the regular indexed information\n"
-                                            + "The index of the repository must be cleared via a ClearTask");
-                                }
-                                executeCodeAnalysisForFile(currentDto);
-                                dba.setLastAnalyzedRevisionOfRepository(repository.getName(), versionControlPlugin.getRepositoryRevision());
-                                duration = System.currentTimeMillis() - start;
-                                LOG.info("Code analyzing took " + duration / 1000 + " seconds");
                             } catch (CodeAnalyzerPluginException ex) {
                                 LOG.error("Code analyzing failed, skipping file\n" + ex);
                                 //in case either of those exceptions occurs try to keep indexing the remaining files
@@ -249,9 +249,11 @@ public class IndexingTask implements Task {
      * @param fileIdentifiers 
      */
     private void removeNotToBeIndexedFiles(Set<FileIdentifier> fileIdentifiers) {
-        for (FileIdentifier currentFile : fileIdentifiers) {
+        Iterator<FileIdentifier> iter = fileIdentifiers.iterator();
+        FileIdentifier currentFile = iter.next();
+        for (; iter.hasNext(); currentFile = iter.next()) {
             if ((currentFile.isDeleted()) || (!shouldFileBeIndexed(currentFile))) {
-                fileIdentifiers.remove(currentFile);
+                iter.remove();
             }
         }
     }
@@ -336,23 +338,11 @@ public class IndexingTask implements Task {
         }
 
         PerFieldAnalyzerWrapper analyzer = new PerFieldAnalyzerWrapper(new SimpleAnalyzer(IndexConstants.LUCENE_VERSION));
-
-
-
-
-
-
         try {
             for (LuceneFieldPlugin currentPlugin : pluginLoader.getMultiplePluginsForPurpose(LuceneFieldPlugin.class, "lucene_field_plugin")) {
                 luceneFieldPlugins.add(currentPlugin);
 
                 analyzer.addAnalyzer(currentPlugin.getFieldName(), currentPlugin.getRegularCaseAnalyzer());
-
-
-
-
-
-
                 if (currentPlugin.addLowercase()) {
                     analyzer.addAnalyzer(currentPlugin.getFieldName() + "_lc", currentPlugin.getLowerCaseAnalyzer());
                 }
