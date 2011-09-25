@@ -21,8 +21,6 @@
 
 package org.codesearch.indexer.client.ui.dashboard;
 
-import java.util.List;
-
 import org.codesearch.indexer.shared.JobStatus;
 
 import com.google.gwt.event.dom.client.HasClickHandlers;

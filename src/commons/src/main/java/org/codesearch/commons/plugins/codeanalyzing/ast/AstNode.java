@@ -29,6 +29,8 @@ import java.util.List;
  */
 public abstract class AstNode implements Serializable, Comparable<AstNode> {
 
+    /** . */
+    private static final long serialVersionUID = -5265705991596746163L;
     protected int startLine;
     protected int startPositionInLine;
     protected int startPositionAbsolute;

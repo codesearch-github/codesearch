@@ -17,6 +17,7 @@ package org.codesearch.indexer.server.tasks;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -44,8 +45,8 @@ import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.store.FSDirectory;
+import org.codesearch.commons.configuration.dto.RepositoryDto;
 import org.codesearch.commons.configuration.properties.PropertiesManager;
-import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 import org.codesearch.commons.constants.IndexConstants;
 import org.codesearch.commons.database.DBAccess;
 import org.codesearch.commons.database.DatabaseAccessException;
@@ -92,7 +93,7 @@ public class IndexingTask implements Task {
     /** The used PropertyReader */
     private PropertiesManager propertiesManager;
     /** the location of the lucene index */
-    private String indexLocation = null;
+    private File indexLocation = null;
     /** the plugins that will be used to create the fields for each document */
     private List<LuceneFieldPlugin> luceneFieldPlugins = new LinkedList<LuceneFieldPlugin>();
     /** The database access object */
@@ -100,12 +101,12 @@ public class IndexingTask implements Task {
     /** The plugin loader. */
     private PluginLoader pluginLoader;
     /** The URI that is called to update the searcher application. */
-    private String searcherUpdatePath;
+    private URI searcherUpdatePath;
     /** The parent {@link IndexingJob}. */
     private IndexingJob job;
 
     @Inject
-    public IndexingTask(DBAccess dba, PluginLoader pluginLoader, String searcherUpdatePath) {
+    public IndexingTask(DBAccess dba, PluginLoader pluginLoader, URI searcherUpdatePath) {
         this.searcherUpdatePath = searcherUpdatePath;
         this.dba = dba;
         this.pluginLoader = pluginLoader;
@@ -117,7 +118,7 @@ public class IndexingTask implements Task {
     }
 
     @Override
-    public void setIndexLocation(String indexLocation) {
+    public void setIndexLocation(File indexLocation) {
         this.indexLocation = indexLocation;
     }
 
@@ -264,8 +265,8 @@ public class IndexingTask implements Task {
      * @throws NotifySearcherException in case the connection to the searcher could not be established
      */
     private void notifySearcher() throws NotifySearcherException {
-        try {
-            URL url = new URL(searcherUpdatePath);
+        try {           
+            URL url = searcherUpdatePath.toURL();
             url.openStream();
         } catch (IOException ex) {
             throw new NotifySearcherException("Could not connect to searcher at the configured address: " + searcherUpdatePath + "\n"
@@ -330,9 +331,8 @@ public class IndexingTask implements Task {
      */
     private void init() throws InvalidIndexLocationException {
         propertiesManager = new PropertiesManager(indexLocation + IndexConstants.REVISIONS_PROPERTY_FILENAME);
-        File dir = new File(indexLocation);
         try {
-            indexDirectory = FSDirectory.open(dir);
+            indexDirectory = FSDirectory.open(indexLocation);
         } catch (IOException ex) {
             throw new InvalidIndexLocationException("Cannot access index directory at: " + indexLocation);
         }
@@ -353,7 +353,7 @@ public class IndexingTask implements Task {
         try {
             IndexWriterConfig config = new IndexWriterConfig(IndexConstants.LUCENE_VERSION, analyzer);
             indexWriter = new IndexWriter(indexDirectory, config);
-            LOG.debug("IndexWriter initialization successful: " + dir.getAbsolutePath());
+            LOG.debug("IndexWriter initialization successful: " + indexLocation.getAbsolutePath());
         } catch (IOException ex) {
             LOG.error("IndexWriter initialization error: " + ex);
         }

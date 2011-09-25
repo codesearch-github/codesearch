@@ -20,7 +20,7 @@
  */
 package org.codesearch.commons.plugins.vcs;
 
-import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
+import org.codesearch.commons.configuration.dto.RepositoryDto;
 
 /**
  * stores information about a specific file in a repository
@@ -36,12 +36,20 @@ public class FileIdentifier {
     private boolean deleted;
     private RepositoryDto repository;
 
-    
-    
+    public FileIdentifier() {
+    }
+
+    public FileIdentifier(String filePath, boolean binary, boolean deleted, RepositoryDto repository) {
+        this.filePath = filePath;
+        this.binary = binary;
+        this.deleted = deleted;
+        this.repository = repository;
+    }
+
     public RepositoryDto getRepository(){
         return repository;
     }
-    
+
     /** determines if the file has been deleted since the last indexing process
      * is handed to the IndexerTask so all database entries and lucene fields associated to the file get purged
      */
@@ -57,13 +65,19 @@ public class FileIdentifier {
         return binary;
     }
 
-    public FileIdentifier() {
+    public void setBinary(boolean binary) {
+        this.binary = binary;
     }
 
-    public FileIdentifier(String filePath, boolean binary, boolean deleted, RepositoryDto repository) {
-        this.filePath = filePath;
-        this.binary = binary;
+    public void setDeleted(boolean deleted) {
         this.deleted = deleted;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
+    }
+
+    public void setRepository(RepositoryDto repository) {
         this.repository = repository;
     }
 

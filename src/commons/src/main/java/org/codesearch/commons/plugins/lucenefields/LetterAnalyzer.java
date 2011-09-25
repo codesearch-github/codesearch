@@ -22,6 +22,7 @@
 package org.codesearch.commons.plugins.lucenefields;
 
 import java.io.Reader;
+
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.LetterTokenizer;
 import org.apache.lucene.analysis.TokenStream;

@@ -20,6 +20,8 @@
  */
 package org.codesearch.searcher.client.ui;
 
+import org.codesearch.searcher.client.Resources;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -35,7 +37,6 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.Widget;
-import org.codesearch.searcher.client.Resources;
 
 /**
  * The container of all views. Allows to define UI that shows up everywhere.

@@ -27,6 +27,10 @@ package org.codesearch.indexer.server.exceptions;
  */
 public class InvalidIndexLocationException extends Exception {
 
+    /** . */
+    private static final long serialVersionUID = -1046835425050030526L;
+
+
     /**
      * Creates a new instance of <code>InvalidIndexLocationException</code> without detail message.
      */

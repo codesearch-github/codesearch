@@ -29,6 +29,8 @@ import java.io.Serializable;
  * @author David Froehlich
  */
 public class Usage implements Comparable<Usage>, Serializable {
+    /** . */
+    private static final long serialVersionUID = -2133513546454101221L;
     /** the length of the usage in characters */
     protected int length;
     /** the column at which the usage starts in the original file */

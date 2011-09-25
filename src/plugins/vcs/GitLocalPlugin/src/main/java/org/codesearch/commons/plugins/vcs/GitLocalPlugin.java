@@ -20,6 +20,7 @@
  */
 package org.codesearch.commons.plugins.vcs;
 
+import org.codesearch.commons.configuration.dto.NoAuthentication;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -34,7 +35,7 @@ import java.util.List;
 import java.util.Set;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
-import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
+import org.codesearch.commons.configuration.dto.RepositoryDto;
 import org.codesearch.commons.validator.ValidationException;
 
 /**
@@ -73,10 +74,10 @@ public class GitLocalPlugin implements VersionControlPlugin {
 
         if (branchDirectory.isDirectory()) {
             LOG.info("It seems repository " + repo.getName() + " is already cloned locally, trying to pull new changes...");
-            try { 
+            try {
                 executeGitCommand("pull");
                 return;
-            } catch(VersionControlPluginException ex) {
+            } catch (VersionControlPluginException ex) {
                 LOG.warn("Existent directory not a valid git repository, removing...");
             }
         }
@@ -93,16 +94,16 @@ public class GitLocalPlugin implements VersionControlPlugin {
 
     /** {@inheritDoc} */
     @Override
-    public FileDto getFileForFilePath(String filePath) throws VersionControlPluginException {
-        byte[] fileContent = executeGitCommand("show", "HEAD:" + filePath);
-        String[] logEntry = new String(executeGitCommand("log", "-1", "--pretty=\"format:%H$$$%an\"", filePath)).split("$$$");
+    public FileDto getFileDtoForFileIdentifier(FileIdentifier fileIdentifier) throws VersionControlPluginException {
+        byte[] fileContent = executeGitCommand("show", "HEAD:" + fileIdentifier.getFilePath());
+        String[] logEntry = new String(executeGitCommand("log", "-1", "--pretty=\"format:%H$$$%an\"", fileIdentifier.getFilePath())).split("$$$");
         String lastRevision = logEntry[0];
         String lastAuthor = logEntry[1];
 
         FileDto file = new FileDto();
         file.setContent(fileContent);
         file.setRepository(currentRepository);
-        file.setFilePath(filePath);
+        file.setFilePath(fileIdentifier.getFilePath());
         file.setLastAlteration(lastRevision);
         file.setLastAuthor(lastAuthor);
         return file;
@@ -110,37 +111,40 @@ public class GitLocalPlugin implements VersionControlPlugin {
 
     /** {@inheritDoc} */
     @Override
-    public Set<FileDto> getChangedFilesSinceRevision(String revision) throws VersionControlPluginException {
-        Set<FileDto> files = new HashSet<FileDto>();
+    public Set<FileIdentifier> getChangedFilesSinceRevision(String revision) throws VersionControlPluginException {
+        Set<FileIdentifier> files = new HashSet<FileIdentifier>();
 
         if (revision.equals("0")) {
             List<String> output = bytesToStringList(executeGitCommand("ls-files"));
 
             LOG.debug(output.size() + " changed files since commit " + revision);
 
+            FileIdentifier fileIdentifier = null;
             for (String line : output) {
-                files.add(getFileForFilePath(line));
+                fileIdentifier = new FileIdentifier();
+                fileIdentifier.setFilePath(line);
+                fileIdentifier.setRepository(currentRepository);
+                files.add(fileIdentifier);
             }
         } else {
             List<String> output = bytesToStringList(executeGitCommand("diff", "--name-status"));
 
             LOG.debug(output.size() + " changed files since commit " + revision);
 
+            FileIdentifier fileIdentifier = null;
             for (String line : output) {
                 char status = line.charAt(0);
                 String path = line.substring(2);
+                fileIdentifier = new FileIdentifier();
+                fileIdentifier.setRepository(currentRepository);
+                fileIdentifier.setFilePath(path);
 
                 if (status == 'D') {
-                    FileDto f = new FileDto();
-                    f.setFilePath(path);
-                    f.setDeleted(true);
-                    files.add(f);
-                } else {
-                    files.add(getFileForFilePath(path));
+                    fileIdentifier.setDeleted(true);
                 }
+                files.add(fileIdentifier);
             }
         }
-
 
         return files;
     }
@@ -177,6 +181,19 @@ public class GitLocalPlugin implements VersionControlPlugin {
     @Override
     public String getVersion() {
         return "0.1";
+    }
+
+    @Override
+    public void setCacheDirectory(String directoryPath) throws VersionControlPluginException {
+        this.cacheDirectory = new File(directoryPath);
+        if (!cacheDirectory.isDirectory() && cacheDirectory.canWrite()) {
+            throw new VersionControlPluginException("Invalid cache directory specified: " + directoryPath);
+        }
+    }
+
+    @Override
+    public void validate() throws ValidationException {
+        //TODO add validation logic
     }
 
     private byte[] executeGitCommand(String... arguments) throws VersionControlPluginException {
@@ -254,18 +271,5 @@ public class GitLocalPlugin implements VersionControlPlugin {
         }
 
         return lines;
-    }
-
-    @Override
-    public void setCacheDirectory(String directoryPath) throws VersionControlPluginException {
-        this.cacheDirectory = new File(directoryPath);
-        if (!cacheDirectory.isDirectory() && cacheDirectory.canWrite()) {
-            throw new VersionControlPluginException("Invalid cache directory specified: " + directoryPath);
-        }
-    }
-
-    @Override
-    public void validate() throws ValidationException {
-        //TODO add validation logic
     }
 }

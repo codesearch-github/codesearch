@@ -12,38 +12,43 @@
  * 
  * You should have received a copy of the GNU General Public License along with Codesearch. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.codesearch.commons.configuration.xml.dto;
+package org.codesearch.commons.configuration.dto;
 
 import java.util.List;
-import org.apache.commons.collections.CollectionUtils;
-import org.codesearch.commons.plugins.vcs.AuthenticationType;
+
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  * DTO used to store information about a repository specified in the config.xml file
  * 
  * @author David Froehlich
  */
+@XStreamAlias("repository")
 public class RepositoryDto {
 
-    /** The name specified for the repository, stored in the <name> tag in the xml file */
+    /** The name of the repository. */
     private String name;
     /** The URL of the repository. */
     private String url;
-    /** Specifies whether the additional index will be created for the repository. */
-    private boolean codeNavigationEnabled;
     /**
      * The version control system used for this repository, (for instance SVN or Bazaar), must match the purpose attribute of the
      * corresponding version control plugin
      */
+    @XStreamAlias("version-control-system")
     private String versionControlSystem;
+    /** The authentication type used to access the files in this repository */
+    @XStreamAlias("authentication-data")
+    private AuthenticationType usedAuthentication;
+    /** Specifies whether the additional index will be created for the repository. */
+    @XStreamAlias("code-navigation-enabled")
+    private boolean codeNavigationEnabled;
     /** A list of file name patterns that the files that will be indexed have to match (every file has to match at least one of the entries */
     private List<String> whitelistEntries;
     /** A list of all file names (in regex) that will not be indexed in this repository */
     private List<String> blacklistEntries;
     /** A list of repository groups this repositorie belongs to */
+    @XStreamAlias("repository-groups")
     private List<String> repositoryGroups;
-    /** The authentication type used to access the files in this repository */
-    private AuthenticationType usedAuthentication;
 
     public RepositoryDto() {
     }

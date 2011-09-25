@@ -4,7 +4,9 @@
  */
 package org.codesearch.commons.plugins.vcs;
 
-import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
+import org.codesearch.commons.configuration.dto.NoAuthentication;
+import org.codesearch.commons.configuration.dto.RepositoryDto;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -48,13 +50,16 @@ public class GitLocalPluginTest {
     }
 
     /**
-     * Test of getFileForFilePath method, of class GitLocalPlugin.
+     * Test of getFileDtoForFileIdentifier method, of class GitLocalPlugin.
      */
     @Test
-    public void testGetFileForFilePath() throws Exception {
-        System.out.println("getFileForFilePath");
-        String filePath = "LICENSE";
-        FileIdentifier result = plugin.getFileForFilePath(filePath);
+    public void testGetFileDtoForFileIdentifier() throws Exception {
+        System.out.println("getFileDtoForFileIdentifier");
+        FileIdentifier fileIdentifier = new FileIdentifier();
+        fileIdentifier.setFilePath("LICENSE");
+        fileIdentifier.setRepository(getTestRepo());
+
+        FileDto result = plugin.getFileDtoForFileIdentifier(fileIdentifier);
 
         System.out.println("File path: " + result.getFilePath());
         System.out.println("Binary: " + result.isBinary());

@@ -21,18 +21,16 @@
 package org.codesearch.commons.configuration.xml;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.codesearch.commons.configuration.ConfigurationReader;
-import org.codesearch.commons.configuration.xml.dto.IndexingTaskType;
-import org.codesearch.commons.configuration.xml.dto.JobDto;
-import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
-import org.codesearch.commons.plugins.vcs.BasicAuthentication;
-import org.codesearch.commons.plugins.vcs.NoAuthentication;
+import org.codesearch.commons.configuration.InvalidConfigurationException;
+import org.codesearch.commons.configuration.dto.JobDto;
+import org.codesearch.commons.configuration.dto.NoAuthentication;
+import org.codesearch.commons.configuration.dto.RepositoryDto;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -44,7 +42,7 @@ public class XmlConfigurationReaderTest {
     }
 
     @Before
-    public void setUp() {
+    public void setUp() throws InvalidConfigurationException {
         configReader = new XmlConfigurationReader("");
     }
 
@@ -52,7 +50,7 @@ public class XmlConfigurationReaderTest {
     public void testGetRepositories() throws Exception {
         RepositoryDto repo1 = getTestRepo();
 
-        List result = configReader.getRepositories();
+        List<RepositoryDto> result = configReader.getRepositories();
         assert (repo1.equals(result.get(0)));
     }
 
@@ -74,14 +72,6 @@ public class XmlConfigurationReaderTest {
     }
 
     @Test
-    public void testGetValue() throws Exception {
-        String key = "testproperty";
-        String expResult = "asdf";
-        String result = configReader.getValue(key);
-        assertEquals(expResult, result);
-    }
-
-    @Test
     public void testGetJobs() throws ConfigurationException {
         RepositoryDto repo1 = getTestRepo();
         System.out.println(repo1.getBlacklistEntries());
@@ -90,6 +80,9 @@ public class XmlConfigurationReaderTest {
         job1.setCronExpression("0 * * * * ?");
 
         List<JobDto> result = configReader.getJobs();
+        for (JobDto jobDto : result) {
+            System.out.println(jobDto.getRepositories());
+        }
         assert (result.get(0).equals(job1));
     }
 
@@ -98,17 +91,5 @@ public class XmlConfigurationReaderTest {
         RepositoryDto repo1 = getTestRepo();
         RepositoryDto repo2 = configReader.getRepositoryByName("jdownloader-repo");
         assertEquals(repo1, repo2);
-    }
-
-    @Test
-    public void testGetValueList() throws Exception {
-        List<String> expResult = new LinkedList<String>();
-        expResult.add("1");
-        expResult.add("2");
-        expResult.add("3");
-        List<String> result = configReader.getValueList("listTest");
-        assertEquals(expResult.get(0), result.get(0));
-        assertEquals(expResult.get(1), result.get(1));
-        assertEquals(expResult.get(2), result.get(2));
     }
 }

@@ -50,7 +50,7 @@ public class QuartzGuiceJobFactory implements JobFactory{
     @Override
     public Job newJob(TriggerFiredBundle tfb, Scheduler s) throws SchedulerException {
         JobDetail jd = tfb.getJobDetail();
-        return (Job) injector.getInstance(jd.getJobClass());
+        return injector.getInstance(jd.getJobClass());
     }
 
 }

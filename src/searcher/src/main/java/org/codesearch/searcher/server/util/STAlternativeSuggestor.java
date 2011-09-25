@@ -23,6 +23,7 @@ package org.codesearch.searcher.server.util;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.spell.Dictionary;
 import org.apache.lucene.search.spell.LuceneDictionary;

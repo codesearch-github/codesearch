@@ -32,6 +32,9 @@ package org.codesearch.commons.database;
  */
 public class DatabaseAccessException extends Exception {
 
+    /** . */
+    private static final long serialVersionUID = -4171498123856144167L;
+
     public DatabaseAccessException(String string) {
         super(string);
     }

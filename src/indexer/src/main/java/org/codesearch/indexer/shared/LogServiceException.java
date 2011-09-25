@@ -9,6 +9,9 @@ package org.codesearch.indexer.shared;
  */
 public class LogServiceException extends Exception {
 
+    /** . */
+    private static final long serialVersionUID = 5478204580908243801L;
+
     /**
      * 
      */

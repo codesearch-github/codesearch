@@ -25,8 +25,8 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.LockObtainFailedException;
+import org.codesearch.commons.configuration.dto.RepositoryDto;
 import org.codesearch.commons.configuration.properties.PropertiesManager;
-import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 import org.codesearch.commons.constants.IndexConstants;
 import org.codesearch.commons.database.DBAccess;
 import org.codesearch.commons.database.DatabaseAccessException;
@@ -46,7 +46,7 @@ public class ClearTask implements Task {
     /** Logger */
     private static final Logger LOG = Logger.getLogger(ClearTask.class);
     /** the location of the index */
-    private String indexLocation;
+    private File indexLocation;
     /** the repository to clear */
     private List<RepositoryDto> repositories;
     /** The database access object */
@@ -68,10 +68,9 @@ public class ClearTask implements Task {
     public void execute() throws TaskExecutionException {
         if (repositories == null || repositories.isEmpty()) { // Clear the whole index
             LOG.info("Clearing the whole index");
-            File indexDir = new File(indexLocation);
             boolean deleteSuccess = true;
-            if (indexDir.listFiles() != null) {
-                for (File f : indexDir.listFiles()) {
+            if (indexLocation.listFiles() != null) {
+                for (File f : indexLocation.listFiles()) {
                     if (!f.delete()) {
                         LOG.error("Could not delete file: " + f.getName());
                         deleteSuccess = false;
@@ -97,8 +96,7 @@ public class ClearTask implements Task {
             LOG.info("Clearing index for repositories: " + repos.toString().trim());
             IndexSearcher searcher = null;
             try {
-                File indexDir = new File(indexLocation);
-                FSDirectory fsd = FSDirectory.open(indexDir);
+                FSDirectory fsd = FSDirectory.open(indexLocation);
                 searcher = new IndexSearcher(fsd, false);
 
                 int index = 0;
@@ -157,7 +155,7 @@ public class ClearTask implements Task {
     }
 
     @Override
-    public void setIndexLocation(String indexLocation) {
+    public void setIndexLocation(File indexLocation) {
         this.indexLocation = indexLocation;
     }
 

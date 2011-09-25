@@ -20,9 +20,10 @@
  */
 package org.codesearch.indexer.server.tasks;
 
+import java.io.File;
 import java.util.List;
 
-import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
+import org.codesearch.commons.configuration.dto.RepositoryDto;
 import org.codesearch.indexer.server.exceptions.TaskExecutionException;
 import org.codesearch.indexer.server.manager.IndexingJob;
 
@@ -49,7 +50,7 @@ public interface Task {
      * Sets the location of the index.
      * @param indexLocation The index location
      */
-    void setIndexLocation(String indexLocation);
+    void setIndexLocation(File indexLocation);
     
     
     /**

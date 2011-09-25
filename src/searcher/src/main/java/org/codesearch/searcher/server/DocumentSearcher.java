@@ -29,6 +29,7 @@ package org.codesearch.searcher.server;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
+
 import org.apache.lucene.queryParser.ParseException;
 import org.codesearch.searcher.shared.SearchResultDto;
 
@@ -54,7 +55,7 @@ public interface DocumentSearcher {
      */
     List<SearchResultDto> search(String searchString, boolean caseSensitive, Set<String> repositoryNames, Set<String> repositoryGroupNames, int maxResults) throws ParseException, IOException, InvalidIndexException;
 
-    List<String> suggestSearchNames(String searchString, boolean caseSensitive, Set<String> repositoryNames, Set<String> repositoryGroupNames) throws ParseException, IOException, InvalidIndexException;
+//    List<String> suggestSearchNames(String searchString, boolean caseSensitive, Set<String> repositoryNames, Set<String> repositoryGroupNames) throws ParseException, IOException, InvalidIndexException;
 
     void refreshIndex() throws InvalidIndexException;
 }

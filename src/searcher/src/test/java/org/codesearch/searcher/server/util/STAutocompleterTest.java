@@ -25,11 +25,13 @@
  */
 package org.codesearch.searcher.server.util;
 
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import org.apache.log4j.Logger;
 
+import org.apache.log4j.Logger;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.junit.After;
@@ -37,7 +39,6 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  *

@@ -22,10 +22,10 @@
 package org.codesearch.searcher.client;
 
 import org.codesearch.searcher.client.ui.fileview.FilePlace;
+import org.codesearch.searcher.client.ui.searchview.SearchPlace;
 
 import com.google.gwt.place.shared.PlaceHistoryMapper;
 import com.google.gwt.place.shared.WithTokenizers;
-import org.codesearch.searcher.client.ui.searchview.SearchPlace;
 
 /**
  * Manages history tokens throughout the searcher.

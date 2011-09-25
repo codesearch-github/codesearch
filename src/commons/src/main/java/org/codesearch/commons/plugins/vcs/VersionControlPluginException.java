@@ -27,6 +27,10 @@ package org.codesearch.commons.plugins.vcs;
  */
 public class VersionControlPluginException extends Exception {
 
+    /** . */
+    private static final long serialVersionUID = 2573404095564788674L;
+
+
     /**
      * Creates a new instance of <code>VersionControlPluginException</code> without detail message.
      */

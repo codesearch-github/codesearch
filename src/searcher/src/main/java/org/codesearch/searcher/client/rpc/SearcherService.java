@@ -22,15 +22,15 @@
 package org.codesearch.searcher.client.rpc;
 
 import java.util.List;
+import java.util.Set;
 
 import org.codesearch.searcher.shared.FileDto;
-import org.codesearch.searcher.shared.SearcherServiceException;
 import org.codesearch.searcher.shared.SearchResultDto;
+import org.codesearch.searcher.shared.SearchType;
+import org.codesearch.searcher.shared.SearcherServiceException;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
-import java.util.Set;
-import org.codesearch.searcher.shared.SearchType;
 
 /**
  * The service used for communication between the GWT javascript client and the server.

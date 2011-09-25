@@ -32,6 +32,9 @@ package org.codesearch.commons.database;
  */
 public class DatabaseEntryNotFoundException extends Exception{
 
+    /** . */
+    private static final long serialVersionUID = 6126646400298529635L;
+
     public DatabaseEntryNotFoundException(String msg) {
         super(msg);
     }

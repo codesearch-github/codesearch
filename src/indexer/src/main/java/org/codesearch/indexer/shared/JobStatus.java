@@ -21,7 +21,10 @@ import java.util.Date;
  */
 public class JobStatus implements Serializable {
 
-	/**
+	/** . */
+    private static final long serialVersionUID = -4303740745569729444L;
+
+    /**
 	 * The different possible values for the status.
 	 */
 	public enum Status {

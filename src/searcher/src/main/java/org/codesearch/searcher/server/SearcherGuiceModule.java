@@ -21,10 +21,11 @@
 
 package org.codesearch.searcher.server;
 
-import com.google.inject.Singleton;
-import com.google.inject.servlet.ServletModule;
 import org.codesearch.searcher.server.rpc.SearcherServiceImpl;
 import org.codesearch.searcher.server.servlets.UpdateIndexerServlet;
+
+import com.google.inject.Singleton;
+import com.google.inject.servlet.ServletModule;
 
 /**
  *

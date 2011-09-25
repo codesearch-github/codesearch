@@ -22,6 +22,8 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 public class LogServiceImpl extends RemoteServiceServlet implements LogService {
 
     /** . */
+    private static final long serialVersionUID = -3848061992960375933L;
+    /** . */
     private IndexingManager indexingManager;
 
     @Inject

@@ -19,12 +19,7 @@
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-package org.codesearch.commons.plugins.vcs;
+package org.codesearch.commons.configuration.dto;
 
 /**
  * Authentication used by the VersionControlSystem if the repository allows authentication via a username and a password.

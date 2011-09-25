@@ -40,7 +40,6 @@ public interface PluginLoader {
      * @return the plugin matching the purpose
      * @throws Exception if no plugin was found with the purpose
      */
-    @SuppressWarnings(value = "unchecked")
     <T extends Plugin> T getPlugin(final Class<T> clazz, final String purpose) throws PluginLoaderException;
 
 }

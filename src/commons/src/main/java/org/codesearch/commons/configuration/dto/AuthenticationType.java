@@ -19,7 +19,7 @@
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.codesearch.commons.plugins.vcs;
+package org.codesearch.commons.configuration.dto;
 
 /**
  * is used in VersionControlPlugins to determine which type of authentication is used

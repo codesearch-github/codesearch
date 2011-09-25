@@ -24,7 +24,7 @@
  * and open the template in the editor.
  */
 
-package org.codesearch.commons.plugins.vcs;
+package org.codesearch.commons.configuration.dto;
 
 /**
  * Authentication type used by VersionControlSystems if the repository requires SSH-authentication

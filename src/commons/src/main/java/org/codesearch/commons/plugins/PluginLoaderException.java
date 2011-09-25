@@ -27,6 +27,9 @@ package org.codesearch.commons.plugins;
  */
 public class PluginLoaderException extends Exception {
 
+    /** . */
+    private static final long serialVersionUID = -2937589067337638521L;
+
     /**
      * Creates a new instance of PluginLoaderException that calls the constructor of Exception with
      * the given value

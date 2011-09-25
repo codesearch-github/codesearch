@@ -18,9 +18,11 @@
  * You should have received a copy of the GNU General Public License
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.codesearch.commons.configuration.xml.dto;
+package org.codesearch.commons.configuration.dto;
 
 import java.util.List;
+
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  * Represents an Indexing Job.
@@ -31,8 +33,10 @@ public class JobDto {
     /** The affected repositories. */
     private List<RepositoryDto> repositories;
     /** The cron expression for the job. */
+    @XStreamAlias("cron-expression")
     private String cronExpression;
     /** whether the index will be cleared before indexing */
+    @XStreamAlias("clear")
     private boolean clearIndex;
 
     public JobDto() {

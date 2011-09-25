@@ -10,8 +10,10 @@ import java.util.List;
  * Used to bundle all the data into a single request.
  */
 public class DashboardData implements Serializable {
-
-	/** All currently running jobs. */
+    
+    /** . */
+    private static final long serialVersionUID = -7632905977656885275L;
+    /** All currently running jobs. */
 	private List<JobStatus> runningJobs;
 	/** All the jobs that are scheduled. */
 	private List<JobStatus> scheduledJobs;

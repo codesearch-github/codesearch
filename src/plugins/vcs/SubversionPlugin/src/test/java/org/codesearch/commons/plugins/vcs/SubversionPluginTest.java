@@ -24,10 +24,6 @@ package org.codesearch.commons.plugins.vcs;
 import java.util.Iterator;
 import java.util.Set;
 import org.apache.log4j.Logger;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
@@ -42,24 +38,6 @@ public class SubversionPluginTest {
     private static final Logger LOG = Logger.getLogger(SubversionPluginTest.class);
 
     public SubversionPluginTest() {
-    }
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
-
-    @Before
-    public void setUp() {
-       
-        
-    }
-
-    @After
-    public void tearDown() {
     }
 
     /**

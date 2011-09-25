@@ -4,7 +4,9 @@
  */
 package org.codesearch.commons.plugins.vcs;
 
-import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
+import java.util.List;
+
+import org.codesearch.commons.configuration.dto.RepositoryDto;
 
 /**
  *

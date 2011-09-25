@@ -35,8 +35,6 @@ import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
-import com.google.gwt.view.client.AbstractDataProvider;
-import com.google.gwt.view.client.AsyncDataProvider;
 import com.google.gwt.view.client.ListDataProvider;
 
 /**

@@ -32,6 +32,10 @@ package org.codesearch.indexer.server.exceptions;
  */
 public class JobExecutionException extends Exception {
 
+    /** . */
+    private static final long serialVersionUID = -985088845757068510L;
+
+
     /**
      * Creates a new instance of <code>JobExecutionException</code> without detail message.
      */

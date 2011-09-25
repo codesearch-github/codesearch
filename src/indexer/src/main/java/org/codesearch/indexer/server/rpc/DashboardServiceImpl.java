@@ -3,21 +3,14 @@
  */
 package org.codesearch.indexer.server.rpc;
 
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import org.codesearch.indexer.client.rpc.DashboardService;
 import org.codesearch.indexer.server.manager.IndexingManager;
 import org.codesearch.indexer.shared.DashboardData;
 import org.codesearch.indexer.shared.DashboardServiceException;
 import org.codesearch.indexer.shared.JobStatus;
-import org.quartz.JobDetail;
-import org.quartz.JobKey;
-import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
-import org.quartz.impl.matchers.GroupMatcher;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.google.inject.Inject;
@@ -30,7 +23,9 @@ import com.google.inject.Singleton;
 @Singleton
 public class DashboardServiceImpl extends RemoteServiceServlet implements DashboardService {
 	
-	/** The indexing manager used to query the job status. */
+	/** . */
+    private static final long serialVersionUID = 8656390076402009245L;
+    /** The indexing manager used to query the job status. */
 	private IndexingManager indexingManager;
 
 	@Inject

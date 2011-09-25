@@ -12,15 +12,13 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
+import org.codesearch.commons.configuration.dto.RepositoryDto;
 import org.codesearch.indexer.server.manager.IndexingJob;
 import org.codesearch.indexer.server.manager.IndexingJobTriggerListener;
 import org.junit.Test;
 import org.quartz.JobDetail;
-import org.quartz.ScheduleBuilder;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
-import org.quartz.SimpleScheduleBuilder;
 import org.quartz.Trigger;
 import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.impl.matchers.EverythingMatcher;

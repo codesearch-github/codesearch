@@ -20,9 +20,6 @@
  */
 package org.codesearch.searcher.server.rpc;
 
-import com.google.gwt.user.server.rpc.RemoteServiceServlet;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -36,8 +33,8 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.apache.lucene.queryParser.ParseException;
 import org.codesearch.commons.configuration.ConfigurationReader;
+import org.codesearch.commons.configuration.dto.RepositoryDto;
 import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
-import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 import org.codesearch.commons.database.DBAccess;
 import org.codesearch.commons.database.DatabaseAccessException;
 import org.codesearch.commons.database.DatabaseEntryNotFoundException;
@@ -48,6 +45,7 @@ import org.codesearch.commons.plugins.codeanalyzing.ast.ExternalUsage;
 import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
 import org.codesearch.commons.plugins.highlighting.HighlightingPlugin;
 import org.codesearch.commons.plugins.highlighting.HighlightingPluginException;
+import org.codesearch.commons.plugins.vcs.FileIdentifier;
 import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
 import org.codesearch.commons.plugins.vcs.VersionControlPluginException;
 import org.codesearch.commons.utils.mime.MimeTypeUtil;
@@ -55,11 +53,15 @@ import org.codesearch.searcher.client.rpc.SearcherService;
 import org.codesearch.searcher.server.DocumentSearcherImpl;
 import org.codesearch.searcher.server.InvalidIndexException;
 import org.codesearch.searcher.shared.FileDto;
-import org.codesearch.searcher.shared.SearcherServiceException;
 import org.codesearch.searcher.shared.OutlineNode;
 import org.codesearch.searcher.shared.SearchResultDto;
 import org.codesearch.searcher.shared.SearchType;
+import org.codesearch.searcher.shared.SearcherServiceException;
 import org.codesearch.searcher.shared.SidebarNode;
+
+import com.google.gwt.user.server.rpc.RemoteServiceServlet;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 /**
  * Service used for search operations.
@@ -133,7 +135,10 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
             VersionControlPlugin vcPlugin = pluginLoader.getPlugin(VersionControlPlugin.class, repositoryDto.getVersionControlSystem());
 
             vcPlugin.setRepository(repositoryDto);
-            org.codesearch.commons.plugins.vcs.FileDto vcFile = vcPlugin.getFileForFilePath(filePath);
+            FileIdentifier fileIdentifier = new FileIdentifier();
+            fileIdentifier.setFilePath(filePath);
+            fileIdentifier.setRepository(repositoryDto);
+            org.codesearch.commons.plugins.vcs.FileDto vcFile = vcPlugin.getFileDtoForFileIdentifier(fileIdentifier);
 
             // GET OUTLINE IF EXISTING
             try {

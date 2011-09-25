@@ -24,7 +24,7 @@
  * and open the template in the editor.
  */
 
-package org.codesearch.commons.configuration.xml.dto;
+package org.codesearch.commons.configuration.dto;
 
 /**
  * DTO class that stores information about a user that is authorized to use the indexer via the web interface

@@ -20,7 +20,6 @@
  */
 package org.codesearch.commons.database;
 
-import com.google.inject.Inject;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -28,7 +27,9 @@ import java.util.LinkedList;
 
 import org.apache.log4j.Logger;
 import org.codesearch.commons.configuration.ConfigurationReader;
-import org.codesearch.commons.configuration.xml.XmlConfigurationReaderConstants;
+import org.codesearch.commons.configuration.dto.DatabaseConfiguration;
+
+import com.google.inject.Inject;
 
 /**
  *
@@ -39,24 +40,12 @@ public class ConnectionPoolImpl implements ConnectionPool {
     private static Logger LOG = Logger.getLogger(ConnectionPoolImpl.class);
     private LinkedList<Connection> connections = new LinkedList<Connection>();
     private int remainingConnections = 150;
-    private String username;
-    private String password;
-    private String driver;
-    private String url;
-    private String portNumber;
-    private String dbName;
-    private String dbms;
+    private DatabaseConfiguration configuration;
 
     @Inject
     public ConnectionPoolImpl(ConfigurationReader configurationReader) {
-        this.username = configurationReader.getValue(XmlConfigurationReaderConstants.DB_USERNAME);
-        this.password = configurationReader.getValue(XmlConfigurationReaderConstants.DB_PASSWORD);
-        this.driver = configurationReader.getValue(XmlConfigurationReaderConstants.DB_DRIVER);
-        this.url = configurationReader.getValue(XmlConfigurationReaderConstants.DB_URL);
-        this.portNumber = configurationReader.getValue(XmlConfigurationReaderConstants.DB_PORT_NUMBER);
-        this.dbName = configurationReader.getValue(XmlConfigurationReaderConstants.DB_NAME);
-        this.dbms = configurationReader.getValue(XmlConfigurationReaderConstants.DBMS);
-        this.remainingConnections = Integer.parseInt(configurationReader.getValue(XmlConfigurationReaderConstants.DB_MAX_CONNECTIONS));
+        configuration = configurationReader.getDatabaseConfiguration();
+        remainingConnections = configuration.getMaxConnections();
     }
 
     /** {@inheritDoc} */
@@ -66,11 +55,11 @@ public class ConnectionPoolImpl implements ConnectionPool {
             remainingConnections--;
             if (connections.isEmpty()) {
                 try {
-                    Class.forName(driver);
-                    String connStr = "jdbc:" + dbms + "://" + url + ":" + portNumber + "/" + dbName;
+                    Class.forName(configuration.getDriver());
+                    String connStr = "jdbc:" + configuration.getProtocol() + "://" + configuration.getHostName() + ":" + configuration.getPort() + "/" + configuration.getDatabase();
                     LOG.debug("Connecting to database: " + connStr);
 
-                    Connection conn = DriverManager.getConnection(connStr, username, password);
+                    Connection conn = DriverManager.getConnection(connStr, configuration.getUsername(), configuration.getPassword());
                     return conn;
                 } catch (SQLException ex) {
                     throw new DatabaseAccessException("SQLException while trying to poll new connection\n" + ex);

@@ -23,8 +23,8 @@ package org.codesearch.commons.plugins.vcs;
 
 import java.util.List;
 import java.util.Set;
-import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 
+import org.codesearch.commons.configuration.dto.RepositoryDto;
 import org.codesearch.commons.plugins.Plugin;
 import org.codesearch.commons.validator.ValidationException;
 

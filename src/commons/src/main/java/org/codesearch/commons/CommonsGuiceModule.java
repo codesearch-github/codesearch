@@ -21,9 +21,6 @@
 
 package org.codesearch.commons;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Singleton;
-import com.google.inject.name.Names;
 import org.codesearch.commons.configuration.ConfigurationReader;
 import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
 import org.codesearch.commons.database.ConnectionPool;
@@ -32,6 +29,10 @@ import org.codesearch.commons.database.DBAccess;
 import org.codesearch.commons.database.DBAccessImpl;
 import org.codesearch.commons.plugins.PluginLoader;
 import org.codesearch.commons.plugins.PluginLoaderImpl;
+
+import com.google.inject.AbstractModule;
+import com.google.inject.Singleton;
+import com.google.inject.name.Names;
 
 /**
  * Guice module for commons. Wires everything together.

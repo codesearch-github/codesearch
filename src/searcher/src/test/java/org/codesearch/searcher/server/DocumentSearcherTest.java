@@ -29,7 +29,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-
+import org.codesearch.commons.configuration.ConfigurationReader;
+import org.codesearch.commons.configuration.InvalidConfigurationException;
 import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
 import org.junit.Test;
 
@@ -42,8 +43,9 @@ public class DocumentSearcherTest {
     private DocumentSearcherImpl instance;
 
 
-    public DocumentSearcherTest() {
-        instance = new DocumentSearcherImpl(new XmlConfigurationReader(null));
+    public DocumentSearcherTest() throws InvalidConfigurationException {
+        ConfigurationReader configurationReader = new XmlConfigurationReader(null);
+        instance = new DocumentSearcherImpl(configurationReader);
     }
 
     /**

@@ -20,24 +20,25 @@
  */
 package org.codesearch.commons.database;
 
-import com.google.inject.Inject;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.sql.Connection;
-import java.sql.Statement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
 import org.codesearch.commons.plugins.codeanalyzing.ast.ExternalUsage;
 import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
 
-import java.util.LinkedList;
+import com.google.inject.Inject;
 
 /**
  * DBUtils provides methods for access to the database specified in the configuration

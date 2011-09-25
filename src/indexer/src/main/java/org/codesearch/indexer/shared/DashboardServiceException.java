@@ -10,7 +10,10 @@ package org.codesearch.indexer.shared;
  */
 public class DashboardServiceException extends Exception {
 
-	/**
+	/** . */
+    private static final long serialVersionUID = -2617014263508638043L;
+
+    /**
 	 * 
 	 */
 	public DashboardServiceException() {

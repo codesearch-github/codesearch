@@ -31,6 +31,9 @@ package org.codesearch.commons.plugins.lucenefields;
  * @author David Froehlich
  */
 public class LuceneFieldValueException extends Exception {
+    /** . */
+    private static final long serialVersionUID = -6675798168456363105L;
+
     public LuceneFieldValueException(String message){
         super(message);
     }

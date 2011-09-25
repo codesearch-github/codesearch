@@ -26,6 +26,8 @@ package org.codesearch.commons.plugins.codeanalyzing.ast;
  * @author David Froehlich
  */
 public abstract class CompoundNode extends AstNode {
+    /** . */
+    private static final long serialVersionUID = -78751120034410241L;
     /** amount of lines in the node. */
     protected int nodeLength;
 

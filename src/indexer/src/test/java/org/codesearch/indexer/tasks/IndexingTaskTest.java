@@ -27,12 +27,12 @@ import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.codesearch.commons.configuration.ConfigurationReader;
+import org.codesearch.commons.configuration.dto.NoAuthentication;
+import org.codesearch.commons.configuration.dto.RepositoryDto;
 import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
-import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
 import org.codesearch.commons.database.DBAccess;
 import org.codesearch.commons.plugins.PluginLoader;
 import org.codesearch.commons.plugins.PluginLoaderImpl;
-import org.codesearch.commons.plugins.vcs.NoAuthentication;
 import org.codesearch.indexer.server.tasks.ClearTask;
 import org.codesearch.indexer.server.tasks.IndexingTask;
 import org.junit.Test;
@@ -45,17 +45,18 @@ import org.junit.Test;
 public class IndexingTaskTest {
 
 //    private String testIndexDir = "src/test/resources/testindex";
-    private String testIndexDir = "/tmp/test";
+    private File testIndexDir = new File("/tmp/test");
     private String testRepoDir = "src/test/resources/testrepo";
 
     public IndexingTaskTest() {
-        File f = new File(testIndexDir);
-        f.mkdir();
+        testIndexDir.mkdir();
     }
 
     @Test
     public void testExecuteLocal() throws Exception {
+        
         ConfigurationReader configReader = new XmlConfigurationReader(null);
+        
 
         PluginLoader pl = new PluginLoaderImpl(configReader);
         DBAccess dba = new MockDatabaseImpl();
@@ -77,7 +78,7 @@ public class IndexingTaskTest {
         c.setIndexLocation(testIndexDir);
         c.execute();
 
-        IndexingTask t = new IndexingTask(dba, pl, "");
+        IndexingTask t = new IndexingTask(dba, pl, null);
         t.setIndexLocation(testIndexDir);
         t.setRepositories(repos);
         t.execute();
@@ -85,9 +86,8 @@ public class IndexingTaskTest {
 
     @Test
     public void cleanup() {
-        File ti = new File(testIndexDir);
         try {
-            FileUtils.deleteDirectory(ti);
+            FileUtils.deleteDirectory(testIndexDir);
         } catch (IOException ex) {
             System.out.println("Deleting index files failed");
         }

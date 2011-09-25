@@ -31,6 +31,9 @@ package org.codesearch.commons.plugins.highlighting;
  * @author David Froehlich
  */
 public class HighlightingPluginException extends Exception{
+    /** . */
+    private static final long serialVersionUID = -7032122074929478507L;
+
     public HighlightingPluginException(){
         super();
     }

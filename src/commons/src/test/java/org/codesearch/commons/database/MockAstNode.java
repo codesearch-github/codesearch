@@ -22,6 +22,7 @@
 package org.codesearch.commons.database;
 
 import java.util.List;
+
 import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
 
 /**
@@ -29,6 +30,9 @@ import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
  * @author Samuel Kogler
  */
 public class MockAstNode extends AstNode {
+
+    /** . */
+    private static final long serialVersionUID = 51027160213228773L;
 
     @Override
     public String getOutlineName() {

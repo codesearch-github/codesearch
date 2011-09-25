@@ -31,6 +31,9 @@ package org.codesearch.commons.plugins.codeanalyzing;
  */
 public class CodeAnalyzerPluginException extends Exception {
 
+    /** . */
+    private static final long serialVersionUID = -1863362103355746782L;
+
     public CodeAnalyzerPluginException(String msg) {
         super(msg);
     }

@@ -30,6 +30,8 @@ import org.codesearch.commons.database.DatabaseAccessException;
  * @author David Froehlich
  */
 public abstract class ExternalUsage extends Usage {
+    /** . */
+    private static final long serialVersionUID = 8289970633299155779L;
     /** the name of the class holding the referenced element */
     protected String targetClassName;
     /** the path of the file containing the class with the referenced element */

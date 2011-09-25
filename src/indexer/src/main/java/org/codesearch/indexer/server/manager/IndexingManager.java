@@ -23,11 +23,10 @@ import java.util.Set;
 
 import javax.inject.Singleton;
 
-import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
 import org.codesearch.commons.configuration.ConfigurationReader;
-import org.codesearch.commons.configuration.xml.dto.JobDto;
-import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
+import org.codesearch.commons.configuration.dto.JobDto;
+import org.codesearch.commons.configuration.dto.RepositoryDto;
 import org.codesearch.indexer.shared.JobStatus;
 import org.quartz.CronScheduleBuilder;
 import org.quartz.JobBuilder;
@@ -71,8 +70,7 @@ public final class IndexingManager {
      */
     @SuppressWarnings("unchecked")
     @Inject
-    public IndexingManager(ConfigurationReader configurationReader, Scheduler scheduler, JobFactory jobFactory) throws SchedulerException,
-            ConfigurationException {
+    public IndexingManager(ConfigurationReader configurationReader, Scheduler scheduler, JobFactory jobFactory) throws SchedulerException {
         this.jobs = configurationReader.getJobs();
         this.scheduler = scheduler;
         this.historyListener = new IndexingJobHistoryListener();
@@ -90,7 +88,7 @@ public final class IndexingManager {
      * @throws SchedulerException if a job could not be added to the scheduler or if it could not be started
      * @throws ConfigurationException if the configuration could not be read
      */
-    public void start() throws SchedulerException, ConfigurationException {
+    public void start() throws SchedulerException {
         LOG.info("Starting scheduler with " + jobs.size() + " jobs");
 
         int i = 0;

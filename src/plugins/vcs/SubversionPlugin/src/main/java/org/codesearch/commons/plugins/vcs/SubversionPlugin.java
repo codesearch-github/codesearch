@@ -20,7 +20,8 @@
  */
 package org.codesearch.commons.plugins.vcs;
 
-import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
+import org.codesearch.commons.configuration.dto.BasicAuthentication;
+import org.codesearch.commons.configuration.dto.RepositoryDto;
 
 import java.io.ByteArrayOutputStream;
 import java.util.HashSet;
@@ -29,7 +30,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import org.apache.log4j.Logger;
-import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
+import org.codesearch.commons.configuration.dto.AuthenticationType;
+import org.codesearch.commons.configuration.dto.NoAuthentication;
 import org.codesearch.commons.validator.ValidationException;
 import org.tmatesoft.svn.core.ISVNDirEntryHandler;
 import org.tmatesoft.svn.core.SVNDirEntry;
@@ -137,14 +139,14 @@ public class SubversionPlugin implements VersionControlPlugin {
             Iterator entryIterator = entry.getChangedPaths().values().iterator();
             while (entryIterator.hasNext()) {
                 SVNLogEntryPath currentPath = (SVNLogEntryPath) entryIterator.next();
-                
+
                 //attribute values for the new fileIdentifier
                 String filePath = currentPath.getPath();
                 boolean deleted = false;
                 if (currentPath.getType() == 'D') { //The file has been deleted
                     deleted = true;
                 }
-                
+
                 identifiers.add(new FileIdentifier(filePath, false, deleted, repository));
                 LOG.info("Add file to indexing list: " + filePath);
 

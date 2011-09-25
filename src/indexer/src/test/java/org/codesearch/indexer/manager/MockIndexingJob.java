@@ -5,6 +5,7 @@
 package org.codesearch.indexer.manager;
 
 import java.util.Date;
+
 import org.apache.log4j.Logger;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;

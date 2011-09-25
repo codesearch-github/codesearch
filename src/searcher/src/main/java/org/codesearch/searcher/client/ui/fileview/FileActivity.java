@@ -26,6 +26,7 @@ import org.codesearch.searcher.client.rpc.SearcherService;
 import org.codesearch.searcher.client.rpc.SearcherServiceAsync;
 import org.codesearch.searcher.client.ui.fileview.FileView.Presenter;
 import org.codesearch.searcher.shared.FileDto;
+import org.codesearch.searcher.shared.SearchResultDto;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.core.client.GWT;
@@ -34,7 +35,6 @@ import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
-import org.codesearch.searcher.shared.SearchResultDto;
 
 /**
  * Presenter for the file view.

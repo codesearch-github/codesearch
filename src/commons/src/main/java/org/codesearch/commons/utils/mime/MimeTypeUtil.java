@@ -28,7 +28,6 @@ import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.codesearch.commons.utils.mime.FileType;
 
 /**
  * Utility class that provides methods to guess mime types via file endings and stores mime types of most files as

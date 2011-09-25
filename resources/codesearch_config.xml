@@ -1,23 +1,24 @@
 <root>
-    <dbms>mysql</dbms>
-    <db-username></db-username>
-    <db-password></db-password>
-    <db-driver></db-driver>
-    <db-url></db-url>
-    <db-port-number>3306</db-port-number>
-    <db-name>codesearch</db-name>
-    <db-max-connections>100</db-max-connections>
+ 	<database>
+		<hostname>127.0.0.1</hostname>
+		<port-number>3306</port-number>
+		<database-name>codesearch</database-name>
+		<protocol>mysql</protocol>
+		<driver>com.mysql.jdbc.Driver</driver>
+		<username>codesearch</username>
+		<password></password>
+		<max-connections>100</max-connections>
+	</database> 
 
     <searcher-location>http://127.0.0.1:8080/searcher/</searcher-location>
-    <version-control-cache-directory>/var/cache/codesearch/vcs/</version-control-cache-directory>
+    <cache-directory>/var/cache/codesearch/vcs/</cache-directory>
+    <index-directory>/var/index/</index-directory>
 
     <global-blacklist-filenames>
         <filename>.*\.class</filename>
         <filename>.*\.o</filename>
         <filename>.*\.bin</filename>
     </global-blacklist-filenames>
-
-    <index-location>/var/index/</index-location>
 
     <index-jobs>
         <index-job>

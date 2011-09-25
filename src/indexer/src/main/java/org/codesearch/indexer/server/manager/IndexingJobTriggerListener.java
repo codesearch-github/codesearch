@@ -22,7 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.codesearch.commons.configuration.xml.dto.RepositoryDto;
+import org.codesearch.commons.configuration.dto.RepositoryDto;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
@@ -102,7 +102,7 @@ public class IndexingJobTriggerListener extends TriggerListenerSupport implement
                     JobDetail newJobDetail = newJob(jobDetail.getJobClass()).withIdentity(jobDetail.getKey().getName(), "DELAYED_JOBS")
                             .usingJobData(jobDetail.getJobDataMap()).build();
 
-                    Trigger newTrigger = (Trigger) newTrigger().withIdentity("DELAY_BY_" + new Date().getTime(), "DELAYED_TRIGGERS")
+                    Trigger newTrigger = newTrigger().withIdentity("DELAY_BY_" + new Date().getTime(), "DELAYED_TRIGGERS")
                             .startAt(new Date(trigger.getStartTime().getTime() + this.delayTime)).forJob(newJobDetail.getKey()).build();
                     //
                     scheduler.addJob(newJobDetail, true);

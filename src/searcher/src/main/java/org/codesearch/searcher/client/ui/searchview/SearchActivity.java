@@ -21,6 +21,8 @@
 package org.codesearch.searcher.client.ui.searchview;
 
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.codesearch.searcher.client.ClientFactory;
 import org.codesearch.searcher.client.rpc.SearcherService;
@@ -34,8 +36,6 @@ import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Presenter for the search view.

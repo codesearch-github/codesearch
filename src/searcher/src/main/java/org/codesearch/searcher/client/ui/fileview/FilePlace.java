@@ -20,11 +20,12 @@
  */
 package org.codesearch.searcher.client.ui.fileview;
 
+import org.codesearch.searcher.client.ui.UIConstants;
+import org.codesearch.searcher.client.ui.UIUtils;
+
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceTokenizer;
 import com.google.gwt.place.shared.Prefix;
-import org.codesearch.searcher.client.ui.UIConstants;
-import org.codesearch.searcher.client.ui.UIUtils;
 
 /**
  * The place token used for the file view.

@@ -27,10 +27,11 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+
 import org.apache.log4j.Logger;
 
 /**
- * PropertiesManager is a class that provides several methods to access property files.
+ * Provides several methods to access property files.
  * It is a simple wrapper to the standard java Properties utility.
  * @author Stephan Stiboller
  */

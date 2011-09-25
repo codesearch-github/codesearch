@@ -20,8 +20,10 @@
  */
 package org.codesearch.searcher.client.ui.fileview;
 
+import java.util.LinkedList;
 import java.util.List;
 
+import org.codesearch.searcher.client.ClientFactory;
 import org.codesearch.searcher.client.ui.fileview.sidebar.Sidebar;
 import org.codesearch.searcher.client.ui.fileview.sidebar.SidebarImpl;
 import org.codesearch.searcher.shared.OutlineNode;
@@ -49,8 +51,6 @@ import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.SplitLayoutPanel;
 import com.google.gwt.user.client.ui.TabLayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
-import java.util.LinkedList;
-import org.codesearch.searcher.client.ClientFactory;
 
 /**
  * Implementation of the File View.

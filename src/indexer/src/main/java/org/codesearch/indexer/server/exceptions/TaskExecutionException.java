@@ -26,6 +26,9 @@ package org.codesearch.indexer.server.exceptions;
  */
 public class TaskExecutionException extends Exception {
 
+    /** . */
+    private static final long serialVersionUID = -8799474837320431051L;
+
     public TaskExecutionException(String string) {
         super(string);
     }

@@ -24,7 +24,7 @@
  * and open the template in the editor.
  */
 
-package org.codesearch.commons.plugins.vcs;
+package org.codesearch.commons.configuration.dto;
 
 /**
  * Authentication used by the VersionControlSystem to access files if no authentication is required

@@ -32,6 +32,9 @@ package org.codesearch.indexer.server.exceptions;
  */
 public class NotifySearcherException extends Exception{
 
+    /** . */
+    private static final long serialVersionUID = -332197371530468660L;
+
     public NotifySearcherException(String message) {
         super(message);
     }
