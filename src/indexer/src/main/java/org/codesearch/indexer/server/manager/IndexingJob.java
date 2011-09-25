@@ -124,6 +124,7 @@ public class IndexingJob implements Job {
             indexingTask.setJob(this);
             indexingTask.execute();
         } catch (TaskExecutionException ex) {
+            LOG.error("Execution of IndexingJob threw an exception" + ex);
             throw new JobExecutionException("Execution of IndexingJob threw an exception" + ex);
         }
 

@@ -39,8 +39,10 @@ public class ConnectionPoolImpl implements ConnectionPool {
 
     private static Logger LOG = Logger.getLogger(ConnectionPoolImpl.class);
     private LinkedList<Connection> connections = new LinkedList<Connection>();
+
     private int remainingConnections = 150;
     private DatabaseConfiguration configuration;
+
 
     @Inject
     public ConnectionPoolImpl(ConfigurationReader configurationReader) {

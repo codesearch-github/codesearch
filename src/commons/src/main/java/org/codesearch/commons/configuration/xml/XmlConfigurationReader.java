@@ -201,6 +201,7 @@ public class XmlConfigurationReader implements ConfigurationReader {
         if (!(cacheDirectory.isDirectory() && cacheDirectory.canWrite())) {
             throw new InvalidConfigurationException("Cache directory is invalid.");
         }
+        codesearchConfiguration.setCacheDirectory(cacheDirectory);
     }
 
     private void loadIndexLocation() throws InvalidConfigurationException {
@@ -213,6 +214,7 @@ public class XmlConfigurationReader implements ConfigurationReader {
         if (!(indexLocation.isDirectory() && indexLocation.canWrite())) {
             throw new InvalidConfigurationException("Index location is invalid.");
         }
+        codesearchConfiguration.setIndexLocation(indexLocation);
     }
 
     private void loadSearcherLocation() throws InvalidConfigurationException {
@@ -339,6 +341,7 @@ public class XmlConfigurationReader implements ConfigurationReader {
             databaseConfiguration.setUsername(hc.getString(XmlConfigurationReaderConstants.DB_USERNAME));
             databaseConfiguration.setPassword(hc.getString(XmlConfigurationReaderConstants.DB_PASSWORD));
             databaseConfiguration.setMaxConnections(hc.getInt(XmlConfigurationReaderConstants.DB_MAX_CONNECTIONS));
+            databaseConfiguration.setProtocol(hc.getString(XmlConfigurationReaderConstants.DB_PROTOCOL));
         }
         codesearchConfiguration.setDatabaseConfiguration(databaseConfiguration);
     }

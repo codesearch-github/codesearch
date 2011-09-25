@@ -78,7 +78,7 @@ public class PluginLoaderImpl implements PluginLoader {
                         }
                     }
                 } catch (ServiceConfigurationError ex) {
-                    System.out.println(ex.toString());
+                    System.out.println(ex.toString()); //FIXME
                 }
             }
 

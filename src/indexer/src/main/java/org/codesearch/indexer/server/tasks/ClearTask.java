@@ -115,7 +115,7 @@ public class ClearTask implements Task {
                         LOG.error("Error encountered while clearing index: " + ex);
                     }
 
-                    PropertiesManager propertiesManager = new PropertiesManager(indexLocation + IndexConstants.REVISIONS_PROPERTY_FILENAME);
+                    PropertiesManager propertiesManager = new PropertiesManager(indexLocation + File.separator + IndexConstants.REVISIONS_PROPERTY_FILENAME);
                     propertiesManager.setPropertyFileValue(repositoryDto.getName(), "0");
 
                     LOG.debug("Cleared " + deleteCount + " documents for repository " + repositoryDto.getName());

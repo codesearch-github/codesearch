@@ -19,13 +19,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -68,8 +65,9 @@ import org.codesearch.indexer.server.exceptions.TaskExecutionException;
 import org.codesearch.indexer.server.manager.IndexingJob;
 
 import com.google.inject.Inject;
-import java.util.ConcurrentModificationException;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import org.codesearch.commons.plugins.vcs.FileDto;
 
 /**
@@ -104,6 +102,8 @@ public class IndexingTask implements Task {
     private URI searcherUpdatePath;
     /** The parent {@link IndexingJob}. */
     private IndexingJob job;
+    /** the CodeAnalyzerPlugins used, one per mimetype */
+    private Map<String, CodeAnalyzerPlugin> caPlugins = new HashMap<String, CodeAnalyzerPlugin>();
 
     @Inject
     public IndexingTask(DBAccess dba, PluginLoader pluginLoader, URI searcherUpdatePath) {
@@ -129,6 +129,9 @@ public class IndexingTask implements Task {
      */
     @Override
     public void execute() throws TaskExecutionException {
+        //whether or not previous database operations were executed successfully
+        //once a DB-operation fails no additional operations are executed in this task to prevent log flooding
+        boolean databaseConnectionValid = true;
         if (repositories != null) {
             StringBuilder repos = new StringBuilder();
             for (RepositoryDto repositoryDto : repositories) {
@@ -158,7 +161,17 @@ public class IndexingTask implements Task {
                         // clear the index of the old verions of the files
                         deleteFilesFromIndex(changedFiles);
                         if (repository.isCodeNavigationEnabled()) {
-                            deleteFilesFromDatabase(changedFiles);
+                            try {
+                                String lastAnalysisRevision = dba.getLastAnalyzedRevisionOfRepository(repository.getName());
+                                if (!lastAnalysisRevision.equals(lastIndexedRevision)) {
+                                    throw new TaskExecutionException("The code informaiton in the database is not at the same revision as the regular indexed information\n"
+                                            + "The index of the repository must be cleared via a ClearTask");
+                                }
+                                deleteFilesFromDatabase(changedFiles);
+                            } catch (DatabaseAccessException ex) {
+                                LOG.error("Code analyzing failed, will attempt to execute regular indexing but no code analysis will take place: Database error:" + ex);
+                                databaseConnectionValid = false;
+                            }
                         }
                         // check whether the changed files should be indexed
                         removeNotToBeIndexedFiles(changedFiles);
@@ -166,20 +179,10 @@ public class IndexingTask implements Task {
                             FileDto currentDto = versionControlPlugin.getFileDtoForFileIdentifier(currentIdentifier);
                             try {
                                 addFileToIndex(currentDto);
-                                long duration = System.currentTimeMillis() - start;
-                                LOG.info("Lucene indexing took " + duration / 1000 + " seconds");
-                                if (repository.isCodeNavigationEnabled()) {
-                                    LOG.info("Starting code analyzing");
-                                    start = System.currentTimeMillis();
-                                    String lastAnalysisRevision = dba.getLastAnalyzedRevisionOfRepository(repository.getName());
-                                    if (!lastAnalysisRevision.equals(lastIndexedRevision)) {
-                                        throw new TaskExecutionException("The code informaiton in the database is not at the same revision as the regular indexed information\n"
-                                                + "The index of the repository must be cleared via a ClearTask");
-                                    }
+
+                                if (repository.isCodeNavigationEnabled() && databaseConnectionValid) {
                                     executeCodeAnalysisForFile(currentDto);
-                                    dba.setLastAnalyzedRevisionOfRepository(repository.getName(), versionControlPlugin.getRepositoryRevision());
-                                    duration = System.currentTimeMillis() - start;
-                                    LOG.info("Code analyzing took " + duration / 1000 + " seconds");
+
                                 }
                             } catch (CodeAnalyzerPluginException ex) {
                                 LOG.error("Code analyzing failed, skipping file\n" + ex);
@@ -188,17 +191,23 @@ public class IndexingTask implements Task {
                                 LOG.error(ex);
                             } catch (DatabaseAccessException ex) {
                                 LOG.error("Code analyzing failed: Database error:" + ex);
-                            } catch (PluginLoaderException ex) {
-                                LOG.error("VersionControlPlugin could not be loaded: " + ex);
+                                databaseConnectionValid = false;
                             }
                         }
+                        long duration = System.currentTimeMillis() - start;
+                        LOG.info("Indexing of repository " + repository.getName() + " took " + duration / 1000 + " seconds");
                         propertiesManager.setPropertyFileValue(repository.getName(), versionControlPlugin.getRepositoryRevision());
+                        if (repository.isCodeNavigationEnabled()) {
+                            try {
+                                dba.setLastAnalyzedRevisionOfRepository(repository.getName(), versionControlPlugin.getRepositoryRevision());
+                            } catch (DatabaseAccessException ex) {
+                                databaseConnectionValid = false;
+                            }
+                        }
                     } catch (PluginLoaderException ex) {
                         LOG.error("Could not load VersionControlPlugin\n" + ex);
                     } catch (VersionControlPluginException ex) {
                         LOG.error("Files could not be retrieved: " + ex);
-                    } catch (DatabaseAccessException ex) {
-                        LOG.error("Code analyzing failed: Database error:" + ex);
                     }
                     i++;
                 }
@@ -250,11 +259,13 @@ public class IndexingTask implements Task {
      * @param fileIdentifiers 
      */
     private void removeNotToBeIndexedFiles(Set<FileIdentifier> fileIdentifiers) {
-        Iterator<FileIdentifier> iter = fileIdentifiers.iterator();
-        FileIdentifier currentFile = iter.next();
-        for (; iter.hasNext(); currentFile = iter.next()) {
-            if ((currentFile.isDeleted()) || (!shouldFileBeIndexed(currentFile))) {
-                iter.remove();
+        if (!fileIdentifiers.isEmpty()) {
+            Iterator<FileIdentifier> iter = fileIdentifiers.iterator();
+            FileIdentifier currentFile = iter.next();
+            for (; iter.hasNext(); currentFile = iter.next()) {
+                if ((currentFile.isDeleted()) || (!shouldFileBeIndexed(currentFile))) {
+                    iter.remove();
+                }
             }
         }
     }
@@ -265,7 +276,7 @@ public class IndexingTask implements Task {
      * @throws NotifySearcherException in case the connection to the searcher could not be established
      */
     private void notifySearcher() throws NotifySearcherException {
-        try {           
+        try {
             URL url = searcherUpdatePath.toURL();
             url.openStream();
         } catch (IOException ex) {
@@ -275,35 +286,34 @@ public class IndexingTask implements Task {
     }
 
     /**
-     * executes the code analysis for the currently set repository
+     * executes the code analysis for the given file
      * 
-     * @param retrieveNewFileList determines whether the code analysis should retrieve a new list of changed files, needed if the
-     *            lastIndexedRevision (stored in a properties file in the index directory) differs from the lastAnalysisRevision (stored in
-     *            the database)
-     * @param lastAnalysisRevision the revision of the repository where code analysis was last executed
-     * @throws VersionControlPluginException if no VCP could be loaded for the set repository
      * @throws CodeAnalyzerPluginException if the source code of one of the files could not be analyzed
      */
-    private void executeCodeAnalysisForFile(FileDto fileDto) throws VersionControlPluginException, DatabaseAccessException, PluginLoaderException, CodeAnalyzerPluginException {
-        // For better efficiency, first sort all files by file type and only
-        // load plugin once per file type
-        Map<String, Set<FileDto>> filetypeMap = new HashMap<String, Set<FileDto>>();
+    private void executeCodeAnalysisForFile(FileDto fileDto) throws DatabaseAccessException, CodeAnalyzerPluginException {
 
-        String fileType = MimeTypeUtil.guessMimeTypeViaFileEnding(fileDto.getFilePath());
-        if (!fileType.equals(MimeTypeUtil.UNKNOWN)) {
-            CodeAnalyzerPlugin plugin = pluginLoader.getPlugin(CodeAnalyzerPlugin.class, fileType);
-            LOG.debug("Analyzing file: " + fileDto.getFilePath());
-            plugin.analyzeFile(new String(fileDto.getContent()));
-            AstNode ast = plugin.getAst();
-            List<String> typeDeclarations = plugin.getTypeDeclarations();
-            List<Usage> usages = plugin.getUsages();
-            List<String> imports = plugin.getImports();
-            // add the externalLinks to the FileDto, so they
-            // can be parsed after the regular indexing is finished
-            // write the AST information into the database
-            dba.setAnalysisDataForFile(fileDto.getFilePath(), fileDto.getRepository().getName(), ast, usages, typeDeclarations, imports);
+        try {
+            String fileType = MimeTypeUtil.guessMimeTypeViaFileEnding(fileDto.getFilePath());
+            if (!fileType.equals(MimeTypeUtil.UNKNOWN)) {
+                CodeAnalyzerPlugin plugin;
+                if (!caPlugins.containsKey(fileType)) {
+                    caPlugins.put(fileType, pluginLoader.getPlugin(CodeAnalyzerPlugin.class, fileType));
+                }
+                plugin = caPlugins.get(fileType);
+                LOG.debug("Analyzing file: " + fileDto.getFilePath());
+                plugin.analyzeFile(new String(fileDto.getContent()));
+                AstNode ast = plugin.getAst();
+                List<String> typeDeclarations = plugin.getTypeDeclarations();
+                List<Usage> usages = plugin.getUsages();
+                List<String> imports = plugin.getImports();
+                // add the externalLinks to the FileDto, so they
+                // can be parsed after the regular indexing is finished
+                // write the AST information into the database
+                dba.setAnalysisDataForFile(fileDto.getFilePath(), fileDto.getRepository().getName(), ast, usages, typeDeclarations, imports);
+            }
+        } catch (PluginLoaderException ex) {
+            //in case no plugin is found for the file just skip it
         }
-
     }
 
     /**
@@ -329,8 +339,8 @@ public class IndexingTask implements Task {
     /**
      * Initializes Lucene IndexWriter, loads plugins etc..
      */
-    private void init() throws InvalidIndexLocationException {
-        propertiesManager = new PropertiesManager(indexLocation + IndexConstants.REVISIONS_PROPERTY_FILENAME);
+    private void init() throws InvalidIndexLocationException, IOException {
+        propertiesManager = new PropertiesManager(indexLocation.getPath() + File.separator + IndexConstants.REVISIONS_PROPERTY_FILENAME);
         try {
             indexDirectory = FSDirectory.open(indexLocation);
         } catch (IOException ex) {
@@ -348,15 +358,11 @@ public class IndexingTask implements Task {
                 }
             }
         } catch (PluginLoaderException ex) {
-            LOG.warn("No LuceneFieldPlugins could be found.");
+            LOG.warn("No LuceneFieldPlugins could be found. Indexing will not create a useable index");
         }
-        try {
-            IndexWriterConfig config = new IndexWriterConfig(IndexConstants.LUCENE_VERSION, analyzer);
-            indexWriter = new IndexWriter(indexDirectory, config);
-            LOG.debug("IndexWriter initialization successful: " + indexLocation.getAbsolutePath());
-        } catch (IOException ex) {
-            LOG.error("IndexWriter initialization error: " + ex);
-        }
+        IndexWriterConfig config = new IndexWriterConfig(IndexConstants.LUCENE_VERSION, analyzer);
+        indexWriter = new IndexWriter(indexDirectory, config);
+        LOG.debug("IndexWriter initialization successful: " + indexLocation.getAbsolutePath());
     }
 
     /**

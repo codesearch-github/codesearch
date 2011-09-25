@@ -458,6 +458,8 @@ public class DBAccessImpl implements DBAccess {
             ps.execute();
         } catch (SQLException ex) {
             throw new DatabaseAccessException("SQLException while trying to access the database\n" + ex);
+        } finally {
+            connectionPool.releaseConnection(conn);
         }
     }
 
