@@ -38,6 +38,7 @@ import org.codesearch.searcher.shared.SearchResultDto;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.Iterator;
 
 @Singleton
 public class DocumentSearcherImpl implements DocumentSearcher {
@@ -74,10 +75,12 @@ public class DocumentSearcherImpl implements DocumentSearcher {
         queryParser = new QueryParser(IndexConstants.LUCENE_VERSION, IndexConstants.INDEX_FIELD_CONTENT + "_lc",
                 new LowerCaseWhiteSpaceAnalyzer());
         queryParser.setAllowLeadingWildcard(true);
+        queryParser.setDefaultOperator(QueryParser.Operator.AND);
         queryParser.setLowercaseExpandedTerms(false);
         queryParserCaseSensitive = new QueryParser(IndexConstants.LUCENE_VERSION, IndexConstants.INDEX_FIELD_CONTENT,
                 new WhitespaceAnalyzer(IndexConstants.LUCENE_VERSION));
         queryParserCaseSensitive.setAllowLeadingWildcard(true);
+        queryParserCaseSensitive.setDefaultOperator(QueryParser.Operator.AND);
         queryParserCaseSensitive.setLowercaseExpandedTerms(false);
         try {
             initSearcher();
@@ -91,61 +94,6 @@ public class DocumentSearcherImpl implements DocumentSearcher {
     /** {@inheritDoc} */
     @Override
     public synchronized List<SearchResultDto> search(String searchString, boolean caseSensitive, Set<String> repositoryNames,
-            Set<String> repositoryGroupNames, int maxResults) throws ParseException, IOException, InvalidIndexException {
-        return performLuceneSearch(searchString, caseSensitive, repositoryNames, repositoryGroupNames, maxResults);
-    }
-
-//    /** {@inheritDoc} */
-//    @Override
-//    public synchronized List<String> suggestSearchNames(String searchString, boolean caseSensitive, Set<String> repositoryNames,
-//            Set<String> repositoryGroupNames) throws ParseException, IOException, InvalidIndexException {
-//        List<SearchResultDto> results = performLuceneSearch(searchString, caseSensitive, repositoryNames, repositoryGroupNames, 10);
-//
-//        return null;
-//    }
-
-    /** {@inheritDoc} */
-    @Override
-    public synchronized String parseQuery(String query, boolean caseSensitive, Set<String> repositoryNames, Set<String> repositoryGroupNames) {
-        for (String repoGroup : repositoryGroupNames) {
-            for (String repo : configurationReader.getRepositoriesForGroup(repoGroup)) {
-                repositoryNames.add(repo);
-            }
-        }
-
-        if (repositoryNames.isEmpty()) {
-            return query;
-        }
-
-        StringBuilder repoQuery = new StringBuilder();
-        repoQuery.append(" AND ");
-        repoQuery.append(IndexConstants.INDEX_FIELD_REPOSITORY);
-        repoQuery.append(":("); // this is because the lucene query is sad
-
-        for (String repo : repositoryNames) {
-            repoQuery.append(repo);
-            repoQuery.append(" OR ");
-        }
-        repoQuery = new StringBuilder(repoQuery.substring(0, repoQuery.length() - 4));
-        repoQuery.append(")");
-
-        return query + repoQuery.toString();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public synchronized void refreshIndex() throws InvalidIndexException {
-        try {
-            // Calling reopen instead of new initialization for performance reasons
-            indexSearcher = new IndexSearcher(indexSearcher.getIndexReader().reopen(true));
-        } catch (CorruptIndexException ex) {
-            throw new InvalidIndexException("Could not refresh the index because it is corrupt: " + ex);
-        } catch (IOException ex) {
-            throw new InvalidIndexException("Could not refresh the index: " + ex);
-        }
-    }
-
-    private synchronized List<SearchResultDto> performLuceneSearch(String searchString, boolean caseSensitive, Set<String> repositoryNames,
             Set<String> repositoryGroupNames, int maxResults) throws ParseException, IOException, InvalidIndexException {
         if (!searcherInitialized) {
             initSearcher();
@@ -180,7 +128,63 @@ public class DocumentSearcherImpl implements DocumentSearcher {
         return results;
     }
 
-    private synchronized void initSearcher() throws InvalidIndexException {
+//    /** {@inheritDoc} */
+//    @Override
+//    public synchronized List<String> suggestSearchNames(String searchString, boolean caseSensitive, Set<String> repositoryNames,
+//            Set<String> repositoryGroupNames) throws ParseException, IOException, InvalidIndexException {
+//        List<SearchResultDto> results = performLuceneSearch(searchString, caseSensitive, repositoryNames, repositoryGroupNames, 10);
+//
+//        return null;
+//    }
+
+    /** {@inheritDoc} */
+    @Override
+    public synchronized void refreshIndex() throws InvalidIndexException {
+        try {
+            // Calling reopen instead of new initialization for performance reasons
+            indexSearcher = new IndexSearcher(indexSearcher.getIndexReader().reopen(true));
+        } catch (CorruptIndexException ex) {
+            throw new InvalidIndexException("Could not refresh the index because it is corrupt: " + ex);
+        } catch (IOException ex) {
+            throw new InvalidIndexException("Could not refresh the index: " + ex);
+        }
+    }
+
+    /**
+     * parses the search term to a lucene conform query keeping in mind the several options
+     * @param query the search query
+     * @return the lucene conform query
+     */
+    private String parseQuery(String query, boolean caseSensitive, Set<String> repositoryNames, Set<String> repositoryGroupNames) {
+        for (String repoGroup : repositoryGroupNames) {
+            for (String repo : configurationReader.getRepositoriesForGroup(repoGroup)) {
+                repositoryNames.add(repo);
+            }
+        }
+
+        if (repositoryNames.isEmpty()) {
+            return query;
+        }
+
+        StringBuilder repoQuery = new StringBuilder();
+        repoQuery.append(" +");
+        repoQuery.append(IndexConstants.INDEX_FIELD_REPOSITORY);
+        repoQuery.append(":("); // this is because the lucene query is sad
+
+        Iterator<String> iter = repositoryNames.iterator();
+        while (iter.hasNext()) {
+            repoQuery.append(iter.next());
+            if (iter.hasNext()) {
+                repoQuery.append(" OR ");
+            }
+        }
+
+        repoQuery.append(")");
+
+        return query + repoQuery.toString();
+    }
+
+    private void initSearcher() throws InvalidIndexException {
         try {
             if (searcherInitialized) {
                 indexSearcher.close();

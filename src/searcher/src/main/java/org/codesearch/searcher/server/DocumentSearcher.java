@@ -39,13 +39,7 @@ import org.codesearch.searcher.shared.SearchResultDto;
  * @author Samuel Kogler
  */
 public interface DocumentSearcher {
-    /**
-     * parses the search term to a lucene conform query keeping in mind the several options
-     * @param query the search query
-     * @return the lucene conform query
-     */
-    String parseQuery(String query, boolean caseSensitive, Set<String> repositoryNames, Set<String> repositoryGroupNames);
-
+ 
     /**
      * Performs a search against the lucene index and returns each result as an ResultItem
      * @param searchString the String that will be parsed to a query
