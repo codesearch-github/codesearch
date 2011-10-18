@@ -1,0 +1,38 @@
+To check before releasing a new version:
+++++++++++++++++++++++++++++++++++++++++
+
+Stage 1:
+
+ - Full build
+ - Run all core unit tests successfully
+
+Stage 2:
+
+ - Deploy searcher and indexer on server
+ - Configure based on config in /resources
+ - Full indexing process
+   - Using Filesystem
+   - Using SVN
+   - Using Git
+ - Check if created index is valid
+ - Check if incremental indexing works
+
+Stage 3:
+
+ - Check if normal searches work as expected
+ - Check if viewing files works
+   - on Filesystem, Git, and SVN
+ - Check if advanced queries work(select repos, etc..)
+ - Check if notification of searcher works when updating index
+
+Stage 5:
+
+ - Change log4j configurations to INFO level
+ - Change GWT configurations for release
+ - Change version number
+ - Write a release description
+ - Commit source
+ - Tag revision with version
+ - Create packages
+ - Upload packages to sourceforge
+ - Announce release on website

@@ -74,16 +74,19 @@ public class XmlConfigurationReaderTest {
     @Test
     public void testGetJobs() throws ConfigurationException {
         RepositoryDto repo1 = getTestRepo();
-        System.out.println(repo1.getBlacklistEntries());
+        List<RepositoryDto> repositoryDtos = new LinkedList<RepositoryDto>();
+        repositoryDtos.add(repo1);
 
         JobDto job1 = new JobDto();
         job1.setCronExpression("0 * * * * ?");
+        job1.setClearIndex(true);
+        job1.setRepositories(repositoryDtos);
 
         List<JobDto> result = configReader.getJobs();
         for (JobDto jobDto : result) {
             System.out.println(jobDto.getRepositories());
         }
-        assert (result.get(0).equals(job1));
+        assert (job1.equals(result.get(0)));
     }
 
     @Test
