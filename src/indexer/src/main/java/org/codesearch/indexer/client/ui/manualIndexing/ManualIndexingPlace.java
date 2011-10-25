@@ -18,20 +18,35 @@
  * You should have received a copy of the GNU General Public License
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.codesearch.indexer.client;
+package org.codesearch.indexer.client.ui.manualIndexing;
 
-import org.codesearch.indexer.client.ui.dashboard.DashboardPlace;
-import org.codesearch.indexer.client.ui.log.LogPlace;
-
-import com.google.gwt.place.shared.PlaceHistoryMapper;
-import com.google.gwt.place.shared.WithTokenizers;
-import org.codesearch.indexer.client.ui.manualIndexing.ManualIndexingPlace;
+import com.google.gwt.place.shared.Place;
+import com.google.gwt.place.shared.PlaceTokenizer;
+import com.google.gwt.place.shared.Prefix;
 
 /**
- * Manages history tokens throughout the searcher.
- * Tokens only appear in URL if their Tokenizers are annotated here.
+ * The place token representing the default page called dashboard.
+ *
  * @author Samuel Kogler
  */
-@WithTokenizers({DashboardPlace.Tokenizer.class, LogPlace.Tokenizer.class, ManualIndexingPlace.Tokenizer.class})
-public interface IndexerPlaceHistoryMapper extends PlaceHistoryMapper {
+public class ManualIndexingPlace extends Place {
+
+    public ManualIndexingPlace() {
+    }
+
+    @Prefix("manualIndexing")
+    public static class Tokenizer implements PlaceTokenizer<ManualIndexingPlace> {
+
+        /** {@inheritDoc} */
+        @Override
+        public String getToken(ManualIndexingPlace place) {
+            return "";
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public ManualIndexingPlace getPlace(String token) {
+            return new ManualIndexingPlace();
+        }
+    }
 }

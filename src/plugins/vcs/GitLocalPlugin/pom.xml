@@ -8,12 +8,12 @@
 
 
     <name>Git Local Plugin</name>
-    <description>A plugin for codesearch used to access files stored in Subversion repositories.</description>
+    <description>A plugin for codesearch used to access files stored in GIT repositories.</description>
 
     <parent>
         <groupId>org.codesearch</groupId>
         <artifactId>codesearch</artifactId>
-        <version>0.1-SNAPSHOT</version>
+        <version>0.1-RC1</version>
     </parent>
 
 
@@ -21,7 +21,7 @@
         <dependency>
             <groupId>org.codesearch</groupId>
             <artifactId>codesearch-commons</artifactId>
-            <version>0.1-SNAPSHOT</version>
+            <version>0.1-RC1</version>
         </dependency>
 
         <dependency>

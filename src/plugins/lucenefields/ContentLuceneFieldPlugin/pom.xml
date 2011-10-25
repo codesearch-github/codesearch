@@ -11,14 +11,14 @@
     <parent>
         <groupId>org.codesearch</groupId>
         <artifactId>codesearch</artifactId>
-        <version>0.1-SNAPSHOT</version>
+        <version>0.1-RC1</version>
     </parent>
 
     <dependencies>
         <dependency>
             <groupId>org.codesearch</groupId>
             <artifactId>codesearch-commons</artifactId>
-            <version>0.1-SNAPSHOT</version>
+            <version>0.1-RC1</version>
         </dependency>
     </dependencies>
 </project>

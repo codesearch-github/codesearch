@@ -61,6 +61,12 @@ public class ContentLuceneFieldPlugin extends LuceneFieldPlugin {
 
     /** {@inheritDoc} */
     @Override
+    public String getVersion() {
+        return "0.1-RC1";
+    }
+    
+    /** {@inheritDoc} */
+    @Override
     public String getPurposes() {
         return "lucene_field_plugin";
     }
@@ -83,16 +89,19 @@ public class ContentLuceneFieldPlugin extends LuceneFieldPlugin {
         return true;
     }
 
+    /** {@inheritDoc} */
     @Override
     public String getFieldName() {
         return "content";
     }
 
+    /** {@inheritDoc} */
     @Override
     public Analyzer getRegularCaseAnalyzer() {
         return new LetterAnalyzer();
     }
 
+    /** {@inheritDoc} */
     @Override
     public Analyzer getLowerCaseAnalyzer() {
         return new SimpleAnalyzer(IndexConstants.LUCENE_VERSION);

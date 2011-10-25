@@ -29,6 +29,8 @@ import org.codesearch.indexer.client.ui.log.LogViewImpl;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.SimpleEventBus;
 import com.google.gwt.place.shared.PlaceController;
+import org.codesearch.indexer.client.ui.manualIndexing.ManualIndexingView;
+import org.codesearch.indexer.client.ui.manualIndexing.ManualIndexingViewImpl;
 
 /**
  * Implementation of the factory.
@@ -40,7 +42,14 @@ public class ClientFactoryImpl extends ClientFactory {
     private final PlaceController placeController = new PlaceController(eventBus);
     private final DashboardView dashboardView = new DashboardViewImpl();
     private final LogView logView = new LogViewImpl();
+    private final ManualIndexingView manualIndexingView = new ManualIndexingViewImpl();
 
+    /** {@inheritDoc} */
+    @Override
+    public ManualIndexingView getManualIndexingView() {
+        return manualIndexingView;
+    }
+    
     /** {@inheritDoc} */
     @Override
     public EventBus getEventBus() {

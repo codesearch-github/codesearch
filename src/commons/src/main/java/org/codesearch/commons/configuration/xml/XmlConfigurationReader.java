@@ -205,16 +205,17 @@ public class XmlConfigurationReader implements ConfigurationReader {
     }
 
     private void loadIndexLocation() throws InvalidConfigurationException {
-        File indexLocation = null;
+        String indexLocation = null;
         try {
-            indexLocation = new File(config.getString(XmlConfigurationReaderConstants.INDEX_DIR));
+            indexLocation = config.getString(XmlConfigurationReaderConstants.INDEX_DIR);
         } catch (NullPointerException ex) {
             throw new InvalidConfigurationException("Index location not specified");
         }
-        if (!(indexLocation.isDirectory() && indexLocation.canWrite())) {
-            throw new InvalidConfigurationException("Index location is invalid.");
+        File index = new File(indexLocation);
+        if (!(index.isDirectory() && index.canWrite())) {
+            throw new InvalidConfigurationException("Index location \""+indexLocation+"\" is invalid.");
         }
-        codesearchConfiguration.setIndexLocation(indexLocation);
+        codesearchConfiguration.setIndexLocation(index);
     }
 
     private void loadSearcherLocation() throws InvalidConfigurationException {

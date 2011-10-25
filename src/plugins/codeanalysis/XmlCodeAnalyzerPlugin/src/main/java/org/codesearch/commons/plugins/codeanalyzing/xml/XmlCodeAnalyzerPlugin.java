@@ -168,6 +168,6 @@ public class XmlCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
     /** {@inheritDoc} */
     @Override
     public String getVersion() {
-        return "1.0";
+        return "0.1-RC1";
     }
 }

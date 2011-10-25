@@ -30,6 +30,8 @@ import org.codesearch.indexer.client.ui.log.LogPlace;
 import com.google.gwt.activity.shared.Activity;
 import com.google.gwt.activity.shared.ActivityMapper;
 import com.google.gwt.place.shared.Place;
+import org.codesearch.indexer.client.ui.manualIndexing.ManualIndexingActivity;
+import org.codesearch.indexer.client.ui.manualIndexing.ManualIndexingPlace;
 
 /**
  * Manages activities in the searcher.
@@ -53,6 +55,9 @@ public class IndexerActivityMapper implements ActivityMapper {
         } else if (place instanceof LogPlace) {
         	LogPlace logPlace = (LogPlace) place;
         	return new LogActivity(clientFactory, logPlace);
+        } else if (place instanceof ManualIndexingPlace) {
+                ManualIndexingPlace manualIndexingPlace = (ManualIndexingPlace) place;
+                return new ManualIndexingActivity(clientFactory, manualIndexingPlace);
         }
 
         return null;

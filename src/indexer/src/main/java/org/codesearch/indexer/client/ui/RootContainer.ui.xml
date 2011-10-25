@@ -75,6 +75,7 @@
     <g:FlowPanel addStyleNames="{style.menu}">
     	<g:Hyperlink text="Dashboard" targetHistoryToken="dashboard:" addStyleNames="{style.menu-link}" />
     	<g:Hyperlink text="View Log" targetHistoryToken="log:" addStyleNames="{style.menu-link}" />
+        <g:Hyperlink text="Manual Indexing" targetHistoryToken="manualIndexing:" addStyleNames="{style.menu-link}" />
     </g:FlowPanel>
     <g:SimplePanel ui:field="contentPanel" addStyleNames="{style.content}"/>
     

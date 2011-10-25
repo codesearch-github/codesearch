@@ -42,48 +42,56 @@ public class RepositoryLuceneFieldPlugin extends LuceneFieldPlugin {
      * @return
      * @throws LuceneFieldValueException
      */
+    @Override
     public String getFieldValue(FileDto fileDto) throws LuceneFieldValueException {
         return fileDto.getRepository().getName();
     }
 
     /** {@inheritDoc} */
+    @Override
     public String getPurposes() {
         return "lucene_field_plugin";
     }
 
-    /**
-     * returns false
-     * @return
-     */
+    /** {@inheritDoc} */
+    @Override
     public boolean isAnalyzed() {
         return false;
     }
-
-    /**
-     * returns true
-     * @return
-     */
+    
+    /** {@inheritDoc} */
+    @Override
     public boolean isStored() {
         return true;
     }
 
     /** {@inheritDoc} */
+    @Override
     public boolean addLowercase() {
         return false;
     }
 
     /** {@inheritDoc} */
+    @Override
     public String getFieldName() {
         return "repository";
     }
 
     /** {@inheritDoc} */
+    @Override
     public Analyzer getRegularCaseAnalyzer() {
         return null;
     }
 
     /** {@inheritDoc} */
+    @Override
     public Analyzer getLowerCaseAnalyzer() {
         return null;
+    }
+    
+    /** {@inheritDoc} */
+    @Override
+    public String getVersion() {
+        return "0.1-RC1";
     }
 }

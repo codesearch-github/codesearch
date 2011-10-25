@@ -5,12 +5,14 @@ import org.codesearch.indexer.client.ui.log.LogView;
 
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.PlaceController;
+import org.codesearch.indexer.client.ui.manualIndexing.ManualIndexingView;
 
 /**
  *
  * @author Samuel Kogler
  */
 public abstract class ClientFactory {
+
     private static ClientFactory clientFactory;
 
     public static ClientFactory getDefaultFactory() {
@@ -25,6 +27,8 @@ public abstract class ClientFactory {
     public abstract PlaceController getPlaceController();
 
     public abstract DashboardView getDashboardView();
-    
+
     public abstract LogView getLogView();
+
+    public abstract ManualIndexingView getManualIndexingView();
 }

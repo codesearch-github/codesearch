@@ -180,7 +180,7 @@ public class GitLocalPlugin implements VersionControlPlugin {
     /** {@inheritDoc} */
     @Override
     public String getVersion() {
-        return "0.1";
+        return "0.1-RC1";
     }
 
     @Override

@@ -43,6 +43,7 @@ import org.quartz.impl.matchers.GroupMatcher;
 import org.quartz.spi.JobFactory;
 
 import com.google.inject.Inject;
+import org.quartz.SimpleTrigger;
 
 /**
  * controls the scheduler used to execute the indexing jobs
@@ -61,6 +62,7 @@ public final class IndexingManager {
     private List<JobDto> jobs;
     /** The job listener that mantains a history of job executions. */
     private IndexingJobHistoryListener historyListener;
+    private ConfigurationReader configReader;
 
     /**
      * Creates a new instance of IndexingManager
@@ -74,14 +76,15 @@ public final class IndexingManager {
         this.jobs = configurationReader.getJobs();
         this.scheduler = scheduler;
         this.historyListener = new IndexingJobHistoryListener();
-        
+        this.configReader = configurationReader;
+
         scheduler.setJobFactory(jobFactory);
         scheduler.getListenerManager().addTriggerListener(new IndexingJobTriggerListener(5 * 60 * 1000),
                 EverythingMatcher.allTriggers()); // delay by 5 minutes if a job is currently running
         scheduler.getListenerManager().addJobListener(historyListener, EverythingMatcher.allJobs());
         start();
     }
-    
+
     /**
      * Reads the jobs from the configuration and adds them to the scheduler, then starts it
      * 
@@ -166,11 +169,11 @@ public final class IndexingManager {
                     }
                 }
             }
-            
-            if(nextFireTime.getTime() == 0L) {
+
+            if (nextFireTime.getTime() == 0L) {
                 nextFireTime = null;
             }
-            if(previousFireTime.getTime() == 0L) {
+            if (previousFireTime.getTime() == 0L) {
                 previousFireTime = null;
             }
 
@@ -183,7 +186,7 @@ public final class IndexingManager {
         }
         return scheduledJobs;
     }
-    
+
     /**
      * Returns the log of job executions.
      * @return list of log messages.
@@ -204,4 +207,37 @@ public final class IndexingManager {
         }
     }
 
+    /**
+     * schedules a job for the given repositories causing them to be indexed once at the time
+     * @param repositories the repositories that are to be indexed 
+     * @param repositoryGroups the repo groups containing the repositories 
+     * @throws SchedulerException 
+     */
+    public void startJobForRepositories(List<String> repositories, List<String> repositoryGroups) throws SchedulerException {
+        JobKey jobKey = new JobKey("manual-job" + new Date().getTime(), IndexingJob.GROUP_NAME);
+        List<RepositoryDto> repos = new LinkedList<RepositoryDto>();
+        for (String currentRepoName : repositories) {
+            repos.add(configReader.getRepositoryByName(currentRepoName));
+        }
+
+        for (String currentRepoGroup : repositoryGroups) {
+            for (String currentRepo : configReader.getRepositoriesForGroup(currentRepoGroup)) {
+                RepositoryDto newRepo = configReader.getRepositoryByName(currentRepo);
+                if (!repos.contains(newRepo)) {
+                    repos.add(newRepo);
+                }
+            }
+        }
+
+        JobDataMap jdm = new JobDataMap();
+        jdm.put(IndexingJob.FIELD_REPOSITORIES, repos);
+        jdm.put(IndexingJob.FIELD_TERMINATED, false);
+        jdm.put(IndexingJob.FIELD_CLEAR_INDEX, false);
+
+        JobDetail jobDetail = JobBuilder.newJob(IndexingJob.class).withIdentity(jobKey).usingJobData(jdm).build();
+        Trigger jobTrigger = TriggerBuilder.newTrigger().forJob(jobKey).startNow().build();
+        scheduler.addJob(jobDetail, true);
+        scheduler.scheduleJob(jobTrigger);
+        LOG.info("Starting manual indexing job for");
+    }
 }

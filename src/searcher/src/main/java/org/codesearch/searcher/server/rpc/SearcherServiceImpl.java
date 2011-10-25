@@ -101,6 +101,7 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
     public List<SearchResultDto> doSearch(String query, boolean caseSensitive, SearchType searchType, Set<String> selection, int maxResults) throws SearcherServiceException {
         List<SearchResultDto> resultItems = new LinkedList<SearchResultDto>();
         try {
+            LOG.info("performing search");
             //TODO fix incompatibility
             if (searchType == SearchType.REPOSITORIES) {
                 resultItems = documentSearcher.search(query, caseSensitive, selection, new HashSet<String>(), maxResults);

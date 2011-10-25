@@ -83,13 +83,14 @@ public class SubversionPlugin implements VersionControlPlugin {
     /** {@inheritDoc} */
     @Override
     public String getVersion() {
-        return "0.1";
+        return "0.1-RC1";
     }
 
     /** {@inheritDoc} */
     @Override
-    public void setRepository(RepositoryDto repository) {
+    public void setRepository(RepositoryDto repository) throws VersionControlPluginException {
         this.repository = repository;
+        establishConnectionToRepo();
     }
 
     /** {@inheritDoc} */
@@ -207,12 +208,8 @@ public class SubversionPlugin implements VersionControlPlugin {
     }
 
     @Override
-    public void validate() throws ValidationException {
-        try {
-            establishConnectionToRepo();
-        } catch (VersionControlPluginException ex) {
-            throw new ValidationException("Connection to repository could not be established:\n" + ex);
-        }
+    public void validate() {
+        //TODO add validation logic
     }
 
     private class ListDirectoryDirEntryHandler implements ISVNDirEntryHandler {

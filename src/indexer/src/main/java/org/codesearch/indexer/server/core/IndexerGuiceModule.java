@@ -37,6 +37,7 @@ import org.quartz.spi.JobFactory;
 
 import com.google.inject.Singleton;
 import com.google.inject.servlet.ServletModule;
+import org.codesearch.indexer.server.rpc.ManualIndexingServiceImpl;
 
 /**
  *
@@ -71,5 +72,6 @@ public class IndexerGuiceModule extends ServletModule {
         bind(IndexingManager.class).in(Singleton.class);
         serve("/dashboard.rpc").with(DashboardServiceImpl.class);
         serve("/log.rpc").with(LogServiceImpl.class);
+        serve("/manualIndexing.rpc").with(ManualIndexingServiceImpl.class);
     }
 }

@@ -1,0 +1,39 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui"
+	xmlns:c='urn:import:com.google.gwt.user.cellview.client'>
+    <ui:style>
+		.grid-item {
+			float: left;
+			border: 1px solid gray;
+			border-radius: 5px;
+			padding: 5px;
+			margin-right: 10px;
+		}
+		
+		.grid-item .title {
+			font-weight: bold;
+			display: block;
+			border-bottom: 1px solid #CCC;
+		}
+		
+		.grid-item .content {
+			display: block;
+		}
+    </ui:style>
+    <g:HTMLPanel>
+        <div class="{style.grid-item}">
+            <g:TabLayoutPanel ui:field='repositoryTabPanel' width='400px' barUnit='EM' barHeight='1.7' height='10em'>
+                <g:tab>
+                    <g:header>Repositories</g:header>
+                    <g:ListBox ui:field='repositories' visibleItemCount='6' multipleSelect='true' width='20em' />
+                </g:tab>
+                <g:tab>
+                    <g:header>Repository Groups</g:header>
+                    <g:ListBox ui:field='repositoryGroups' visibleItemCount='6' multipleSelect='true' width='20em' />
+                </g:tab>
+            </g:TabLayoutPanel>
+        </div>
+        <g:Button ui:field="indexingButton">Start indexing</g:Button>
+    </g:HTMLPanel>
+</ui:UiBinder> 

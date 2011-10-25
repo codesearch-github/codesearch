@@ -44,6 +44,12 @@ public class FilenameLuceneFieldPlugin extends LuceneFieldPlugin {
         }
 
     }
+    
+    /** {@inheritDoc} */
+    @Override
+    public String getVersion() {
+        return "0.1-RC1";
+    }
 
     /** {@inhertDoc} */
     @Override
@@ -69,11 +75,13 @@ public class FilenameLuceneFieldPlugin extends LuceneFieldPlugin {
         return "filename";
     }
 
+    /** {@inhertDoc} */
     @Override
     public Analyzer getRegularCaseAnalyzer() {
         return new LetterAnalyzer();
     }
 
+    /** {@inhertDoc} */
     @Override
     public Analyzer getLowerCaseAnalyzer() {
         return new SimpleAnalyzer(IndexConstants.LUCENE_VERSION);

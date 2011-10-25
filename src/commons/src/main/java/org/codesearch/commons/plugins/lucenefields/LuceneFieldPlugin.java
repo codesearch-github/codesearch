@@ -83,11 +83,4 @@ public abstract class LuceneFieldPlugin implements Plugin {
     public String getPurposes(){
         return "lucene_field_plugin";
     }
-
-    /** {@inheritDoc} */
-    @Override
-    public String getVersion() {
-        return "1.0";
-    }
-
 }

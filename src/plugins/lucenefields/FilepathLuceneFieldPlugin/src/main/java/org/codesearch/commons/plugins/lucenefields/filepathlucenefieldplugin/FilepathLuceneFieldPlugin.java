@@ -18,7 +18,6 @@
  * You should have received a copy of the GNU General Public License
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.codesearch.commons.plugins.lucenefields.filepathlucenefieldplugin;
 
 import org.apache.lucene.analysis.Analyzer;
@@ -28,6 +27,7 @@ import org.codesearch.commons.plugins.lucenefields.LuceneFieldPlugin;
 import org.codesearch.commons.plugins.lucenefields.LuceneFieldValueException;
 import org.codesearch.commons.plugins.lucenefields.LetterAnalyzer;
 import org.codesearch.commons.plugins.vcs.FileDto;
+
 /**
  *
  * @author David Froehlich
@@ -51,19 +51,13 @@ public class FilepathLuceneFieldPlugin extends LuceneFieldPlugin {
         return "lucene_field_plugin";
     }
 
-    /**
-     * returns true
-     * @return
-     */
+    /** {@inheritDoc} */
     @Override
     public boolean isAnalyzed() {
         return true;
     }
 
-    /**
-     * returns true
-     * @return
-     */
+    /** {@inheritDoc} */
     @Override
     public boolean isStored() {
         return true;
@@ -76,18 +70,26 @@ public class FilepathLuceneFieldPlugin extends LuceneFieldPlugin {
     }
 
     @Override
+    /** {@inheritDoc} */
     public String getFieldName() {
         return "filepath";
     }
 
     @Override
+    /** {@inheritDoc} */
     public Analyzer getRegularCaseAnalyzer() {
         return new LetterAnalyzer();
     }
 
     @Override
+    /** {@inheritDoc} */
     public Analyzer getLowerCaseAnalyzer() {
         return new SimpleAnalyzer(IndexConstants.LUCENE_VERSION);
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public String getVersion() {
+        return "0.1-RC1";
+    }
 }

@@ -94,7 +94,6 @@ public class PluginLoaderImpl implements PluginLoader {
                     throw new PluginLoaderException("VersionControlPlugin failed to load because an invalid cache directory was specified: " + ex);
                 }
             }
-
             return (T) validPlugin;
         }
         throw new PluginLoaderException("No Plugin found for purpose: " + purpose + " and Class: " + clazz);
@@ -103,13 +102,17 @@ public class PluginLoaderImpl implements PluginLoader {
     @Override
     public synchronized <T extends Plugin> List<T> getMultiplePluginsForPurpose(final Class<T> clazz, final String purpose) throws PluginLoaderException {
         List<T> validPlugins = new LinkedList<T>();
-        for (Plugin plugin : serviceLoader) {
-            String[] purposes = plugin.getPurposes().split(" ");
-            for (String s : purposes) {
-                if (s.equalsIgnoreCase(purpose)) {
-                    validPlugins.add((T) plugin);
+        for (Object obj : serviceLoader) {
+            if (obj instanceof Plugin) {
+                Plugin plugin = (Plugin) obj;
+                String[] purposes = plugin.getPurposes().split(" ");
+                for (String s : purposes) {
+                    if (s.equalsIgnoreCase(purpose)) {
+                        validPlugins.add((T) plugin);
+                    }
                 }
             }
+
         }
         if (validPlugins.isEmpty()) {
             throw new PluginLoaderException("No Plugin found for purpose: " + purpose + " and Class: " + clazz);

@@ -661,7 +661,7 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
     /** {@inheritDoc} */
     @Override
     public String getVersion() {
-        return "0.1-SNAPSHOT";
+        return "0.1-RC1";
     }
 
     /** {@inheritDoc} */

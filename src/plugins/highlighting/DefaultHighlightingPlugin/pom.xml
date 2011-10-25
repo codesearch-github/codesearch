@@ -10,14 +10,14 @@
     <parent>
         <artifactId>codesearch</artifactId>
         <groupId>org.codesearch</groupId>
-        <version>0.1-SNAPSHOT</version>
+        <version>0.1-RC1</version>
     </parent>
 
     <dependencies>
         <dependency>
             <groupId>org.codesearch</groupId>
             <artifactId>codesearch-commons</artifactId>
-            <version>0.1-SNAPSHOT</version>
+            <version>0.1-RC1</version>
         </dependency>
 
         <dependency>
@@ -28,7 +28,7 @@
         <dependency>
             <groupId>org.codesearch</groupId>
             <artifactId>codesearch-jhighlight</artifactId>
-            <version>0.1-SNAPSHOT</version>
+            <version>0.1-RC1</version>
         </dependency>
 
         <dependency>
