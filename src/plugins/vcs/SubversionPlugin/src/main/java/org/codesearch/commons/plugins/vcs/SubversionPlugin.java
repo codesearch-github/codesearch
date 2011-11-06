@@ -20,10 +20,12 @@
  */
 package org.codesearch.commons.plugins.vcs;
 
+import java.util.logging.Level;
 import org.codesearch.commons.configuration.dto.BasicAuthentication;
 import org.codesearch.commons.configuration.dto.RepositoryDto;
 
 import java.io.ByteArrayOutputStream;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -102,7 +104,7 @@ public class SubversionPlugin implements VersionControlPlugin {
             FileDto fileDto = new FileDto();
             SVNNodeKind nodeKind = svnRepo.checkPath(filePath, -1);
             if (nodeKind != SVNNodeKind.FILE) {
-                return null;
+                return null; // In case the file was deleted or it is a directory
             }
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
@@ -127,31 +129,37 @@ public class SubversionPlugin implements VersionControlPlugin {
     @Override
     public Set<FileIdentifier> getChangedFilesSinceRevision(String revision) throws VersionControlPluginException {
         Set<FileIdentifier> identifiers = new HashSet();
-        List logs = null;
         try {
-            logs = (LinkedList) svnRepo.log(new String[]{}, null, Long.parseLong(revision) + 1, -1, true, false);
+            if (revision.equals("0")) {
+                listEntries("/", identifiers);
+            } else {
+                List logs = null;
+                logs = (LinkedList) svnRepo.log(new String[]{}, null, Long.parseLong(revision) + 1, -1, true, false);
+                for (int i = 0; i < logs.size(); i++) {
+                    SVNLogEntry entry = (SVNLogEntry) logs.get(i);
+                    Iterator entryIterator = entry.getChangedPaths().values().iterator();
+                    while (entryIterator.hasNext()) {
+                        SVNLogEntryPath currentPath = (SVNLogEntryPath) entryIterator.next();
+
+                        //attribute values for the new fileIdentifier
+                        String filePath = currentPath.getPath();
+                        boolean deleted = false;
+                        if (currentPath.getType() == 'D') { //The file has been deleted
+                            deleted = true;
+                        }
+                        FileIdentifier fileIdentifier = new FileIdentifier(filePath, false, deleted, repository);
+                        if (identifiers.contains(fileIdentifier)) {
+                            identifiers.remove(fileIdentifier);
+                        }
+                        identifiers.add(fileIdentifier);
+                        LOG.info("Add file to indexing list: " + filePath);
+                    }
+                }
+            }
         } catch (NullPointerException e) {
             throw new VersionControlPluginException("No repository specified");
         } catch (SVNException ex) {
             return identifiers;
-        }
-        for (int i = 0; i < logs.size(); i++) {
-            SVNLogEntry entry = (SVNLogEntry) logs.get(i);
-            Iterator entryIterator = entry.getChangedPaths().values().iterator();
-            while (entryIterator.hasNext()) {
-                SVNLogEntryPath currentPath = (SVNLogEntryPath) entryIterator.next();
-
-                //attribute values for the new fileIdentifier
-                String filePath = currentPath.getPath();
-                boolean deleted = false;
-                if (currentPath.getType() == 'D') { //The file has been deleted
-                    deleted = true;
-                }
-
-                identifiers.add(new FileIdentifier(filePath, false, deleted, repository));
-                LOG.info("Add file to indexing list: " + filePath);
-
-            }
         }
         return identifiers;
     }
@@ -204,6 +212,19 @@ public class SubversionPlugin implements VersionControlPlugin {
             }
         } catch (SVNException ex) {
             throw new VersionControlPluginException("Connection to specified repository could not be established:\n" + ex);
+        }
+    }
+
+    private void listEntries(String path, Set<FileIdentifier> identifiers) throws SVNException {
+        Collection entries = svnRepo.getDir(path, -1, null, (Collection) null);
+        Iterator iterator = entries.iterator();
+        while (iterator.hasNext()) {
+            SVNDirEntry entry = (SVNDirEntry) iterator.next();
+            if (entry.getKind() == SVNNodeKind.DIR) {
+                listEntries((path.equals("")) ? entry.getName() : path + "/" + entry.getName(), identifiers);
+            } else if (entry.getKind() == SVNNodeKind.FILE) {
+                identifiers.add(new FileIdentifier(path + "/" + entry.getName(), false, false, repository));
+            }
         }
     }
 

@@ -25,14 +25,14 @@ sed -i 's/<!--STARTPLUGINS-->/<!--STARTPLUGINS/' commons/pom.xml
 sed -i 's/<!--ENDPLUGINS-->/ENDPLUGINS-->/' commons/pom.xml
 
 cd commons
-mvn clean install -DskipTests=true
+mvn clean install -DskipTests=true -T 2.0C
 cd ..
 
 sed -i 's/<!--STARTPLUGINS/<!--STARTPLUGINS-->/' commons/pom.xml
 sed -i 's/ENDPLUGINS-->/<!--ENDPLUGINS-->/' commons/pom.xml
 
-find plugins -iname "pom.xml" -execdir mvn clean install -DskipTests=true \;
+find plugins -iname "pom.xml" -execdir mvn clean install -DskipTests=true -T 2.0C -q \;
 
 cd commons
-mvn clean install -DskipTests=true
+mvn clean install -DskipTests=true -T 2.0C
 cd ..

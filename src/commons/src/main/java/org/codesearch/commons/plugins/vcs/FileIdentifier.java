@@ -91,8 +91,6 @@ public class FileIdentifier {
 
     @Override
     public int hashCode() {
-        int hash = 3;
-        hash = 67 * hash + (this.filePath != null ? this.filePath.hashCode() : 0);
-        return hash;
+        return 201 + (this.filePath != null ? this.filePath.hashCode() : 0);
     }
 }

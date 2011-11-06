@@ -1,15 +1,15 @@
 /**
  * Copyright 2010 David Froehlich <david.froehlich@businesssoftware.at>, Samuel Kogler <samuel.kogler@gmail.com>, Stephan Stiboller
  * <stistc06@htlkaindorf.at>
- * 
+ *
  * This file is part of Codesearch.
- * 
+ *
  * Codesearch is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * 
+ *
  * Codesearch is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with Codesearch. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.codesearch.indexer.server.tasks;
@@ -72,7 +72,7 @@ import org.codesearch.commons.plugins.vcs.FileDto;
 
 /**
  * This task performs basic indexing of one repository.
- * 
+ *
  * @author Stephan Stiboller
  * @author David Froehlich
  */
@@ -124,7 +124,7 @@ public class IndexingTask implements Task {
 
     /**
      * executes the task, updates the index fields of the set repository
-     * 
+     *
      * @throws TaskExecutionException
      */
     @Override
@@ -182,7 +182,6 @@ public class IndexingTask implements Task {
 
                                 if (repository.isCodeNavigationEnabled() && databaseConnectionValid) {
                                     executeCodeAnalysisForFile(currentDto);
-
                                 }
                             } catch (CodeAnalyzerPluginException ex) {
                                 LOG.error("Code analyzing failed, skipping file\n" + ex);
@@ -243,7 +242,7 @@ public class IndexingTask implements Task {
      * @param fileIdentifiers
      * @param plugin
      * @return
-     * @throws VersionControlPluginException 
+     * @throws VersionControlPluginException
      */
     private Set<FileDto> retrieveFileDtosForIdentifiers(Set<FileIdentifier> fileIdentifiers, VersionControlPlugin plugin) throws VersionControlPluginException {
         Set<FileDto> fileDtos = new HashSet<FileDto>();
@@ -256,7 +255,7 @@ public class IndexingTask implements Task {
     /**
      * checks all FileIdentifiers whether the files should be indexed or not
      * deletes those files that should not be indexed from the set
-     * @param fileIdentifiers 
+     * @param fileIdentifiers
      */
     private void removeNotToBeIndexedFiles(Set<FileIdentifier> fileIdentifiers) {
         if (!fileIdentifiers.isEmpty()) {
@@ -272,7 +271,7 @@ public class IndexingTask implements Task {
 
     /**
      * Sends a request to the searcher web application, notifying it to re-load the index.
-     * 
+     *
      * @throws NotifySearcherException in case the connection to the searcher could not be established
      */
     private void notifySearcher() throws NotifySearcherException {
@@ -287,7 +286,7 @@ public class IndexingTask implements Task {
 
     /**
      * executes the code analysis for the given file
-     * 
+     *
      * @throws CodeAnalyzerPluginException if the source code of one of the files could not be analyzed
      */
     private void executeCodeAnalysisForFile(FileDto fileDto) throws DatabaseAccessException, CodeAnalyzerPluginException {
@@ -318,7 +317,7 @@ public class IndexingTask implements Task {
 
     /**
      * Adds all fields of the specified file to the specified document.
-     * 
+     *
      * @param doc The target document
      * @param file The source file
      */
@@ -400,7 +399,7 @@ public class IndexingTask implements Task {
         }
         Document doc = new Document();
         if (file == null || file.getFilePath() == null) {
-            return; // TODO find out why this can happen
+            return; // If the file is deleted, plugins sometimes return null
         }
         // The lucene document containing all relevant indexing information
         doc = new Document();

@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.codesearch.indexer.server.rpc;
 
@@ -55,7 +55,6 @@ public class ManualIndexingServiceImpl extends RemoteServiceServlet implements M
     public void startManualIndexing(List<String> repositories, List<String> repositoryGroups) throws ManualIndexingServiceException {
         try {
             indexingManager.startJobForRepositories(repositories, repositoryGroups);
-            //FIXME
         } catch (SchedulerException ex) {
             throw new ManualIndexingServiceException("Could not start manual indexing job:\n"+ex);
         }

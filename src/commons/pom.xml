@@ -45,23 +45,76 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
         </dependency>
-        
+
 		<!-- Lucene API to create/manage index -->
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-core</artifactId>
         </dependency>
-		<!-- MySQL database -->
+
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>5.1.17</version>
         </dependency>
+
+       		<!-- Default included plugins -->
+        <!--STARTPLUGINS-->
+        <dependency>
+            <groupId>org.codesearch</groupId>
+            <artifactId>RepositoryLuceneFieldPlugin</artifactId>
+            <version>0.1-RC1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codesearch</groupId>
+            <artifactId>FilepathLuceneFieldPlugin</artifactId>
+            <version>0.1-RC1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codesearch</groupId>
+            <artifactId>ContentLuceneFieldPlugin</artifactId>
+            <version>0.1-RC1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codesearch</groupId>
+            <artifactId>FilenameLuceneFieldPlugin</artifactId>
+            <version>0.1-RC1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codesearch</groupId>
+            <artifactId>JavaCodeAnalyzerPlugin</artifactId>
+            <version>0.1-RC1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codesearch</groupId>
+            <artifactId>XmlCodeAnalyzerPlugin</artifactId>
+            <version>0.1-RC1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codesearch</groupId>
+            <artifactId>DefaultHighlightingPlugin</artifactId>
+            <version>0.1-RC1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codesearch</groupId>
+            <artifactId>codesearch-jhighlight</artifactId>
+            <version>0.1-RC1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codesearch</groupId>
+            <artifactId>FilesystemPlugin</artifactId>
+            <version>0.1-RC1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codesearch</groupId>
+            <artifactId>GitLocalPlugin</artifactId>
+            <version>0.1-RC1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codesearch</groupId>
+            <artifactId>SubversionPlugin</artifactId>
+            <version>0.1-RC1</version>
+        </dependency>
+        <!--ENDPLUGINS-->
     </dependencies>
-
-	<!--build> <plugins> <plugin> <artifactId>maven-dependency-plugin</artifactId> 
-		<executions> <execution> <phase>install</phase> <goals> <goal>copy-dependencies</goal> 
-		</goals> <configuration> <outputDirectory>${project.build.directory}/lib</outputDirectory> 
-		</configuration> </execution> </executions> </plugin> </plugins> </build -->
-
 </project>

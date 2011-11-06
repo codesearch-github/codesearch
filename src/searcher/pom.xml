@@ -57,14 +57,11 @@
             <artifactId>jmimemagic</artifactId>
         </dependency>
 
-		<!-- INTERNAL DEPENDENCIES -->
-
         <dependency>
             <groupId>org.codesearch</groupId>
             <artifactId>codesearch-commons</artifactId>
             <version>0.1-RC1</version>
         </dependency>
-
     </dependencies>
 
     <build>

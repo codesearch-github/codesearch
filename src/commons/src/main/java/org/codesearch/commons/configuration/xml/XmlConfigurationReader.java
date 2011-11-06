@@ -1,15 +1,15 @@
 /**
  * Copyright 2010 David Froehlich <david.froehlich@businesssoftware.at>, Samuel Kogler <samuel.kogler@gmail.com>, Stephan Stiboller
  * <stistc06@htlkaindorf.at>
- * 
+ *
  * This file is part of Codesearch.
- * 
+ *
  * Codesearch is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * 
+ *
  * Codesearch is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with Codesearch. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.codesearch.commons.configuration.xml;
@@ -45,7 +45,7 @@ import com.google.inject.name.Named;
 /**
  * Xml implementation of the configuration reader. By default, the properties are loaded from a file in the classpath called
  * codesearch_config.xml.
- * 
+ *
  * @author Stephan Stiboller
  * @author David Froehlich
  * @author Samuel Kogler
@@ -62,7 +62,7 @@ public class XmlConfigurationReader implements ConfigurationReader {
 
     /**
      * creates a new instance of XmlConfigurationReader
-     * 
+     *
      * @param configPath the classpath of the config file
      * @throws InvalidConfigurationException if the configuration file was invalid
      */
@@ -176,6 +176,9 @@ public class XmlConfigurationReader implements ConfigurationReader {
         codesearchConfiguration = new CodesearchConfiguration();
         try {
             config = new XMLConfiguration(this.configPath);
+            if(config == null) {
+                throw new InvalidConfigurationException("Config was null at: " + this.configPath);
+            }
         } catch (ConfigurationException ex) {
             throw new InvalidConfigurationException("Configuration file could not be read:\n" + ex);
         }
@@ -226,12 +229,12 @@ public class XmlConfigurationReader implements ConfigurationReader {
             throw new InvalidConfigurationException("Searcher location is not a valid URI: " + ex);
         }
     }
-    
+
     private void loadRepositoryGroups() throws InvalidConfigurationException {
         List<String> repositoryGroups = Arrays.asList(config.getString(XmlConfigurationReaderConstants.REPOSITORY_GROUP_LIST).split(" "));
         codesearchConfiguration.setRepositoryGroups(repositoryGroups);
     }
-    
+
     private void loadRepositories() throws InvalidConfigurationException {
         LinkedList<RepositoryDto> repositories = new LinkedList<RepositoryDto>();
         List<HierarchicalConfiguration> repositoryConfigs = config.configurationsAt(XmlConfigurationReaderConstants.REPOSITORY_LIST);
@@ -318,7 +321,7 @@ public class XmlConfigurationReader implements ConfigurationReader {
         }
         codesearchConfiguration.setJobs(jobs);
     }
-    
+
     private void loadIndexerUsers() {
         List<IndexerUserDto> indexerUsers = new LinkedList<IndexerUserDto>();
         List<HierarchicalConfiguration> userConfig = config.configurationsAt(XmlConfigurationReaderConstants.INDEXER_USERS);
@@ -346,7 +349,7 @@ public class XmlConfigurationReader implements ConfigurationReader {
         }
         codesearchConfiguration.setDatabaseConfiguration(databaseConfiguration);
     }
-    
+
     private void loadGlobalWhitelist() {
         List globalWhitelist = config.getList(XmlConfigurationReaderConstants.GLOBAL_WHITELIST);
         if (globalWhitelist == null) {
@@ -354,7 +357,7 @@ public class XmlConfigurationReader implements ConfigurationReader {
         }
         codesearchConfiguration.setGlobalWhitelist(globalWhitelist);
     }
-    
+
     private void loadGlobalBlacklist() {
         List globalBlacklist = config.getList(XmlConfigurationReaderConstants.GLOBAL_BLACKLIST);
         if (globalBlacklist == null) {
@@ -362,10 +365,10 @@ public class XmlConfigurationReader implements ConfigurationReader {
         }
         codesearchConfiguration.setGlobalBlacklist(globalBlacklist);
     }
-    
+
     /**
      * Takes a string of repository names and returns a {@link List} of the corresponding {@link RepositoryDto} objects.
-     * 
+     *
      * @param repositoryNames The names of the repositories in a single string separated by spaces.
      * @return the {@link List} of {@link RepositoryDto}s.
      */
