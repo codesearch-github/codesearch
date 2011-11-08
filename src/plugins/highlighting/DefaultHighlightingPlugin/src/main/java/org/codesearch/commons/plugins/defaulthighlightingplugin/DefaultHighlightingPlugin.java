@@ -91,7 +91,7 @@ public class DefaultHighlightingPlugin implements HighlightingPlugin {
             } else {
                 renderer = new XmlXhtmlRenderer();
             }
-            return renderer.highlight(new String(content, "UTF-8"));
+            return renderer.highlight(new String(content, "UTF-8"), getEscapeStartToken(), getEscapeEndToken());
         } catch (IOException ex) {
             throw new HighlightingPluginException("Parsing was not successful\n" + ex);
         } catch (NullPointerException ex) {
@@ -131,18 +131,18 @@ public class DefaultHighlightingPlugin implements HighlightingPlugin {
     /** {@inheritDoc} */
     @Override
     public String getVersion() {
-        return "0.1-SNAPSHOT";
+        return "0.1-RC1";
     }
 
     /** {@inheritDoc} */
     @Override
     public String getEscapeStartToken() {
-        return " _begin_"+"µ_escape_"; //The token is split into 2 string so this file can be viewed without the string triggering highlighting plugin
+        return " _begin_escape_"; //The token is split into 2 string so this file can be viewed without the string triggering highlighting plugin
     }
 
     /** {@inheritDoc} */
     @Override
     public String getEscapeEndToken() {
-        return " _end_"+"µ_escape_"; //The token is split into 2 string so this file can be viewed without the string triggering highlighting plugin
+        return " _end_escape_"; //The token is split into 2 string so this file can be viewed without the string triggering highlighting plugin
     }
 }

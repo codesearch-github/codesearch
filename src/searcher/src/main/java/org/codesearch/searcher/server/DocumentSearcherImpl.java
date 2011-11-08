@@ -104,9 +104,10 @@ public class DocumentSearcherImpl implements DocumentSearcher {
         if (caseSensitive) {
             query = queryParserCaseSensitive.parse(finalSearchString);
         } else {
-            finalSearchString = finalSearchString.replace(IndexConstants.INDEX_FIELD_FILEPATH + ":",
-                    IndexConstants.INDEX_FIELD_FILEPATH + "_lc:").replace(IndexConstants.INDEX_FIELD_CONTENT + ":",
-                    IndexConstants.INDEX_FIELD_CONTENT + "_lc:");
+            finalSearchString = finalSearchString.
+                    replace(IndexConstants.INDEX_FIELD_FILEPATH + ":", IndexConstants.INDEX_FIELD_FILEPATH + "_lc:").
+                    replace(IndexConstants.INDEX_FIELD_CONTENT + ":", IndexConstants.INDEX_FIELD_CONTENT + "_lc:").
+                    replace(IndexConstants.INDEX_FIELD_FILENAME + ":", IndexConstants.INDEX_FIELD_FILENAME + "_lc:");
             query = queryParser.parse(finalSearchString.toLowerCase());
         }
 

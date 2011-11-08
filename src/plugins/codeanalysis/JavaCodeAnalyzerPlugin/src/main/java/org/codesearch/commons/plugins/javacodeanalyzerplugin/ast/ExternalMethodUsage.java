@@ -50,7 +50,13 @@ public class ExternalMethodUsage extends ExternalUsage {
     @Override
     public void resolveLink(String targetFilePath, AstNode ast){
         super.setTargetFilePath(targetFilePath);
-        //TODO retrieve reference line
-        super.setReferenceLine(-1);
+        for(AstNode currentAst : ast.getChildNodes()){
+            if(currentAst instanceof MethodNode){
+                MethodNode methodNode = (MethodNode)ast;
+                if(super.getReplacedString().equals(methodNode.getName()) && parameters.size() == methodNode.getParameters().size()){
+                    super.setReferenceLine(methodNode.getStartLine());
+                }
+            }
+        }
     }
 }

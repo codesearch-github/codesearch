@@ -36,12 +36,13 @@ public abstract class XhtmlRenderer implements Renderer {
 
     /** {@inheritDoc} */
     @Override
-    public String highlight(String input) throws IOException {
+    public String highlight(String input, String beginEscapeToken, String endEscapeToken) throws IOException {
         ExplicitStateHighlighter highlighter = getHighlighter();
 
         BufferedReader r = new BufferedReader(new StringReader(input));
         StringBuilder out = new StringBuilder();
-
+        String trimmedStartToken = beginEscapeToken.trim();
+        String trimmedEndToken = endEscapeToken.trim();
         String line;
         String token;
         int length;
@@ -61,10 +62,11 @@ public abstract class XhtmlRenderer implements Renderer {
 
             while (index < line.length()) {
                 style = highlighter.getNextToken();
+                
                 length = highlighter.getTokenLength();
                 token = line.substring(index, index + length);
                 boolean append = true;
-                if (token.startsWith("_begin_escape_")) {
+                if (token.startsWith(trimmedStartToken)) {
                     escaped = true;
                     out.deleteCharAt(out.length() - 1);
                     token = token.substring(14);
@@ -72,7 +74,7 @@ public abstract class XhtmlRenderer implements Renderer {
                         append = false;
                     }
                 } else if (escaped) {
-                    if (token.startsWith("_end_escape_")) {
+                    if (token.startsWith(trimmedEndToken)) {
                         escaped = false;
                         out.deleteCharAt(out.length() - 1);
                         token = token.substring(12);

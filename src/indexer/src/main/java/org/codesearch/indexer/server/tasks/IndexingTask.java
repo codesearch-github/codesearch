@@ -146,7 +146,7 @@ public class IndexingTask implements Task {
                         job.setCurrentRepository(i);
                     }
                     try {
-                        LOG.info("Indexing repository: " + repository.getName());
+                        LOG.info("Indexing repository: " + repository.getName() + (repository.isCodeNavigationEnabled() ? " codenavigation enabled" : " codenavigation disabled"));
                         long start = System.currentTimeMillis();
                         // Read the index status file
                         String lastIndexedRevision = propertiesManager.getPropertyFileValue(repository.getName());

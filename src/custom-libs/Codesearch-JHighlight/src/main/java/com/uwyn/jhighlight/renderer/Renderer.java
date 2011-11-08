@@ -37,5 +37,5 @@ public interface Renderer {
      * @return The highlighted source code
      * @throws IOException
      */
-    public String highlight(String input) throws IOException;
+    public String highlight(String input, String beginEscapeToken, String endEscapeToken) throws IOException;
 }
