@@ -22,5 +22,5 @@ public interface ManualIndexingService extends RemoteService {
 	 * @return The data for the manual indexing job.
 	 */
 	ManualIndexingData getData() throws ManualIndexingServiceException;
-        void startManualIndexing(List<String> repositories, List<String> repositoryGroups) throws ManualIndexingServiceException;
+        void startManualIndexing(List<String> repositories, List<String> repositoryGroups, boolean clear) throws ManualIndexingServiceException;
 }

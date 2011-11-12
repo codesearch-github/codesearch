@@ -31,8 +31,6 @@ import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
-import java.lang.String;
-import java.util.List;
 import org.codesearch.indexer.client.rpc.ManualIndexingService;
 import org.codesearch.indexer.client.rpc.ManualIndexingServiceAsync;
 import org.codesearch.indexer.client.ui.manualIndexing.ManualIndexingView.Presenter;
@@ -83,19 +81,19 @@ public class ManualIndexingActivity extends AbstractActivity implements Presente
 
     @Override
     public void startManualIndexing() {
-        manualIndexingServiceAsync.startManualIndexing(manualIndexingView.getRepositories(), manualIndexingView.getRepositoryGroups(), new ManualIndexingCallback());
+        manualIndexingServiceAsync.startManualIndexing(manualIndexingView.getRepositories(), manualIndexingView.getRepositoryGroups(), manualIndexingView.getClear().getValue(), new ManualIndexingCallback());
     }
     
     private class ManualIndexingCallback implements AsyncCallback<Void>{
 
         @Override
         public void onFailure(Throwable caught) {
-            Window.alert("FAIL!");//FIXME
+            Window.alert("Starting the manual indexing job failed, see server log for detailed information");
         }
 
         @Override
         public void onSuccess(Void result) {
-            //TODO add notification
+            Window.alert("Started manual indexing job");//TODO maybe move message to some kind of notification area
         }
         
     }

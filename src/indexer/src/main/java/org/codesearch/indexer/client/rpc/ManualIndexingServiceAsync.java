@@ -15,5 +15,5 @@ public interface ManualIndexingServiceAsync {
 
     void getData(AsyncCallback<ManualIndexingData> callback);
 
-    void startManualIndexing(List<String> repositories, List<String> repoGroups, AsyncCallback<Void> callback);
+    void startManualIndexing(List<String> repositories, List<String> repoGroups, boolean clear, AsyncCallback<Void> callback);
 }

@@ -52,9 +52,9 @@ public class ManualIndexingServiceImpl extends RemoteServiceServlet implements M
     }
 
     @Override
-    public void startManualIndexing(List<String> repositories, List<String> repositoryGroups) throws ManualIndexingServiceException {
+    public void startManualIndexing(List<String> repositories, List<String> repositoryGroups, boolean clear) throws ManualIndexingServiceException {
         try {
-            indexingManager.startJobForRepositories(repositories, repositoryGroups);
+            indexingManager.startJobForRepositories(repositories, repositoryGroups, clear);
         } catch (SchedulerException ex) {
             throw new ManualIndexingServiceException("Could not start manual indexing job:\n"+ex);
         }

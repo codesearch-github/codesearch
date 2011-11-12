@@ -34,6 +34,7 @@
                 </g:tab>
             </g:TabLayoutPanel>
         </div>
+        <g:CheckBox ui:field='clear' text='Clear before indexing' />
         <g:Button ui:field="indexingButton">Start indexing</g:Button>
     </g:HTMLPanel>
 </ui:UiBinder> 

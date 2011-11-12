@@ -8,8 +8,8 @@ import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Widget;
 import java.util.LinkedList;
@@ -34,6 +34,9 @@ public class ManualIndexingViewImpl extends Composite implements ManualIndexingV
     /** the object representation of the submit button */
     @UiField
     HasClickHandlers indexingButton;
+    
+    @UiField
+    HasValue<Boolean> clear;
     
     private Presenter presenter;
 
@@ -76,6 +79,12 @@ public class ManualIndexingViewImpl extends Composite implements ManualIndexingV
     void onIndexingButton(ClickEvent e) {
         presenter.startManualIndexing();
     }
+    
+    @Override
+    public HasValue<Boolean> getClear() {
+        return clear;
+    }
+    
     @Override
     public void setRepositories(List<String> repositories) {
         for(String currentRepo : repositories){

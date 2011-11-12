@@ -213,7 +213,7 @@ public final class IndexingManager {
      * @param repositoryGroups the repo groups containing the repositories 
      * @throws SchedulerException 
      */
-    public void startJobForRepositories(List<String> repositories, List<String> repositoryGroups) throws SchedulerException {
+    public void startJobForRepositories(List<String> repositories, List<String> repositoryGroups, boolean clear) throws SchedulerException {
         JobKey jobKey = new JobKey("manual-job" + new Date().getTime(), IndexingJob.GROUP_NAME);
         List<RepositoryDto> repos = new LinkedList<RepositoryDto>();
         for (String currentRepoName : repositories) {
@@ -232,7 +232,7 @@ public final class IndexingManager {
         JobDataMap jdm = new JobDataMap();
         jdm.put(IndexingJob.FIELD_REPOSITORIES, repos);
         jdm.put(IndexingJob.FIELD_TERMINATED, false);
-        jdm.put(IndexingJob.FIELD_CLEAR_INDEX, false);
+        jdm.put(IndexingJob.FIELD_CLEAR_INDEX, clear);
 
         JobDetail jobDetail = JobBuilder.newJob(IndexingJob.class).withIdentity(jobKey).usingJobData(jdm).build();
         Trigger jobTrigger = TriggerBuilder.newTrigger().forJob(jobKey).startNow().build();
