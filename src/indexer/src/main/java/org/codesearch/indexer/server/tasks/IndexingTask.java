@@ -65,9 +65,12 @@ import org.codesearch.indexer.server.exceptions.TaskExecutionException;
 import org.codesearch.indexer.server.manager.IndexingJob;
 
 import com.google.inject.Inject;
+import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import org.apache.lucene.analysis.TokenStream;
+import org.codesearch.commons.plugins.lucenefields.FullValueAnalyzer;
 import org.codesearch.commons.plugins.vcs.FileDto;
 
 /**
@@ -326,10 +329,14 @@ public class IndexingTask implements Task {
             String fieldValue = currentPlugin.getFieldValue(file);
             String currentFieldName = currentPlugin.getFieldName();
             Store store = currentPlugin.isStored() ? Field.Store.YES : Field.Store.NO;
-            Index index = currentPlugin.isAnalyzed() ? Field.Index.ANALYZED : Field.Index.NOT_ANALYZED;
-            doc.add(new Field(currentFieldName, fieldValue, store, index));
-            if (currentPlugin.addLowercase()) {
-                doc.add(new Field(currentFieldName + "_lc", fieldValue.toLowerCase(), store, index));
+            Index index = currentPlugin.getRegularCaseAnalyzer() != null ? Field.Index.ANALYZED : Field.Index.NOT_ANALYZED;
+            Field regularField = new Field(currentFieldName, fieldValue, store, index);
+
+            doc.add(regularField);
+
+            if (currentPlugin.getLowerCaseAnalyzer() != null) {
+                Field lowerCaseField = new Field(currentFieldName + "_lc", fieldValue.toLowerCase(), store, index);
+                doc.add(lowerCaseField);
                 // TODO move _lc to a constant
             }
         }
@@ -346,15 +353,12 @@ public class IndexingTask implements Task {
             throw new InvalidIndexLocationException("Cannot access index directory at: " + indexLocation);
         }
 
-        PerFieldAnalyzerWrapper analyzer = new PerFieldAnalyzerWrapper(new SimpleAnalyzer(IndexConstants.LUCENE_VERSION));
+        PerFieldAnalyzerWrapper analyzer = new PerFieldAnalyzerWrapper(new FullValueAnalyzer(true));
         try {
             for (LuceneFieldPlugin currentPlugin : pluginLoader.getMultiplePluginsForPurpose(LuceneFieldPlugin.class, "lucene_field_plugin")) {
                 luceneFieldPlugins.add(currentPlugin);
-
                 analyzer.addAnalyzer(currentPlugin.getFieldName(), currentPlugin.getRegularCaseAnalyzer());
-                if (currentPlugin.addLowercase()) {
-                    analyzer.addAnalyzer(currentPlugin.getFieldName() + "_lc", currentPlugin.getLowerCaseAnalyzer());
-                }
+                analyzer.addAnalyzer(currentPlugin.getFieldName() + "_lc", currentPlugin.getLowerCaseAnalyzer());
             }
         } catch (PluginLoaderException ex) {
             LOG.warn("No LuceneFieldPlugins could be found. Indexing will not create a useable index");

@@ -45,18 +45,6 @@ public class RevisionLuceneFieldPlugin extends LuceneFieldPlugin {
 
     /**  {@inheritDoc} */
     @Override
-    public boolean isAnalyzed() {
-        return false;
-    }
-
-    /**  {@inheritDoc} */
-    @Override
-    public boolean addLowercase() {
-        return false;
-    }
-
-    /**  {@inheritDoc} */
-    @Override
     public boolean isStored() {
         return false;
     }

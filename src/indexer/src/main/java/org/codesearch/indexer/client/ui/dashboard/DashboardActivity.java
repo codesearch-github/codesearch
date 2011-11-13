@@ -36,6 +36,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.view.client.ListDataProvider;
+import org.codesearch.indexer.shared.RepositoryStatus;
 
 /**
  * Presenter for the dashboard.
@@ -49,6 +50,7 @@ public class DashboardActivity extends AbstractActivity implements Presenter {
     
     private ListDataProvider<JobStatus> runningJobsDataProvider = new ListDataProvider<JobStatus>();
     private ListDataProvider<JobStatus> scheduledJobsDataProvider = new ListDataProvider<JobStatus>();
+    private ListDataProvider<RepositoryStatus> repositoryStatuses = new ListDataProvider<RepositoryStatus>();
    
     public DashboardActivity(ClientFactory clientFactory, DashboardPlace place) {
         this.clientFactory = clientFactory;
@@ -63,7 +65,7 @@ public class DashboardActivity extends AbstractActivity implements Presenter {
         
         runningJobsDataProvider.addDataDisplay(dashboardView.getRunningJobsTable());
         scheduledJobsDataProvider.addDataDisplay(dashboardView.getScheduledJobsTable());
-        
+        repositoryStatuses.addDataDisplay(dashboardView.getRepositoryStatuses());
         refresh();
     }
 
@@ -79,6 +81,7 @@ public class DashboardActivity extends AbstractActivity implements Presenter {
         dashboardView.cleanup();
         runningJobsDataProvider.removeDataDisplay(dashboardView.getRunningJobsTable());
         scheduledJobsDataProvider.removeDataDisplay(dashboardView.getScheduledJobsTable());
+        repositoryStatuses.removeDataDisplay(dashboardView.getRepositoryStatuses());
     }
     
     @Override
@@ -100,6 +103,7 @@ public class DashboardActivity extends AbstractActivity implements Presenter {
 		public void onSuccess(DashboardData result) {
 			runningJobsDataProvider.setList(result.getRunningJobs());
 			scheduledJobsDataProvider.setList(result.getScheduledJobs());
+                        repositoryStatuses.setList(result.getRepositoryStatuses());
 		}
     }
 }

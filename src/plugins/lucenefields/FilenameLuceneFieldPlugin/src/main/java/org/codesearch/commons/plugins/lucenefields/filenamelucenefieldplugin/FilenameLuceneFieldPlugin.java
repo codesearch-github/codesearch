@@ -18,15 +18,12 @@
  * You should have received a copy of the GNU General Public License
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.codesearch.commons.plugins.lucenefields.filenamelucenefieldplugin;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.SimpleAnalyzer;
-import org.codesearch.commons.constants.IndexConstants;
+import org.codesearch.commons.plugins.lucenefields.FullValueAnalyzer;
 import org.codesearch.commons.plugins.lucenefields.LuceneFieldPlugin;
 import org.codesearch.commons.plugins.lucenefields.LuceneFieldValueException;
-import org.codesearch.commons.plugins.lucenefields.LetterAnalyzer;
 import org.codesearch.commons.plugins.vcs.FileDto;
 
 /**
@@ -34,33 +31,22 @@ import org.codesearch.commons.plugins.vcs.FileDto;
  * @author David Froehlich
  */
 public class FilenameLuceneFieldPlugin extends LuceneFieldPlugin {
+
     /** {@inhertDoc} */
     @Override
     public String getFieldValue(FileDto fileDto) throws LuceneFieldValueException {
         try {
-            return fileDto.getFilePath().substring(fileDto.getFilePath().lastIndexOf("/"));
+            return fileDto.getFilePath().substring(fileDto.getFilePath().lastIndexOf("/") + 1);
         } catch (StringIndexOutOfBoundsException ex) {
             return fileDto.getFilePath();
         }
 
     }
-    
+
     /** {@inheritDoc} */
     @Override
     public String getVersion() {
         return "0.1-RC1";
-    }
-
-    /** {@inhertDoc} */
-    @Override
-    public boolean isAnalyzed() {
-        return true;
-    }
-
-    /** {@inhertDoc} */
-    @Override
-    public boolean addLowercase() {
-        return true;
     }
 
     /** {@inhertDoc} */
@@ -78,12 +64,12 @@ public class FilenameLuceneFieldPlugin extends LuceneFieldPlugin {
     /** {@inhertDoc} */
     @Override
     public Analyzer getRegularCaseAnalyzer() {
-        return new LetterAnalyzer();
+        return new FullValueAnalyzer(true);
     }
 
     /** {@inhertDoc} */
     @Override
     public Analyzer getLowerCaseAnalyzer() {
-        return new SimpleAnalyzer(IndexConstants.LUCENE_VERSION);
+        return new FullValueAnalyzer(false);
     }
 }

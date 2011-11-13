@@ -18,25 +18,57 @@
  * You should have received a copy of the GNU General Public License
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.codesearch.commons.plugins.lucenefields;
 
 import java.io.Reader;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.LetterTokenizer;
+import org.apache.lucene.analysis.CharTokenizer;
 import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.util.Version;
 import org.codesearch.commons.constants.IndexConstants;
 
 /**
  *
  * @author David Froehlich
  */
-public final class LetterAnalyzer extends Analyzer {
+public final class SimpleSourceCodeAnalyzer extends Analyzer {
+    private boolean caseSensitive;
+
+    public SimpleSourceCodeAnalyzer(boolean caseSensitive) {
+        this.caseSensitive = caseSensitive;
+    }
 
     /** {@inheritDoc} */
     @Override
     public TokenStream tokenStream(final String fieldName, final Reader reader) {
-        return new LetterTokenizer(IndexConstants.LUCENE_VERSION, reader);
+        if(caseSensitive){
+            return new SimpleSourceCodeTokenizer(IndexConstants.LUCENE_VERSION, reader);
+        }
+        return new SimpleLowercaseSourceCodeTokenizer(IndexConstants.LUCENE_VERSION, reader);
+    }
+
+    class SimpleSourceCodeTokenizer extends CharTokenizer {
+
+        SimpleSourceCodeTokenizer(Version matchVersion, Reader in) {
+            super(matchVersion, in);
+        }
+
+        @Override
+        protected boolean isTokenChar(int c) {
+            return Character.isJavaIdentifierPart(c) || c == '-' || c == '@' || c == '+' || c == '*' || c == '/' || c == '%';
+        }
+    }
+
+    class SimpleLowercaseSourceCodeTokenizer extends SimpleSourceCodeTokenizer {
+
+        SimpleLowercaseSourceCodeTokenizer(Version matchVersion, Reader in) {
+            super(matchVersion, in);
+        }
+
+        @Override
+        protected int normalize(int c) {
+            return Character.toLowerCase(c);
+        }
     }
 }

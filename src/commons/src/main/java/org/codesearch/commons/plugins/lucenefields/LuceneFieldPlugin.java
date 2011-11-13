@@ -41,19 +41,6 @@ public abstract class LuceneFieldPlugin implements Plugin {
     public abstract String getFieldValue(FileDto fileDto) throws LuceneFieldValueException;
 
     /**
-     * determines whether the content of the field will be stored as Field.Index.Analyzed in the lucene index
-     * @return true is it is analyzed
-     */
-    public abstract boolean isAnalyzed();
-
-    /**
-     * determines whether the content of the field should also be stored in another field as lowercase
-     * if true the IndexingTask will create an additional field with the _lc at the end storing the content of the field in lowercase
-     * @return
-     */
-    public abstract boolean addLowercase();
-
-    /**
      * determines whether the content of the field will be stored as Field.Stored.Yes in the lucene index
      * @return
      */
@@ -66,14 +53,15 @@ public abstract class LuceneFieldPlugin implements Plugin {
     public abstract String getFieldName();
 
     /**
-     * returns the analyzer used for this field in regular case
+     * Returns the analyzer used for this field in regular case.
+     * If the field should not be analyzed, return null.
      * @return
      */
     public abstract Analyzer getRegularCaseAnalyzer();
 
     /**
-     * returns the analyzer used for the content of the lower case field
-     * only used if addLowercase() returns true
+     * Returns the analyzer used for the content of the lower case field.
+     * If the field should not be analyzed in lower case, return null.
      * @return
      */
     public abstract Analyzer getLowerCaseAnalyzer();

@@ -21,11 +21,9 @@
 package org.codesearch.commons.plugins.lucenefields.filepathlucenefieldplugin;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.SimpleAnalyzer;
-import org.codesearch.commons.constants.IndexConstants;
+import org.codesearch.commons.plugins.lucenefields.FullValueAnalyzer;
 import org.codesearch.commons.plugins.lucenefields.LuceneFieldPlugin;
 import org.codesearch.commons.plugins.lucenefields.LuceneFieldValueException;
-import org.codesearch.commons.plugins.lucenefields.LetterAnalyzer;
 import org.codesearch.commons.plugins.vcs.FileDto;
 
 /**
@@ -50,22 +48,10 @@ public class FilepathLuceneFieldPlugin extends LuceneFieldPlugin {
     public String getPurposes() {
         return "lucene_field_plugin";
     }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean isAnalyzed() {
-        return true;
-    }
-
+    
     /** {@inheritDoc} */
     @Override
     public boolean isStored() {
-        return true;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean addLowercase() {
         return true;
     }
 
@@ -78,13 +64,13 @@ public class FilepathLuceneFieldPlugin extends LuceneFieldPlugin {
     @Override
     /** {@inheritDoc} */
     public Analyzer getRegularCaseAnalyzer() {
-        return new LetterAnalyzer();
+        return new FullValueAnalyzer(true);
     }
 
     @Override
     /** {@inheritDoc} */
     public Analyzer getLowerCaseAnalyzer() {
-        return new SimpleAnalyzer(IndexConstants.LUCENE_VERSION);
+        return new FullValueAnalyzer(false);
     }
 
     /** {@inheritDoc} */

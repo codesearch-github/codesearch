@@ -27,6 +27,7 @@ import org.apache.log4j.Logger;
 import org.codesearch.commons.configuration.ConfigurationReader;
 import org.codesearch.commons.configuration.dto.JobDto;
 import org.codesearch.commons.configuration.dto.RepositoryDto;
+import org.codesearch.commons.plugins.PluginLoaderException;
 import org.codesearch.indexer.shared.JobStatus;
 import org.quartz.CronScheduleBuilder;
 import org.quartz.JobBuilder;
@@ -43,6 +44,12 @@ import org.quartz.impl.matchers.GroupMatcher;
 import org.quartz.spi.JobFactory;
 
 import com.google.inject.Inject;
+import java.io.File;
+import org.codesearch.commons.configuration.properties.PropertiesManager;
+import org.codesearch.commons.constants.IndexConstants;
+import org.codesearch.commons.plugins.PluginLoader;
+import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
+import org.codesearch.indexer.shared.RepositoryStatus;
 import org.quartz.SimpleTrigger;
 
 /**
@@ -63,7 +70,8 @@ public final class IndexingManager {
     /** The job listener that mantains a history of job executions. */
     private IndexingJobHistoryListener historyListener;
     private ConfigurationReader configReader;
-
+    private PropertiesManager propertiesManager;
+    
     /**
      * Creates a new instance of IndexingManager
      * 
@@ -77,7 +85,9 @@ public final class IndexingManager {
         this.scheduler = scheduler;
         this.historyListener = new IndexingJobHistoryListener();
         this.configReader = configurationReader;
-
+        String indexLocation = configurationReader.getIndexLocation().getPath();
+        propertiesManager = new PropertiesManager(indexLocation + File.separator + IndexConstants.REVISIONS_PROPERTY_FILENAME);
+        
         scheduler.setJobFactory(jobFactory);
         scheduler.getListenerManager().addTriggerListener(new IndexingJobTriggerListener(5 * 60 * 1000),
                 EverythingMatcher.allTriggers()); // delay by 5 minutes if a job is currently running
@@ -122,6 +132,24 @@ public final class IndexingManager {
             i++;
         }
         scheduler.start();
+    }
+
+    public List<RepositoryStatus> getRepositoryStatuses()  {
+        List<RepositoryStatus> repositoryStatuses = new LinkedList<RepositoryStatus>();
+        
+        for(RepositoryDto currentDto : configReader.getRepositories()){
+            String revision = propertiesManager.getPropertyFileValue(currentDto.getName());
+            RepositoryStatus.Status status = RepositoryStatus.Status.INDEXED;
+            if(revision.equals(IndexConstants.REPOSITORY_STATUS_EMPTY)){
+                status = RepositoryStatus.Status.EMPTY;
+            } else if (revision.equals(IndexConstants.REPOSITORY_STATUS_INCONSISTENT)){
+                status = RepositoryStatus.Status.INCONSISTENT;
+            } else if (revision.equals(IndexConstants.REPOSITORY_STATUS_IN_PROGRESS)) {
+                status = RepositoryStatus.Status.IN_PROGRESS;
+            }
+            repositoryStatuses.add(new RepositoryStatus(currentDto.getName(), revision, status));
+        }
+        return repositoryStatuses;
     }
 
     public List<JobStatus> getRunningJobs() throws SchedulerException {

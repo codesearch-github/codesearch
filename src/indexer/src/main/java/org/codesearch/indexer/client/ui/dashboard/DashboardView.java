@@ -27,6 +27,7 @@ import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.client.ui.IsWidget;
+import org.codesearch.indexer.shared.RepositoryStatus;
 
 /**
  * Displays general information like current status and errors.
@@ -75,6 +76,12 @@ public interface DashboardView extends IsWidget {
      * @return The table.
      */
     CellTable<JobStatus> getRunningJobsTable();
+    
+    /**
+     * Returns the table that is used to display the repository statuses
+     * @return The table
+     */
+    CellTable<RepositoryStatus> getRepositoryStatuses();
     
     interface Presenter {
         void goTo(Place place);

@@ -20,7 +20,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.WhitespaceAnalyzer;
 import org.apache.lucene.document.Document;
@@ -39,6 +38,7 @@ import org.codesearch.searcher.shared.SearchResultDto;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import java.util.Iterator;
+import org.codesearch.commons.plugins.lucenefields.SimpleSourceCodeAnalyzer;
 
 @Singleton
 public class DocumentSearcherImpl implements DocumentSearcher {
@@ -72,13 +72,14 @@ public class DocumentSearcherImpl implements DocumentSearcher {
         LOG.debug("Index location set to: " + indexLocation);
         // FIXME critical: use analyzers and fields provided by plugins!
         // TODO make or find proper analyzers for search
+
         queryParser = new QueryParser(IndexConstants.LUCENE_VERSION, IndexConstants.INDEX_FIELD_CONTENT + "_lc",
-                new LowerCaseWhiteSpaceAnalyzer());
+                new SimpleSourceCodeAnalyzer(false));
         queryParser.setAllowLeadingWildcard(true);
         queryParser.setDefaultOperator(QueryParser.Operator.AND);
         queryParser.setLowercaseExpandedTerms(false);
         queryParserCaseSensitive = new QueryParser(IndexConstants.LUCENE_VERSION, IndexConstants.INDEX_FIELD_CONTENT,
-                new WhitespaceAnalyzer(IndexConstants.LUCENE_VERSION));
+                new SimpleSourceCodeAnalyzer(true));
         queryParserCaseSensitive.setAllowLeadingWildcard(true);
         queryParserCaseSensitive.setDefaultOperator(QueryParser.Operator.AND);
         queryParserCaseSensitive.setLowercaseExpandedTerms(false);
