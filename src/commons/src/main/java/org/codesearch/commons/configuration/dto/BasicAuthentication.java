@@ -41,4 +41,10 @@ public class BasicAuthentication implements AuthenticationType {
         this.username = username;
         this.password = password;
     }
+
+    @Override
+    public String toString() {
+        return "BasicAuthentication{" + "username=" + username + ", password=" + password + '}';
+    }    
+    
 }

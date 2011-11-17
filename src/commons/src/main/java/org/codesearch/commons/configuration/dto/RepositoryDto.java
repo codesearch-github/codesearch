@@ -136,16 +136,18 @@ public class RepositoryDto {
     }
 
     /**
-     * @return the repositoryGroups
+     * Returns the list of groups this repository belongs to.
+     * @return The groups of this repository
      */
     public List<String> getRepositoryGroups() {
         return repositoryGroups;
     }
 
     /**
-     * Return the repository list as a single string the groups are spearated with a whitespace
+     * Returns the list of groups this repository belongs to in a single
+     * String, separated by spaces.
      * 
-     * @return repository list as a single string separated by whitspaces
+     * @return The repository group string
      */
     public String getRepositoryGroupsAsString() {
         String repoString = "";
@@ -187,7 +189,7 @@ public class RepositoryDto {
     @Override
     public String toString() {
         String retString = "";
-        retString += "Name: " + name + ", url: " + url + ", used authentication: " + usedAuthentication.toString();
+        retString += "Name: " + name + ", url: " + url + ", authentication: " + usedAuthentication.toString();
         return retString;
     }
 }

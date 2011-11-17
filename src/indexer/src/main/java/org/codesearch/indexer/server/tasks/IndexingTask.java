@@ -28,7 +28,6 @@ import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.PerFieldAnalyzerWrapper;
-import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Field.Index;
@@ -65,12 +64,10 @@ import org.codesearch.indexer.server.exceptions.TaskExecutionException;
 import org.codesearch.indexer.server.manager.IndexingJob;
 
 import com.google.inject.Inject;
-import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import org.apache.lucene.analysis.TokenStream;
-import org.codesearch.commons.plugins.lucenefields.FullValueAnalyzer;
+import org.codesearch.commons.plugins.lucenefields.LuceneFieldPluginLoader;
 import org.codesearch.commons.plugins.vcs.FileDto;
 
 /**
@@ -107,9 +104,14 @@ public class IndexingTask implements Task {
     private IndexingJob job;
     /** the CodeAnalyzerPlugins used, one per mimetype */
     private Map<String, CodeAnalyzerPlugin> caPlugins = new HashMap<String, CodeAnalyzerPlugin>();
+    /** The wrapper analyzer constructed by the plugin loader */
+    private PerFieldAnalyzerWrapper caseInsensitiveAnalyzer;
 
     @Inject
-    public IndexingTask(DBAccess dba, PluginLoader pluginLoader, URI searcherUpdatePath) {
+    public IndexingTask(DBAccess dba, PluginLoader pluginLoader, URI searcherUpdatePath, LuceneFieldPluginLoader luceneFieldPluginLoader) {
+        luceneFieldPlugins = luceneFieldPluginLoader.getAllLuceneFieldPlugins();
+        caseInsensitiveAnalyzer = luceneFieldPluginLoader.getPerFieldAnalyzerWrapper(false);
+
         this.searcherUpdatePath = searcherUpdatePath;
         this.dba = dba;
         this.pluginLoader = pluginLoader;
@@ -335,9 +337,8 @@ public class IndexingTask implements Task {
             doc.add(regularField);
 
             if (currentPlugin.getLowerCaseAnalyzer() != null) {
-                Field lowerCaseField = new Field(currentFieldName + "_lc", fieldValue.toLowerCase(), store, index);
+                Field lowerCaseField = new Field(currentFieldName + IndexConstants.LC_POSTFIX, fieldValue.toLowerCase(), store, index);
                 doc.add(lowerCaseField);
-                // TODO move _lc to a constant
             }
         }
     }
@@ -352,18 +353,9 @@ public class IndexingTask implements Task {
         } catch (IOException ex) {
             throw new InvalidIndexLocationException("Cannot access index directory at: " + indexLocation);
         }
-
-        PerFieldAnalyzerWrapper analyzer = new PerFieldAnalyzerWrapper(new FullValueAnalyzer(true));
-        try {
-            for (LuceneFieldPlugin currentPlugin : pluginLoader.getMultiplePluginsForPurpose(LuceneFieldPlugin.class, "lucene_field_plugin")) {
-                luceneFieldPlugins.add(currentPlugin);
-                analyzer.addAnalyzer(currentPlugin.getFieldName(), currentPlugin.getRegularCaseAnalyzer());
-                analyzer.addAnalyzer(currentPlugin.getFieldName() + "_lc", currentPlugin.getLowerCaseAnalyzer());
-            }
-        } catch (PluginLoaderException ex) {
-            LOG.warn("No LuceneFieldPlugins could be found. Indexing will not create a useable index");
-        }
-        IndexWriterConfig config = new IndexWriterConfig(IndexConstants.LUCENE_VERSION, analyzer);
+        
+        // By default, fields are indexed case insensitive
+        IndexWriterConfig config = new IndexWriterConfig(IndexConstants.LUCENE_VERSION, caseInsensitiveAnalyzer);
         indexWriter = new IndexWriter(indexDirectory, config);
         LOG.debug("IndexWriter initialization successful: " + indexLocation.getAbsolutePath());
     }
@@ -396,7 +388,6 @@ public class IndexingTask implements Task {
      * Adds the specified files to the index.
      */
     private void addFileToIndex(FileDto file) throws VersionControlPluginException, CorruptIndexException, IOException, LuceneFieldValueException {
-        // FIXME: improve error handling
         if (indexWriter == null) {
             LOG.error("Creation of indexDirectory failed due to missing initialization of IndexWriter!");
             throw new IllegalStateException("IndexWriter was not initialized: fatal error");

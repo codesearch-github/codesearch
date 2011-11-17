@@ -36,4 +36,9 @@ public class SshAuthentication implements AuthenticationType {
     public SshAuthentication(String sshFilePath) {
         this.sshFilePath = sshFilePath;
     }
+
+    @Override
+    public String toString() {
+        return "SshAuthentication{" + "sshFilePath=" + sshFilePath + '}';
+    }
 }

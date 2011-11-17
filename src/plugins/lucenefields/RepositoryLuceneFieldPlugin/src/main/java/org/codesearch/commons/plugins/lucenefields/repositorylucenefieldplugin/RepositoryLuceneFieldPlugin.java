@@ -26,7 +26,6 @@
 package org.codesearch.commons.plugins.lucenefields.repositorylucenefieldplugin;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.codesearch.commons.plugins.lucenefields.FullValueAnalyzer;
 import org.codesearch.commons.plugins.lucenefields.LuceneFieldPlugin;
 import org.codesearch.commons.plugins.lucenefields.LuceneFieldValueException;
 import org.codesearch.commons.plugins.vcs.FileDto;

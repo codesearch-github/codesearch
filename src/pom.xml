@@ -161,6 +161,8 @@
 				<version>1.9.0</version>
 				<configuration>
 					<header>license_header</header>
+                                        <strictCheck>true</strictCheck>
+                                        <dryRun>true</dryRun>
 				</configuration>
 			</plugin>
 			<plugin>

@@ -33,6 +33,7 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
 import com.google.inject.Inject;
+import org.codesearch.commons.plugins.lucenefields.LuceneFieldPluginLoader;
 
 /**
  * Stores one or more tasks and controls their execution.
@@ -64,24 +65,25 @@ public class IndexingJob implements Job {
     private DBAccess dba;
     /** The plugin loader. */
     private PluginLoader pluginLoader;
+    /** The lucene field plugin loader. */
+    private LuceneFieldPluginLoader luceneFieldPluginLoader;
     /** The affected repositories. */
     private List<RepositoryDto> repositories;
     /**
      * whether or not the index should be cleared for the specified repositories before indexing
      */
     private boolean clearIndex;
-
     /** The location of the index. */
     private File indexLocation;
-
     /** The current job data map of the job. */
     private JobDataMap jobDataMap;
 
     @Inject
-    public IndexingJob(ConfigurationReader configReader, DBAccess dba, PluginLoader pluginLoader) {
+    public IndexingJob(ConfigurationReader configReader, DBAccess dba, PluginLoader pluginLoader, LuceneFieldPluginLoader luceneFieldPluginLoader) {
         this.configReader = configReader;
         this.dba = dba;
         this.pluginLoader = pluginLoader;
+        this.luceneFieldPluginLoader = luceneFieldPluginLoader;
         indexLocation = configReader.getIndexLocation();
     }
 
@@ -118,7 +120,7 @@ public class IndexingJob implements Job {
             jobDataMap.put(FIELD_FINISHED_REPOSITORIES, 0);
             jobDataMap.put(FIELD_STATUS, STATUS_INDEXING);
             // execution of regular indexing job
-            Task indexingTask = new IndexingTask(dba, pluginLoader, configReader.getSearcherLocation());
+            Task indexingTask = new IndexingTask(dba, pluginLoader, configReader.getSearcherLocation(), luceneFieldPluginLoader);
             indexingTask.setRepositories(repositories);
             indexingTask.setIndexLocation(configReader.getIndexLocation());
             indexingTask.setJob(this);

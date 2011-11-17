@@ -33,6 +33,8 @@ import org.codesearch.commons.plugins.PluginLoaderImpl;
 import com.google.inject.AbstractModule;
 import com.google.inject.Singleton;
 import com.google.inject.name.Names;
+import org.codesearch.commons.plugins.lucenefields.LuceneFieldPluginLoader;
+import org.codesearch.commons.plugins.lucenefields.LuceneFieldPluginLoaderImpl;
 
 /**
  * Guice module for commons. Wires everything together.
@@ -46,6 +48,7 @@ public class CommonsGuiceModule extends AbstractModule{
         bind(ConnectionPool.class).to(ConnectionPoolImpl.class).in(Singleton.class);
         bind(DBAccess.class).to(DBAccessImpl.class).in(Singleton.class);
         bind(PluginLoader.class).to(PluginLoaderImpl.class).in(Singleton.class);
+        bind(LuceneFieldPluginLoader.class).to(LuceneFieldPluginLoaderImpl.class).in(Singleton.class);
         bind(String.class).annotatedWith(Names.named("configpath")).toInstance("codesearch_config.xml");
     }
 

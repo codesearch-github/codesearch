@@ -26,8 +26,6 @@
 package org.codesearch.commons.plugins.lucenefields.contentlucenefieldplugin;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.SimpleAnalyzer;
-import org.codesearch.commons.constants.IndexConstants;
 import org.codesearch.commons.plugins.lucenefields.SimpleSourceCodeAnalyzer;
 import org.codesearch.commons.plugins.lucenefields.LuceneFieldPlugin;
 import org.codesearch.commons.plugins.lucenefields.LuceneFieldValueException;
@@ -74,7 +72,7 @@ public class ContentLuceneFieldPlugin extends LuceneFieldPlugin {
     /** {@inheritDoc} */
     @Override
     public boolean isStored() {
-        return true;
+        return false;
     }
 
 

@@ -21,7 +21,6 @@
 
 package org.codesearch.searcher.server;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -32,6 +31,8 @@ import java.util.Set;
 import org.codesearch.commons.configuration.ConfigurationReader;
 import org.codesearch.commons.configuration.InvalidConfigurationException;
 import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
+import org.codesearch.commons.plugins.PluginLoaderImpl;
+import org.codesearch.commons.plugins.lucenefields.LuceneFieldPluginLoaderImpl;
 import org.junit.Test;
 
 /**
@@ -45,7 +46,7 @@ public class DocumentSearcherTest {
 
     public DocumentSearcherTest() throws InvalidConfigurationException {
         ConfigurationReader configurationReader = new XmlConfigurationReader(null);
-        instance = new DocumentSearcherImpl(configurationReader);
+        instance = new DocumentSearcherImpl(configurationReader, new LuceneFieldPluginLoaderImpl(new PluginLoaderImpl(configurationReader)));
     }
 
     /**

@@ -38,4 +38,8 @@ public class NoAuthentication implements AuthenticationType {
         return (obj instanceof NoAuthentication);
     }
 
+    @Override
+    public String toString() {
+        return "NoAuthentication";
+    }
 }

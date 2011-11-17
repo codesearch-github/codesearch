@@ -33,6 +33,7 @@ import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
 import org.codesearch.commons.database.DBAccess;
 import org.codesearch.commons.plugins.PluginLoader;
 import org.codesearch.commons.plugins.PluginLoaderImpl;
+import org.codesearch.commons.plugins.lucenefields.LuceneFieldPluginLoaderImpl;
 import org.codesearch.indexer.server.tasks.ClearTask;
 import org.codesearch.indexer.server.tasks.IndexingTask;
 import org.junit.Test;
@@ -44,7 +45,6 @@ import org.junit.Test;
  */
 public class IndexingTaskTest {
 
-//    private String testIndexDir = "src/test/resources/testindex";
     private File testIndexDir = new File("/tmp/test");
     private String testRepoDir = "src/test/resources/testrepo";
 
@@ -54,9 +54,7 @@ public class IndexingTaskTest {
 
     @Test
     public void testExecuteLocal() throws Exception {
-        
         ConfigurationReader configReader = new XmlConfigurationReader(null);
-        
 
         PluginLoader pl = new PluginLoaderImpl(configReader);
         DBAccess dba = new MockDatabaseImpl();
@@ -78,7 +76,7 @@ public class IndexingTaskTest {
         c.setIndexLocation(testIndexDir);
         c.execute();
 
-        IndexingTask t = new IndexingTask(dba, pl, null);
+        IndexingTask t = new IndexingTask(dba, pl, null, new LuceneFieldPluginLoaderImpl(pl));
         t.setIndexLocation(testIndexDir);
         t.setRepositories(repos);
         t.execute();

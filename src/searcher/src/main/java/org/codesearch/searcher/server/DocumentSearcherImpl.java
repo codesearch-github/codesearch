@@ -38,6 +38,7 @@ import org.codesearch.searcher.shared.SearchResultDto;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import java.util.Iterator;
+import org.codesearch.commons.plugins.lucenefields.LuceneFieldPluginLoader;
 import org.codesearch.commons.plugins.lucenefields.SimpleSourceCodeAnalyzer;
 
 @Singleton
@@ -66,20 +67,18 @@ public class DocumentSearcherImpl implements DocumentSearcher {
      * @throws IOException if the index could not be opened
      */
     @Inject
-    public DocumentSearcherImpl(ConfigurationReader configurationReader) {
+    public DocumentSearcherImpl(ConfigurationReader configurationReader, LuceneFieldPluginLoader luceneFieldPluginLoader) {
         // Retrieve index location from the configuration
         indexLocation = configurationReader.getIndexLocation();
         LOG.debug("Index location set to: " + indexLocation);
-        // FIXME critical: use analyzers and fields provided by plugins!
-        // TODO make or find proper analyzers for search
 
-        queryParser = new QueryParser(IndexConstants.LUCENE_VERSION, IndexConstants.INDEX_FIELD_CONTENT + "_lc",
-                new SimpleSourceCodeAnalyzer(false));
+        queryParser = new QueryParser(IndexConstants.LUCENE_VERSION, IndexConstants.INDEX_FIELD_CONTENT + IndexConstants.LC_POSTFIX,
+                luceneFieldPluginLoader.getPerFieldAnalyzerWrapper(false));
         queryParser.setAllowLeadingWildcard(true);
         queryParser.setDefaultOperator(QueryParser.Operator.AND);
         queryParser.setLowercaseExpandedTerms(false);
-        queryParserCaseSensitive = new QueryParser(IndexConstants.LUCENE_VERSION, IndexConstants.INDEX_FIELD_CONTENT,
-                new SimpleSourceCodeAnalyzer(true));
+        queryParserCaseSensitive = new QueryParser(IndexConstants.LUCENE_VERSION, IndexConstants.INDEX_FIELD_CONTENT, 
+                luceneFieldPluginLoader.getPerFieldAnalyzerWrapper(true));
         queryParserCaseSensitive.setAllowLeadingWildcard(true);
         queryParserCaseSensitive.setDefaultOperator(QueryParser.Operator.AND);
         queryParserCaseSensitive.setLowercaseExpandedTerms(false);
@@ -100,15 +99,16 @@ public class DocumentSearcherImpl implements DocumentSearcher {
             initSearcher();
         }
         List<SearchResultDto> results = new LinkedList<SearchResultDto>();
-        String finalSearchString = parseQuery(searchString, caseSensitive, repositoryNames, repositoryGroupNames);
+        String finalSearchString = parseQuery(searchString, repositoryNames, repositoryGroupNames);
         Query query = null;
         if (caseSensitive) {
             query = queryParserCaseSensitive.parse(finalSearchString);
         } else {
+            //TODO: make this compatible with plugins
             finalSearchString = finalSearchString.
-                    replace(IndexConstants.INDEX_FIELD_FILEPATH + ":", IndexConstants.INDEX_FIELD_FILEPATH + "_lc:").
-                    replace(IndexConstants.INDEX_FIELD_CONTENT + ":", IndexConstants.INDEX_FIELD_CONTENT + "_lc:").
-                    replace(IndexConstants.INDEX_FIELD_FILENAME + ":", IndexConstants.INDEX_FIELD_FILENAME + "_lc:");
+                    replace(IndexConstants.INDEX_FIELD_FILEPATH + ":", IndexConstants.INDEX_FIELD_FILEPATH + IndexConstants.LC_POSTFIX + ":").
+                    replace(IndexConstants.INDEX_FIELD_CONTENT  + ":", IndexConstants.INDEX_FIELD_CONTENT  + IndexConstants.LC_POSTFIX + ":").
+                    replace(IndexConstants.INDEX_FIELD_FILENAME + ":", IndexConstants.INDEX_FIELD_FILENAME + IndexConstants.LC_POSTFIX + ":");
             query = queryParser.parse(finalSearchString.toLowerCase());
         }
 
@@ -117,7 +117,7 @@ public class DocumentSearcherImpl implements DocumentSearcher {
         TopDocs topDocs = indexSearcher.search(query, maxResults);
         LOG.info("Found " + topDocs.scoreDocs.length + " results");
         Document doc;
-        // Add each search result in form of a ResultItem to the results-list
+        
         for (ScoreDoc sd : topDocs.scoreDocs) {
             doc = indexSearcher.doc(sd.doc);
             SearchResultDto searchResult = new SearchResultDto();
@@ -157,7 +157,7 @@ public class DocumentSearcherImpl implements DocumentSearcher {
      * @param query the search query
      * @return the lucene conform query
      */
-    private String parseQuery(String query, boolean caseSensitive, Set<String> repositoryNames, Set<String> repositoryGroupNames) {
+    private String parseQuery(String query, Set<String> repositoryNames, Set<String> repositoryGroupNames) {
         for (String repoGroup : repositoryGroupNames) {
             for (String repo : configurationReader.getRepositoriesForGroup(repoGroup)) {
                 repositoryNames.add(repo);
