@@ -120,8 +120,8 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
 
     /** {@inheritDoc} */
     @Override
-    public FileDto getFile(String repository, String filePath) throws SearcherServiceException {
-        LOG.debug("Retrieving file content for file: " + filePath + " @ " + repository);
+    public FileDto getFile(String repoName, String filePath) throws SearcherServiceException {
+        LOG.debug("Retrieving file content for file: " + filePath + " @ " + repoName);
         FileDto file = new FileDto();
         try {
             String fileName = filePath.substring(filePath.lastIndexOf('/') + 1);
@@ -132,18 +132,23 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
             LOG.debug("detected mime is: " + guessedMimeType);
             file.setBinary(MimeTypeUtil.isBinaryType(guessedMimeType));
 
-            RepositoryDto repositoryDto = configurationReader.getRepositoryByName(repository);
+            RepositoryDto repositoryDto = configurationReader.getRepositoryByName(repoName);
             VersionControlPlugin vcPlugin = pluginLoader.getPlugin(VersionControlPlugin.class, repositoryDto.getVersionControlSystem());
 
             vcPlugin.setRepository(repositoryDto);
             FileIdentifier fileIdentifier = new FileIdentifier();
             fileIdentifier.setFilePath(filePath);
             fileIdentifier.setRepository(repositoryDto);
-            org.codesearch.commons.plugins.vcs.FileDto vcFile = vcPlugin.getFileDtoForFileIdentifier(fileIdentifier);
+            org.codesearch.commons.plugins.vcs.FileDto vcFile = vcPlugin.getFileDtoForFileIdentifierAtRevision(fileIdentifier, repositoryDto.getIndexedRevision());
 
+            if(!repositoryDto.getIndexedRevision().equals(vcPlugin.getRepositoryRevision())){
+               //TODO if the last indexed version is not the latest display a warning 
+                
+            }
+            
             // GET OUTLINE IF EXISTING
             try {
-                AstNode fileNode = dba.getBinaryIndexForFile(filePath, repository);
+                AstNode fileNode = dba.getBinaryIndexForFile(filePath, repoName);
                 if (fileNode != null) {
                     List<OutlineNode> outline = new LinkedList<OutlineNode>();
                     for (AstNode a : fileNode.getChildNodes()) {
@@ -178,7 +183,7 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
                 String highlightingEscapeStartToken = hlPlugin.getEscapeStartToken();
                 String highlightingEscapeEndToken = hlPlugin.getEscapeEndToken();
 
-                byte[] parsedFileContent = addUsageLinksToFileContent(vcFile.getContent(), filePath, repository, highlightingEscapeStartToken, highlightingEscapeEndToken);
+                byte[] parsedFileContent = addUsageLinksToFileContent(vcFile.getContent(), filePath, repoName, highlightingEscapeStartToken, highlightingEscapeEndToken);
                 file.setFileContent(hlPlugin.parseToHtml(parsedFileContent, guessedMimeType));
             } catch (PluginLoaderException ex) {
                 LOG.debug("No suitable highlighting plugin found");
@@ -192,7 +197,7 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
         } catch (PluginLoaderException ex) {
             throw new SearcherServiceException("Problem loading plugin: \n" + ex);
         }
-        LOG.debug("Finished retrieving file content for file: " + filePath + " @ " + repository);
+        LOG.debug("Finished retrieving file content for file: " + filePath + " @ " + repoName);
         return file;
     }
 

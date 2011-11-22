@@ -62,7 +62,7 @@ public class SubversionPluginTest {
         LOG.info("getFileContentForFilePath");
         String filePath = "/svnsearch/trunk/src/main/java/com/bearingpoint/ta/svnsearch/testfile.txt";
         FileIdentifier identifier = new FileIdentifier(filePath, true, true, null);
-        String result = new String(sp.getFileDtoForFileIdentifier(identifier).getContent());
+        String result = new String(sp.getFileDtoForFileIdentifierAtRevision(identifier, VersionControlPlugin.CURRENT_VERSION).getContent());
         assert (result.equals("test"));
     }
 

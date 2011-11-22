@@ -18,19 +18,15 @@
  * You should have received a copy of the GNU General Public License
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.codesearch.commons.plugins.vcs;
 
-import java.util.List;
 
 import org.codesearch.commons.configuration.dto.RepositoryDto;
 
 /**
- *
- * @author david
+ * Represents a file in a VersionControlSystem
+ * Contains file identification(path and RepositoryDto), the file content
+ * @author David Froehlich
  */
 public class FileDto {
 

@@ -30,6 +30,8 @@ public class RepositoryDto {
     private String name;
     /** The URL of the repository. */
     private String url;
+    /** The revision that was last indexed/analyzed, note that whenever a file is displayed in the searcher the content from this revision will be displayed */
+    private String indexedRevision;
     /**
      * The version control system used for this repository, (for instance SVN or Bazaar), must match the purpose attribute of the
      * corresponding version control plugin
@@ -49,8 +51,16 @@ public class RepositoryDto {
     /** A list of repository groups this repositorie belongs to */
     @XStreamAlias("repository-groups")
     private List<String> repositoryGroups;
-
+    
     public RepositoryDto() {
+    }
+
+    public String getIndexedRevision() {
+        return indexedRevision;
+    }
+
+    public void setIndexedRevision(String indexedRevision) {
+        this.indexedRevision = indexedRevision;
     }
 
     /**
@@ -68,7 +78,7 @@ public class RepositoryDto {
      * @param repositoryGroups the groups this repository belongs to
      */
     public RepositoryDto(String name, String url, AuthenticationType usedAuthentication, boolean codeNavigationEnabled,
-            String versionControlSystem, List<String> blacklistEntries, List<String> whitelistEntries, List<String> repositoryGroups) {
+            String versionControlSystem, List<String> blacklistEntries, List<String> whitelistEntries, List<String> repositoryGroups, String indexedRevision) {
         this.name = name;
         this.url = url;
         this.usedAuthentication = usedAuthentication;
@@ -77,6 +87,7 @@ public class RepositoryDto {
         this.blacklistEntries = blacklistEntries;
         this.repositoryGroups = repositoryGroups;
         this.whitelistEntries = whitelistEntries;
+        this.indexedRevision = indexedRevision;
     }
 
     public List<String> getWhitelistEntries() {

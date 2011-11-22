@@ -94,9 +94,9 @@ public class GitLocalPlugin implements VersionControlPlugin {
 
     /** {@inheritDoc} */
     @Override
-    public FileDto getFileDtoForFileIdentifier(FileIdentifier fileIdentifier) throws VersionControlPluginException {
+    public FileDto getFileDtoForFileIdentifierAtRevision(FileIdentifier fileIdentifier, String revision) throws VersionControlPluginException {
         byte[] fileContent = executeGitCommand("show", "HEAD:" + fileIdentifier.getFilePath());
-        String[] logEntry = new String(executeGitCommand("log", "-1", "--pretty=\"format:%H$$$%an\"", fileIdentifier.getFilePath())).split("$$$");
+        String[] logEntry = new String(executeGitCommand("log", revision, "--pretty=\"format:%H$$$%an\"", fileIdentifier.getFilePath())).split("$$$");
         String lastRevision = logEntry[0];
         String lastAuthor = logEntry[1];
 

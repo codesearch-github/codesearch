@@ -41,6 +41,8 @@ import org.codesearch.commons.configuration.dto.SshAuthentication;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
+import org.codesearch.commons.configuration.properties.PropertiesManager;
+import org.codesearch.commons.constants.IndexConstants;
 
 /**
  * Xml implementation of the configuration reader. By default, the properties are loaded from a file in the classpath called
@@ -60,6 +62,7 @@ public class XmlConfigurationReader implements ConfigurationReader {
 
     private CodesearchConfiguration codesearchConfiguration;
 
+    PropertiesManager propertiesManager;
     /**
      * creates a new instance of XmlConfigurationReader
      *
@@ -71,6 +74,7 @@ public class XmlConfigurationReader implements ConfigurationReader {
         if (StringUtils.isNotEmpty(configPath)) {
             this.configPath = configPath;
         }
+        
         LOG.debug("Reading config file: " + this.configPath);
         loadConfig();
     }
@@ -236,6 +240,7 @@ public class XmlConfigurationReader implements ConfigurationReader {
     }
 
     private void loadRepositories() throws InvalidConfigurationException {
+        propertiesManager = new PropertiesManager(getIndexLocation() + File.separator + IndexConstants.REVISIONS_PROPERTY_FILENAME);
         LinkedList<RepositoryDto> repositories = new LinkedList<RepositoryDto>();
         List<HierarchicalConfiguration> repositoryConfigs = config.configurationsAt(XmlConfigurationReaderConstants.REPOSITORY_LIST);
         for (HierarchicalConfiguration repositoryConfig : repositoryConfigs) {
@@ -285,9 +290,10 @@ public class XmlConfigurationReader implements ConfigurationReader {
             usedAuthentication = new SshAuthentication(sshFilePath);
         }
 
+        String indexedRevision = propertiesManager.getPropertyFileValue(name);
         repo = new RepositoryDto(name, hc.getString(XmlConfigurationReaderConstants.REPOSITORY_URL), usedAuthentication, hc
                 .getBoolean(XmlConfigurationReaderConstants.REPOSITORY_CODE_NAVIGATION_ENABLED), hc
-                .getString(XmlConfigurationReaderConstants.REPOSITORY_VCS), blacklistEntries, whitelistFileNames, repositoryGroups);
+                .getString(XmlConfigurationReaderConstants.REPOSITORY_VCS), blacklistEntries, whitelistFileNames, repositoryGroups, indexedRevision);
         LOG.info("reading repository from configuration: " + repo.toString());
         return repo;
     }

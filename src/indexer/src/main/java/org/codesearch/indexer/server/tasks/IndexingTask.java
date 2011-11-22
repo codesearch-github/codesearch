@@ -181,7 +181,7 @@ public class IndexingTask implements Task {
                         // check whether the changed files should be indexed
                         removeNotToBeIndexedFiles(changedFiles);
                         for (FileIdentifier currentIdentifier : changedFiles) {
-                            FileDto currentDto = versionControlPlugin.getFileDtoForFileIdentifier(currentIdentifier);
+                            FileDto currentDto = versionControlPlugin.getFileDtoForFileIdentifierAtRevision(currentIdentifier, VersionControlPlugin.CURRENT_VERSION);
                             try {
                                 addFileToIndex(currentDto);
 
@@ -249,10 +249,12 @@ public class IndexingTask implements Task {
      * @return
      * @throws VersionControlPluginException
      */
+    @Deprecated
     private Set<FileDto> retrieveFileDtosForIdentifiers(Set<FileIdentifier> fileIdentifiers, VersionControlPlugin plugin) throws VersionControlPluginException {
+        //TODO find out if this method is still needed
         Set<FileDto> fileDtos = new HashSet<FileDto>();
         for (FileIdentifier currentIdentifier : fileIdentifiers) {
-            fileDtos.add(plugin.getFileDtoForFileIdentifier(currentIdentifier));
+            fileDtos.add(plugin.getFileDtoForFileIdentifierAtRevision(currentIdentifier, VersionControlPlugin.CURRENT_VERSION));
         }
         return fileDtos;
     }

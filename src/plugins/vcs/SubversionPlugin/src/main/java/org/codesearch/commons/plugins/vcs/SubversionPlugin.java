@@ -97,7 +97,7 @@ public class SubversionPlugin implements VersionControlPlugin {
 
     /** {@inheritDoc} */
     @Override
-    public FileDto getFileDtoForFileIdentifier(FileIdentifier identifier) throws VersionControlPluginException {
+    public FileDto getFileDtoForFileIdentifierAtRevision(FileIdentifier identifier, String revision) throws VersionControlPluginException {
         try {
             String filePath = identifier.getFilePath();
             LOG.debug("Retrieving and checking file: " + filePath);
@@ -109,7 +109,7 @@ public class SubversionPlugin implements VersionControlPlugin {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
             SVNProperties properties = new SVNProperties();
-            svnRepo.getFile(filePath, -1, properties, baos);
+            svnRepo.getFile(filePath, Long.parseLong(revision), properties, baos);
             boolean binary = !SVNProperty.isTextMimeType(properties.getStringValue(SVNProperty.MIME_TYPE));
             String lastAuthor = properties.getStringValue(SVNProperty.LAST_AUTHOR);
             String lastAlterationDate = properties.getStringValue(SVNProperty.COMMITTED_DATE); //TODO test this

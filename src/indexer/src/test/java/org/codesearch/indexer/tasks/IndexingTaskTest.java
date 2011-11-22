@@ -67,7 +67,7 @@ public class IndexingTaskTest {
                 "FILESYSTEM",
                 new LinkedList<String>(),
                 new LinkedList<String>(),
-                new LinkedList<String>());
+                new LinkedList<String>(), "0");
 
         List<RepositoryDto> repos = new LinkedList<RepositoryDto>();
         repos.add(repo);

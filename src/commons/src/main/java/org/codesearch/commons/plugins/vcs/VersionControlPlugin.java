@@ -33,7 +33,7 @@ import org.codesearch.commons.validator.ValidationException;
  * @author Samuel Kogler
  */
 public interface VersionControlPlugin extends Plugin {
-
+    public final String CURRENT_VERSION = "-1";
     /**
      * Sets the current repository.
      * It is required that the repository is set before calling any of the
@@ -43,11 +43,12 @@ public interface VersionControlPlugin extends Plugin {
     void setRepository(RepositoryDto repository) throws VersionControlPluginException;
 
     /**
-     * Retrieves the file corresponding to the given file path.
+     * Retrieves the file corresponding to the given file path at the given revision
      * @param filePath The file path relative to the current repository URL
+     * @param revision The revision for which the content should be retrieved (use VersionControlPlugin.CURRENT_VERSION for the current version)
      * @return The retrieved file
      */
-    FileDto getFileDtoForFileIdentifier(FileIdentifier fileInfo) throws VersionControlPluginException;
+    FileDto getFileDtoForFileIdentifierAtRevision(FileIdentifier fileInfo, String revision) throws VersionControlPluginException;
 
     /**
      * Returns a list of changed files since the given revision.

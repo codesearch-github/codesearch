@@ -43,7 +43,7 @@ public final class IndexConstants {
     public static final String REPOSITORY_STATUS_INCONSISTENT = "inconsistent";
     public static final String REPOSITORY_STATUS_EMPTY = "0";
     
-    public static final String LC_POSTFIX = IndexConstants.LC_POSTFIX;
+    public static final String LC_POSTFIX = "_lc";
     
     
     private IndexConstants(){

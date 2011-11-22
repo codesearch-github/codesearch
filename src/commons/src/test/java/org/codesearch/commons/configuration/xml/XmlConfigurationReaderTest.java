@@ -67,7 +67,7 @@ public class XmlConfigurationReaderTest {
         RepositoryDto repo1 = new RepositoryDto("jdownloader-repo",
                 "svn://svn.jdownloader.org/jdownloader",
                 new NoAuthentication(), true,
-                "SVN", ignFileNames1, new LinkedList<String>(), repoGroups1);
+                "SVN", ignFileNames1, new LinkedList<String>(), repoGroups1, null); //FIXME
         return repo1;
     }
 

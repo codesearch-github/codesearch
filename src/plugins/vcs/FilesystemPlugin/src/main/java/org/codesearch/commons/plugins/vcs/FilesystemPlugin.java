@@ -49,7 +49,7 @@ public class FilesystemPlugin implements VersionControlPlugin {
 
     /** {@inheritDoc} */
     @Override
-    public FileDto getFileDtoForFileIdentifier(FileIdentifier identifier) throws VersionControlPluginException {
+    public FileDto getFileDtoForFileIdentifierAtRevision(FileIdentifier identifier, String revision) throws VersionControlPluginException {
         try {
             File file = new File(identifier.getFilePath());
             FileInputStream fis = new FileInputStream(file);

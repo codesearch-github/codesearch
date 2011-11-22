@@ -79,7 +79,7 @@ public class GitLocalPluginTest {
         fileIdentifier.setFilePath("LICENSE");
         fileIdentifier.setRepository(getTestRepo());
 
-        FileDto result = plugin.getFileDtoForFileIdentifier(fileIdentifier);
+        FileDto result = plugin.getFileDtoForFileIdentifierAtRevision(fileIdentifier, VersionControlPlugin.CURRENT_VERSION);
 
         System.out.println("File path: " + result.getFilePath());
         System.out.println("Binary: " + result.isBinary());
