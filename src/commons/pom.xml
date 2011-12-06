@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<modelVersion>4.0.0</modelVersion>
 
-    <artifactId>codesearch-commons</artifactId>
-    <name>Codesearch: Commons</name>
-    <packaging>jar</packaging>
+<artifactId>codesearch-commons</artifactId>
+<name>Codesearch: Commons</name>
+<packaging>jar</packaging>
 
-    <parent>
-        <groupId>org.codesearch</groupId>
+<parent>
+<groupId>org.codesearch</groupId>
         <artifactId>codesearch</artifactId>
         <version>0.1-RC1</version>
     </parent>
@@ -63,6 +63,11 @@
         <dependency>
             <groupId>org.codesearch</groupId>
             <artifactId>RepositoryLuceneFieldPlugin</artifactId>
+            <version>0.1-RC1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codesearch</groupId>
+            <artifactId>RepositoryGroupLuceneFieldPlugin</artifactId>
             <version>0.1-RC1</version>
         </dependency>
         <dependency>
