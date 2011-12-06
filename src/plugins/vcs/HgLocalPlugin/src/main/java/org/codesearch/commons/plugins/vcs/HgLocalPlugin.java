@@ -5,7 +5,7 @@
  *
  * This file is part of Codesearch.
  *
- * Codesearch is free software: you can redistribute it and/or modify
+ * Codesearch is free software: you can redistribute it andor modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
@@ -16,7 +16,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
+ * along with Codesearch.  If not, see <http:www.gnu.orglicenses>.
  */
 package org.codesearch.commons.plugins.vcs;
 
@@ -25,6 +25,7 @@ import org.codesearch.commons.configuration.dto.NoAuthentication;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -39,26 +40,26 @@ import org.codesearch.commons.configuration.dto.RepositoryDto;
 import org.codesearch.commons.validator.ValidationException;
 
 /**
- * A plugin used to access files stored in Git repositories.
+ * A plugin used to access files stored in Mercurial repositories.
  * Checks out repositories to the local filesystem.
  * @author Samuel Kogler
  */
-public class GitLocalPlugin implements VersionControlPlugin {
+public class HgLocalPlugin implements VersionControlPlugin {
 
-    private static final Logger LOG = Logger.getLogger(GitLocalPlugin.class);
-    private File cacheDirectory = new File("/tmp/codesearch/git/");
+    private static final Logger LOG = Logger.getLogger(HgLocalPlugin.class);
+    private File cacheDirectory = new File("/tmp/codesearch/hg");
     private File branchDirectory;
     private RepositoryDto currentRepository;
-    private final String GIT_BINARY_LOCATION = "/usr/bin/git";
-    private final String GIT_DEFAULT_ARGUMENTS = "--no-pager";
+    private final String HG_BINARY_LOCATION = "/usr/bin/hg";
+    private final String HG_DEFAULT_ARGUMENTS = "";
     private ProcessBuilder processBuilder = new ProcessBuilder();
 
     /**
-     * Creates a new instance of the GitLocalPlugin
+     * Creates a new instance of the HgLocalPlugin
      */
-    public GitLocalPlugin() {
-        if (!new File(GIT_BINARY_LOCATION).isFile()) {
-            LOG.error("Git Binary not found at " + GIT_BINARY_LOCATION);
+    public HgLocalPlugin() {
+        if (!new File(HG_BINARY_LOCATION).isFile()) {
+            LOG.error("Git Binary not found at " + HG_BINARY_LOCATION);
             LOG.error("Plugin will not be usable");
         }
     }
@@ -75,10 +76,10 @@ public class GitLocalPlugin implements VersionControlPlugin {
         if (branchDirectory.isDirectory()) {
             LOG.info("It seems repository " + repo.getName() + " is already cloned locally, trying to pull new changes...");
             try {
-                executeGitCommand("pull");
+                executeHgCommand("pull");
                 return;
             } catch (VersionControlPluginException ex) {
-                LOG.warn("Existent directory not a valid git repository, removing...");
+                LOG.warn("Existent directory not a valid hg repository, removing...");
             }
         }
 
@@ -86,7 +87,7 @@ public class GitLocalPlugin implements VersionControlPlugin {
         LOG.info("Cloning repository " + repo.getName() + " ...");
 
         if (repo.getUsedAuthentication() instanceof NoAuthentication) {
-            executeGitCommand("clone", repo.getUrl(), branchDirectory.getAbsolutePath());
+            executeHgCommand("clone", repo.getUrl(), branchDirectory.getAbsolutePath());
         } else {
             throw new VersionControlPluginException("Authentication not supported yet.");
         }
@@ -95,11 +96,11 @@ public class GitLocalPlugin implements VersionControlPlugin {
     /** {@inheritDoc} */
     @Override
     public FileDto getFileDtoForFileIdentifierAtRevision(FileIdentifier fileIdentifier, String revision) throws VersionControlPluginException {
-        if (revision == null || revision.isEmpty() || revision.equals("0")) {
-            revision = "HEAD";
+        if (revision == null || revision.isEmpty()) {
+            revision = ".";
         }
-        byte[] fileContent = executeGitCommand("show", revision + ":" + fileIdentifier.getFilePath());
-        String[] logEntry = new String(executeGitCommand("log", revision, "--pretty=\"format:%H$$$%an\"", fileIdentifier.getFilePath())).split("$$$");
+        byte[] fileContent = executeHgCommand("cat", "-r " + revision, fileIdentifier.getFilePath());
+        String[] logEntry = new String(executeHgCommand("log", "-l 1", "--template \"{node}$$${author}\"", fileIdentifier.getFilePath())).split("$$$");
         String lastRevision = logEntry[0];
         String lastAuthor = logEntry[1];
 
@@ -118,9 +119,9 @@ public class GitLocalPlugin implements VersionControlPlugin {
         Set<FileIdentifier> files = new HashSet<FileIdentifier>();
 
         if (revision.equals("0")) {
-            List<String> output = bytesToStringList(executeGitCommand("ls-files"));
+            List<String> output = bytesToStringList(executeHgCommand("manifest"));
 
-            LOG.debug(output.size() + " changed files since commit " + revision);
+            LOG.debug(output.size() + " changed files since revision " + revision);
 
             FileIdentifier fileIdentifier = null;
             for (String line : output) {
@@ -130,9 +131,9 @@ public class GitLocalPlugin implements VersionControlPlugin {
                 files.add(fileIdentifier);
             }
         } else {
-            List<String> output = bytesToStringList(executeGitCommand("diff", "--name-status"));
+            List<String> output = bytesToStringList(executeHgCommand("status", "--rev " + revision));
 
-            LOG.debug(output.size() + " changed files since commit " + revision);
+            LOG.debug(output.size() + " changed files since revision " + revision);
 
             FileIdentifier fileIdentifier = null;
             for (String line : output) {
@@ -142,7 +143,7 @@ public class GitLocalPlugin implements VersionControlPlugin {
                 fileIdentifier.setRepository(currentRepository);
                 fileIdentifier.setFilePath(path);
 
-                if (status == 'D') {
+                if (status == 'R') {
                     fileIdentifier.setDeleted(true);
                 }
                 files.add(fileIdentifier);
@@ -155,29 +156,28 @@ public class GitLocalPlugin implements VersionControlPlugin {
     /** {@inheritDoc} */
     @Override
     public String getRepositoryRevision() throws VersionControlPluginException {
-        return new String(executeGitCommand("rev-parse", "HEAD"));
+        return new String(executeHgCommand("hg log -l 1 --template \"{node}\""));
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<String> getFilesInDirectory(String directoryPath) throws VersionControlPluginException {
         if (directoryPath != null && directoryPath.startsWith("/")) {
             directoryPath = directoryPath.substring(1);
         }
-        List<String> files = new LinkedList<String>();
-        List<String> output = bytesToStringList(executeGitCommand("ls-tree", "HEAD" + ":" + directoryPath));
-
-        for (String line : output) {
-            String[] cols = line.split("\\s+");
-            files.add(cols[3]);
+        
+        File absolutePath = new File(branchDirectory, directoryPath);
+        if(absolutePath.isDirectory()) {
+            return Arrays.asList(absolutePath.list());
+        } else {
+            throw new VersionControlPluginException("Cannot list files in directory " + directoryPath + ": File does not exist or is not a directory.");
         }
-
-        return files;
     }
 
     /** {@inheritDoc} */
     @Override
     public String getPurposes() {
-        return "GIT";
+        return "HG";
     }
 
     /** {@inheritDoc} */
@@ -186,6 +186,7 @@ public class GitLocalPlugin implements VersionControlPlugin {
         return "0.1-RC1";
     }
 
+    /** {@inheritDoc} */
     @Override
     public void setCacheDirectory(String directoryPath) throws VersionControlPluginException {
         this.cacheDirectory = new File(directoryPath);
@@ -194,16 +195,17 @@ public class GitLocalPlugin implements VersionControlPlugin {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public void validate() throws ValidationException {
         //TODO add validation logic
     }
 
-    private byte[] executeGitCommand(String... arguments) throws VersionControlPluginException {
+    private byte[] executeHgCommand(String... arguments) throws VersionControlPluginException {
         try {
             List<String> command = new LinkedList<String>();
-            command.add(GIT_BINARY_LOCATION);
-            command.add(GIT_DEFAULT_ARGUMENTS);
+            command.add(HG_BINARY_LOCATION);
+            command.add(HG_DEFAULT_ARGUMENTS);
             command.addAll(Arrays.asList(arguments));
 
             Process process = null;
@@ -212,23 +214,23 @@ public class GitLocalPlugin implements VersionControlPlugin {
                 processBuilder = new ProcessBuilder();
                 processBuilder.directory(branchDirectory);
                 processBuilder.command(command);
-                LOG.trace("Executing git command: " + processBuilder.command());
+                LOG.trace("Executing hg command: " + processBuilder.command());
                 process = processBuilder.start();
 
                 byte[] output = IOUtils.toByteArray(process.getInputStream());
 
                 process.waitFor();
                 if (process.exitValue() != 0) {
-                    throw new VersionControlPluginException("Git returned error code: " + process.exitValue() + "\n    Git output: " + IOUtils.toString(process.getErrorStream()));
+                    throw new VersionControlPluginException("Hg returned error code: " + process.exitValue() + "\n   Output: " + IOUtils.toString(process.getErrorStream()));
                 }
                 cleanupProcess(process);
 
                 return output;
             }
         } catch (InterruptedException ex) {
-            throw new VersionControlPluginException("Execution of git interrupted by operating system");
+            throw new VersionControlPluginException("Execution of hg interrupted by operating system");
         } catch (IOException ex) {
-            throw new VersionControlPluginException("Error executing git command: " + ex);
+            throw new VersionControlPluginException("Error executing hg command: " + ex);
         }
     }
 
