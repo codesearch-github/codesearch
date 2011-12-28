@@ -77,6 +77,7 @@ public class FileActivity extends AbstractActivity implements Presenter {
 
     @Override
     public void onStop() {
+        Window.setTitle("Codesearch");
         fileView.disconnectEventHandlers();
         fileView.cleanup();
     }

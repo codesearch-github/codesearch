@@ -206,6 +206,7 @@ public class FileViewImpl extends Composite implements FileView {
             }
             filenameLabel.setText(fileName);
             filenameLabel.setTitle(filePath);
+            Window.setTitle(filePath);
         }
     }
 
