@@ -1,15 +1,15 @@
 /**
  * Copyright 2010 David Froehlich <david.froehlich@businesssoftware.at>, Samuel Kogler <samuel.kogler@gmail.com>, Stephan Stiboller
  * <stistc06@htlkaindorf.at>
- * 
+ *
  * This file is part of Codesearch.
- * 
+ *
  * Codesearch is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * 
+ *
  * Codesearch is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with Codesearch. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.codesearch.commons.configuration.dto;
@@ -20,7 +20,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  * DTO used to store information about a repository specified in the config.xml file
- * 
+ *
  * @author David Froehlich
  */
 @XStreamAlias("repository")
@@ -30,8 +30,6 @@ public class RepositoryDto {
     private String name;
     /** The URL of the repository. */
     private String url;
-    /** The revision that was last indexed/analyzed, note that whenever a file is displayed in the searcher the content from this revision will be displayed */
-    private String indexedRevision;
     /**
      * The version control system used for this repository, (for instance SVN or Bazaar), must match the purpose attribute of the
      * corresponding version control plugin
@@ -51,21 +49,13 @@ public class RepositoryDto {
     /** A list of repository groups this repositorie belongs to */
     @XStreamAlias("repository-groups")
     private List<String> repositoryGroups;
-    
+
     public RepositoryDto() {
-    }
-
-    public String getIndexedRevision() {
-        return indexedRevision;
-    }
-
-    public void setIndexedRevision(String indexedRevision) {
-        this.indexedRevision = indexedRevision;
     }
 
     /**
      * Creates a new instance of RepositoryDto
-     * 
+     *
      * @param name the unique name of the repository
      * @param url the url used by the VersionControlPlugin to access the repository
      * @param usedAuthentication the authentication type used by the plugin
@@ -87,7 +77,6 @@ public class RepositoryDto {
         this.blacklistEntries = blacklistEntries;
         this.repositoryGroups = repositoryGroups;
         this.whitelistEntries = whitelistEntries;
-        this.indexedRevision = indexedRevision;
     }
 
     public List<String> getWhitelistEntries() {
@@ -157,7 +146,7 @@ public class RepositoryDto {
     /**
      * Returns the list of groups this repository belongs to in a single
      * String, separated by spaces.
-     * 
+     *
      * @return The repository group string
      */
     public String getRepositoryGroupsAsString() {
@@ -177,7 +166,7 @@ public class RepositoryDto {
 
     /**
      * compares this RepositoryDto with the given one
-     * 
+     *
      * @param o the RepositoryDto to compare
      * @return true if all the attributes are equal
      */

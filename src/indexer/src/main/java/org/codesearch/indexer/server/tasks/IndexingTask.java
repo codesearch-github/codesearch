@@ -42,7 +42,7 @@ import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.store.FSDirectory;
 import org.codesearch.commons.configuration.dto.RepositoryDto;
-import org.codesearch.commons.configuration.properties.PropertiesManager;
+import org.codesearch.commons.configuration.properties.RepositoryRevisionManager;
 import org.codesearch.commons.constants.IndexConstants;
 import org.codesearch.commons.database.DBAccess;
 import org.codesearch.commons.database.DatabaseAccessException;
@@ -67,6 +67,7 @@ import com.google.inject.Inject;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import org.codesearch.commons.configuration.properties.PropertiesManager;
 import org.codesearch.commons.plugins.lucenefields.LuceneFieldPluginLoader;
 import org.codesearch.commons.plugins.vcs.FileDto;
 
@@ -88,7 +89,7 @@ public class IndexingTask implements Task {
     private FSDirectory indexDirectory;
     /** The Version control Plugin */
     private VersionControlPlugin versionControlPlugin;
-    /** The used PropertyReader */
+    /** used to read the repository revision status */
     private PropertiesManager propertiesManager;
     /** the location of the lucene index */
     private File indexLocation = null;
@@ -108,9 +109,10 @@ public class IndexingTask implements Task {
     private PerFieldAnalyzerWrapper caseInsensitiveAnalyzer;
 
     @Inject
-    public IndexingTask(DBAccess dba, PluginLoader pluginLoader, URI searcherUpdatePath, LuceneFieldPluginLoader luceneFieldPluginLoader) {
+    public IndexingTask(DBAccess dba, PluginLoader pluginLoader, URI searcherUpdatePath, LuceneFieldPluginLoader luceneFieldPluginLoader, PropertiesManager propertiesManager) {
         luceneFieldPlugins = luceneFieldPluginLoader.getAllLuceneFieldPlugins();
         caseInsensitiveAnalyzer = luceneFieldPluginLoader.getPerFieldAnalyzerWrapper(false);
+        this.propertiesManager = propertiesManager;
 
         this.searcherUpdatePath = searcherUpdatePath;
         this.dba = dba;
@@ -154,7 +156,7 @@ public class IndexingTask implements Task {
                         LOG.info("Indexing repository: " + repository.getName() + (repository.isCodeNavigationEnabled() ? " codenavigation enabled" : " codenavigation disabled"));
                         long start = System.currentTimeMillis();
                         // Read the index status file
-                        String lastIndexedRevision = propertiesManager.getPropertyFileValue(repository.getName());
+                        String lastIndexedRevision = propertiesManager.getValue(repository.getName());
                         LOG.info("Last indexed revision is: " + lastIndexedRevision);
                         // Get the version control plugins
                         versionControlPlugin = pluginLoader.getPlugin(VersionControlPlugin.class, repository.getVersionControlSystem());
@@ -200,7 +202,7 @@ public class IndexingTask implements Task {
                         }
                         long duration = System.currentTimeMillis() - start;
                         LOG.info("Indexing of repository " + repository.getName() + " took " + duration / 1000 + " seconds");
-                        propertiesManager.setPropertyFileValue(repository.getName(), versionControlPlugin.getRepositoryRevision());
+                        propertiesManager.setValue(repository.getName(), versionControlPlugin.getRepositoryRevision());
                         if (repository.isCodeNavigationEnabled()) {
                             try {
                                 dba.setLastAnalyzedRevisionOfRepository(repository.getName(), versionControlPlugin.getRepositoryRevision());
@@ -349,13 +351,12 @@ public class IndexingTask implements Task {
      * Initializes Lucene IndexWriter, loads plugins etc..
      */
     private void init() throws InvalidIndexLocationException, IOException {
-        propertiesManager = new PropertiesManager(indexLocation.getPath() + File.separator + IndexConstants.REVISIONS_PROPERTY_FILENAME);
         try {
             indexDirectory = FSDirectory.open(indexLocation);
         } catch (IOException ex) {
             throw new InvalidIndexLocationException("Cannot access index directory at: " + indexLocation);
         }
-        
+
         // By default, fields are indexed case insensitive
         IndexWriterConfig config = new IndexWriterConfig(IndexConstants.LUCENE_VERSION, caseInsensitiveAnalyzer);
         indexWriter = new IndexWriter(indexDirectory, config);

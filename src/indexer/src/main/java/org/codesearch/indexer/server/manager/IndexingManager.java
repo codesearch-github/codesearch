@@ -1,34 +1,36 @@
 /**
  * Copyright 2010 David Froehlich <david.froehlich@businesssoftware.at>, Samuel Kogler <samuel.kogler@gmail.com>, Stephan Stiboller
  * <stistc06@htlkaindorf.at>
- * 
+ *
  * This file is part of Codesearch.
- * 
+ *
  * Codesearch is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * 
+ *
  * Codesearch is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with Codesearch. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.codesearch.indexer.server.manager;
 
+import com.google.inject.Inject;
+import java.io.File;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-
 import javax.inject.Singleton;
-
 import org.apache.log4j.Logger;
 import org.codesearch.commons.configuration.ConfigurationReader;
 import org.codesearch.commons.configuration.dto.JobDto;
 import org.codesearch.commons.configuration.dto.RepositoryDto;
-import org.codesearch.commons.plugins.PluginLoaderException;
+import org.codesearch.commons.configuration.properties.PropertiesManager;
+import org.codesearch.commons.configuration.properties.RepositoryRevisionManager;
+import org.codesearch.commons.constants.IndexConstants;
 import org.codesearch.indexer.shared.JobStatus;
+import org.codesearch.indexer.shared.RepositoryStatus;
 import org.quartz.CronScheduleBuilder;
 import org.quartz.JobBuilder;
 import org.quartz.JobDataMap;
@@ -43,18 +45,9 @@ import org.quartz.impl.matchers.EverythingMatcher;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.quartz.spi.JobFactory;
 
-import com.google.inject.Inject;
-import java.io.File;
-import org.codesearch.commons.configuration.properties.PropertiesManager;
-import org.codesearch.commons.constants.IndexConstants;
-import org.codesearch.commons.plugins.PluginLoader;
-import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
-import org.codesearch.indexer.shared.RepositoryStatus;
-import org.quartz.SimpleTrigger;
-
 /**
  * controls the scheduler used to execute the indexing jobs
- * 
+ *
  * @author Stiboller Stephan
  * @author David Froehlich
  */
@@ -70,24 +63,24 @@ public final class IndexingManager {
     /** The job listener that mantains a history of job executions. */
     private IndexingJobHistoryListener historyListener;
     private ConfigurationReader configReader;
+    /** used to read the repository revision status */
     private PropertiesManager propertiesManager;
-    
+
     /**
      * Creates a new instance of IndexingManager
-     * 
+     *
      * @throws SchedulerException In case the scheduler could not be instantiated
      * @throws ConfigurationException
      */
     @SuppressWarnings("unchecked")
     @Inject
-    public IndexingManager(ConfigurationReader configurationReader, Scheduler scheduler, JobFactory jobFactory) throws SchedulerException {
+    public IndexingManager(ConfigurationReader configurationReader, PropertiesManager propertiesManager, Scheduler scheduler, JobFactory jobFactory) throws SchedulerException {
         this.jobs = configurationReader.getJobs();
         this.scheduler = scheduler;
         this.historyListener = new IndexingJobHistoryListener();
+        this.propertiesManager = propertiesManager;
         this.configReader = configurationReader;
-        String indexLocation = configurationReader.getIndexLocation().getPath();
-        propertiesManager = new PropertiesManager(indexLocation + File.separator + IndexConstants.REVISIONS_PROPERTY_FILENAME);
-        
+
         scheduler.setJobFactory(jobFactory);
         scheduler.getListenerManager().addTriggerListener(new IndexingJobTriggerListener(5 * 60 * 1000),
                 EverythingMatcher.allTriggers()); // delay by 5 minutes if a job is currently running
@@ -97,7 +90,7 @@ public final class IndexingManager {
 
     /**
      * Reads the jobs from the configuration and adds them to the scheduler, then starts it
-     * 
+     *
      * @throws SchedulerException if a job could not be added to the scheduler or if it could not be started
      * @throws ConfigurationException if the configuration could not be read
      */
@@ -136,9 +129,9 @@ public final class IndexingManager {
 
     public List<RepositoryStatus> getRepositoryStatuses()  {
         List<RepositoryStatus> repositoryStatuses = new LinkedList<RepositoryStatus>();
-        
+
         for(RepositoryDto currentDto : configReader.getRepositories()){
-            String revision = propertiesManager.getPropertyFileValue(currentDto.getName());
+            String revision = propertiesManager.getValue(currentDto.getName());
             RepositoryStatus.Status status = RepositoryStatus.Status.INDEXED;
             if(revision.equals(IndexConstants.REPOSITORY_STATUS_EMPTY)){
                 status = RepositoryStatus.Status.EMPTY;
@@ -237,9 +230,9 @@ public final class IndexingManager {
 
     /**
      * schedules a job for the given repositories causing them to be indexed once at the time
-     * @param repositories the repositories that are to be indexed 
-     * @param repositoryGroups the repo groups containing the repositories 
-     * @throws SchedulerException 
+     * @param repositories the repositories that are to be indexed
+     * @param repositoryGroups the repo groups containing the repositories
+     * @throws SchedulerException
      */
     public void startJobForRepositories(List<String> repositories, List<String> repositoryGroups, boolean clear) throws SchedulerException {
         JobKey jobKey = new JobKey("manual-job" + new Date().getTime(), IndexingJob.GROUP_NAME);

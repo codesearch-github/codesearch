@@ -1,15 +1,15 @@
 /**
  * Copyright 2010 David Froehlich <david.froehlich@businesssoftware.at>, Samuel Kogler <samuel.kogler@gmail.com>, Stephan Stiboller
  * <stistc06@htlkaindorf.at>
- * 
+ *
  * This file is part of Codesearch.
- * 
+ *
  * Codesearch is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * 
+ *
  * Codesearch is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with Codesearch. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.codesearch.indexer.server.manager;
@@ -33,11 +33,12 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
 import com.google.inject.Inject;
+import org.codesearch.commons.configuration.properties.PropertiesManager;
 import org.codesearch.commons.plugins.lucenefields.LuceneFieldPluginLoader;
 
 /**
  * Stores one or more tasks and controls their execution.
- * 
+ *
  * @author Stiboller Stephan
  * @author David Froehlich
  * @author Samuel Kogler
@@ -69,6 +70,8 @@ public class IndexingJob implements Job {
     private LuceneFieldPluginLoader luceneFieldPluginLoader;
     /** The affected repositories. */
     private List<RepositoryDto> repositories;
+    private PropertiesManager propertiesManager;
+
     /**
      * whether or not the index should be cleared for the specified repositories before indexing
      */
@@ -79,9 +82,10 @@ public class IndexingJob implements Job {
     private JobDataMap jobDataMap;
 
     @Inject
-    public IndexingJob(ConfigurationReader configReader, DBAccess dba, PluginLoader pluginLoader, LuceneFieldPluginLoader luceneFieldPluginLoader) {
+    public IndexingJob(ConfigurationReader configReader, DBAccess dba, PluginLoader pluginLoader, LuceneFieldPluginLoader luceneFieldPluginLoader, PropertiesManager propertiesManager) {
         this.configReader = configReader;
         this.dba = dba;
+        this.propertiesManager = propertiesManager;
         this.pluginLoader = pluginLoader;
         this.luceneFieldPluginLoader = luceneFieldPluginLoader;
         indexLocation = configReader.getIndexLocation();
@@ -89,7 +93,7 @@ public class IndexingJob implements Job {
 
     /**
      * Executes all tasks from the taskList one after another
-     * 
+     *
      * @param jec the JobExecutionContext containing the tasks, the id of the job and whether the job is flagged as terminated or not
      * @throws JobExecutionException if the execution of a task was not successful or if the job was terminated
      */
@@ -109,7 +113,7 @@ public class IndexingJob implements Job {
                 jobDataMap.put(FIELD_STATUS, STATUS_CLEARING);
                 // clear the index of data associated to the specified
                 // repositories
-                ClearTask clearTask = new ClearTask(dba);
+                ClearTask clearTask = new ClearTask(dba, propertiesManager);
                 clearTask.setRepositories(repositories);
                 clearTask.setIndexLocation(indexLocation);
                 clearTask.setJob(this);
@@ -120,7 +124,7 @@ public class IndexingJob implements Job {
             jobDataMap.put(FIELD_FINISHED_REPOSITORIES, 0);
             jobDataMap.put(FIELD_STATUS, STATUS_INDEXING);
             // execution of regular indexing job
-            Task indexingTask = new IndexingTask(dba, pluginLoader, configReader.getSearcherLocation(), luceneFieldPluginLoader);
+            Task indexingTask = new IndexingTask(dba, pluginLoader, configReader.getSearcherLocation(), luceneFieldPluginLoader, propertiesManager);
             indexingTask.setRepositories(repositories);
             indexingTask.setIndexLocation(configReader.getIndexLocation());
             indexingTask.setJob(this);

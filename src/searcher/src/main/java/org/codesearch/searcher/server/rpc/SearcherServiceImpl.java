@@ -62,6 +62,7 @@ import org.codesearch.searcher.shared.SidebarNode;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import org.codesearch.commons.configuration.properties.PropertiesManager;
 
 /**
  * Service used for search operations.
@@ -76,14 +77,16 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
     /** The document searcher used to search the index. */
     private DocumentSearcherImpl documentSearcher;
     private ConfigurationReader configurationReader;
+    private PropertiesManager propertiesManager;
     private PluginLoader pluginLoader;
     private DBAccess dba;
     private List<String> repositories;
     private List<String> repositoryGroups;
 
     @Inject
-    public SearcherServiceImpl(DocumentSearcherImpl documentSearcher, ConfigurationReader configurationReader, PluginLoader pluginLoader, DBAccess dba) {
+    public SearcherServiceImpl(DocumentSearcherImpl documentSearcher, ConfigurationReader configurationReader, PropertiesManager propertiesManager, PluginLoader pluginLoader, DBAccess dba) {
         this.documentSearcher = documentSearcher;
+        this.propertiesManager = propertiesManager;
         this.configurationReader = configurationReader;
         this.pluginLoader = pluginLoader;
         this.dba = dba;
@@ -139,13 +142,8 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
             FileIdentifier fileIdentifier = new FileIdentifier();
             fileIdentifier.setFilePath(filePath);
             fileIdentifier.setRepository(repositoryDto);
-            org.codesearch.commons.plugins.vcs.FileDto vcFile = vcPlugin.getFileDtoForFileIdentifierAtRevision(fileIdentifier, repositoryDto.getIndexedRevision());
+            org.codesearch.commons.plugins.vcs.FileDto vcFile = vcPlugin.getFileDtoForFileIdentifierAtRevision(fileIdentifier, propertiesManager.getValue(repoName));
 
-            if(!repositoryDto.getIndexedRevision().equals(vcPlugin.getRepositoryRevision())){
-               //TODO if the last indexed version is not the latest display a warning 
-                
-            }
-            
             // GET OUTLINE IF EXISTING
             try {
                 AstNode fileNode = dba.getBinaryIndexForFile(filePath, repoName);

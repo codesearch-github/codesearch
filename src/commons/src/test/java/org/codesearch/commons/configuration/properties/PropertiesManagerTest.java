@@ -31,21 +31,21 @@ public class PropertiesManagerTest {
     /**
      * The used PropertiesReader instance
      */
-    private PropertiesManager pr = new PropertiesManager(PropertiesManagerTest.class.getClassLoader().getResourceAsStream("revisions.properties"));
+    private RepositoryRevisionManager pr = new RepositoryRevisionManager(PropertiesManagerTest.class.getClassLoader().getResourceAsStream("revisions.properties"));
 
     public PropertiesManagerTest() {
     }
-    
+
     /**
-     * Test of getPropertyFileValue method, of class PropertiesReader.
+     * Test of getValue method, of class PropertiesReader.
      */
     @Test
     public void testGetPropertyFileValue() throws Exception {
         String key = "testrepo1";
         String expResult = "5";
-        String result = pr.getPropertyFileValue(key);
+        String result = pr.getValue(key);
         assertEquals(expResult, result);
     }
 
-    
+
 }

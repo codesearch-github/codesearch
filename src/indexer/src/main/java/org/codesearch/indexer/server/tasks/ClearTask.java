@@ -1,15 +1,15 @@
 /**
  * Copyright 2010 David Froehlich <david.froehlich@businesssoftware.at>, Samuel Kogler <samuel.kogler@gmail.com>, Stephan Stiboller
  * <stistc06@htlkaindorf.at>
- * 
+ *
  * This file is part of Codesearch.
- * 
+ *
  * Codesearch is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * 
+ *
  * Codesearch is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with Codesearch. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.codesearch.indexer.server.tasks;
@@ -26,7 +26,6 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.LockObtainFailedException;
 import org.codesearch.commons.configuration.dto.RepositoryDto;
-import org.codesearch.commons.configuration.properties.PropertiesManager;
 import org.codesearch.commons.constants.IndexConstants;
 import org.codesearch.commons.database.DBAccess;
 import org.codesearch.commons.database.DatabaseAccessException;
@@ -34,10 +33,11 @@ import org.codesearch.indexer.server.exceptions.TaskExecutionException;
 import org.codesearch.indexer.server.manager.IndexingJob;
 
 import com.google.inject.Inject;
+import org.codesearch.commons.configuration.properties.PropertiesManager;
 
 /**
  * Clears the index of the specified repositories. If none are specified, deletes the entire index.
- * 
+ *
  * @author David Froehlich
  * @author Samuel Kogler
  */
@@ -53,15 +53,18 @@ public class ClearTask implements Task {
     private DBAccess dba;
     /** The parent {@link IndexingJob}. */
     private IndexingJob job;
+    /** The properties manager used to reset the indexed revision. */
+    private PropertiesManager propertiesManager;
 
     @Inject
-    public ClearTask(DBAccess dba) {
+    public ClearTask(DBAccess dba, PropertiesManager propertiesManager) {
         this.dba = dba;
+        this.propertiesManager = propertiesManager;
     }
 
     /**
      * executes the task deletes all index files and resets the lastIndexingRevision of all repositories
-     * 
+     *
      * @throws TaskExecutionException
      */
     @Override
@@ -115,8 +118,7 @@ public class ClearTask implements Task {
                         LOG.error("Error encountered while clearing index: " + ex);
                     }
 
-                    PropertiesManager propertiesManager = new PropertiesManager(indexLocation + File.separator + IndexConstants.REVISIONS_PROPERTY_FILENAME);
-                    propertiesManager.setPropertyFileValue(repositoryDto.getName(), "0");
+                    propertiesManager.setValue(repositoryDto.getName(), "0");
 
                     LOG.debug("Cleared " + deleteCount + " documents for repository " + repositoryDto.getName());
                     index++;

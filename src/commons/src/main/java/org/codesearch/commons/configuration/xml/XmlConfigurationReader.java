@@ -40,8 +40,7 @@ import org.codesearch.commons.configuration.dto.JobDto;
 import org.codesearch.commons.configuration.dto.NoAuthentication;
 import org.codesearch.commons.configuration.dto.RepositoryDto;
 import org.codesearch.commons.configuration.dto.SshAuthentication;
-import org.codesearch.commons.configuration.properties.PropertiesManager;
-import org.codesearch.commons.constants.IndexConstants;
+import org.codesearch.commons.configuration.properties.RepositoryRevisionManager;
 
 /**
  * Xml implementation of the configuration reader. By default, the properties are loaded from a file in the classpath called
@@ -62,7 +61,7 @@ public class XmlConfigurationReader implements ConfigurationReader {
 
     private CodesearchConfiguration codesearchConfiguration;
 
-    PropertiesManager propertiesManager;
+    RepositoryRevisionManager propertiesManager;
     /**
      * creates a new instance of XmlConfigurationReader
      *
@@ -240,7 +239,6 @@ public class XmlConfigurationReader implements ConfigurationReader {
     }
 
     private void loadRepositories() throws InvalidConfigurationException {
-        propertiesManager = new PropertiesManager(getIndexLocation() + File.separator + IndexConstants.REVISIONS_PROPERTY_FILENAME);
         LinkedList<RepositoryDto> repositories = new LinkedList<RepositoryDto>();
         List<HierarchicalConfiguration> repositoryConfigs = config.configurationsAt(XmlConfigurationReaderConstants.REPOSITORY_LIST);
         for (HierarchicalConfiguration repositoryConfig : repositoryConfigs) {
@@ -290,7 +288,7 @@ public class XmlConfigurationReader implements ConfigurationReader {
             usedAuthentication = new SshAuthentication(sshFilePath);
         }
 
-        String indexedRevision = propertiesManager.getPropertyFileValue(name);
+        String indexedRevision = propertiesManager.getValue(name);
         repo = new RepositoryDto(name, hc.getString(XmlConfigurationReaderConstants.REPOSITORY_URL), usedAuthentication, hc
                 .getBoolean(XmlConfigurationReaderConstants.REPOSITORY_CODE_NAVIGATION_ENABLED), hc
                 .getString(XmlConfigurationReaderConstants.REPOSITORY_VCS), blacklistEntries, whitelistFileNames, repositoryGroups, indexedRevision);

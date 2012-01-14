@@ -29,6 +29,8 @@ import org.apache.commons.io.FileUtils;
 import org.codesearch.commons.configuration.ConfigurationReader;
 import org.codesearch.commons.configuration.dto.NoAuthentication;
 import org.codesearch.commons.configuration.dto.RepositoryDto;
+import org.codesearch.commons.configuration.properties.PropertiesManager;
+import org.codesearch.commons.configuration.properties.RepositoryRevisionManager;
 import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
 import org.codesearch.commons.database.DBAccess;
 import org.codesearch.commons.plugins.PluginLoader;
@@ -58,7 +60,7 @@ public class IndexingTaskTest {
 
         PluginLoader pl = new PluginLoaderImpl(configReader);
         DBAccess dba = new MockDatabaseImpl();
-
+        PropertiesManager pm = new RepositoryRevisionManager(configReader);
         RepositoryDto repo = new RepositoryDto(
                 "local_repo",
                 testRepoDir,
@@ -72,11 +74,11 @@ public class IndexingTaskTest {
         List<RepositoryDto> repos = new LinkedList<RepositoryDto>();
         repos.add(repo);
 
-        ClearTask c = new ClearTask(dba);
+        ClearTask c = new ClearTask(dba, pm);
         c.setIndexLocation(testIndexDir);
         c.execute();
 
-        IndexingTask t = new IndexingTask(dba, pl, null, new LuceneFieldPluginLoaderImpl(pl));
+        IndexingTask t = new IndexingTask(dba, pl, null, new LuceneFieldPluginLoaderImpl(pl), pm);
         t.setIndexLocation(testIndexDir);
         t.setRepositories(repos);
         t.execute();
