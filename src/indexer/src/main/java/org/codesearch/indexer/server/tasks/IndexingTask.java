@@ -42,7 +42,6 @@ import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.store.FSDirectory;
 import org.codesearch.commons.configuration.dto.RepositoryDto;
-import org.codesearch.commons.configuration.properties.RepositoryRevisionManager;
 import org.codesearch.commons.constants.IndexConstants;
 import org.codesearch.commons.database.DBAccess;
 import org.codesearch.commons.database.DatabaseAccessException;
