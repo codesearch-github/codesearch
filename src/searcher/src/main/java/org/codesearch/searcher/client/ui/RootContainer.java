@@ -20,8 +20,6 @@
  */
 package org.codesearch.searcher.client.ui;
 
-import org.codesearch.searcher.client.Resources;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -37,6 +35,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.Widget;
+import org.codesearch.searcher.client.Resources;
 
 /**
  * The container of all views. Allows to define UI that shows up everywhere.
@@ -46,18 +45,17 @@ import com.google.gwt.user.client.ui.Widget;
 public class RootContainer extends Composite implements AcceptsOneWidget {
 
     private static RootContainerUiBinder uiBinder = GWT.create(RootContainerUiBinder.class);
- 
+
     interface RootContainerUiBinder extends UiBinder<Widget, RootContainer> {
     }
     @UiField
     LayoutPanel contentPanel;
     @UiField
     FlowPanel errorPanel;
-   
+
 
     public RootContainer() {
         initWidget(uiBinder.createAndBindUi(this));
-        
     }
 
     /** {@inheritDoc} */
@@ -68,12 +66,11 @@ public class RootContainer extends Composite implements AcceptsOneWidget {
         if (widget != null) {
             contentPanel.add(w);
         }
-
     }
 
     /**
      * Creates an error panel display for the given errorMessage
-     * @param String errorMessage to be displayed
+     * @param errorMessage Message to be displayed
      * @return VerticalPanel the error display
      */
     public FlowPanel addErrorPanel(String errorMessage) {
@@ -88,7 +85,7 @@ public class RootContainer extends Composite implements AcceptsOneWidget {
             {
                 ((PushButton)event.getSource()).getParent().setVisible(false);
                 Widget wi = ((PushButton)event.getSource()).getParent().getParent().getParent();
-               
+
             }
         });
         //Label

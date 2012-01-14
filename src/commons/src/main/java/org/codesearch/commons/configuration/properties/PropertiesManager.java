@@ -45,7 +45,7 @@ public class PropertiesManager {
 
     /**
      * Creates a new instance of PropertiesManager
-     * @param the location of the property file
+     * @param propertyFileLocation propertyFileLocation
      */
     public PropertiesManager(final String propertyFileLocation) {
         try {
@@ -74,7 +74,7 @@ public class PropertiesManager {
     /**
      * Gets a new value for the specified key
      * @param key
-     * @param value
+     * @return The value of the key.
      */
     public String getPropertyFileValue(final String key) {
         return properties.getProperty(key, "0");

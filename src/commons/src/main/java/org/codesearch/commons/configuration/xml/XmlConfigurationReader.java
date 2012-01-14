@@ -21,7 +21,9 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
-
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
@@ -38,9 +40,6 @@ import org.codesearch.commons.configuration.dto.JobDto;
 import org.codesearch.commons.configuration.dto.NoAuthentication;
 import org.codesearch.commons.configuration.dto.RepositoryDto;
 import org.codesearch.commons.configuration.dto.SshAuthentication;
-
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
 import org.codesearch.commons.configuration.properties.PropertiesManager;
 import org.codesearch.commons.constants.IndexConstants;
 
@@ -52,6 +51,7 @@ import org.codesearch.commons.constants.IndexConstants;
  * @author David Froehlich
  * @author Samuel Kogler
  */
+@Singleton
 public class XmlConfigurationReader implements ConfigurationReader {
 
     private static final Logger LOG = Logger.getLogger(XmlConfigurationReader.class);
@@ -74,7 +74,7 @@ public class XmlConfigurationReader implements ConfigurationReader {
         if (StringUtils.isNotEmpty(configPath)) {
             this.configPath = configPath;
         }
-        
+
         LOG.debug("Reading config file: " + this.configPath);
         loadConfig();
     }
