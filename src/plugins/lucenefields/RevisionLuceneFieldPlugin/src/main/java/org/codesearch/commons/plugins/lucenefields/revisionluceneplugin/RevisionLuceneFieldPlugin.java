@@ -66,10 +66,4 @@ public class RevisionLuceneFieldPlugin extends LuceneFieldPlugin {
     public Analyzer getLowerCaseAnalyzer() {
         return null;
     }
-    
-    /** {@inheritDoc} */
-    @Override
-    public String getVersion() {
-        return "0.1-RC1";
-    }
 }

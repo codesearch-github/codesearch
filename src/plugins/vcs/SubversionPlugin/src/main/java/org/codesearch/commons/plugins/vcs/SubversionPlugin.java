@@ -81,13 +81,7 @@ public class SubversionPlugin implements VersionControlPlugin {
     public String getPurposes() {
         return "SVN";
     }
-
-    /** {@inheritDoc} */
-    @Override
-    public String getVersion() {
-        return "0.1-RC1";
-    }
-
+    
     /** {@inheritDoc} */
     @Override
     public void setRepository(RepositoryDto repository) throws VersionControlPluginException {

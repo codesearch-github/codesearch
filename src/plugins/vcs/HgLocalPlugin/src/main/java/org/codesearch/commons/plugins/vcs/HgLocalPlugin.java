@@ -165,7 +165,7 @@ public class HgLocalPlugin implements VersionControlPlugin {
         if (directoryPath != null && directoryPath.startsWith("/")) {
             directoryPath = directoryPath.substring(1);
         }
-        
+
         File absolutePath = new File(branchDirectory, directoryPath);
         if(absolutePath.isDirectory()) {
             return Arrays.asList(absolutePath.list());
@@ -178,12 +178,6 @@ public class HgLocalPlugin implements VersionControlPlugin {
     @Override
     public String getPurposes() {
         return "HG";
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public String getVersion() {
-        return "0.1-RC1";
     }
 
     /** {@inheritDoc} */

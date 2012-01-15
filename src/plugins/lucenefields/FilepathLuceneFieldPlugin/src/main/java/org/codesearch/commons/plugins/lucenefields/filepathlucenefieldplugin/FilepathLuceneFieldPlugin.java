@@ -48,7 +48,7 @@ public class FilepathLuceneFieldPlugin extends LuceneFieldPlugin {
     public String getPurposes() {
         return "lucene_field_plugin";
     }
-    
+
     /** {@inheritDoc} */
     @Override
     public boolean isStored() {
@@ -71,11 +71,5 @@ public class FilepathLuceneFieldPlugin extends LuceneFieldPlugin {
     /** {@inheritDoc} */
     public Analyzer getLowerCaseAnalyzer() {
         return new FullValueAnalyzer(false);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public String getVersion() {
-        return "0.1-RC1";
     }
 }

@@ -179,12 +179,6 @@ public class GitLocalPlugin implements VersionControlPlugin {
         return "GIT";
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public String getVersion() {
-        return "0.1-RC1";
-    }
-
     @Override
     public void setCacheDirectory(String directoryPath) throws VersionControlPluginException {
         this.cacheDirectory = new File(directoryPath);

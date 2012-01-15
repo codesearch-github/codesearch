@@ -34,10 +34,4 @@ public interface Plugin {
      * @return the purpose of the plugin
      */
     String getPurposes();
-
-    /**
-     * Returns the version of the plugin
-     * @return the version of the plugin
-     */
-    String getVersion();
 }

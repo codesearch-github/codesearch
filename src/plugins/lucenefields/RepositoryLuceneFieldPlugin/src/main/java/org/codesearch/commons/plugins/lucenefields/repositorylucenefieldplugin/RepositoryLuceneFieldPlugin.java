@@ -31,7 +31,7 @@ import org.codesearch.commons.plugins.lucenefields.LuceneFieldValueException;
 import org.codesearch.commons.plugins.vcs.FileDto;
 
 /**
- * LuceneFieldPlugin that returns the name of the repository 
+ * LuceneFieldPlugin that returns the name of the repository
  * @author David Froehlich
  */
 public class RepositoryLuceneFieldPlugin extends LuceneFieldPlugin {
@@ -75,11 +75,5 @@ public class RepositoryLuceneFieldPlugin extends LuceneFieldPlugin {
     @Override
     public Analyzer getLowerCaseAnalyzer() {
         return null;
-    }
-    
-    /** {@inheritDoc} */
-    @Override
-    public String getVersion() {
-        return "0.1-RC1";
     }
 }

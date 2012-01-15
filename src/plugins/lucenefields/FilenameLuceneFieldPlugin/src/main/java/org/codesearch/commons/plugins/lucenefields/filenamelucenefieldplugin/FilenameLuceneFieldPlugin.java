@@ -43,12 +43,6 @@ public class FilenameLuceneFieldPlugin extends LuceneFieldPlugin {
 
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public String getVersion() {
-        return "0.1-RC1";
-    }
-
     /** {@inhertDoc} */
     @Override
     public boolean isStored() {

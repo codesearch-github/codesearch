@@ -660,12 +660,6 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
 
     /** {@inheritDoc} */
     @Override
-    public String getVersion() {
-        return "0.1-RC1";
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public List<String> getTypeDeclarations() throws CodeAnalyzerPluginException {
         if (typeDeclarations == null) {
             throw new CodeAnalyzerPluginException("No type declaration information available, you must first analyze a file");

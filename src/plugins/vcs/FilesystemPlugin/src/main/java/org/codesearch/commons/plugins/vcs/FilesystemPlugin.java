@@ -126,12 +126,6 @@ public class FilesystemPlugin implements VersionControlPlugin {
         return "FILESYSTEM";
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public String getVersion() {
-        return "0.1-RC1";
-    }
-
     @Override
     public List<String> getFilesInDirectory(String directoryPath) throws VersionControlPluginException {
         File f = new File(directoryPath);

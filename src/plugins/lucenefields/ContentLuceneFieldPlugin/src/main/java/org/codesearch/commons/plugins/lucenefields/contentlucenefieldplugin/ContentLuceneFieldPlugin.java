@@ -59,16 +59,10 @@ public class ContentLuceneFieldPlugin extends LuceneFieldPlugin {
 
     /** {@inheritDoc} */
     @Override
-    public String getVersion() {
-        return "0.1-RC1";
-    }
-    
-    /** {@inheritDoc} */
-    @Override
     public String getPurposes() {
         return "lucene_field_plugin";
     }
-    
+
     /** {@inheritDoc} */
     @Override
     public boolean isStored() {

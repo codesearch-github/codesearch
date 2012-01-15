@@ -164,10 +164,4 @@ public class XmlCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
     public String getPurposes() {
         return "application/xml";
     }
-
-    /** {@inheritDoc} */
-    @Override
-    public String getVersion() {
-        return "0.1-RC1";
-    }
 }
