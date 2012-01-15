@@ -81,7 +81,7 @@ public class SubversionPlugin implements VersionControlPlugin {
     public String getPurposes() {
         return "SVN";
     }
-    
+
     /** {@inheritDoc} */
     @Override
     public void setRepository(RepositoryDto repository) throws VersionControlPluginException {
@@ -169,11 +169,11 @@ public class SubversionPlugin implements VersionControlPlugin {
     }
 
     @Override
-    public List<String> getFilesInDirectory(String directoryPath) throws VersionControlPluginException {
+    public List<String> getFilesInDirectory(String directoryPath, String revision) throws VersionControlPluginException {
         List<String> fileNames = new LinkedList<String>();
         try {
             directoryPath = svnRepo.getRepositoryRoot(true).getPath();
-            svnRepo.getDir(directoryPath, -1, null, new ListDirectoryDirEntryHandler(fileNames));
+            svnRepo.getDir(directoryPath, Long.parseLong(revision), null, new ListDirectoryDirEntryHandler(fileNames));
         } catch (SVNException ex) {
             throw new VersionControlPluginException(ex.getMessage());
         }

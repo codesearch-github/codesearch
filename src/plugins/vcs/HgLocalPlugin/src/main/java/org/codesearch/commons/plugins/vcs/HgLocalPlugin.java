@@ -161,7 +161,9 @@ public class HgLocalPlugin implements VersionControlPlugin {
 
     /** {@inheritDoc} */
     @Override
-    public List<String> getFilesInDirectory(String directoryPath) throws VersionControlPluginException {
+    public List<String> getFilesInDirectory(String directoryPath, String revision) throws VersionControlPluginException {
+        //TODO fix revision check
+
         if (directoryPath != null && directoryPath.startsWith("/")) {
             directoryPath = directoryPath.substring(1);
         }

@@ -127,7 +127,8 @@ public class FilesystemPlugin implements VersionControlPlugin {
     }
 
     @Override
-    public List<String> getFilesInDirectory(String directoryPath) throws VersionControlPluginException {
+    public List<String> getFilesInDirectory(String directoryPath, String revision) throws VersionControlPluginException {
+        //intentionally ignore the revision parameter
         File f = new File(directoryPath);
         return Arrays.asList(f.list());
     }

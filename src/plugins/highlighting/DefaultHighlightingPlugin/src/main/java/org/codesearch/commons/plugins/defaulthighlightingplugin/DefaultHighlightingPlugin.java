@@ -130,12 +130,6 @@ public class DefaultHighlightingPlugin implements HighlightingPlugin {
 
     /** {@inheritDoc} */
     @Override
-    public String getVersion() {
-        return "0.1-RC1";
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public String getEscapeStartToken() {
         return " _begin_escape_"; //The token is split into 2 string so this file can be viewed without the string triggering highlighting plugin
     }

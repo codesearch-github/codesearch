@@ -93,7 +93,7 @@ public class PluginLoaderImpl implements PluginLoader {
                 } catch (VersionControlPluginException ex) {
                     throw new PluginLoaderException("VersionControlPlugin failed to load because an invalid cache directory was specified: " + ex);
                 }
-            }
+            } 
             return (T) validPlugin;
         }
         throw new PluginLoaderException("No Plugin found for purpose: " + purpose + " and Class: " + clazz);

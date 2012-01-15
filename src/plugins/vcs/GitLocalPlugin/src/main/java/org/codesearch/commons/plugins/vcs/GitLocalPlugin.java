@@ -116,7 +116,7 @@ public class GitLocalPlugin implements VersionControlPlugin {
     public Set<FileIdentifier> getChangedFilesSinceRevision(String revision) throws VersionControlPluginException {
         Set<FileIdentifier> files = new HashSet<FileIdentifier>();
 
-        if (revision.equals("0")) {
+        if (revision.equals(VersionControlPlugin.CURRENT_VERSION)) {
             List<String> output = bytesToStringList(executeGitCommand("ls-files"));
 
             LOG.debug(output.size() + " changed files since commit " + revision);
@@ -158,12 +158,12 @@ public class GitLocalPlugin implements VersionControlPlugin {
     }
 
     @Override
-    public List<String> getFilesInDirectory(String directoryPath) throws VersionControlPluginException {
+    public List<String> getFilesInDirectory(String directoryPath, String revision) throws VersionControlPluginException {
         if (directoryPath != null && directoryPath.startsWith("/")) {
             directoryPath = directoryPath.substring(1);
         }
         List<String> files = new LinkedList<String>();
-        List<String> output = bytesToStringList(executeGitCommand("ls-tree", "HEAD" + ":" + directoryPath));
+        List<String> output = bytesToStringList(executeGitCommand("ls-tree", revision + ":" + directoryPath));
 
         for (String line : output) {
             String[] cols = line.split("\\s+");
@@ -182,7 +182,7 @@ public class GitLocalPlugin implements VersionControlPlugin {
     @Override
     public void setCacheDirectory(String directoryPath) throws VersionControlPluginException {
         this.cacheDirectory = new File(directoryPath);
-        if (!cacheDirectory.isDirectory() && cacheDirectory.canWrite()) {
+        if (!(cacheDirectory.isDirectory() && cacheDirectory.canWrite())) {
             throw new VersionControlPluginException("Invalid cache directory specified: " + directoryPath);
         }
     }

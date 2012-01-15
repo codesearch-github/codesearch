@@ -33,7 +33,7 @@ import org.codesearch.commons.plugins.vcs.FileDto;
  * @author Samuel Kogler
  */
 public class RepositoryGroupLuceneFieldPlugin extends LuceneFieldPlugin {
-    
+
     /** Analyzer used for case sensitive queries. */
     private Analyzer regularCaseAnalyzer = new WhitespaceAnalyzer(IndexConstants.LUCENE_VERSION);
     /** Analyzer used for case insensitive queries. */
@@ -73,11 +73,5 @@ public class RepositoryGroupLuceneFieldPlugin extends LuceneFieldPlugin {
     @Override
     public Analyzer getLowerCaseAnalyzer() {
         return lowerCaseAnalyzer;
-    }
-    
-    /** {@inheritDoc} */
-    @Override
-    public String getVersion() {
-        return "0.1-RC1";
     }
 }

@@ -42,8 +42,9 @@ public class GitLocalPluginTest {
 
     private VersionControlPlugin plugin;
 
-    public GitLocalPluginTest() {
+    public GitLocalPluginTest() throws VersionControlPluginException {
         plugin = new GitLocalPlugin();
+        plugin.setCacheDirectory("/tmp"); // specify the cache directory used during the tests
     }
 
     private RepositoryDto getTestRepo() {
@@ -121,15 +122,4 @@ public class GitLocalPluginTest {
         assert (!"0".equals(result));
     }
 
-    /**
-     * Test of getFilesInDirectory method, of class GitLocalPlugin.
-     */
-    @Test
-    @Ignore
-    public void testGetFilesInDirectory() throws Exception {
-        System.out.println("getFilesInDirectory");
-        String directoryPath = "src";
-        List<String> files = plugin.getFilesInDirectory(directoryPath);
-        System.out.println("Files in directory src/: \n" + files);
-    }
 }
