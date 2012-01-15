@@ -21,19 +21,15 @@
 
 package org.codesearch.searcher.client;
 
-import org.codesearch.searcher.client.ui.RootContainer;
-import org.codesearch.searcher.client.ui.searchview.SearchPlace;
-import org.codesearch.searcher.shared.SearchType;
-
 import com.google.gwt.activity.shared.ActivityManager;
 import com.google.gwt.activity.shared.ActivityMapper;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceController;
 import com.google.gwt.place.shared.PlaceHistoryHandler;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
+import com.google.web.bindery.event.shared.EventBus;
+import org.codesearch.searcher.client.ui.RootContainer;
 
 /**
  * The entry point for the searcher.
@@ -41,8 +37,7 @@ import com.google.gwt.user.client.ui.RootLayoutPanel;
  */
 public class SearcherEntryPoint implements EntryPoint {
 
-    private Place defaultPlace = new SearchPlace("", SearchType.REPOSITORIES, null, 200);
-    private RootContainer rootContainer = new RootContainer();
+    private RootContainer rootContainer;
 
     /** {@inheritDoc} */
     @Override
@@ -50,6 +45,7 @@ public class SearcherEntryPoint implements EntryPoint {
         Resources.INSTANCE.searcherStyle().ensureInjected();
 
         ClientFactory clientFactory = ClientFactory.getDefaultFactory();
+        rootContainer = new RootContainer(clientFactory.getDefaultPlace(), clientFactory.getPlaceController());
         EventBus eventBus = clientFactory.getEventBus();
         PlaceController placeController = clientFactory.getPlaceController();
 
@@ -59,7 +55,7 @@ public class SearcherEntryPoint implements EntryPoint {
 
         SearcherPlaceHistoryMapper historyMapper = GWT.create(SearcherPlaceHistoryMapper.class);
         PlaceHistoryHandler historyHandler = new PlaceHistoryHandler(historyMapper);
-        historyHandler.register(placeController, eventBus, defaultPlace);
+        historyHandler.register(placeController, eventBus, clientFactory.getDefaultPlace());
 
         RootLayoutPanel.get().add(rootContainer);
         historyHandler.handleCurrentHistory();

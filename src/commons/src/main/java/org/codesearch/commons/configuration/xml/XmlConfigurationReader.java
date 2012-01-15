@@ -40,7 +40,6 @@ import org.codesearch.commons.configuration.dto.JobDto;
 import org.codesearch.commons.configuration.dto.NoAuthentication;
 import org.codesearch.commons.configuration.dto.RepositoryDto;
 import org.codesearch.commons.configuration.dto.SshAuthentication;
-import org.codesearch.commons.configuration.properties.RepositoryRevisionManager;
 
 /**
  * Xml implementation of the configuration reader. By default, the properties are loaded from a file in the classpath called
@@ -60,8 +59,6 @@ public class XmlConfigurationReader implements ConfigurationReader {
     private String configPath = "codesearch_config.xml";
 
     private CodesearchConfiguration codesearchConfiguration;
-
-    RepositoryRevisionManager propertiesManager;
     /**
      * creates a new instance of XmlConfigurationReader
      *
@@ -288,10 +285,9 @@ public class XmlConfigurationReader implements ConfigurationReader {
             usedAuthentication = new SshAuthentication(sshFilePath);
         }
 
-        String indexedRevision = propertiesManager.getValue(name);
         repo = new RepositoryDto(name, hc.getString(XmlConfigurationReaderConstants.REPOSITORY_URL), usedAuthentication, hc
                 .getBoolean(XmlConfigurationReaderConstants.REPOSITORY_CODE_NAVIGATION_ENABLED), hc
-                .getString(XmlConfigurationReaderConstants.REPOSITORY_VCS), blacklistEntries, whitelistFileNames, repositoryGroups, indexedRevision);
+                .getString(XmlConfigurationReaderConstants.REPOSITORY_VCS), blacklistEntries, whitelistFileNames, repositoryGroups);
         LOG.info("reading repository from configuration: " + repo.toString());
         return repo;
     }

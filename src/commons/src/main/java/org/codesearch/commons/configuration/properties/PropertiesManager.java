@@ -3,13 +3,11 @@ package org.codesearch.commons.configuration.properties;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import javax.inject.Singleton;
 
 /**
  * Provides several methods to access properties.
  * @author Stephan Stiboller
  */
-@Singleton
 public interface PropertiesManager {
 
     /**

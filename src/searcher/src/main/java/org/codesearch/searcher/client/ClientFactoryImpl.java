@@ -21,14 +21,16 @@
 
 package org.codesearch.searcher.client;
 
+import com.google.gwt.place.shared.Place;
+import com.google.gwt.place.shared.PlaceController;
+import com.google.web.bindery.event.shared.EventBus;
+import com.google.web.bindery.event.shared.SimpleEventBus;
 import org.codesearch.searcher.client.ui.fileview.FileView;
 import org.codesearch.searcher.client.ui.fileview.FileViewImpl;
+import org.codesearch.searcher.client.ui.searchview.SearchPlace;
 import org.codesearch.searcher.client.ui.searchview.SearchView;
 import org.codesearch.searcher.client.ui.searchview.SearchViewImpl;
-
-import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.event.shared.SimpleEventBus;
-import com.google.gwt.place.shared.PlaceController;
+import org.codesearch.searcher.shared.SearchType;
 
 /**
  * Implementation of the factory.
@@ -40,6 +42,12 @@ public class ClientFactoryImpl extends ClientFactory {
     private final PlaceController placeController = new PlaceController(eventBus);
     private final SearchView searchView = new SearchViewImpl();
     private final FileView fileView = new FileViewImpl();
+    private final Place defaultPlace = new SearchPlace("", SearchType.REPOSITORIES, null, 200);
+
+    /** {@inheritDoc} */
+    public final Place getDefaultPlace() {
+        return defaultPlace;
+    }
 
     /** {@inheritDoc} */
     @Override

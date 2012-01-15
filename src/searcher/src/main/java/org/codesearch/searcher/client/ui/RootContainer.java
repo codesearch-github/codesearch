@@ -23,6 +23,8 @@ package org.codesearch.searcher.client.ui;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.place.shared.Place;
+import com.google.gwt.place.shared.PlaceController;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
@@ -52,10 +54,27 @@ public class RootContainer extends Composite implements AcceptsOneWidget {
     LayoutPanel contentPanel;
     @UiField
     FlowPanel errorPanel;
+    @UiField
+    Image logo;
 
+    private Place defaultPlace;
+    private PlaceController placeController;
 
-    public RootContainer() {
+    public RootContainer(Place defaultPlace, PlaceController placeController) {
+        this.defaultPlace = defaultPlace;
+        this.placeController = placeController;
+
         initWidget(uiBinder.createAndBindUi(this));
+        addHandlers();
+    }
+
+    private void addHandlers() {
+        logo.addClickHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+                placeController.goTo(defaultPlace);
+            }
+        });
     }
 
     /** {@inheritDoc} */

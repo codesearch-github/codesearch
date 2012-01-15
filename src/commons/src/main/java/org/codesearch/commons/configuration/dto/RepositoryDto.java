@@ -68,7 +68,7 @@ public class RepositoryDto {
      * @param repositoryGroups the groups this repository belongs to
      */
     public RepositoryDto(String name, String url, AuthenticationType usedAuthentication, boolean codeNavigationEnabled,
-            String versionControlSystem, List<String> blacklistEntries, List<String> whitelistEntries, List<String> repositoryGroups, String indexedRevision) {
+            String versionControlSystem, List<String> blacklistEntries, List<String> whitelistEntries, List<String> repositoryGroups) {
         this.name = name;
         this.url = url;
         this.usedAuthentication = usedAuthentication;

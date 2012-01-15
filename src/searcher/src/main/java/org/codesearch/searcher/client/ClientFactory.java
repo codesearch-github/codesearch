@@ -20,11 +20,11 @@
  */
 package org.codesearch.searcher.client;
 
+import com.google.gwt.place.shared.Place;
+import com.google.gwt.place.shared.PlaceController;
+import com.google.web.bindery.event.shared.EventBus;
 import org.codesearch.searcher.client.ui.fileview.FileView;
 import org.codesearch.searcher.client.ui.searchview.SearchView;
-
-import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.place.shared.PlaceController;
 
 /**
  * Provides the implementations of classes used throughout the client.
@@ -48,4 +48,6 @@ public abstract class ClientFactory {
     public abstract SearchView getSearchView();
 
     public abstract FileView getFileView();
+
+    public abstract Place getDefaultPlace();
 }

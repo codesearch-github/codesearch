@@ -44,11 +44,16 @@
         {
         float: left;
         }
+
+        .logo
+        {
+            cursor: pointer;
+        }
     </ui:style>
     <g:DockLayoutPanel unit='PX'>
         <g:north size='30'>
             <g:HTMLPanel>
-                <g:Image resource='{res.logo}' />
+                <g:Image resource='{res.logo}' ui:field='logo' styleName='{style.logo}'/>
             </g:HTMLPanel>
         </g:north>
         <g:center>
