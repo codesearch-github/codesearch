@@ -104,7 +104,7 @@ public class SubversionPlugin implements VersionControlPlugin {
             FileDto fileDto = new FileDto();
             SVNNodeKind nodeKind = svnRepo.checkPath(filePath, -1);
             if (nodeKind != SVNNodeKind.FILE) {
-                return null; // In case the file was deleted or it is a directory
+                throw new VersionControlPluginException("The file is either a folder or has been deleted");
             }
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
 

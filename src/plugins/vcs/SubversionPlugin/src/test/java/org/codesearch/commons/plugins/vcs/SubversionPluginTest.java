@@ -21,9 +21,11 @@
 
 package org.codesearch.commons.plugins.vcs;
 
-import java.util.Iterator;
 import java.util.Set;
-import org.apache.log4j.Logger;
+import org.codesearch.commons.configuration.dto.AuthenticationType;
+import org.codesearch.commons.configuration.dto.NoAuthentication;
+import org.codesearch.commons.configuration.dto.RepositoryDto;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -34,42 +36,43 @@ public class SubversionPluginTest {
 
     SubversionPlugin sp = new SubversionPlugin();
 
-     /* Logger */
-    private static final Logger LOG = Logger.getLogger(SubversionPluginTest.class);
-
     public SubversionPluginTest() {
     }
 
-    /**
-     * Test of getPathsForChangedFilesSinceRevision method, of class SubversionPlugin.
-     */
-    @Test
-    public void testGetPathsForChangedFilesSinceRevision() throws Exception {
-        LOG.info("getPathsForChangedFilesSinceRevision");
-        String revision = "217";
-   //     sp.setRepository(new URI("svn://portal.htl-kaindorf.at/svnsearch"), "feldruebe", "dota!123");
-        Set result = sp.getChangedFilesSinceRevision(revision);
-        Iterator iter = result.iterator();
-        FileIdentifier file = (FileIdentifier) iter.next();
-        assert (file.getFilePath().endsWith("testfile.txt"));
-    }
-
-    /**
-     * Test of getFileContentForFilePath method, of class SubversionPlugin.
-     */
-    @Test
-    public void testGetFileContentForFilePath() throws Exception {
-        LOG.info("getFileContentForFilePath");
-        String filePath = "/svnsearch/trunk/src/main/java/com/bearingpoint/ta/svnsearch/testfile.txt";
-        FileIdentifier identifier = new FileIdentifier(filePath, true, true, null);
-        String result = new String(sp.getFileDtoForFileIdentifierAtRevision(identifier, VersionControlPlugin.CURRENT_VERSION).getContent());
-        assert (result.equals("test"));
+    @Before
+    public void setUp() throws VersionControlPluginException {
+        RepositoryDto repositoryDto = new RepositoryDto();
+        repositoryDto.setName("codesearch test repo");
+        repositoryDto.setUrl("svn://svn.code.sf.net/p/codesearchtest/code/trunk");
+        repositoryDto.setVersionControlSystem("SVN");
+        repositoryDto.setUsedAuthentication(new NoAuthentication());
+        sp.setRepository(repositoryDto);
     }
 
     @Test
-    public void testGetFilesInDirectory() throws Exception {
-        for(String s : sp.getFilesInDirectory(null)){
-            LOG.info(s+"\n");
+    public void testGetFile() throws VersionControlPluginException {
+        FileDto file = sp.getFileDtoForFileIdentifierAtRevision(new FileIdentifier("/trunk/testfile", true, false, null), VersionControlPlugin.CURRENT_VERSION);
+        assert "version 3\n".equals(new String(file.getContent()));
+    }
+
+    @Test
+    public void testGetOldFile() throws VersionControlPluginException {
+        FileDto file = sp.getFileDtoForFileIdentifierAtRevision(new FileIdentifier("/trunk/testfile", true, false, null), "2");
+        assert "version 1\n".equals(new String(file.getContent()));
+    }
+
+    /**
+     * Tests whether the paths that are returned by the getChangedFilesSinceRevision are valid
+     */
+    @Test
+    public void testGetFiles() throws VersionControlPluginException{
+        Set<FileIdentifier> changedFilesSinceRevision = sp.getChangedFilesSinceRevision("1");
+        assert (changedFilesSinceRevision.size() != 0);
+        for(FileIdentifier fileIdentifier : changedFilesSinceRevision){
+            FileDto fileDto = sp.getFileDtoForFileIdentifierAtRevision(fileIdentifier, VersionControlPlugin.CURRENT_VERSION);
+            assert (fileDto != null);
         }
     }
+
+
 }

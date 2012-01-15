@@ -1,16 +1,20 @@
 /**
- * Copyright 2010 David Froehlich <david.froehlich@businesssoftware.at>, Samuel Kogler <samuel.kogler@gmail.com>, Stephan Stiboller
- * <stistc06@htlkaindorf.at>
+ * Copyright 2010 David Froehlich <david.froehlich@businesssoftware.at>, Samuel
+ * Kogler <samuel.kogler@gmail.com>, Stephan Stiboller <stistc06@htlkaindorf.at>
  *
  * This file is part of Codesearch.
  *
- * Codesearch is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * Codesearch is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
  *
- * Codesearch is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * Codesearch is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with Codesearch. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with
+ * Codesearch. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.codesearch.indexer.server.tasks;
 
@@ -78,33 +82,61 @@ import org.codesearch.commons.plugins.vcs.FileDto;
  */
 public class IndexingTask implements Task {
 
-    /** The Logger. */
+    /**
+     * The Logger.
+     */
     private static final Logger LOG = Logger.getLogger(IndexingTask.class);
-    /** The affected repositories. */
+    /**
+     * The affected repositories.
+     */
     private List<RepositoryDto> repositories;
-    /** The currently active IndexWriter */
+    /**
+     * The currently active IndexWriter
+     */
     private IndexWriter indexWriter;
-    /** The index directory, contains all index files */
+    /**
+     * The index directory, contains all index files
+     */
     private FSDirectory indexDirectory;
-    /** The Version control Plugin */
+    /**
+     * The Version control Plugin
+     */
     private VersionControlPlugin versionControlPlugin;
-    /** used to read the repository revision status */
+    /**
+     * used to read the repository revision status
+     */
     private PropertiesManager propertiesManager;
-    /** the location of the lucene index */
+    /**
+     * the location of the lucene index
+     */
     private File indexLocation = null;
-    /** the plugins that will be used to create the fields for each document */
+    /**
+     * the plugins that will be used to create the fields for each document
+     */
     private List<LuceneFieldPlugin> luceneFieldPlugins = new LinkedList<LuceneFieldPlugin>();
-    /** The database access object */
+    /**
+     * The database access object
+     */
     private DBAccess dba;
-    /** The plugin loader. */
+    /**
+     * The plugin loader.
+     */
     private PluginLoader pluginLoader;
-    /** The URI that is called to update the searcher application. */
+    /**
+     * The URI that is called to update the searcher application.
+     */
     private URI searcherUpdatePath;
-    /** The parent {@link IndexingJob}. */
+    /**
+     * The parent {@link IndexingJob}.
+     */
     private IndexingJob job;
-    /** the CodeAnalyzerPlugins used, one per mimetype */
+    /**
+     * the CodeAnalyzerPlugins used, one per mimetype
+     */
     private Map<String, CodeAnalyzerPlugin> caPlugins = new HashMap<String, CodeAnalyzerPlugin>();
-    /** The wrapper analyzer constructed by the plugin loader */
+    /**
+     * The wrapper analyzer constructed by the plugin loader
+     */
     private PerFieldAnalyzerWrapper caseInsensitiveAnalyzer;
 
     @Inject
@@ -182,21 +214,24 @@ public class IndexingTask implements Task {
                         // check whether the changed files should be indexed
                         removeNotToBeIndexedFiles(changedFiles);
                         for (FileIdentifier currentIdentifier : changedFiles) {
-                            FileDto currentDto = versionControlPlugin.getFileDtoForFileIdentifierAtRevision(currentIdentifier, VersionControlPlugin.CURRENT_VERSION);
-                            try {
-                                addFileToIndex(currentDto);
+                            if (!currentIdentifier.isDeleted()) {
+                                try {
+                                    FileDto currentDto = versionControlPlugin.getFileDtoForFileIdentifierAtRevision(currentIdentifier, VersionControlPlugin.CURRENT_VERSION);
+                                    addFileToIndex(currentDto);
 
-                                if (repository.isCodeNavigationEnabled() && databaseConnectionValid) {
-                                    executeCodeAnalysisForFile(currentDto);
+                                    if (repository.isCodeNavigationEnabled() && databaseConnectionValid) {
+                                        executeCodeAnalysisForFile(currentDto);
+                                    }
+
+                                } catch (CodeAnalyzerPluginException ex) {
+                                    LOG.error("Code analyzing failed, skipping file\n" + ex);
+                                    //in case either of those exceptions occurs try to keep indexing the remaining files
+                                } catch (LuceneFieldValueException ex) {
+                                    LOG.error(ex);
+                                } catch (DatabaseAccessException ex) {
+                                    LOG.error("Code analyzing failed: Database error:" + ex);
+                                    databaseConnectionValid = false;
                                 }
-                            } catch (CodeAnalyzerPluginException ex) {
-                                LOG.error("Code analyzing failed, skipping file\n" + ex);
-                                //in case either of those exceptions occurs try to keep indexing the remaining files
-                            } catch (LuceneFieldValueException ex) {
-                                LOG.error(ex);
-                            } catch (DatabaseAccessException ex) {
-                                LOG.error("Code analyzing failed: Database error:" + ex);
-                                databaseConnectionValid = false;
                             }
                         }
                         long duration = System.currentTimeMillis() - start;
@@ -245,6 +280,7 @@ public class IndexingTask implements Task {
 
     /**
      * retrieves the set of all FileDtos for the given FileIdentifiers
+     *
      * @param fileIdentifiers
      * @param plugin
      * @return
@@ -263,6 +299,7 @@ public class IndexingTask implements Task {
     /**
      * checks all FileIdentifiers whether the files should be indexed or not
      * deletes those files that should not be indexed from the set
+     *
      * @param fileIdentifiers
      */
     private void removeNotToBeIndexedFiles(Set<FileIdentifier> fileIdentifiers) {
@@ -278,9 +315,11 @@ public class IndexingTask implements Task {
     }
 
     /**
-     * Sends a request to the searcher web application, notifying it to re-load the index.
+     * Sends a request to the searcher web application, notifying it to re-load
+     * the index.
      *
-     * @throws NotifySearcherException in case the connection to the searcher could not be established
+     * @throws NotifySearcherException in case the connection to the searcher
+     * could not be established
      */
     private void notifySearcher() throws NotifySearcherException {
         try {
@@ -295,7 +334,8 @@ public class IndexingTask implements Task {
     /**
      * executes the code analysis for the given file
      *
-     * @throws CodeAnalyzerPluginException if the source code of one of the files could not be analyzed
+     * @throws CodeAnalyzerPluginException if the source code of one of the
+     * files could not be analyzed
      */
     private void executeCodeAnalysisForFile(FileDto fileDto) throws DatabaseAccessException, CodeAnalyzerPluginException {
 
@@ -395,17 +435,10 @@ public class IndexingTask implements Task {
             throw new IllegalStateException("IndexWriter was not initialized: fatal error");
         }
         Document doc = new Document();
-        if (file == null || file.getFilePath() == null) {
-            return; // If the file is deleted, plugins sometimes return null
-        }
-        // The lucene document containing all relevant indexing information
-        doc = new Document();
-
         // Add fields
         addLuceneFields(doc, file);
         // Add document to the index
         indexWriter.addDocument(doc);
-
         // Logging
         if (LOG.isDebugEnabled()) {
             String fileName;
@@ -442,7 +475,8 @@ public class IndexingTask implements Task {
     }
 
     /**
-     * Checks whether the current file is on the list of files that will not be indexed
+     * Checks whether the current file is on the list of files that will not be
+     * indexed
      */
     private boolean shouldFileBeIndexed(FileIdentifier file) {
         String path = file.getFilePath();
@@ -479,7 +513,9 @@ public class IndexingTask implements Task {
         return shouldFileBeIndexed && matchesElementOnWhitelist;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setJob(IndexingJob job) {
         this.job = job;

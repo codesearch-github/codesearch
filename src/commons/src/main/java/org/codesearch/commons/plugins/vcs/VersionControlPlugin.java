@@ -23,7 +23,6 @@ package org.codesearch.commons.plugins.vcs;
 
 import java.util.List;
 import java.util.Set;
-
 import org.codesearch.commons.configuration.dto.RepositoryDto;
 import org.codesearch.commons.plugins.Plugin;
 import org.codesearch.commons.validator.ValidationException;
@@ -77,11 +76,11 @@ public interface VersionControlPlugin extends Plugin {
      * @throws VersionControlPluginException if the directory is invalid
      */
     void setCacheDirectory(String directoryPath) throws VersionControlPluginException;
-    
+
     /**
      * validates whether the plugin will be usable and a connection to the specified repository can be established
      * aborts all further executions if an exception is thrown
-     * @throws ValidationException 
+     * @throws ValidationException
      */
     void validate() throws ValidationException;
 }
