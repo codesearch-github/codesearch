@@ -21,13 +21,6 @@
 
 package org.codesearch.searcher.client.ui.fileview;
 
-import org.codesearch.searcher.client.ClientFactory;
-import org.codesearch.searcher.client.rpc.SearcherService;
-import org.codesearch.searcher.client.rpc.SearcherServiceAsync;
-import org.codesearch.searcher.client.ui.fileview.FileView.Presenter;
-import org.codesearch.searcher.shared.FileDto;
-import org.codesearch.searcher.shared.SearchResultDto;
-
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.EventBus;
@@ -35,6 +28,12 @@ import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
+import org.codesearch.searcher.client.ClientFactory;
+import org.codesearch.searcher.client.rpc.SearcherService;
+import org.codesearch.searcher.client.rpc.SearcherServiceAsync;
+import org.codesearch.searcher.client.ui.fileview.FileView.Presenter;
+import org.codesearch.searcher.shared.FileDto;
+import org.codesearch.searcher.shared.SearchResultDto;
 
 /**
  * Presenter for the file view.
@@ -66,7 +65,7 @@ public class FileActivity extends AbstractActivity implements Presenter {
         fileView.setRepository(repository);
         fileView.connectEventHandlers();
         fileView.setSearchTerm(searchTerm);
-        searcherServiceAsync.getFile(repository, filePath, new GetFileCallback());
+        searcherServiceAsync.getFile(repository, filePath, true, true, new GetFileCallback());
     }
 
     /** {@inheritDoc} */
@@ -75,6 +74,7 @@ public class FileActivity extends AbstractActivity implements Presenter {
         clientFactory.getPlaceController().goTo(place);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void onStop() {
         Window.setTitle("Codesearch");
@@ -82,6 +82,7 @@ public class FileActivity extends AbstractActivity implements Presenter {
         fileView.cleanup();
     }
 
+    /** {@inheritDoc} */
     @Override
     public void goToUsage(int usageId) {
         searcherServiceAsync.resolveUsage(usageId, repository, filePath, new ResolveUsageCallback());
@@ -89,11 +90,13 @@ public class FileActivity extends AbstractActivity implements Presenter {
 
     private class ResolveUsageCallback implements AsyncCallback<SearchResultDto> {
 
+        /** {@inheritDoc} */
         @Override
         public void onFailure(Throwable caught) {
             Window.alert("Could not resolve usage because: \n" + caught.toString());
         }
 
+        /** {@inheritDoc} */
         @Override
         public void onSuccess(SearchResultDto result) {
             goTo(new FilePlace(result.getRepository(), result.getFilePath(), ""));

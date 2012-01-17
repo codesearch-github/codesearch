@@ -1,40 +1,39 @@
 /**
- * Copyright 2010 David Froehlich   <david.froehlich@businesssoftware.at>,
- *                Samuel Kogler     <samuel.kogler@gmail.com>,
- *                Stephan Stiboller <stistc06@htlkaindorf.at>
+ * Copyright 2010 David Froehlich <david.froehlich@businesssoftware.at>, Samuel
+ * Kogler <samuel.kogler@gmail.com>, Stephan Stiboller <stistc06@htlkaindorf.at>
  *
  * This file is part of Codesearch.
  *
- * Codesearch is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Codesearch is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
  *
- * Codesearch is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * Codesearch is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with
+ * Codesearch. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.codesearch.searcher.server.rpc;
 
+import com.google.gwt.user.server.rpc.RemoteServiceServlet;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-
 import net.sf.jmimemagic.Magic;
 import net.sf.jmimemagic.MagicMatch;
-
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.apache.lucene.queryParser.ParseException;
 import org.codesearch.commons.configuration.ConfigurationReader;
 import org.codesearch.commons.configuration.dto.RepositoryDto;
-import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
+import org.codesearch.commons.configuration.properties.PropertiesManager;
 import org.codesearch.commons.database.DBAccess;
 import org.codesearch.commons.database.DatabaseAccessException;
 import org.codesearch.commons.database.DatabaseEntryNotFoundException;
@@ -59,22 +58,22 @@ import org.codesearch.searcher.shared.SearchType;
 import org.codesearch.searcher.shared.SearcherServiceException;
 import org.codesearch.searcher.shared.SidebarNode;
 
-import com.google.gwt.user.server.rpc.RemoteServiceServlet;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import org.codesearch.commons.configuration.properties.PropertiesManager;
-
 /**
  * Service used for search operations.
+ *
  * @author Samuel Kogler
  */
 @Singleton
 public class SearcherServiceImpl extends RemoteServiceServlet implements SearcherService {
 
     private static final long serialVersionUID = 1389141189614933738L;
-    /** The logger. */
+    /**
+     * The logger.
+     */
     private static final Logger LOG = Logger.getLogger(SearcherServiceImpl.class);
-    /** The document searcher used to search the index. */
+    /**
+     * The document searcher used to search the index.
+     */
     private DocumentSearcherImpl documentSearcher;
     private ConfigurationReader configurationReader;
     private PropertiesManager propertiesManager;
@@ -99,7 +98,9 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
         }
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<SearchResultDto> doSearch(String query, boolean caseSensitive, SearchType searchType, Set<String> selection, int maxResults) throws SearcherServiceException {
         List<SearchResultDto> resultItems = new LinkedList<SearchResultDto>();
@@ -121,20 +122,14 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
         return resultItems;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public FileDto getFile(String repoName, String filePath) throws SearcherServiceException {
-        LOG.debug("Retrieving file content for file: " + filePath + " @ " + repoName);
+    public FileDto getFile(String repoName, String filePath, boolean highlight, boolean insertCodeNavigationLinks) throws SearcherServiceException {
+        LOG.info("Retrieving file: " + filePath + " @ " + repoName);
         FileDto file = new FileDto();
         try {
-            String fileName = filePath.substring(filePath.lastIndexOf('/') + 1);
-            LOG.debug("file name: " + fileName);
-
-            String guessedMimeType = MimeTypeUtil.guessMimeTypeViaFileEnding(fileName);
-
-            LOG.debug("detected mime is: " + guessedMimeType);
-            file.setBinary(MimeTypeUtil.isBinaryType(guessedMimeType));
-
             RepositoryDto repositoryDto = configurationReader.getRepositoryByName(repoName);
             VersionControlPlugin vcPlugin = pluginLoader.getPlugin(VersionControlPlugin.class, repositoryDto.getVersionControlSystem());
 
@@ -143,6 +138,7 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
             fileIdentifier.setFilePath(filePath);
             fileIdentifier.setRepository(repositoryDto);
             org.codesearch.commons.plugins.vcs.FileDto vcFile = vcPlugin.getFileDtoForFileIdentifierAtRevision(fileIdentifier, propertiesManager.getValue(repoName));
+
 
             // GET OUTLINE IF EXISTING
             try {
@@ -157,12 +153,18 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
                     }
                     file.setOutline(outline);
                 }
-
             } catch (DatabaseEntryNotFoundException ex) {
                 //in case the file has no binary index it is simply displayed without an outline
             } catch (DatabaseAccessException ex) {
                 LOG.error("Could not access database: \n" + ex);
             }
+
+            String fileName = filePath.substring(filePath.lastIndexOf('/') + 1);
+            String guessedMimeType = MimeTypeUtil.guessMimeTypeViaFileEnding(fileName);
+
+            LOG.debug("detected mime is: " + guessedMimeType);
+            file.setBinary(MimeTypeUtil.isBinaryType(guessedMimeType));
+
             if (MimeTypeUtil.UNKNOWN.equals(guessedMimeType)) {
                 MagicMatch magicMatch;
                 try {
@@ -176,20 +178,34 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
                 }
             }
 
-            try {
-                HighlightingPlugin hlPlugin = pluginLoader.getPlugin(HighlightingPlugin.class, guessedMimeType);
-                String highlightingEscapeStartToken = hlPlugin.getEscapeStartToken();
-                String highlightingEscapeEndToken = hlPlugin.getEscapeEndToken();
-
-                byte[] parsedFileContent = addUsageLinksToFileContent(vcFile.getContent(), filePath, repoName, highlightingEscapeStartToken, highlightingEscapeEndToken);
-                file.setFileContent(hlPlugin.parseToHtml(parsedFileContent, guessedMimeType));
-            } catch (PluginLoaderException ex) {
-                LOG.debug("No suitable highlighting plugin found");
-                // No plugin found, just escape to HTML
+            byte[] fileContent = vcFile.getContent().clone();
+            String escapeStartToken = "";
+            String escapeEndToken = "";
+            String processedFileContent = "";
+            if (highlight) {
+                try {
+                    HighlightingPlugin hlPlugin = null;
+                    hlPlugin = pluginLoader.getPlugin(HighlightingPlugin.class, guessedMimeType);
+                    escapeStartToken = hlPlugin.getEscapeStartToken();
+                    escapeEndToken = hlPlugin.getEscapeEndToken();
+                    if (insertCodeNavigationLinks) {
+                        fileContent = addUsageLinksToFileContent(fileContent, filePath, repoName, escapeStartToken, escapeEndToken);
+                    }
+                    processedFileContent = hlPlugin.parseToHtml(fileContent, guessedMimeType);
+                } catch (PluginLoaderException ex) {
+                    LOG.debug("No suitable highlighting plugin found");
+                    //If anything went wrong, discard changes and escape to HTML
+                    processedFileContent = StringEscapeUtils.escapeHtml(new String(vcFile.getContent()));
+                } catch (HighlightingPluginException ex) {
+                    LOG.error(ex);
+                    //If anything went wrong, discard changes and escape to HTML
+                    processedFileContent = StringEscapeUtils.escapeHtml(new String(vcFile.getContent()));
+                }
+                file.setFileContent(processedFileContent);
+            } else {
                 file.setFileContent(StringEscapeUtils.escapeHtml(new String(vcFile.getContent())));
             }
-        } catch (HighlightingPluginException ex) {
-            LOG.error(ex);
+
         } catch (VersionControlPluginException ex) {
             throw new SearcherServiceException("Could not get file: \n" + ex);
         } catch (PluginLoaderException ex) {
@@ -225,6 +241,17 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
         return null;
     }
 
+//TODO: Implement this properly
+//    private String parseToHtml(String input, String escapeStartToken, String escapeEndToken) {
+//        String[] outerParts = input.split(escapeStartToken);
+//        for (String outerPart : outerParts) {
+//            String[] innerParts = outerPart.split(escapeEndToken);
+//            for (String innerPart : innerParts) {
+//
+//            }
+//        }
+//        return "";
+//    }
     private AstNode getAstOfFileContainingDeclaration(String repository, String targetFilePath, String originFilePath) throws DatabaseAccessException, DatabaseEntryNotFoundException {
         return dba.getBinaryIndexForFile(targetFilePath, repository);
     }
@@ -251,24 +278,20 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
         return targetFilePath;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<String> getAvailableRepositoryGroups() {
         return repositoryGroups;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<String> getAvailableRepositories() {
         return repositories;
-    }
-
-    public void setDocumentSearcher(DocumentSearcherImpl documentSearcher) {
-        this.documentSearcher = documentSearcher;
-    }
-
-    public void setXmlConfigurationReader(XmlConfigurationReader xmlConfigurationReader) {
-        this.configurationReader = xmlConfigurationReader;
     }
 
     private OutlineNode convertAstNodeToOutlineNode(AstNode astNode) {

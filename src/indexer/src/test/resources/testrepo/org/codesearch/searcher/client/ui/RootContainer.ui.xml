@@ -48,7 +48,7 @@
     <g:DockLayoutPanel unit='PX'>
         <g:north size='30'>
             <g:FlowPanel styleName='{style.header}'>
-                <g:Image resource='{res.logo}' />
+                <g:Image resource='{res.logo}' ui:field='logo' />
             </g:FlowPanel>
         </g:north>
         <g:center>

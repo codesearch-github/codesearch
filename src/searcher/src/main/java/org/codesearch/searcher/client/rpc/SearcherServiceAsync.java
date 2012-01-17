@@ -20,17 +20,14 @@
  */
 package org.codesearch.searcher.client.rpc;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import java.util.List;
 import java.util.Set;
-
 import org.codesearch.searcher.shared.FileDto;
 import org.codesearch.searcher.shared.SearchResultDto;
 import org.codesearch.searcher.shared.SearchType;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
-
 public interface SearcherServiceAsync {
-
 	void doSearch(String query, boolean caseSensitive, SearchType searchType,
 			Set<String> selection, int maxResults, AsyncCallback<List<SearchResultDto>> callback);
 
@@ -38,10 +35,9 @@ public interface SearcherServiceAsync {
 
 	void getAvailableRepositoryGroups(AsyncCallback<List<String>> callback);
 
-	void getFile(String repository, String filePath,
+	void getFile(String repository, String filePath, boolean highlight, boolean insertCodeNavigationLinks,
 			AsyncCallback<FileDto> callback);
 
 	void resolveUsage(int usageId, String repository, String filePath,
 			AsyncCallback<SearchResultDto> callback);
-
 }

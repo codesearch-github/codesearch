@@ -21,16 +21,14 @@
 
 package org.codesearch.searcher.client.rpc;
 
+import com.google.gwt.user.client.rpc.RemoteService;
+import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import java.util.List;
 import java.util.Set;
-
 import org.codesearch.searcher.shared.FileDto;
 import org.codesearch.searcher.shared.SearchResultDto;
 import org.codesearch.searcher.shared.SearchType;
 import org.codesearch.searcher.shared.SearcherServiceException;
-
-import com.google.gwt.user.client.rpc.RemoteService;
-import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
 /**
  * The service used for communication between the GWT javascript client and the server.
@@ -42,6 +40,9 @@ public interface SearcherService extends RemoteService {
      * Executes a lucene search on the server and returns the results as a {@link List} of {@link SearchResultDto}.
      * @param query The given search query.
      * @param caseSensitive Whether the search should be case sensitive.
+     * @param searchType Whether the selection consists of repositories or repository groups
+     * @param selection The selected repositories or repository groups that are used for filtering
+     * @param maxResults The maximum number of results
      * @return The results as a {@link List} of {@link SearchResultDto}.
      * @throws SearcherServiceException If an exception occurs on the server.
      */
@@ -65,10 +66,12 @@ public interface SearcherService extends RemoteService {
      * Retrieves a file identified by the given repository name and filepath.
      * @param repository The given repository name.
      * @param filePath The given file path.
+     * @param highlight Whether the server should highlight syntax elements by inserting HTML tags
+     * @param insertCodeNavigationLinks Whether the server should insert html code navigation links in the file content.
      * @return The {@link FileDto} containing the file content and all necessary information about the file.
      * @throws SearcherServiceException If an exception occurs on the server.
      */
-    FileDto getFile(String repository, String filePath) throws SearcherServiceException;
+    FileDto getFile(String repository, String filePath, boolean highlight, boolean insertCodeNavigationLinks) throws SearcherServiceException;
 
     /**
      * Resolves the usage with the given id in the given file and returns a {@link SearchResultDto}
