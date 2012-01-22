@@ -29,6 +29,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.apache.log4j.Logger;
 import org.codesearch.commons.configuration.ConfigurationReader;
+import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
 
 /**
  * Implementation that uses a property file to represent the currently indexed revision of a repository.
@@ -80,12 +81,12 @@ public class RepositoryRevisionManager implements PropertiesManager {
     /**
      * Gets a new value for the specified key
      *
-     * @param key
-     * @return The value of the key.
+     * @param key 
+     * @return The value of the key, or {@link VersionControlPlugin.UNDEFINED_VERSION} if no value is found
      */
     @Override
     public synchronized String getValue(final String key) {
-        return properties.getProperty(key, "0");
+        return properties.getProperty(key, VersionControlPlugin.UNDEFINED_VERSION);
     }
 
     /**

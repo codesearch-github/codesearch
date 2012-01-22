@@ -38,10 +38,7 @@ public final class IndexConstants {
     public static final String INDEX_FIELD_REVISION="revision";
     public static final String INDEX_FIELD_FILE_TYPE = "file_type";
     public static final String REVISIONS_PROPERTY_FILENAME = "revisions.properties";
-    // the different status messages for repository statuses in the revisions file
-    public static final String REPOSITORY_STATUS_IN_PROGRESS = "in_progress";
     public static final String REPOSITORY_STATUS_INCONSISTENT = "inconsistent";
-    public static final String REPOSITORY_STATUS_EMPTY = "0";
     
     public static final String LC_POSTFIX = "_lc";
     

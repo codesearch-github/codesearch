@@ -32,7 +32,7 @@ import org.codesearch.commons.validator.ValidationException;
  * @author Samuel Kogler
  */
 public interface VersionControlPlugin extends Plugin {
-    public final String CURRENT_VERSION = "-1";
+    public final String UNDEFINED_VERSION = "-1";
     /**
      * Sets the current repository.
      * It is required that the repository is set before calling any of the

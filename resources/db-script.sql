@@ -68,7 +68,7 @@ CREATE TABLE IF NOT EXISTS `import` (
 CREATE TABLE IF NOT EXISTS `repository` (
   `repository_id` int(11) NOT NULL AUTO_INCREMENT,
   `repository_name` varchar(255) NOT NULL,
-  `last_analyzed_revision` varchar(255) NOT NULL DEFAULT '0',
+  `last_analyzed_revision` varchar(255) NOT NULL DEFAULT '-1',
   PRIMARY KEY (`repository_id`),
   UNIQUE KEY `repository_name` (`repository_name`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=4 ;

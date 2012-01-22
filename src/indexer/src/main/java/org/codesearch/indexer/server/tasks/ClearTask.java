@@ -1,16 +1,20 @@
 /**
- * Copyright 2010 David Froehlich <david.froehlich@businesssoftware.at>, Samuel Kogler <samuel.kogler@gmail.com>, Stephan Stiboller
- * <stistc06@htlkaindorf.at>
+ * Copyright 2010 David Froehlich <david.froehlich@businesssoftware.at>, Samuel
+ * Kogler <samuel.kogler@gmail.com>, Stephan Stiboller <stistc06@htlkaindorf.at>
  *
  * This file is part of Codesearch.
  *
- * Codesearch is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * Codesearch is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
  *
- * Codesearch is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * Codesearch is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with Codesearch. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with
+ * Codesearch. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.codesearch.indexer.server.tasks;
 
@@ -34,26 +38,40 @@ import org.codesearch.indexer.server.manager.IndexingJob;
 
 import com.google.inject.Inject;
 import org.codesearch.commons.configuration.properties.PropertiesManager;
+import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
 
 /**
- * Clears the index of the specified repositories. If none are specified, deletes the entire index.
+ * Clears the index of the specified repositories. If none are specified,
+ * deletes the entire index.
  *
  * @author David Froehlich
  * @author Samuel Kogler
  */
 public class ClearTask implements Task {
 
-    /** Logger */
+    /**
+     * Logger
+     */
     private static final Logger LOG = Logger.getLogger(ClearTask.class);
-    /** the location of the index */
+    /**
+     * the location of the index
+     */
     private File indexLocation;
-    /** the repository to clear */
+    /**
+     * the repository to clear
+     */
     private List<RepositoryDto> repositories;
-    /** The database access object */
+    /**
+     * The database access object
+     */
     private DBAccess dba;
-    /** The parent {@link IndexingJob}. */
+    /**
+     * The parent {@link IndexingJob}.
+     */
     private IndexingJob job;
-    /** The properties manager used to reset the indexed revision. */
+    /**
+     * The properties manager used to reset the indexed revision.
+     */
     private PropertiesManager propertiesManager;
 
     @Inject
@@ -66,7 +84,8 @@ public class ClearTask implements Task {
     }
 
     /**
-     * executes the task deletes all index files and resets the lastIndexingRevision of all repositories
+     * executes the task deletes all index files and resets the
+     * lastIndexingRevision of all repositories
      *
      * @throws TaskExecutionException
      */
@@ -121,7 +140,7 @@ public class ClearTask implements Task {
                         LOG.error("Error encountered while clearing index: " + ex);
                     }
 
-                    propertiesManager.setValue(repositoryDto.getName(), "0");
+                    propertiesManager.setValue(repositoryDto.getName(), VersionControlPlugin.UNDEFINED_VERSION);
 
                     LOG.debug("Cleared " + deleteCount + " documents for repository " + repositoryDto.getName());
                     index++;
@@ -144,14 +163,12 @@ public class ClearTask implements Task {
             }
 
             for (RepositoryDto repositoryDto : repositories) {
-                if (repositoryDto.isCodeNavigationEnabled()) {
-                    try {
-                        dba.clearTablesForRepository(repositoryDto.getName());
-                        dba.setLastAnalyzedRevisionOfRepository(repositoryDto.getName(), "0");
-                        LOG.debug("Cleared code analysis index for repository " + repositoryDto.getName());
-                    } catch (DatabaseAccessException ex) {
-                        LOG.error("Could not clear code analysis index: \n" + ex);
-                    }
+                try {
+                    dba.clearTablesForRepository(repositoryDto.getName());
+                    dba.setLastAnalyzedRevisionOfRepository(repositoryDto.getName(), VersionControlPlugin.UNDEFINED_VERSION);
+                    LOG.debug("Cleared code analysis index for repository " + repositoryDto.getName());
+                } catch (DatabaseAccessException ex) {
+                    LOG.warn("Could not clear code analysis index for repository: " + repositoryDto.getName() + ", ignore if code analysis is not enabled \n");
                 }
             }
         }

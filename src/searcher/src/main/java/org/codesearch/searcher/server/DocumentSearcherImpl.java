@@ -1,16 +1,20 @@
 /**
- * Copyright 2010 David Froehlich <david.froehlich@businesssoftware.at>, Samuel Kogler <samuel.kogler@gmail.com>, Stephan Stiboller
- * <stistc06@htlkaindorf.at>
- * 
+ * Copyright 2010 David Froehlich <david.froehlich@businesssoftware.at>, Samuel
+ * Kogler <samuel.kogler@gmail.com>, Stephan Stiboller <stistc06@htlkaindorf.at>
+ *
  * This file is part of Codesearch.
- * 
- * Codesearch is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * 
- * Codesearch is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License along with Codesearch. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Codesearch is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * Codesearch is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * Codesearch. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.codesearch.searcher.server;
 
@@ -34,32 +38,50 @@ import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.FSDirectory;
 import org.codesearch.commons.configuration.ConfigurationReader;
 import org.codesearch.commons.constants.IndexConstants;
+import org.codesearch.commons.plugins.lucenefields.LuceneFieldPlugin;
 import org.codesearch.commons.plugins.lucenefields.LuceneFieldPluginLoader;
 import org.codesearch.searcher.shared.SearchResultDto;
 
 @Singleton
 public class DocumentSearcherImpl implements DocumentSearcher {
 
-    /** The logger. */
+    /**
+     * The logger.
+     */
     private static final Logger LOG = Logger.getLogger(DocumentSearcherImpl.class);
-    /** The parser used for parsing search terms to lucene queries */
+    private final List<LuceneFieldPlugin> luceneFieldPlugins;
+    /**
+     * The parser used for parsing search terms to lucene queries
+     */
     private QueryParser queryParser;
-    /** The parser used for parsing search terms to lucene queries - case sensitive */
+    /**
+     * The parser used for parsing search terms to lucene queries - case
+     * sensitive
+     */
     private QueryParser queryParserCaseSensitive;
-    /** The searcher used for searching the lucene index */
+    /**
+     * The searcher used for searching the lucene index
+     */
     private IndexSearcher indexSearcher;
-    /** Whether the searcher has been initialized. **/
+    /**
+     * Whether the searcher has been initialized. *
+     */
     private boolean searcherInitialized = false;
-    /** The location of the index. **/
+    /**
+     * The location of the index. *
+     */
     private File indexLocation;
-    /** The used configuration reader. */
+    /**
+     * The used configuration reader.
+     */
     private ConfigurationReader configurationReader;
 
     /**
      * Creates a new DocumentSearcher instance
-     * 
-     * @throws ConfigurationException if no value for the key specified in the constant INDEX_LOCATION_KEY could be found in the in the
-     *             configuration via the XmlConfigurationReader
+     *
+     * @throws ConfigurationException if no value for the key specified in the
+     * constant INDEX_LOCATION_KEY could be found in the in the configuration
+     * via the XmlConfigurationReader
      * @throws IOException if the index could not be opened
      */
     @Inject
@@ -73,11 +95,13 @@ public class DocumentSearcherImpl implements DocumentSearcher {
         queryParser.setAllowLeadingWildcard(true);
         queryParser.setDefaultOperator(QueryParser.Operator.AND);
         queryParser.setLowercaseExpandedTerms(false);
-        queryParserCaseSensitive = new QueryParser(IndexConstants.LUCENE_VERSION, IndexConstants.INDEX_FIELD_CONTENT, 
+        queryParserCaseSensitive = new QueryParser(IndexConstants.LUCENE_VERSION, IndexConstants.INDEX_FIELD_CONTENT,
                 luceneFieldPluginLoader.getPerFieldAnalyzerWrapper(true));
         queryParserCaseSensitive.setAllowLeadingWildcard(true);
         queryParserCaseSensitive.setDefaultOperator(QueryParser.Operator.AND);
         queryParserCaseSensitive.setLowercaseExpandedTerms(false);
+        luceneFieldPlugins = luceneFieldPluginLoader.getAllLuceneFieldPlugins();
+
         try {
             initSearcher();
         } catch (InvalidIndexException ex) {
@@ -87,7 +111,9 @@ public class DocumentSearcherImpl implements DocumentSearcher {
         LOG.debug("DocumentSearcher created");
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized List<SearchResultDto> search(String searchString, boolean caseSensitive, Set<String> repositoryNames,
             Set<String> repositoryGroupNames, int maxResults) throws ParseException, IOException, InvalidIndexException {
@@ -96,15 +122,15 @@ public class DocumentSearcherImpl implements DocumentSearcher {
         }
         List<SearchResultDto> results = new LinkedList<SearchResultDto>();
         String finalSearchString = parseQuery(searchString, repositoryNames, repositoryGroupNames);
-        Query query = null;
+        Query query;
         if (caseSensitive) {
             query = queryParserCaseSensitive.parse(finalSearchString);
         } else {
-            //TODO: make this compatible with plugins
-            finalSearchString = finalSearchString.
-                    replace(IndexConstants.INDEX_FIELD_FILEPATH + ":", IndexConstants.INDEX_FIELD_FILEPATH + IndexConstants.LC_POSTFIX + ":").
-                    replace(IndexConstants.INDEX_FIELD_CONTENT  + ":", IndexConstants.INDEX_FIELD_CONTENT  + IndexConstants.LC_POSTFIX + ":").
-                    replace(IndexConstants.INDEX_FIELD_FILENAME + ":", IndexConstants.INDEX_FIELD_FILENAME + IndexConstants.LC_POSTFIX + ":");
+            for (LuceneFieldPlugin plugin : luceneFieldPlugins) {
+                if (plugin.getLowerCaseAnalyzer() != null) {
+                    finalSearchString = finalSearchString.replace(plugin.getFieldName() + ":", plugin.getFieldName() + IndexConstants.LC_POSTFIX + ":");
+                }
+            }
             query = queryParser.parse(finalSearchString.toLowerCase());
         }
 
@@ -113,7 +139,7 @@ public class DocumentSearcherImpl implements DocumentSearcher {
         TopDocs topDocs = indexSearcher.search(query, maxResults);
         LOG.info("Found " + topDocs.scoreDocs.length + " results");
         Document doc;
-        
+
         for (ScoreDoc sd : topDocs.scoreDocs) {
             doc = indexSearcher.doc(sd.doc);
             SearchResultDto searchResult = new SearchResultDto();
@@ -134,8 +160,9 @@ public class DocumentSearcherImpl implements DocumentSearcher {
 //
 //        return null;
 //    }
-
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized void refreshIndex() throws InvalidIndexException {
         try {
@@ -149,7 +176,9 @@ public class DocumentSearcherImpl implements DocumentSearcher {
     }
 
     /**
-     * parses the search term to a lucene conform query keeping in mind the several options
+     * parses the search term to a lucene conform query keeping in mind the
+     * several options
+     *
      * @param query the search query
      * @return the lucene conform query
      */

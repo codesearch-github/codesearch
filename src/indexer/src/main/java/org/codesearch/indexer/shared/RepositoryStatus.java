@@ -37,7 +37,6 @@ public class RepositoryStatus implements Serializable {
 
     public enum Status {
 
-        IN_PROGRESS, // if the repostory is currently being indexed
         INDEXED, // if everything is alright
         INCONSISTENT, // if an indexing process failed
         EMPTY //if the repository has never been indexed

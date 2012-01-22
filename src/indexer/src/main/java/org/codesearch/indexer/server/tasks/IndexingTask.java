@@ -185,7 +185,7 @@ public class IndexingTask implements Task {
                             try {
                                 String lastAnalysisRevision = dba.getLastAnalyzedRevisionOfRepository(repository.getName());
                                 if (!lastAnalysisRevision.equals(lastIndexedRevision)) {
-                                    throw new TaskExecutionException("The code informaiton in the database is not at the same revision as the regular indexed information\n"
+                                    throw new TaskExecutionException("The code information in the database is not at the same revision as the regular indexed information\n"
                                             + "The index of the repository must be cleared via a ClearTask");
                                 }
                             } catch (DatabaseAccessException ex) {
@@ -198,7 +198,7 @@ public class IndexingTask implements Task {
                         for (FileIdentifier currentIdentifier : changedFiles) {
                             if (!currentIdentifier.isDeleted()) {
                                 try {
-                                    FileDto currentDto = versionControlPlugin.getFileDtoForFileIdentifierAtRevision(currentIdentifier, VersionControlPlugin.CURRENT_VERSION);
+                                    FileDto currentDto = versionControlPlugin.getFileDtoForFileIdentifierAtRevision(currentIdentifier, VersionControlPlugin.UNDEFINED_VERSION);
                                     addFileToIndex(currentDto);
 
                                     if (repository.isCodeNavigationEnabled() && databaseConnectionValid) {
@@ -264,7 +264,7 @@ public class IndexingTask implements Task {
         //TODO find out if this method is still needed
         Set<FileDto> fileDtos = new HashSet<FileDto>();
         for (FileIdentifier currentIdentifier : fileIdentifiers) {
-            fileDtos.add(plugin.getFileDtoForFileIdentifierAtRevision(currentIdentifier, VersionControlPlugin.CURRENT_VERSION));
+            fileDtos.add(plugin.getFileDtoForFileIdentifierAtRevision(currentIdentifier, VersionControlPlugin.UNDEFINED_VERSION));
         }
         return fileDtos;
     }

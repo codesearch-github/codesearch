@@ -51,7 +51,7 @@ public class SubversionPluginTest {
 
     @Test
     public void testGetFile() throws VersionControlPluginException {
-        FileDto file = sp.getFileDtoForFileIdentifierAtRevision(new FileIdentifier("/trunk/testfile", true, false, null), VersionControlPlugin.CURRENT_VERSION);
+        FileDto file = sp.getFileDtoForFileIdentifierAtRevision(new FileIdentifier("/trunk/testfile", true, false, null), VersionControlPlugin.UNDEFINED_VERSION);
         assert "version 3\n".equals(new String(file.getContent()));
     }
 
@@ -69,7 +69,7 @@ public class SubversionPluginTest {
         Set<FileIdentifier> changedFilesSinceRevision = sp.getChangedFilesSinceRevision("1");
         assert (changedFilesSinceRevision.size() != 0);
         for(FileIdentifier fileIdentifier : changedFilesSinceRevision){
-            FileDto fileDto = sp.getFileDtoForFileIdentifierAtRevision(fileIdentifier, VersionControlPlugin.CURRENT_VERSION);
+            FileDto fileDto = sp.getFileDtoForFileIdentifierAtRevision(fileIdentifier, VersionControlPlugin.UNDEFINED_VERSION);
             assert (fileDto != null);
         }
     }

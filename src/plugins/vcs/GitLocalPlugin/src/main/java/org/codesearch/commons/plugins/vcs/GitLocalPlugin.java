@@ -94,7 +94,7 @@ public class GitLocalPlugin implements VersionControlPlugin {
     /** {@inheritDoc} */
     @Override
     public FileDto getFileDtoForFileIdentifierAtRevision(FileIdentifier fileIdentifier, String revision) throws VersionControlPluginException {
-        if (revision == null || revision.isEmpty() || revision.equals(VersionControlPlugin.CURRENT_VERSION)) {
+        if (revision == null || revision.isEmpty() || revision.equals(VersionControlPlugin.UNDEFINED_VERSION)) {
             revision = "HEAD";
         }
         byte[] fileContent = executeGitCommand("show", revision + ":" + fileIdentifier.getFilePath());
@@ -116,7 +116,7 @@ public class GitLocalPlugin implements VersionControlPlugin {
     public Set<FileIdentifier> getChangedFilesSinceRevision(String revision) throws VersionControlPluginException {
         Set<FileIdentifier> files = new HashSet<FileIdentifier>();
 
-        if (revision.equals(VersionControlPlugin.CURRENT_VERSION)) {
+        if (revision.equals(VersionControlPlugin.UNDEFINED_VERSION)) {
             List<String> output = bytesToStringList(executeGitCommand("ls-files"));
 
             LOG.debug(output.size() + " changed files since commit " + revision);

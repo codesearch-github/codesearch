@@ -39,6 +39,7 @@ import org.codesearch.commons.plugins.codeanalyzing.ast.ExternalUsage;
 import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
 
 import com.google.inject.Inject;
+import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
 
 /**
  * DBUtils provides methods for access to the database specified in the configuration
@@ -65,7 +66,7 @@ public class DBAccessImpl implements DBAccess {
     private static final String STMT_GET_USAGES_FOR_FILE = "SELECT usages FROM file WHERE file_path = ? AND repository_id = ?";
     private static final String STMT_CLEAR_FILES_FOR_REPOSITORY = "DELETE FROM file WHERE repository_id = ?";
     private static final String STMT_RESET_REPOSITORY_REVISIONS = "UPDATE repository SET last_analyzed_revision = 0";
-    private static final String STMT_PURGE_ALL_FILE_RECORDS = "DELETE FROM file";
+    private static final String STMT_PURGE_ALL_RECORDS = "DELETE FROM repository";
     private static final String STMT_DELETE_FILE = "DELETE FROM file WHERE file_path = ? AND repository_id = (SELECT repository_id FROM repository where repository_name = ?)";
     private ConnectionPool connectionPool;
 
@@ -231,7 +232,7 @@ public class DBAccessImpl implements DBAccess {
             ResultSet rs = ps.executeQuery();
             if (!rs.first()) {
                 createRepositoryEntry(repositoryName);
-                lastAnalyzedRevision = "0";
+                lastAnalyzedRevision = VersionControlPlugin.UNDEFINED_VERSION;
             } else {
                 lastAnalyzedRevision = rs.getString("last_analyzed_revision");
             }
@@ -319,9 +320,7 @@ public class DBAccessImpl implements DBAccess {
     public synchronized void purgeDatabaseEntries() throws DatabaseAccessException {
         Connection conn = connectionPool.getConnection();
         try {
-            PreparedStatement ps = conn.prepareStatement(STMT_RESET_REPOSITORY_REVISIONS);
-            ps.execute();
-            ps = conn.prepareStatement(STMT_PURGE_ALL_FILE_RECORDS);
+            PreparedStatement ps = conn.prepareStatement(STMT_PURGE_ALL_RECORDS);
             ps.execute();
         } catch (SQLException ex) {
             throw new DatabaseAccessException("SQLException while trying to access the database\n" + ex);

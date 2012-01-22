@@ -145,7 +145,6 @@ public class DashboardViewImpl extends Composite implements DashboardView {
     }
 
     private class RepositoryStatusNameColumn extends TextColumn<RepositoryStatus> {
-
         @Override
         public String getValue(RepositoryStatus object) {
             return object.getRepositoryName();
@@ -153,7 +152,6 @@ public class DashboardViewImpl extends Composite implements DashboardView {
     }
 
     private class RepositoryStatusRevisionColumn extends TextColumn<RepositoryStatus> {
-
         @Override
         public String getValue(RepositoryStatus object) {
             return object.getRevision();
@@ -161,7 +159,6 @@ public class DashboardViewImpl extends Composite implements DashboardView {
     }
 
     private class RepositoryStatusStatusColumn extends TextColumn<RepositoryStatus> {
-
         @Override
         public String getValue(RepositoryStatus object) {
             String returnValue = "";
@@ -174,9 +171,6 @@ public class DashboardViewImpl extends Composite implements DashboardView {
                     break;
                 case INDEXED:
                     returnValue = "indexed";
-                    break;
-                case IN_PROGRESS:
-                    returnValue = "indexing in progress";
                     break;
             }
             return returnValue;

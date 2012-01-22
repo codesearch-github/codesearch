@@ -29,6 +29,7 @@ import org.codesearch.commons.configuration.dto.RepositoryDto;
 import org.codesearch.commons.configuration.properties.PropertiesManager;
 import org.codesearch.commons.configuration.properties.RepositoryRevisionManager;
 import org.codesearch.commons.constants.IndexConstants;
+import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
 import org.codesearch.indexer.shared.JobStatus;
 import org.codesearch.indexer.shared.RepositoryStatus;
 import org.quartz.CronScheduleBuilder;
@@ -133,12 +134,10 @@ public final class IndexingManager {
         for(RepositoryDto currentDto : configReader.getRepositories()){
             String revision = propertiesManager.getValue(currentDto.getName());
             RepositoryStatus.Status status = RepositoryStatus.Status.INDEXED;
-            if(revision.equals(IndexConstants.REPOSITORY_STATUS_EMPTY)){
+            if(revision.equals(VersionControlPlugin.UNDEFINED_VERSION)){
                 status = RepositoryStatus.Status.EMPTY;
             } else if (revision.equals(IndexConstants.REPOSITORY_STATUS_INCONSISTENT)){
                 status = RepositoryStatus.Status.INCONSISTENT;
-            } else if (revision.equals(IndexConstants.REPOSITORY_STATUS_IN_PROGRESS)) {
-                status = RepositoryStatus.Status.IN_PROGRESS;
             }
             repositoryStatuses.add(new RepositoryStatus(currentDto.getName(), revision, status));
         }

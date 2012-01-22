@@ -79,7 +79,7 @@ public class GitLocalPluginTest {
         fileIdentifier.setFilePath("test.java");
         fileIdentifier.setRepository(getTestRepo());
 
-        FileDto result = plugin.getFileDtoForFileIdentifierAtRevision(fileIdentifier, VersionControlPlugin.CURRENT_VERSION);
+        FileDto result = plugin.getFileDtoForFileIdentifierAtRevision(fileIdentifier, VersionControlPlugin.UNDEFINED_VERSION);
         assert ("version 3\n".equals(new String(result.getContent())));
     }
 

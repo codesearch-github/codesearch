@@ -131,10 +131,14 @@ public class IndexingJob implements Job {
             Task indexingTask = new IndexingTask(dba, pluginLoader, configReader.getSearcherLocation(), luceneFieldPluginLoader, propertiesManager, repositories, indexDirectory, this);
             indexingTask.execute();
         } catch (TaskExecutionException ex) {
-            LOG.error("Execution of IndexingJob threw an exception" + ex);
-            throw new JobExecutionException("Execution of IndexingJob threw an exception" + ex);
+            String errorMsg = "Execution of IndexingJob threw an exception:\n" + ex;
+            LOG.error(errorMsg);
+            //logging + throwing because of quartz
+            throw new JobExecutionException(errorMsg);
         }catch (IOException ex) {
-            throw new JobExecutionException("Cannot access index directory at: " + indexLocation);
+            String errorMsg = "Cannot access index directory at: " + indexLocation;
+            LOG.error(errorMsg);
+            throw new JobExecutionException(errorMsg);
         }
 
         LOG.debug("Finished execution of job in " + (new Date().getTime() - startDate.getTime()) / 1000f + " seconds");
