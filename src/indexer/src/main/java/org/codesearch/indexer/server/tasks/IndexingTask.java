@@ -18,18 +18,15 @@
  */
 package org.codesearch.indexer.server.tasks;
 
+import com.google.inject.Inject;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.PerFieldAnalyzerWrapper;
 import org.apache.lucene.document.Document;
@@ -44,8 +41,10 @@ import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.codesearch.commons.configuration.dto.RepositoryDto;
+import org.codesearch.commons.configuration.properties.PropertiesManager;
 import org.codesearch.commons.constants.IndexConstants;
 import org.codesearch.commons.database.DBAccess;
 import org.codesearch.commons.database.DatabaseAccessException;
@@ -56,7 +55,9 @@ import org.codesearch.commons.plugins.codeanalyzing.CodeAnalyzerPluginException;
 import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
 import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
 import org.codesearch.commons.plugins.lucenefields.LuceneFieldPlugin;
+import org.codesearch.commons.plugins.lucenefields.LuceneFieldPluginLoader;
 import org.codesearch.commons.plugins.lucenefields.LuceneFieldValueException;
+import org.codesearch.commons.plugins.vcs.FileDto;
 import org.codesearch.commons.plugins.vcs.FileIdentifier;
 import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
 import org.codesearch.commons.plugins.vcs.VersionControlPluginException;
@@ -65,14 +66,6 @@ import org.codesearch.indexer.server.exceptions.InvalidIndexLocationException;
 import org.codesearch.indexer.server.exceptions.NotifySearcherException;
 import org.codesearch.indexer.server.exceptions.TaskExecutionException;
 import org.codesearch.indexer.server.manager.IndexingJob;
-
-import com.google.inject.Inject;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import org.codesearch.commons.configuration.properties.PropertiesManager;
-import org.codesearch.commons.plugins.lucenefields.LuceneFieldPluginLoader;
-import org.codesearch.commons.plugins.vcs.FileDto;
 
 /**
  * This task performs basic indexing of one repository.
@@ -97,7 +90,7 @@ public class IndexingTask implements Task {
     /**
      * The index directory, contains all index files
      */
-    private FSDirectory indexDirectory;
+    private Directory indexDirectory;
     /**
      * The Version control Plugin
      */
@@ -106,10 +99,6 @@ public class IndexingTask implements Task {
      * used to read the repository revision status
      */
     private PropertiesManager propertiesManager;
-    /**
-     * the location of the lucene index
-     */
-    private File indexLocation = null;
     /**
      * the plugins that will be used to create the fields for each document
      */
@@ -140,24 +129,19 @@ public class IndexingTask implements Task {
     private PerFieldAnalyzerWrapper caseInsensitiveAnalyzer;
 
     @Inject
-    public IndexingTask(DBAccess dba, PluginLoader pluginLoader, URI searcherUpdatePath, LuceneFieldPluginLoader luceneFieldPluginLoader, PropertiesManager propertiesManager) {
+    public IndexingTask(DBAccess dba, PluginLoader pluginLoader, URI searcherUpdatePath, LuceneFieldPluginLoader luceneFieldPluginLoader, PropertiesManager propertiesManager, List<RepositoryDto> repositories, Directory indexDirectory, IndexingJob job) throws IOException {
         luceneFieldPlugins = luceneFieldPluginLoader.getAllLuceneFieldPlugins();
         caseInsensitiveAnalyzer = luceneFieldPluginLoader.getPerFieldAnalyzerWrapper(false);
         this.propertiesManager = propertiesManager;
-
+        this.repositories = repositories;
         this.searcherUpdatePath = searcherUpdatePath;
         this.dba = dba;
         this.pluginLoader = pluginLoader;
-    }
-
-    @Override
-    public void setRepositories(List<RepositoryDto> repositories) {
-        this.repositories = repositories;
-    }
-
-    @Override
-    public void setIndexLocation(File indexLocation) {
-        this.indexLocation = indexLocation;
+        this.indexDirectory = indexDirectory;
+        this.job = job;
+        IndexWriterConfig config = new IndexWriterConfig(IndexConstants.LUCENE_VERSION, caseInsensitiveAnalyzer);
+        indexWriter = new IndexWriter(indexDirectory, config);
+        LOG.debug("IndexWriter initialization successful");
     }
 
     /**
@@ -177,7 +161,6 @@ public class IndexingTask implements Task {
             }
             LOG.info("Starting indexing of repositories: " + repos.toString().trim());
             try {
-                init();
                 int i = 0;
                 for (RepositoryDto repository : repositories) {
                     if (job != null) {
@@ -205,7 +188,6 @@ public class IndexingTask implements Task {
                                     throw new TaskExecutionException("The code informaiton in the database is not at the same revision as the regular indexed information\n"
                                             + "The index of the repository must be cleared via a ClearTask");
                                 }
-                                deleteFilesFromDatabase(changedFiles);
                             } catch (DatabaseAccessException ex) {
                                 LOG.error("Code analyzing failed, will attempt to execute regular indexing but no code analysis will take place: Database error:" + ex);
                                 databaseConnectionValid = false;
@@ -222,7 +204,6 @@ public class IndexingTask implements Task {
                                     if (repository.isCodeNavigationEnabled() && databaseConnectionValid) {
                                         executeCodeAnalysisForFile(currentDto);
                                     }
-
                                 } catch (CodeAnalyzerPluginException ex) {
                                     LOG.error("Code analyzing failed, skipping file\n" + ex);
                                     //in case either of those exceptions occurs try to keep indexing the remaining files
@@ -258,8 +239,6 @@ public class IndexingTask implements Task {
                     LOG.warn("Notification of searcher failed, changes in the index will not be recognized without a restart: " + ex);
                 }
                 LOG.info("Finished indexing");
-            } catch (InvalidIndexLocationException ex) {
-                LOG.error("Invalid index location: " + ex);
             } catch (FileNotFoundException ex) {
                 LOG.error("Could not write the index status file: " + ex);
             } catch (IOException ex) {
@@ -269,12 +248,6 @@ public class IndexingTask implements Task {
             }
         } else {
             LOG.warn("No repositories specified, skipping indexing.");
-        }
-    }
-
-    private void deleteFilesFromDatabase(Set<FileIdentifier> identifier) throws DatabaseAccessException {
-        for (FileIdentifier currentIdentifier : identifier) {
-            dba.deleteFile(currentIdentifier.getFilePath(), currentIdentifier.getRepository().getName());
         }
     }
 
@@ -338,8 +311,9 @@ public class IndexingTask implements Task {
      * files could not be analyzed
      */
     private void executeCodeAnalysisForFile(FileDto fileDto) throws DatabaseAccessException, CodeAnalyzerPluginException {
-
         try {
+            //delete outdated record from database
+            dba.deleteFile(fileDto.getFilePath(), fileDto.getRepository().getName());
             String fileType = MimeTypeUtil.guessMimeTypeViaFileEnding(fileDto.getFilePath());
             if (!fileType.equals(MimeTypeUtil.UNKNOWN)) {
                 CodeAnalyzerPlugin plugin;
@@ -387,22 +361,6 @@ public class IndexingTask implements Task {
     }
 
     /**
-     * Initializes Lucene IndexWriter, loads plugins etc..
-     */
-    private void init() throws InvalidIndexLocationException, IOException {
-        try {
-            indexDirectory = FSDirectory.open(indexLocation);
-        } catch (IOException ex) {
-            throw new InvalidIndexLocationException("Cannot access index directory at: " + indexLocation);
-        }
-
-        // By default, fields are indexed case insensitive
-        IndexWriterConfig config = new IndexWriterConfig(IndexConstants.LUCENE_VERSION, caseInsensitiveAnalyzer);
-        indexWriter = new IndexWriter(indexDirectory, config);
-        LOG.debug("IndexWriter initialization successful: " + indexLocation.getAbsolutePath());
-    }
-
-    /**
      * Performs cleanup tasks after execution or after an error is encountered.
      */
     private void cleanup() {
@@ -421,8 +379,12 @@ public class IndexingTask implements Task {
                 }
             }
         }
-        if (indexDirectory != null) {
-            indexDirectory.close();
+        try {
+            if (indexDirectory != null) {
+                indexDirectory.close();
+            }
+        } catch (IOException ex) {
+            LOG.error("Could not close the index directory");
         }
     }
 
@@ -511,13 +473,5 @@ public class IndexingTask implements Task {
             }
         }
         return shouldFileBeIndexed && matchesElementOnWhitelist;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setJob(IndexingJob job) {
-        this.job = job;
     }
 }

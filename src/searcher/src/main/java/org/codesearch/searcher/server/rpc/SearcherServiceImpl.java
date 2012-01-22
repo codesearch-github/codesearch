@@ -51,12 +51,7 @@ import org.codesearch.commons.utils.mime.MimeTypeUtil;
 import org.codesearch.searcher.client.rpc.SearcherService;
 import org.codesearch.searcher.server.DocumentSearcherImpl;
 import org.codesearch.searcher.server.InvalidIndexException;
-import org.codesearch.searcher.shared.FileDto;
-import org.codesearch.searcher.shared.OutlineNode;
-import org.codesearch.searcher.shared.SearchResultDto;
-import org.codesearch.searcher.shared.SearchType;
-import org.codesearch.searcher.shared.SearcherServiceException;
-import org.codesearch.searcher.shared.SidebarNode;
+import org.codesearch.searcher.shared.*;
 
 /**
  * Service used for search operations.
@@ -129,6 +124,7 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
     public FileDto getFile(String repoName, String filePath, boolean highlight, boolean insertCodeNavigationLinks) throws SearcherServiceException {
         LOG.info("Retrieving file: " + filePath + " @ " + repoName);
         FileDto file = new FileDto();
+        String indexedRevision = propertiesManager.getValue(repoName);
         try {
             RepositoryDto repositoryDto = configurationReader.getRepositoryByName(repoName);
             VersionControlPlugin vcPlugin = pluginLoader.getPlugin(VersionControlPlugin.class, repositoryDto.getVersionControlSystem());
@@ -137,25 +133,33 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
             FileIdentifier fileIdentifier = new FileIdentifier();
             fileIdentifier.setFilePath(filePath);
             fileIdentifier.setRepository(repositoryDto);
-            org.codesearch.commons.plugins.vcs.FileDto vcFile = vcPlugin.getFileDtoForFileIdentifierAtRevision(fileIdentifier, propertiesManager.getValue(repoName));
-
+            org.codesearch.commons.plugins.vcs.FileDto vcFile = vcPlugin.getFileDtoForFileIdentifierAtRevision(fileIdentifier, indexedRevision);
 
             // GET OUTLINE IF EXISTING
             try {
-                AstNode fileNode = dba.getBinaryIndexForFile(filePath, repoName);
-                if (fileNode != null) {
-                    List<OutlineNode> outline = new LinkedList<OutlineNode>();
-                    for (AstNode a : fileNode.getChildNodes()) {
-                        if (a == null) {
-                            continue;
+                String analyzedRevision = dba.getLastAnalyzedRevisionOfRepository(repoName);
+                if (analyzedRevision.equals(indexedRevision)) {
+                    AstNode fileNode = dba.getBinaryIndexForFile(filePath, repoName);
+                    if (fileNode != null) {
+                        List<OutlineNode> outline = new LinkedList<OutlineNode>();
+                        for (AstNode a : fileNode.getChildNodes()) {
+                            if (a == null) {
+                                continue;
+                            }
+                            outline.add(convertAstNodeToOutlineNode(a));
                         }
-                        outline.add(convertAstNodeToOutlineNode(a));
+                        file.setOutline(outline);
                     }
-                    file.setOutline(outline);
+                } else {
+                    insertCodeNavigationLinks = false;
+                    // in case the last analyzed revision does not match the last indexed revision
                 }
+
             } catch (DatabaseEntryNotFoundException ex) {
+                insertCodeNavigationLinks = false;
                 //in case the file has no binary index it is simply displayed without an outline
             } catch (DatabaseAccessException ex) {
+                insertCodeNavigationLinks = false;
                 LOG.error("Could not access database: \n" + ex);
             }
 

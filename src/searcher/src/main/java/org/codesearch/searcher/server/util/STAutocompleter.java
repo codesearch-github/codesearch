@@ -46,9 +46,10 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 
 /**
- *
- * @author zeheron
+ * 
+ * @author Stephan Stiboller
  */
+@Deprecated
 public final class STAutocompleter {
 
     private static final String GRAMMED_WORDS_FIELD = "words";

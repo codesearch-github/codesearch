@@ -151,20 +151,6 @@ public class JavaCodeAnalyzerPluginTest {
     }
 
     /**
-     * Test of getVersion method, of class JavaCodeAnalyzerPlugin.
-     */
-    @Test
-    public void testGetVersion() {
-        System.out.println("getVersion");
-        JavaCodeAnalyzerPlugin instance = new JavaCodeAnalyzerPlugin();
-        String expResult = "";
-        String result = instance.getVersion();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
      * Test of getTypeDeclarations method, of class JavaCodeAnalyzerPlugin.
      */
     @Test

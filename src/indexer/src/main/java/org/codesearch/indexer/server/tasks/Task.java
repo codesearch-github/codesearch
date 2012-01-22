@@ -20,12 +20,7 @@
  */
 package org.codesearch.indexer.server.tasks;
 
-import java.io.File;
-import java.util.List;
-
-import org.codesearch.commons.configuration.dto.RepositoryDto;
 import org.codesearch.indexer.server.exceptions.TaskExecutionException;
-import org.codesearch.indexer.server.manager.IndexingJob;
 
 /**
  * Base class for all IndexingTasks
@@ -39,24 +34,4 @@ public interface Task {
      * @throws TaskExecutionException if the execution of the task failed
      */
     void execute() throws TaskExecutionException;
-
-    /**
-     * Sets the repositories this task should handle.
-     * @param repositories The list of repositories
-     */
-    void setRepositories(List<RepositoryDto> repositories);
-
-    /**
-     * Sets the location of the index.
-     * @param indexLocation The index location
-     */
-    void setIndexLocation(File indexLocation);
-    
-    
-    /**
-     * The parent job instance of this task.
-     * Is used to set the current status.
-     * @param job The job instance.
-     */
-    void setJob(IndexingJob job);
 }

@@ -57,9 +57,12 @@ public class ClearTask implements Task {
     private PropertiesManager propertiesManager;
 
     @Inject
-    public ClearTask(DBAccess dba, PropertiesManager propertiesManager) {
+    public ClearTask(DBAccess dba, PropertiesManager propertiesManager, List<RepositoryDto> repositories, File indexLocation, IndexingJob job) {
         this.dba = dba;
         this.propertiesManager = propertiesManager;
+        this.repositories = repositories;
+        this.indexLocation = indexLocation;
+        this.job = job;
     }
 
     /**
@@ -154,21 +157,5 @@ public class ClearTask implements Task {
         }
 
         LOG.info("Finished clearing index");
-    }
-
-    @Override
-    public void setIndexLocation(File indexLocation) {
-        this.indexLocation = indexLocation;
-    }
-
-    @Override
-    public void setRepositories(List<RepositoryDto> repositories) {
-        this.repositories = repositories;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void setJob(IndexingJob job) {
-        this.job = job;
     }
 }

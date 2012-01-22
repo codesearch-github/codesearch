@@ -33,12 +33,14 @@ import org.codesearch.commons.configuration.InvalidConfigurationException;
 import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
 import org.codesearch.commons.plugins.PluginLoaderImpl;
 import org.codesearch.commons.plugins.lucenefields.LuceneFieldPluginLoaderImpl;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
  *
  * @author David Froehlich
  */
+@Ignore
 public class DocumentSearcherTest {
 
     private DocumentSearcherImpl instance;

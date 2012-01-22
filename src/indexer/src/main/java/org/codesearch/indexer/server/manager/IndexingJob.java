@@ -33,6 +33,9 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
 import com.google.inject.Inject;
+import java.io.IOException;
+import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.FSDirectory;
 import org.codesearch.commons.configuration.properties.PropertiesManager;
 import org.codesearch.commons.plugins.lucenefields.LuceneFieldPluginLoader;
 
@@ -113,10 +116,7 @@ public class IndexingJob implements Job {
                 jobDataMap.put(FIELD_STATUS, STATUS_CLEARING);
                 // clear the index of data associated to the specified
                 // repositories
-                ClearTask clearTask = new ClearTask(dba, propertiesManager);
-                clearTask.setRepositories(repositories);
-                clearTask.setIndexLocation(indexLocation);
-                clearTask.setJob(this);
+                ClearTask clearTask = new ClearTask(dba, propertiesManager, repositories, indexLocation, this);
                 clearTask.execute();
             }
 
@@ -124,14 +124,17 @@ public class IndexingJob implements Job {
             jobDataMap.put(FIELD_FINISHED_REPOSITORIES, 0);
             jobDataMap.put(FIELD_STATUS, STATUS_INDEXING);
             // execution of regular indexing job
-            Task indexingTask = new IndexingTask(dba, pluginLoader, configReader.getSearcherLocation(), luceneFieldPluginLoader, propertiesManager);
-            indexingTask.setRepositories(repositories);
-            indexingTask.setIndexLocation(configReader.getIndexLocation());
-            indexingTask.setJob(this);
+            // By default, fields are indexed case insensitive
+        
+            Directory indexDirectory = FSDirectory.open(indexLocation);
+            LOG.info("Opened index at " + indexDirectory);
+            Task indexingTask = new IndexingTask(dba, pluginLoader, configReader.getSearcherLocation(), luceneFieldPluginLoader, propertiesManager, repositories, indexDirectory, this);
             indexingTask.execute();
         } catch (TaskExecutionException ex) {
             LOG.error("Execution of IndexingJob threw an exception" + ex);
             throw new JobExecutionException("Execution of IndexingJob threw an exception" + ex);
+        }catch (IOException ex) {
+            throw new JobExecutionException("Cannot access index directory at: " + indexLocation);
         }
 
         LOG.debug("Finished execution of job in " + (new Date().getTime() - startDate.getTime()) / 1000f + " seconds");

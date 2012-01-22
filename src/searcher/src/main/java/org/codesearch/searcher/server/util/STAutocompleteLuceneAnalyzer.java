@@ -38,8 +38,9 @@ import org.codesearch.commons.constants.IndexConstants;
 
 /**
  * A custom analyzer used for autocompletion
- * @author zeheron
+ * @author Stephan Stiboller
  */
+@Deprecated
 public final class STAutocompleteLuceneAnalyzer extends Analyzer {
 
     /** {@inheritDoc} */

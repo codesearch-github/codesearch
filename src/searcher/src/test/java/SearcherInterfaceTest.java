@@ -20,11 +20,13 @@
  */
 
 import com.google.gwt.junit.client.GWTTestCase;
+import org.junit.Ignore;
 
 /**
  * Tests the searcher interface.
  * @author Samuel Kogler
  */
+@Ignore
 public class SearcherInterfaceTest extends GWTTestCase {
     @Override
     public String getModuleName() {

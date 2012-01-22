@@ -31,14 +31,14 @@ import org.codesearch.commons.plugins.codeanalyzing.ast.ExternalUsage;
 import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
 
 /**
- *
+ * Dummy DBAccess class that provides no functionality at all
  * @author Samuel Kogler
  */
-public class MockDatabaseImpl implements DBAccess {
+public class NoOpDatabaseImpl implements DBAccess {
     
     @Override
     public void clearTablesForRepository(String repoName) throws DatabaseAccessException {
-        System.out.println("clearing repo: " + repoName);
+        
     }
 
     @Override
