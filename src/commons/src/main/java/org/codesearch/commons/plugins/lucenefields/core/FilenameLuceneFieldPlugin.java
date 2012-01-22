@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.codesearch.commons.plugins.lucenefields.filenamelucenefieldplugin;
+package org.codesearch.commons.plugins.lucenefields.core;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.codesearch.commons.plugins.lucenefields.FullValueAnalyzer;

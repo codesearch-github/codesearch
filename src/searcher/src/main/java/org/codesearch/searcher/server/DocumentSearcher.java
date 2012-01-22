@@ -29,7 +29,6 @@ package org.codesearch.searcher.server;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
-
 import org.apache.lucene.queryParser.ParseException;
 import org.codesearch.searcher.shared.SearchResultDto;
 

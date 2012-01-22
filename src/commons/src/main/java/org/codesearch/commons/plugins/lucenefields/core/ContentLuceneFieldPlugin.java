@@ -23,7 +23,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.codesearch.commons.plugins.lucenefields.contentlucenefieldplugin;
+package org.codesearch.commons.plugins.lucenefields.core;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.codesearch.commons.plugins.lucenefields.SimpleSourceCodeAnalyzer;

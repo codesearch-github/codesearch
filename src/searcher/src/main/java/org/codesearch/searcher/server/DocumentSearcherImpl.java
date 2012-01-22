@@ -14,14 +14,15 @@
  */
 package org.codesearch.searcher.server;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import java.io.File;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-
 import org.apache.log4j.Logger;
-import org.apache.lucene.analysis.WhitespaceAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.queryParser.ParseException;
@@ -33,13 +34,8 @@ import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.FSDirectory;
 import org.codesearch.commons.configuration.ConfigurationReader;
 import org.codesearch.commons.constants.IndexConstants;
-import org.codesearch.searcher.shared.SearchResultDto;
-
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import java.util.Iterator;
 import org.codesearch.commons.plugins.lucenefields.LuceneFieldPluginLoader;
-import org.codesearch.commons.plugins.lucenefields.SimpleSourceCodeAnalyzer;
+import org.codesearch.searcher.shared.SearchResultDto;
 
 @Singleton
 public class DocumentSearcherImpl implements DocumentSearcher {
