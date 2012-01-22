@@ -11,6 +11,7 @@ import org.codesearch.commons.plugins.PluginLoaderException;
 
 /**
  * Implements {@link LuceneFieldPluginLoader}
+ *
  * @author Samuel Kogler
  */
 public class LuceneFieldPluginLoaderImpl implements LuceneFieldPluginLoader {
@@ -29,20 +30,28 @@ public class LuceneFieldPluginLoaderImpl implements LuceneFieldPluginLoader {
         }
 
         for (LuceneFieldPlugin currentPlugin : luceneFieldPlugins) {
-            caseSensitivePfaw.addAnalyzer(currentPlugin.getFieldName(), currentPlugin.getRegularCaseAnalyzer());
-            caseInsensitivePfaw.addAnalyzer(currentPlugin.getFieldName(), currentPlugin.getRegularCaseAnalyzer());
-            caseSensitivePfaw.addAnalyzer(currentPlugin.getFieldName() + IndexConstants.LC_POSTFIX, currentPlugin.getLowerCaseAnalyzer());
-            caseInsensitivePfaw.addAnalyzer(currentPlugin.getFieldName() + IndexConstants.LC_POSTFIX, currentPlugin.getLowerCaseAnalyzer());
+            if (currentPlugin.getRegularCaseAnalyzer() != null) {
+                caseSensitivePfaw.addAnalyzer(currentPlugin.getFieldName(), currentPlugin.getRegularCaseAnalyzer());
+                caseSensitivePfaw.addAnalyzer(currentPlugin.getFieldName() + IndexConstants.LC_POSTFIX, currentPlugin.getLowerCaseAnalyzer());
+            }
+            if (currentPlugin.getLowerCaseAnalyzer() != null) {
+                caseInsensitivePfaw.addAnalyzer(currentPlugin.getFieldName(), currentPlugin.getRegularCaseAnalyzer());
+                caseInsensitivePfaw.addAnalyzer(currentPlugin.getFieldName() + IndexConstants.LC_POSTFIX, currentPlugin.getLowerCaseAnalyzer());
+            }
         }
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public PerFieldAnalyzerWrapper getPerFieldAnalyzerWrapper(boolean caseSensitive) {
         return caseSensitive ? caseSensitivePfaw : caseInsensitivePfaw;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<LuceneFieldPlugin> getAllLuceneFieldPlugins() {
         return luceneFieldPlugins;

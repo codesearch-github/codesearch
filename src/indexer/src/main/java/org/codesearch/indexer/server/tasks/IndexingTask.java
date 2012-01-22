@@ -140,6 +140,7 @@ public class IndexingTask implements Task {
         this.indexDirectory = indexDirectory;
         this.job = job;
         IndexWriterConfig config = new IndexWriterConfig(IndexConstants.LUCENE_VERSION, caseInsensitiveAnalyzer);
+        
         indexWriter = new IndexWriter(indexDirectory, config);
         LOG.debug("IndexWriter initialization successful");
     }
