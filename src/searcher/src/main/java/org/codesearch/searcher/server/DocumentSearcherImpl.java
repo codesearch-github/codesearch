@@ -86,6 +86,7 @@ public class DocumentSearcherImpl implements DocumentSearcher {
      */
     @Inject
     public DocumentSearcherImpl(ConfigurationReader configurationReader, LuceneFieldPluginLoader luceneFieldPluginLoader) {
+        this.configurationReader = configurationReader;
         // Retrieve index location from the configuration
         indexLocation = configurationReader.getIndexLocation();
         LOG.debug("Index location set to: " + indexLocation);

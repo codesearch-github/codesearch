@@ -156,8 +156,10 @@ public class XmlConfigurationReader implements ConfigurationReader {
     public synchronized List<String> getRepositoriesForGroup(String groupName) {
         List<String> repos = new LinkedList<String>();
         for (RepositoryDto repo : getRepositories()) {
-            if (repo.getRepositoryGroups().contains(groupName)) {
-                repos.add(repo.getName());
+            if (repo.getRepositoryGroups() != null) {
+                if (repo.getRepositoryGroups().contains(groupName)) {
+                    repos.add(repo.getName());
+                }
             }
         }
         return repos;
