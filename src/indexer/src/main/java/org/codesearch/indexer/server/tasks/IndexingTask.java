@@ -174,7 +174,8 @@ public class IndexingTask implements Task {
                         versionControlPlugin = pluginLoader.getPlugin(VersionControlPlugin.class, repository.getVersionControlSystem());
                         // get the changed files
                         versionControlPlugin.setRepository(repository);
-                        LOG.info("Newest revision is      : " + versionControlPlugin.getRepositoryRevision());
+                        String repositoryRevision = versionControlPlugin.getRepositoryRevision();
+                        LOG.info("Newest revision is      : " + repositoryRevision);
                         Set<FileIdentifier> changedFiles = versionControlPlugin.getChangedFilesSinceRevision(lastIndexedRevision);
                         LOG.info(changedFiles.size() + " files have changed since the last indexing");
                         // clear the index of the old verions of the files
@@ -184,7 +185,7 @@ public class IndexingTask implements Task {
                                 String lastAnalysisRevision = dba.getLastAnalyzedRevisionOfRepository(repository.getName());
                                 if (!lastAnalysisRevision.equals(lastIndexedRevision)) {
                                     throw new TaskExecutionException("The code information in the database is not at the same revision as the regular indexed information\n"
-                                            + "The index of the repository must be cleared via a ClearTask");
+                                            + "The index of the repository must be cleared first");
                                 }
                             } catch (DatabaseAccessException ex) {
                                 LOG.error("Code analyzing failed, will attempt to execute regular indexing but no code analysis will take place: Database error:" + ex);
@@ -210,23 +211,26 @@ public class IndexingTask implements Task {
                                 } catch (DatabaseAccessException ex) {
                                     LOG.error("Code analyzing failed: Database error:" + ex);
                                     databaseConnectionValid = false;
+                                } catch (VersionControlPluginException ex) {
+                                    LOG.error("Could not retrieve file: " + currentIdentifier.getFilePath());
+                                    LOG.debug("VersionControlPlugin threw exception: \n" + ex);
                                 }
                             }
                         }
                         long duration = System.currentTimeMillis() - start;
                         LOG.info("Indexing of repository " + repository.getName() + " took " + duration / 1000 + " seconds");
-                        propertiesManager.setValue(repository.getName(), versionControlPlugin.getRepositoryRevision());
+                        propertiesManager.setValue(repository.getName(), repositoryRevision);
                         if (repository.isCodeNavigationEnabled()) {
                             try {
-                                dba.setLastAnalyzedRevisionOfRepository(repository.getName(), versionControlPlugin.getRepositoryRevision());
+                                dba.setLastAnalyzedRevisionOfRepository(repository.getName(), repositoryRevision);
                             } catch (DatabaseAccessException ex) {
                                 databaseConnectionValid = false;
                             }
                         }
                     } catch (PluginLoaderException ex) {
-                        LOG.error("Could not load VersionControlPlugin\n" + ex);
+                        LOG.error("Could not load VersionControlPlugin, skipping repository " + repository.getName() + ": \n" + ex);
                     } catch (VersionControlPluginException ex) {
-                        LOG.error("Files could not be retrieved: " + ex);
+                        LOG.error("Fatal error in VersionControlPlugin, skipping repository " + repository.getName() + ": \n" + ex);
                     }
                     i++;
                 }

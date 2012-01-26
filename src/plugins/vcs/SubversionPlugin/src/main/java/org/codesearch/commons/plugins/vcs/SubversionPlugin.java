@@ -143,7 +143,7 @@ public class SubversionPlugin implements VersionControlPlugin {
                             identifiers.remove(fileIdentifier);
                         }
                         identifiers.add(fileIdentifier);
-                        LOG.info("Add file to indexing list: " + filePath);
+                        LOG.debug("Add file to indexing list: " + filePath);
                     }
                 }
             }
