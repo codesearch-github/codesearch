@@ -19,13 +19,12 @@
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * 
+ *
  */
 package org.codesearch.indexer.client.rpc;
 
-import java.util.List;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import java.util.List;
 
 /**
  * @author Samuel Kogler
@@ -34,7 +33,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 public interface LogServiceAsync {
 
     /**
-     * 
+     *
      * @see org.codesearch.indexer.client.rpc.LogService#getLog()
      */
     void getLog(AsyncCallback<List<String>> callback);

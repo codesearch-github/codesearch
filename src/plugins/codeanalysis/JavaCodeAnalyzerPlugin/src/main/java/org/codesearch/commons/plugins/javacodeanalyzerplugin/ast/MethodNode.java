@@ -22,7 +22,6 @@ package org.codesearch.commons.plugins.javacodeanalyzerplugin.ast;
 
 import java.util.LinkedList;
 import java.util.List;
-
 import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
 import org.codesearch.commons.plugins.codeanalyzing.ast.CompoundNode;
 
@@ -35,7 +34,7 @@ public class MethodNode extends CompoundNode {
     private String returnType;
     private boolean constructor;
     private List<VariableNode> localVariables = new LinkedList<VariableNode>();
-    
+
     public List<VariableNode> getLocalVariables() {
         return localVariables;
     }
@@ -73,7 +72,7 @@ public class MethodNode extends CompoundNode {
     public String getOutlineName() {
         String parameterString = "";
         String returnString = "";
-        
+
         for (VariableNode v : parameters) {
             parameterString += v.getType() + " " + v.getName() + ", ";
         }

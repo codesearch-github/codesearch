@@ -20,10 +20,6 @@
  */
 package org.codesearch.indexer.client.ui.dashboard;
 
-import java.util.Date;
-
-import org.codesearch.indexer.shared.JobStatus;
-
 import com.google.gwt.cell.client.Cell;
 import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.core.client.GWT;
@@ -40,6 +36,8 @@ import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.NoSelectionModel;
+import java.util.Date;
+import org.codesearch.indexer.shared.JobStatus;
 import org.codesearch.indexer.shared.RepositoryStatus;
 
 public class DashboardViewImpl extends Composite implements DashboardView {
@@ -136,7 +134,7 @@ public class DashboardViewImpl extends Composite implements DashboardView {
         runningJobs.addColumn(new JobStatusCurrentRepoColumn(), "Current repository");
         runningJobs.addColumn(new JobStatusTotalReposColumn(), "Total repositories");
         runningJobs.setSelectionModel(new NoSelectionModel<JobStatus>());
-        
+
         repositoryStatuses = new CellTable<RepositoryStatus>();
         repositoryStatuses.addColumn(new RepositoryStatusNameColumn(), "Name");
         repositoryStatuses.addColumn(new RepositoryStatusRevisionColumn(), "Revision");

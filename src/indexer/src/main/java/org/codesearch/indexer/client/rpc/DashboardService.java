@@ -19,15 +19,14 @@
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * 
+ *
  */
 package org.codesearch.indexer.client.rpc;
 
-import org.codesearch.indexer.shared.DashboardData;
-import org.codesearch.indexer.shared.DashboardServiceException;
-
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
+import org.codesearch.indexer.shared.DashboardData;
+import org.codesearch.indexer.shared.DashboardServiceException;
 
 /**
  * @author Samuel Kogler
@@ -35,11 +34,11 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
  */
 @RemoteServiceRelativePath("../dashboard.rpc")
 public interface DashboardService extends RemoteService {
-	
+
 	/**
 	 * Retrieves the data for the dashboard.
 	 * @return The data for the dashboard.
 	 */
 	DashboardData getData() throws DashboardServiceException;
-	
+
 }

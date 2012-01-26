@@ -24,21 +24,21 @@
  */
 package org.codesearch.commons.plugins.javacodeanalyzerplugin;
 
-import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.ClassNode;
-import org.apache.log4j.Logger;
 import java.util.List;
+import org.apache.log4j.Logger;
 import org.codesearch.commons.plugins.codeanalyzing.CodeAnalyzerPluginException;
 import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
 import org.codesearch.commons.plugins.codeanalyzing.ast.Visibility;
+import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.ClassNode;
 import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.ExternalClassOrEnumUsage;
 import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.FileNode;
 import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.MethodNode;
 import org.junit.After;
 import org.junit.AfterClass;
+import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  *
@@ -73,7 +73,7 @@ public class JavaCodeAnalyzerPluginTest {
     @Test
     public void testBasicAnalysis() throws CodeAnalyzerPluginException {
         JavaCodeAnalyzerPlugin instance = new JavaCodeAnalyzerPlugin();
-        
+
         //create mock source code
         String content = "";
         content += "package foopackage;\n";
@@ -82,16 +82,16 @@ public class JavaCodeAnalyzerPluginTest {
         content += "  public Foo(){\n";
         content += "  }\n";
         content += "}\n";
-        
+
         //create expected result
         FileNode expResult = new FileNode();
-        
+
         ClassNode classNode = new ClassNode();
         classNode.setStartLine(3);
         classNode.setStartPositionInLine(1);
         classNode.setName("Foo");
         classNode.setVisibility(Visibility.PUBLIC);
-        
+
         MethodNode constructor = new MethodNode();
         constructor.setStartLine(4);
         constructor.setConstructor(true);
@@ -102,9 +102,9 @@ public class JavaCodeAnalyzerPluginTest {
         expResult.getClasses().add(classNode);
         instance.analyzeFile(content);
         FileNode result = (FileNode) instance.getAst();
-        
+
         assertEquals(expResult, result);
-        
+
     }
 
     /**

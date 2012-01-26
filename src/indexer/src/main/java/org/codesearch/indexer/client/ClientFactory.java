@@ -20,11 +20,10 @@
  */
 package org.codesearch.indexer.client;
 
-import org.codesearch.indexer.client.ui.dashboard.DashboardView;
-import org.codesearch.indexer.client.ui.log.LogView;
-
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.PlaceController;
+import org.codesearch.indexer.client.ui.dashboard.DashboardView;
+import org.codesearch.indexer.client.ui.log.LogView;
 import org.codesearch.indexer.client.ui.manualIndexing.ManualIndexingView;
 
 /**

@@ -22,7 +22,6 @@ package org.codesearch.indexer.tasks;
 
 import java.util.List;
 import java.util.Map;
-
 import org.codesearch.commons.database.DBAccess;
 import org.codesearch.commons.database.DatabaseAccessException;
 import org.codesearch.commons.database.DatabaseEntryNotFoundException;
@@ -35,10 +34,10 @@ import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
  * @author Samuel Kogler
  */
 public class NoOpDatabaseImpl implements DBAccess {
-    
+
     @Override
     public void clearTablesForRepository(String repoName) throws DatabaseAccessException {
-        
+
     }
 
     @Override

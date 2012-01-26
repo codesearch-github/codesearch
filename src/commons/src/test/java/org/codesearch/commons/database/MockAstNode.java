@@ -22,7 +22,6 @@
 package org.codesearch.commons.database;
 
 import java.util.List;
-
 import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
 
 /**

@@ -14,15 +14,20 @@
  */
 package org.codesearch.indexer.server.manager;
 
+import com.google.inject.Inject;
 import java.io.File;
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
-
 import org.apache.log4j.Logger;
+import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.FSDirectory;
 import org.codesearch.commons.configuration.ConfigurationReader;
 import org.codesearch.commons.configuration.dto.RepositoryDto;
+import org.codesearch.commons.configuration.properties.PropertiesManager;
 import org.codesearch.commons.database.DBAccess;
 import org.codesearch.commons.plugins.PluginLoader;
+import org.codesearch.commons.plugins.lucenefields.LuceneFieldPluginLoader;
 import org.codesearch.indexer.server.exceptions.TaskExecutionException;
 import org.codesearch.indexer.server.tasks.ClearTask;
 import org.codesearch.indexer.server.tasks.IndexingTask;
@@ -31,13 +36,6 @@ import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
-
-import com.google.inject.Inject;
-import java.io.IOException;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.FSDirectory;
-import org.codesearch.commons.configuration.properties.PropertiesManager;
-import org.codesearch.commons.plugins.lucenefields.LuceneFieldPluginLoader;
 
 /**
  * Stores one or more tasks and controls their execution.
@@ -125,7 +123,7 @@ public class IndexingJob implements Job {
             jobDataMap.put(FIELD_STATUS, STATUS_INDEXING);
             // execution of regular indexing job
             // By default, fields are indexed case insensitive
-        
+
             Directory indexDirectory = FSDirectory.open(indexLocation);
             LOG.info("Opened index at " + indexDirectory);
             Task indexingTask = new IndexingTask(dba, pluginLoader, configReader.getSearcherLocation(), luceneFieldPluginLoader, propertiesManager, repositories, indexDirectory, this);

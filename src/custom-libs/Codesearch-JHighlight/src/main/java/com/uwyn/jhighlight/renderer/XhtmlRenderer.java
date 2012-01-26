@@ -20,10 +20,9 @@
  */
 package com.uwyn.jhighlight.renderer;
 
-import java.io.*;
-
 import com.uwyn.jhighlight.highlighter.ExplicitStateHighlighter;
 import com.uwyn.jhighlight.tools.StringUtils;
+import java.io.*;
 
 /**
  * Provides an abstract base class to perform source code to XHTML syntax
@@ -62,7 +61,7 @@ public abstract class XhtmlRenderer implements Renderer {
 
             while (index < line.length()) {
                 style = highlighter.getNextToken();
-                
+
                 length = highlighter.getTokenLength();
                 token = line.substring(index, index + length);
                 boolean append = true;
@@ -129,5 +128,5 @@ public abstract class XhtmlRenderer implements Renderer {
      */
     protected abstract ExplicitStateHighlighter getHighlighter();
 
-    
+
 }

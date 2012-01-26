@@ -21,8 +21,6 @@
 
 package com.uwyn.jhighlight.pcj;
 
-import com.uwyn.jhighlight.pcj.CharCollection;
-import com.uwyn.jhighlight.pcj.CharIterator;
 import com.uwyn.jhighlight.pcj.util.Display;
 import com.uwyn.jhighlight.pcj.util.Exceptions;
 
@@ -44,11 +42,11 @@ import com.uwyn.jhighlight.pcj.util.Exceptions;
  */
 public abstract class AbstractCharCollection implements CharCollection
 {
-	
+
     /** Default constructor to be invoked by sub-classes. */
     protected AbstractCharCollection()
 	{ }
-	
+
     /**
      *  Throws <tt>UnsupportedOperationException</tt>.
      *
@@ -57,7 +55,7 @@ public abstract class AbstractCharCollection implements CharCollection
      */
     public boolean add(char v)
     { Exceptions.unsupported("add"); return false; }
-	
+
     public boolean addAll(CharCollection c)
 	{
         CharIterator i = c.iterator();  //  Throws NullPointerException
@@ -66,7 +64,7 @@ public abstract class AbstractCharCollection implements CharCollection
             result = result|add(i.next());
         return result;
     }
-	
+
     public void clear()
 	{
         CharIterator i = iterator();
@@ -76,7 +74,7 @@ public abstract class AbstractCharCollection implements CharCollection
             i.remove();
         }
     }
-	
+
     public boolean contains(char v)
 	{
         CharIterator i = iterator();
@@ -85,7 +83,7 @@ public abstract class AbstractCharCollection implements CharCollection
                 return true;
         return false;
     }
-	
+
     public boolean containsAll(CharCollection c)
 	{
         CharIterator i = c.iterator();  //  Throws NullPointerException
@@ -94,10 +92,10 @@ public abstract class AbstractCharCollection implements CharCollection
                 return false;
         return true;
     }
-	
+
     public boolean isEmpty()
     { return size()==0; }
-	
+
     public boolean remove(char v)
 	{
         CharIterator i = iterator();
@@ -113,7 +111,7 @@ public abstract class AbstractCharCollection implements CharCollection
         }
         return result;
     }
-	
+
     public boolean removeAll(CharCollection c)
 	{
         if (c==null)
@@ -130,7 +128,7 @@ public abstract class AbstractCharCollection implements CharCollection
         }
         return result;
     }
-	
+
     public boolean retainAll(CharCollection c)
 	{
         if (c==null)
@@ -147,7 +145,7 @@ public abstract class AbstractCharCollection implements CharCollection
         }
         return result;
     }
-	
+
     public int size()
 	{
         CharIterator i = iterator();
@@ -159,12 +157,12 @@ public abstract class AbstractCharCollection implements CharCollection
         }
         return size;
     }
-	
+
     public char[] toArray()
 	{
         return toArray(null);
     }
-	
+
     public char[] toArray(char[] a)
 	{
         int size = size();
@@ -179,7 +177,7 @@ public abstract class AbstractCharCollection implements CharCollection
         }
         return a;
     }
-	
+
     /**
      *  Does nothing. Sub-classes may provide an implementation to
      *  minimize memory usage, but this is not required since many
@@ -187,7 +185,7 @@ public abstract class AbstractCharCollection implements CharCollection
      */
     public void trimToSize()
     { }
-	
+
     /**
      *  Returns a string representation of this collection.
      *
@@ -195,7 +193,7 @@ public abstract class AbstractCharCollection implements CharCollection
      */
     public String toString()
 	{
-        StringBuffer s = new StringBuffer();
+        StringBuilder s = new StringBuilder();
         s.append('[');
         CharIterator i = iterator();
         while (i.hasNext())
@@ -207,5 +205,5 @@ public abstract class AbstractCharCollection implements CharCollection
         s.append(']');
         return s.toString();
     }
-	
+
 }

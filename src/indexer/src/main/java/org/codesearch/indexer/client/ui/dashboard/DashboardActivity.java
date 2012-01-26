@@ -21,13 +21,6 @@
 
 package org.codesearch.indexer.client.ui.dashboard;
 
-import org.codesearch.indexer.client.ClientFactory;
-import org.codesearch.indexer.client.rpc.DashboardService;
-import org.codesearch.indexer.client.rpc.DashboardServiceAsync;
-import org.codesearch.indexer.client.ui.dashboard.DashboardView.Presenter;
-import org.codesearch.indexer.shared.DashboardData;
-import org.codesearch.indexer.shared.JobStatus;
-
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.EventBus;
@@ -36,6 +29,12 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.view.client.ListDataProvider;
+import org.codesearch.indexer.client.ClientFactory;
+import org.codesearch.indexer.client.rpc.DashboardService;
+import org.codesearch.indexer.client.rpc.DashboardServiceAsync;
+import org.codesearch.indexer.client.ui.dashboard.DashboardView.Presenter;
+import org.codesearch.indexer.shared.DashboardData;
+import org.codesearch.indexer.shared.JobStatus;
 import org.codesearch.indexer.shared.RepositoryStatus;
 
 /**
@@ -47,11 +46,11 @@ public class DashboardActivity extends AbstractActivity implements Presenter {
     private ClientFactory clientFactory;
     private DashboardView dashboardView;
     private DashboardServiceAsync dashboardServiceAsync = GWT.create(DashboardService.class);
-    
+
     private ListDataProvider<JobStatus> runningJobsDataProvider = new ListDataProvider<JobStatus>();
     private ListDataProvider<JobStatus> scheduledJobsDataProvider = new ListDataProvider<JobStatus>();
     private ListDataProvider<RepositoryStatus> repositoryStatuses = new ListDataProvider<RepositoryStatus>();
-   
+
     public DashboardActivity(ClientFactory clientFactory, DashboardPlace place) {
         this.clientFactory = clientFactory;
     }
@@ -62,7 +61,7 @@ public class DashboardActivity extends AbstractActivity implements Presenter {
         dashboardView = clientFactory.getDashboardView();
         dashboardView.setPresenter(this);
         panel.setWidget(dashboardView.asWidget());
-        
+
         runningJobsDataProvider.addDataDisplay(dashboardView.getRunningJobsTable());
         scheduledJobsDataProvider.addDataDisplay(dashboardView.getScheduledJobsTable());
         repositoryStatuses.addDataDisplay(dashboardView.getRepositoryStatuses());
@@ -83,13 +82,13 @@ public class DashboardActivity extends AbstractActivity implements Presenter {
         scheduledJobsDataProvider.removeDataDisplay(dashboardView.getScheduledJobsTable());
         repositoryStatuses.removeDataDisplay(dashboardView.getRepositoryStatuses());
     }
-    
+
     @Override
     public void refresh() {
     	dashboardView.cleanup();
     	dashboardServiceAsync.getData(new DashboardDataCallback());
     }
-    
+
     class DashboardDataCallback implements AsyncCallback<DashboardData> {
 
 		/** {@inheritDoc} */

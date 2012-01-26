@@ -32,10 +32,8 @@ import japa.parser.ast.expr.LongLiteralExpr;
 import japa.parser.ast.expr.MethodCallExpr;
 import japa.parser.ast.expr.NameExpr;
 import japa.parser.ast.expr.StringLiteralExpr;
-
 import java.util.LinkedList;
 import java.util.List;
-
 import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
 import org.codesearch.commons.plugins.codeanalyzing.ast.Visibility;
 import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.ClassNode;
@@ -271,7 +269,7 @@ public class AnalyzerUtil {
                                 }
                             } catch (NullPointerException ex) {
                                 return null;
-                                //TODO find out why this occurs 
+                                //TODO find out why this occurs
                             }
                         }
                         return method;

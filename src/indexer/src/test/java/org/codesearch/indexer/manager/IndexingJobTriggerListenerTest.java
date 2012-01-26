@@ -25,21 +25,19 @@
 package org.codesearch.indexer.manager;
 
 
-import static org.quartz.JobBuilder.newJob;
-import static org.quartz.TriggerBuilder.newTrigger;
-
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-
 import org.codesearch.commons.configuration.dto.RepositoryDto;
 import org.codesearch.indexer.server.manager.IndexingJob;
 import org.codesearch.indexer.server.manager.IndexingJobTriggerListener;
 import org.junit.Test;
+import static org.quartz.JobBuilder.newJob;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
+import static org.quartz.TriggerBuilder.newTrigger;
 import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.impl.matchers.EverythingMatcher;
 
@@ -58,17 +56,17 @@ public class IndexingJobTriggerListenerTest {
             Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
             IndexingJobTriggerListener listener = new IndexingJobTriggerListener(1100);
             scheduler.getListenerManager().addTriggerListener(listener, EverythingMatcher.allTriggers());
-            
+
             RepositoryDto repositoryDto1 = new RepositoryDto();
             repositoryDto1.setName("testrepo1");
-            
+
             RepositoryDto repositoryDto2 = new RepositoryDto();
             repositoryDto1.setName("testrepo2");
-            
+
             List<RepositoryDto> repos1 = new LinkedList<RepositoryDto>();
             repos1.add(repositoryDto1);
             repos1.add(repositoryDto2);
-            
+
             List<RepositoryDto> repos2 = new LinkedList<RepositoryDto>();
             repos2.add(repositoryDto2);
 
@@ -89,11 +87,11 @@ public class IndexingJobTriggerListenerTest {
             Date now = new Date();
             Date dt1 = new Date(now.getTime() + 1000L);
             Date dt2 = new Date(now.getTime() + 1500L);
-            
+
             Trigger t1 = newTrigger().withIdentity("trigger1")
                     .forJob("job1").startAt(dt1)
                     .build();
-            
+
             Trigger t2 = newTrigger().withIdentity("trigger2")
                     .forJob("job2").startAt(dt2)
                     .build();

@@ -19,16 +19,14 @@
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * 
+ *
  */
 package org.codesearch.indexer.client.rpc;
 
-import java.util.List;
-
-import org.codesearch.indexer.shared.LogServiceException;
-
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
+import java.util.List;
+import org.codesearch.indexer.shared.LogServiceException;
 
 /**
  * @author Samuel Kogler
@@ -37,7 +35,7 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 @RemoteServiceRelativePath("../log.rpc")
 public interface LogService extends RemoteService {
 
-    
+
     /**
      * Gets the log messages from the server.
      * @return list of log messages.

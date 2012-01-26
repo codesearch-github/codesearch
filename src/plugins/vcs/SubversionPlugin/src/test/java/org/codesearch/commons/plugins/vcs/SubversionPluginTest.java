@@ -22,7 +22,6 @@
 package org.codesearch.commons.plugins.vcs;
 
 import java.util.Set;
-import org.codesearch.commons.configuration.dto.AuthenticationType;
 import org.codesearch.commons.configuration.dto.NoAuthentication;
 import org.codesearch.commons.configuration.dto.RepositoryDto;
 import org.junit.Before;
@@ -67,7 +66,7 @@ public class SubversionPluginTest {
     @Test
     public void testGetFiles() throws VersionControlPluginException{
         Set<FileIdentifier> changedFilesSinceRevision = sp.getChangedFilesSinceRevision("1");
-        assert (changedFilesSinceRevision.size() != 0);
+        assert (!changedFilesSinceRevision.isEmpty());
         for(FileIdentifier fileIdentifier : changedFilesSinceRevision){
             FileDto fileDto = sp.getFileDtoForFileIdentifierAtRevision(fileIdentifier, VersionControlPlugin.UNDEFINED_VERSION);
             assert (fileDto != null);

@@ -21,11 +21,8 @@
 
 package org.codesearch.indexer.client.ui.manualIndexing;
 
-import org.codesearch.indexer.shared.JobStatus;
-
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.place.shared.Place;
-import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.IsWidget;
 import java.util.List;
@@ -37,12 +34,12 @@ import java.util.List;
 public interface ManualIndexingView extends IsWidget {
 
     void setRepositoryGroups(List<String> repositoryGroups);
-    
+
     /**
      * sets the repositories
      */
     void setRepositories(List<String> repositories);
-    
+
     /**
      * Resets the state of the view.
      */
@@ -64,23 +61,23 @@ public interface ManualIndexingView extends IsWidget {
      */
     void disconnectEventHandlers();
 
-    
+
     Presenter getPresenter();
-        
+
     HasValue<Boolean> getClear();
-    
+
     HasClickHandlers getIndexingButton();
-    
+
     /**
      * @return the repositories the user has selected as a list of strings
      */
     List<String> getRepositories();
-    
+
     /**
      * @return the repository groups the user has selected as a list of strings
      */
     List<String> getRepositoryGroups();
-    
+
     interface Presenter {
         void goTo(Place place);
         void refresh();

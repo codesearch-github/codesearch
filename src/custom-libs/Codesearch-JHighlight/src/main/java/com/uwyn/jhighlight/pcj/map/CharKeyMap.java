@@ -21,7 +21,6 @@
 
 package com.uwyn.jhighlight.pcj.map;
 
-import com.uwyn.jhighlight.pcj.map.CharKeyMapIterator;
 import com.uwyn.jhighlight.pcj.set.CharSet;
 
 /**
@@ -35,12 +34,12 @@ import com.uwyn.jhighlight.pcj.set.CharSet;
  */
 public interface CharKeyMap
 {
-	
+
     /**
      *  Clears this map.
      */
     void clear();
-	
+
     /**
      *  Indicates whether this map contains a mapping from a specified
      *  key.
@@ -53,7 +52,7 @@ public interface CharKeyMap
      *              otherwise.
      */
     boolean containsKey(char key);
-	
+
     /**
      *  Indicates whether this map contains a mapping to a specified
      *  value.
@@ -66,7 +65,7 @@ public interface CharKeyMap
      *              <tt>false</tt> otherwise.
      */
     boolean containsValue(Object value);
-	
+
     /**
      *  Returns an iterator over the entries of this map. It is
      *  possible to remove entries from this map using the iterator
@@ -76,7 +75,7 @@ public interface CharKeyMap
      *  @return     an iterator over the entries of this map.
      */
     CharKeyMapIterator entries();
-	
+
     /**
      *  Indicates whether this map is equal to some object.
      *
@@ -88,7 +87,7 @@ public interface CharKeyMap
      *              otherwise.
      */
     boolean equals(Object obj);
-	
+
     /**
      *  Maps a specified key to a value.
      *
@@ -100,14 +99,14 @@ public interface CharKeyMap
      *              specified key.
      */
     Object get(char key);
-	
+
     /**
      *  Returns a hash code value for this map.
      *
      *  @return     a hash code value for this map.
      */
     int hashCode();
-	
+
     /**
      *  Indicates whether this map is empty.
      *
@@ -115,7 +114,7 @@ public interface CharKeyMap
      *              <tt>false</tt> otherwise.
      */
     public boolean isEmpty();
-	
+
     /**
      *  Returns a set view of the keys of this map. The set is not
      *  directly modifiable, but changes to the map are reflected in
@@ -124,7 +123,7 @@ public interface CharKeyMap
      *  @return     a set view of the keys of this map.
      */
     CharSet keySet();
-	
+
     /**
      *  Adds a mapping from a specified key to a specified value to
      *  this map. If a mapping already exists for the specified key
@@ -144,7 +143,7 @@ public interface CharKeyMap
      *              if the operation is not supported by this map.
      */
     Object put(char key, Object value);
-	
+
     /**
      *  Adds all mappings from a specified map to this map. Any
      *  existing mappings whose keys collide with a new mapping is
@@ -160,7 +159,7 @@ public interface CharKeyMap
      *              if the operation is not supported by this map.
      */
     void putAll(CharKeyMap map);
-	
+
     /**
      *  Removes the mapping from a specified key from this map.
      *
@@ -175,7 +174,7 @@ public interface CharKeyMap
      *              if the operation is not supported by this map.
      */
     Object remove(char key);
-	
+
     /**
      *  Returns the size of this map. The size is defined as the
      *  number of mappings from keys to values.
@@ -183,7 +182,7 @@ public interface CharKeyMap
      *  @return     the size of this map.
      */
     int size();
-	
+
     /**
      *  Returns a collection view of the values in this map. The
      *  collection is not modifiable, but changes to the map are
@@ -192,5 +191,5 @@ public interface CharKeyMap
      *  @return     a collection view of the values in this map.
      */
     java.util.Collection values();
-	
+
 }

@@ -24,7 +24,6 @@ package com.uwyn.jhighlight.pcj.set;
 import com.uwyn.jhighlight.pcj.AbstractCharCollection;
 import com.uwyn.jhighlight.pcj.CharIterator;
 import com.uwyn.jhighlight.pcj.hash.DefaultCharHashFunction;
-import com.uwyn.jhighlight.pcj.set.CharSet;
 
 /**
  *  This class represents an abstract base for implementing
@@ -40,11 +39,11 @@ import com.uwyn.jhighlight.pcj.set.CharSet;
  */
 public abstract class AbstractCharSet extends AbstractCharCollection implements CharSet
 {
-	
+
     /** Default constructor to be invoked by sub-classes. */
     protected AbstractCharSet()
 	{ }
-	
+
     public boolean equals(Object obj)
 	{
         if (!(obj instanceof CharSet))
@@ -54,7 +53,7 @@ public abstract class AbstractCharSet extends AbstractCharCollection implements 
             return false;
         return containsAll(s);
     }
-	
+
     public int hashCode()
 	{
         int h = 0;
@@ -63,5 +62,5 @@ public abstract class AbstractCharSet extends AbstractCharCollection implements 
             h += DefaultCharHashFunction.INSTANCE.hash(i.next());
         return h;
     }
-	
+
 }

@@ -20,6 +20,7 @@
  */
 package org.codesearch.commons.database;
 
+import com.google.inject.Inject;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -32,13 +33,10 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
 import org.codesearch.commons.plugins.codeanalyzing.ast.ExternalUsage;
 import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
-
-import com.google.inject.Inject;
 import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
 
 /**
@@ -336,7 +334,7 @@ public class DBAccessImpl implements DBAccess {
         Connection conn = connectionPool.getConnection();
         ObjectInputStream regObjectStream;
         try {
-            String targetPackageName = targetFileName.substring(0, targetFileName.lastIndexOf(".")) + ".*";
+            String targetPackageName = targetFileName.substring(0, targetFileName.lastIndexOf('.')) + ".*";
             PreparedStatement ps = conn.prepareStatement(STMT_GET_FILES_IMPORTING_FILE);
             ps.setString(1, targetFileName);
             ps.setString(2, targetPackageName);

@@ -20,16 +20,14 @@
  */
 package org.codesearch.commons.database;
 
+import com.google.inject.Inject;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.LinkedList;
-
 import org.apache.log4j.Logger;
 import org.codesearch.commons.configuration.ConfigurationReader;
 import org.codesearch.commons.configuration.dto.DatabaseConfiguration;
-
-import com.google.inject.Inject;
 
 /**
  *

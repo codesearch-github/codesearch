@@ -14,9 +14,8 @@
  */
 package org.codesearch.commons.configuration.dto;
 
-import java.util.List;
-
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import java.util.List;
 
 /**
  * DTO used to store information about a repository specified in the config.xml file

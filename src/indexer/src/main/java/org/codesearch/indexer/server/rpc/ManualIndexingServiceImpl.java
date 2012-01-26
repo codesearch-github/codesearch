@@ -23,19 +23,15 @@
  */
 package org.codesearch.indexer.server.rpc;
 
-import java.util.List;
-
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.codesearch.indexer.server.manager.IndexingManager;
-
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import java.util.LinkedList;
+import java.util.List;
 import org.codesearch.commons.configuration.ConfigurationReader;
 import org.codesearch.commons.configuration.dto.RepositoryDto;
 import org.codesearch.indexer.client.rpc.ManualIndexingService;
+import org.codesearch.indexer.server.manager.IndexingManager;
 import org.codesearch.indexer.shared.ManualIndexingData;
 import org.codesearch.indexer.shared.ManualIndexingServiceException;
 import org.quartz.SchedulerException;

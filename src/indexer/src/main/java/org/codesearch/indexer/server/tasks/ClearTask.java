@@ -18,10 +18,10 @@
  */
 package org.codesearch.indexer.server.tasks;
 
+import com.google.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.StaleReaderException;
@@ -30,15 +30,13 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.LockObtainFailedException;
 import org.codesearch.commons.configuration.dto.RepositoryDto;
+import org.codesearch.commons.configuration.properties.PropertiesManager;
 import org.codesearch.commons.constants.IndexConstants;
 import org.codesearch.commons.database.DBAccess;
 import org.codesearch.commons.database.DatabaseAccessException;
+import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
 import org.codesearch.indexer.server.exceptions.TaskExecutionException;
 import org.codesearch.indexer.server.manager.IndexingJob;
-
-import com.google.inject.Inject;
-import org.codesearch.commons.configuration.properties.PropertiesManager;
-import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
 
 /**
  * Clears the index of the specified repositories. If none are specified,

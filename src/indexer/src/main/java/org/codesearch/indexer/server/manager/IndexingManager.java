@@ -15,7 +15,6 @@
 package org.codesearch.indexer.server.manager;
 
 import com.google.inject.Inject;
-import java.io.File;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.LinkedList;
@@ -27,7 +26,6 @@ import org.codesearch.commons.configuration.ConfigurationReader;
 import org.codesearch.commons.configuration.dto.JobDto;
 import org.codesearch.commons.configuration.dto.RepositoryDto;
 import org.codesearch.commons.configuration.properties.PropertiesManager;
-import org.codesearch.commons.configuration.properties.RepositoryRevisionManager;
 import org.codesearch.commons.constants.IndexConstants;
 import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
 import org.codesearch.indexer.shared.JobStatus;

@@ -22,16 +22,14 @@
  */
 package org.codesearch.commons.plugins.vcs;
 
+import java.util.LinkedList;
+import java.util.Set;
 import org.codesearch.commons.configuration.dto.NoAuthentication;
 import org.codesearch.commons.configuration.dto.RepositoryDto;
-
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import org.junit.Before;
-import org.junit.Test;
 import static org.junit.Assert.*;
+import org.junit.Before;
 import org.junit.Ignore;
+import org.junit.Test;
 
 /**
  * Tests {@link GitLocalPlugin}.

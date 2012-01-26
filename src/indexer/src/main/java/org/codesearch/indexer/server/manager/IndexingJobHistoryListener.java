@@ -19,7 +19,7 @@
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * 
+ *
  */
 package org.codesearch.indexer.server.manager;
 
@@ -27,14 +27,13 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.JobListener;
 
 
 /**
- * 
+ *
  * Job listener that mantains a history of job executions.
  * @author Samuel Kogler
  *
@@ -42,7 +41,7 @@ import org.quartz.JobListener;
 public class IndexingJobHistoryListener implements JobListener {
 
     private List<String> historyMessages = new LinkedList<String>();
-    
+
     /** {@inheritDoc} */
     @Override
     public String getName() {
@@ -68,7 +67,7 @@ public class IndexingJobHistoryListener implements JobListener {
         String message = context.getJobDetail().getKey() + " finished.";
         createHistoryMessage(message);
     }
-    
+
     /**
      * @return the historyMessages
      */

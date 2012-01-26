@@ -20,7 +20,6 @@
  */
 package org.codesearch.commons.plugins.javacodeanalyzerplugin.ast;
 
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;

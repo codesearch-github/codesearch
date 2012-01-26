@@ -21,23 +21,21 @@
 
 package org.codesearch.indexer.server.core;
 
+import com.google.inject.Singleton;
+import com.google.inject.servlet.ServletModule;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
-
 import org.apache.log4j.Logger;
 import org.codesearch.indexer.server.manager.IndexingManager;
 import org.codesearch.indexer.server.rpc.DashboardServiceImpl;
 import org.codesearch.indexer.server.rpc.LogServiceImpl;
+import org.codesearch.indexer.server.rpc.ManualIndexingServiceImpl;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SchedulerFactory;
 import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.spi.JobFactory;
-
-import com.google.inject.Singleton;
-import com.google.inject.servlet.ServletModule;
-import org.codesearch.indexer.server.rpc.ManualIndexingServiceImpl;
 
 /**
  *
@@ -60,14 +58,14 @@ public class IndexerGuiceModule extends ServletModule {
             // Initialize quartz
         	SchedulerFactory schedulerFactory = new StdSchedulerFactory(properties);
             bind(Scheduler.class).toInstance(schedulerFactory.getScheduler());
-            
+
             LOG.debug("Initialized quartz successfully");
         } catch (SchedulerException ex) {
             LOG.error("Could not instantiate scheduler: " + ex);
         } catch (IOException e) {
             LOG.error("Could not find configuration file 'quartz.properties':\n" + e);
         }
-        
+
         bind(JobFactory.class).to(QuartzGuiceJobFactory.class).in(Singleton.class);
         bind(IndexingManager.class).in(Singleton.class);
         serve("/dashboard.rpc").with(DashboardServiceImpl.class);

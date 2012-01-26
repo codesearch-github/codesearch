@@ -21,7 +21,6 @@
 package org.codesearch.commons.plugins.javacodeanalyzerplugin.ast;
 
 import java.util.List;
-
 import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
 import org.codesearch.commons.plugins.codeanalyzing.ast.ExternalUsage;
 
@@ -31,7 +30,7 @@ import org.codesearch.commons.plugins.codeanalyzing.ast.ExternalUsage;
  */
 public class ExternalMethodUsage extends ExternalUsage {
     private List<String> parameters;
-    
+
     public ExternalMethodUsage(int startPositionInLine, int startLine, int length, String replacedString, String targetClassName, List<String> parameters) {
         super(startPositionInLine, startLine, length, replacedString, targetClassName);
         this.parameters = parameters;

@@ -403,7 +403,7 @@ public class IndexingTask implements Task {
         if (LOG.isDebugEnabled()) {
             String fileName;
             try {
-                fileName = file.getFilePath().substring(file.getFilePath().lastIndexOf("/") + 1);
+                fileName = file.getFilePath().substring(file.getFilePath().lastIndexOf('/') + 1);
             } catch (StringIndexOutOfBoundsException ex) {
                 // if the file is in the root directory of the repository
                 fileName = file.getFilePath();

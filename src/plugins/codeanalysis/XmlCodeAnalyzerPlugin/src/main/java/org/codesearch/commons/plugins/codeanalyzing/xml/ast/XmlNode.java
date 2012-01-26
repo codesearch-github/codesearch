@@ -23,8 +23,6 @@ package org.codesearch.commons.plugins.codeanalyzing.xml.ast;
 
 import java.util.LinkedList;
 import java.util.List;
-import org.apache.commons.lang.StringUtils;
-
 import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
 import org.codesearch.commons.plugins.codeanalyzing.ast.CompoundNode;
 

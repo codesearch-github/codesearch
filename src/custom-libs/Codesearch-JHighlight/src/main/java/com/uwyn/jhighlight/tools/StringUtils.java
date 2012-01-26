@@ -37,18 +37,18 @@ import java.util.regex.Pattern;
 public abstract class StringUtils
 {
 	private static final CharKeyOpenHashMap	mHtmlEncodeMap = new CharKeyOpenHashMap();
-	
+
 	static
 	{
 		// Html encoding mapping according to the HTML 4.0 spec
 		// http://www.w3.org/TR/REC-html40/sgml/entities.html
-		
+
 		// Special characters for HTML
 		mHtmlEncodeMap.put('\u0026', "&amp;");
 		mHtmlEncodeMap.put('\u003C', "&lt;");
 		mHtmlEncodeMap.put('\u003E', "&gt;");
 		mHtmlEncodeMap.put('\u0022', "&quot;");
-		
+
 		mHtmlEncodeMap.put('\u0152', "&OElig;");
 		mHtmlEncodeMap.put('\u0153', "&oelig;");
 		mHtmlEncodeMap.put('\u0160', "&Scaron;");
@@ -77,7 +77,7 @@ public abstract class StringUtils
 		mHtmlEncodeMap.put('\u2039', "&lsaquo;");
 		mHtmlEncodeMap.put('\u203A', "&rsaquo;");
 		mHtmlEncodeMap.put('\u20AC', "&euro;");
-		
+
 		// Character entity references for ISO 8859-1 characters
 		mHtmlEncodeMap.put('\u00A0', "&nbsp;");
 		mHtmlEncodeMap.put('\u00A1', "&iexcl;");
@@ -175,7 +175,7 @@ public abstract class StringUtils
 		mHtmlEncodeMap.put('\u00FD', "&yacute;");
 		mHtmlEncodeMap.put('\u00FE', "&thorn;");
 		mHtmlEncodeMap.put('\u00FF', "&yuml;");
-		
+
 		// Mathematical, Greek and Symbolic characters for HTML
 		mHtmlEncodeMap.put('\u0192', "&fnof;");
 		mHtmlEncodeMap.put('\u0391', "&Alpha;");
@@ -302,11 +302,11 @@ public abstract class StringUtils
 		mHtmlEncodeMap.put('\u2665', "&hearts;");
 		mHtmlEncodeMap.put('\u2666', "&diams;");
 	}
-	
+
 	private StringUtils()
 	{
 	}
-	
+
 	/**
 	 * Transforms a provided <code>String</code> object into a new string,
 	 * containing only valid Html characters.
@@ -322,7 +322,7 @@ public abstract class StringUtils
 	{
 		return encode(source, mHtmlEncodeMap);
 	}
-	
+
 	/**
 	 * Transforms a provided <code>String</code> object into a new string,
 	 * using the mapping that are provided through the supplied encoding table.
@@ -344,21 +344,21 @@ public abstract class StringUtils
 		{
 			return null;
 		}
-		
+
 		if (null == encodingTable)
 		{
 			return source;
 		}
-		
+
 		StringBuffer	encoded_string = null;
 		char[]			string_to_encode_array = source.toCharArray();
 		int				last_match = -1;
 		int				difference = 0;
-		
+
 		for (int i = 0; i < string_to_encode_array.length; i++)
 		{
 			char char_to_encode = string_to_encode_array[i];
-			
+
 			if (encodingTable.containsKey(char_to_encode))
 			{
 				if (null == encoded_string)
@@ -374,7 +374,7 @@ public abstract class StringUtils
 				last_match = i;
 			}
 		}
-		
+
 		if (null == encoded_string)
 		{
 			return source;
@@ -389,7 +389,7 @@ public abstract class StringUtils
 			return encoded_string.toString();
 		}
 	}
-	
+
 	/**
 	 * Checks if the name filters through an including and an excluding
 	 * regular expression.
@@ -411,16 +411,16 @@ public abstract class StringUtils
 		{
 			included_array = new Pattern[] {included};
 		}
-		
+
 		Pattern[] excluded_array = null;
 		if (excluded != null)
 		{
 			excluded_array = new Pattern[] {excluded};
 		}
-		
+
 		return filter(name, included_array, excluded_array);
 	}
-	
+
 	/**
 	 * Checks if the name filters through a series of including and excluding
 	 * regular expressions.
@@ -441,9 +441,9 @@ public abstract class StringUtils
 		{
 			return false;
 		}
-		
+
 		boolean accepted = false;
-		
+
 		// retain only the includes
 		if (null == included)
 		{
@@ -455,7 +455,7 @@ public abstract class StringUtils
 			for (int i = 0; i < included.length; i++)
 			{
 				pattern = included[i];
-				
+
 				if (pattern != null &&
 					pattern.matcher(name).matches())
 				{
@@ -464,7 +464,7 @@ public abstract class StringUtils
 				}
 			}
 		}
-		
+
 		// remove the excludes
 		if (accepted &&
 			excluded != null)
@@ -473,7 +473,7 @@ public abstract class StringUtils
 			for (int i = 0; i < excluded.length; i++)
 			{
 				pattern = excluded[i];
-				
+
 				if (pattern != null &&
 					pattern.matcher(name).matches())
 				{
@@ -482,10 +482,10 @@ public abstract class StringUtils
 				}
 			}
 		}
-		
+
 		return accepted;
 	}
-	
+
 	/**
 	 * Splits a string into different parts, using a seperator string to detect
 	 * the seperation boundaries in a case-sensitive manner. The seperator will
@@ -504,7 +504,7 @@ public abstract class StringUtils
 	{
 		return split(source, seperator, true);
 	}
-	
+
 	/**
 	 * Splits a string into different parts, using a seperator string to detect
 	 * the seperation boundaries. The seperator will not be included in the list
@@ -524,22 +524,22 @@ public abstract class StringUtils
 	public static ArrayList split(String source, String seperator, boolean matchCase)
 	{
 		ArrayList	substrings = new ArrayList();
-		
+
 		if (null == source)
 		{
 			return substrings;
 		}
-		
+
 		if (null == seperator)
 		{
 			substrings.add(source);
 			return substrings;
 		}
-		
+
 		int		current_index = 0;
 		int		delimiter_index = 0;
 		String	element = null;
-		
+
 		String	source_lookup_reference = null;
 		if (!matchCase)
 		{
@@ -550,11 +550,11 @@ public abstract class StringUtils
 		{
 			source_lookup_reference = source;
 		}
-		
+
 		while (current_index <= source_lookup_reference.length())
 		{
 			delimiter_index = source_lookup_reference.indexOf(seperator, current_index);
-			
+
 			if (-1 == delimiter_index)
 			{
 				element = new String(source.substring(current_index, source.length()));
@@ -568,10 +568,10 @@ public abstract class StringUtils
 				current_index = delimiter_index + seperator.length();
 			}
 		}
-		
+
 		return substrings;
 	}
-	
+
 	/**
 	 * Searches for a string within a specified string in a case-sensitive
 	 * manner and replaces every match with another string.
@@ -589,7 +589,7 @@ public abstract class StringUtils
 	{
 		return replace(source, stringToReplace, replacementString, true);
 	}
-	
+
 	/**
 	 * Searches for a string within a specified string and replaces every match
 	 * with another string.
@@ -611,20 +611,20 @@ public abstract class StringUtils
 		{
 			return null;
 		}
-		
+
 		if (null == stringToReplace)
 		{
 			return source;
 		}
-		
+
 		if (null == replacementString)
 		{
 			return source;
 		}
-		
+
 		Iterator		string_parts = split(source, stringToReplace, matchCase).iterator();
 		StringBuffer	new_string = new StringBuffer();
-		
+
 		synchronized (new_string) // speed increase by thread lock pre-allocation
 		{
 			while (string_parts.hasNext())
@@ -636,11 +636,11 @@ public abstract class StringUtils
 					new_string.append(replacementString);
 				}
 			}
-			
+
 			return new_string.toString();
 		}
 	}
-	
+
 	/**
 	 * Creates a new string that contains the provided string a number of times.
 	 *
@@ -657,7 +657,7 @@ public abstract class StringUtils
 		{
 			return null;
 		}
-		
+
 		StringBuffer new_string = new StringBuffer();
 		synchronized (new_string) // speed increase by thread lock pre-allocation
 		{
@@ -666,11 +666,11 @@ public abstract class StringUtils
 				new_string.append(source);
 				count --;
 			}
-			
+
 			return new_string.toString();
 		}
 	}
-	
+
 	/**
 	 * Converts all tabs on a line to spaces according to the provided tab
 	 * width.
@@ -684,14 +684,14 @@ public abstract class StringUtils
 	public static String convertTabsToSpaces(String line, int tabWidth)
 	{
 		StringBuffer result = new StringBuffer();
-		
+
 		synchronized (result) // speed increase by thread lock pre-allocation
 		{
 			int tab_index = -1;
 			int last_tab_index = 0;
 			int added_chars = 0;
 			int tab_size;
-			while ((tab_index = line.indexOf("\t", last_tab_index)) != -1)
+			while ((tab_index = line.indexOf('\t', last_tab_index)) != -1)
 			{
 				tab_size = tabWidth - ((tab_index + added_chars) % tabWidth);
 				if (0 == tab_size)
@@ -712,7 +712,7 @@ public abstract class StringUtils
 				result.append(line.substring(last_tab_index));
 			}
 		}
-		
+
 		return result.toString();
 	}
 }

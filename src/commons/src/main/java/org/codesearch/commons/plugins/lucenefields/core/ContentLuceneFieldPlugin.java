@@ -48,7 +48,7 @@ public class ContentLuceneFieldPlugin extends LuceneFieldPlugin {
     @Override
     public String getFieldValue(FileDto fileDto) throws LuceneFieldValueException {
         String content = "";
-        try{if (!fileDto.isBinary() && !MimeTypeUtil.isBinaryType(MimeTypeUtil.guessMimeTypeViaFileEnding(fileDto.getFilePath().substring(fileDto.getFilePath().lastIndexOf("."))))) {
+        try{if (!fileDto.isBinary() && !MimeTypeUtil.isBinaryType(MimeTypeUtil.guessMimeTypeViaFileEnding(fileDto.getFilePath().substring(fileDto.getFilePath().lastIndexOf('.'))))) {
             content = new String(fileDto.getContent());
         }
         } catch(StringIndexOutOfBoundsException ex){

@@ -30,12 +30,10 @@ package com.uwyn.jhighlight.pcj;
  *  @version    1.1     2002/30/12
  *  @since      1.0
  */
-import com.uwyn.jhighlight.pcj.CharCollection;
-import com.uwyn.jhighlight.pcj.CharIterator;
 
 public interface CharCollection
 {
-	
+
     /**
      *  Adds an element to this collection.
      *
@@ -53,7 +51,7 @@ public interface CharCollection
      *  @see        #addAll(CharCollection)
      */
     boolean add(char v);
-	
+
     /**
      *  Adds all the elements of a specified collection to
      *  this collection.
@@ -76,7 +74,7 @@ public interface CharCollection
      *  @see        #add(char)
      */
     boolean addAll(CharCollection c);
-	
+
     /**
      *  Clears this collection.
      *
@@ -85,7 +83,7 @@ public interface CharCollection
      *              collection.
      */
     void clear();
-	
+
     /**
      *  Indicates whether this collection contains a specified
      *  element.
@@ -99,7 +97,7 @@ public interface CharCollection
      *  @see        #containsAll(CharCollection)
      */
     boolean contains(char v);
-	
+
     /**
      *  Indicates whether all elements of a specified
      *  collection is contained in this collection.
@@ -118,7 +116,7 @@ public interface CharCollection
      *  @see        #contains(char)
      */
     boolean containsAll(CharCollection c);
-	
+
     /**
      *  Indicates whether this collection is equal to some object.
      *
@@ -129,14 +127,14 @@ public interface CharCollection
      *              <tt>obj</tt>; returns <tt>false</tt> otherwise.
      */
     boolean equals(Object obj);
-	
+
     /**
      *  Returns a hash code value for this collection.
      *
      *  @return     a hash code value for this collection.
      */
     int hashCode();
-	
+
     /**
      *  Indicates whether this collection is empty.
      *
@@ -144,14 +142,14 @@ public interface CharCollection
      *              <tt>false</tt> otherwise.
      */
     boolean isEmpty();
-	
+
     /**
      *  Returns an iterator over this collection.
      *
      *  @return     an iterator over this collection.
      */
     CharIterator iterator();
-	
+
     /**
      *  Removes a specified element from this collection.
      *
@@ -167,7 +165,7 @@ public interface CharCollection
      *              collection.
      */
     boolean remove(char v);
-	
+
     /**
      *  Removes all the elements of a specified collection from
      *  this collection.
@@ -188,7 +186,7 @@ public interface CharCollection
      *              if <tt>c</tt> is <tt>null</tt>.
      */
     boolean removeAll(CharCollection c);
-	
+
     /**
      *  Retains only the elements of a specified collection in
      *  this collection.
@@ -210,14 +208,14 @@ public interface CharCollection
      *              if <tt>c</tt> is <tt>null</tt>.
      */
     boolean retainAll(CharCollection c);
-	
+
     /**
      *  Returns the number of elements in this collection.
      *
      *  @return     the number of elements in this collection.
      */
     int size();
-	
+
     /**
      *  Returns the elements of this collection as an array.
      *
@@ -225,7 +223,7 @@ public interface CharCollection
      *              collection.
      */
     char[] toArray();
-	
+
     /**
      *  Returns the elements of this collection as an array.
      *
@@ -242,12 +240,12 @@ public interface CharCollection
      *              this collection, and returned.
      */
     char[] toArray(char[] a);
-	
+
     /**
      *  Minimizes the memory used by this collection. The exact
      *  operation of this method depends on the class implementing it.
      *  Implementors may choose to ignore it completely.
      */
     void trimToSize();
-	
+
 }

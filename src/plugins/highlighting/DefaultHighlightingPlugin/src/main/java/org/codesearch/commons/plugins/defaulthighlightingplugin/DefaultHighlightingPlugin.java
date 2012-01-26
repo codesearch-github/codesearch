@@ -20,16 +20,14 @@
  */
 package org.codesearch.commons.plugins.defaulthighlightingplugin;
 
-import java.io.IOException;
-
-import org.apache.commons.codec.binary.Base64;
-import org.codesearch.commons.plugins.highlighting.HighlightingPlugin;
-import org.codesearch.commons.plugins.highlighting.HighlightingPluginException;
-
 import com.uwyn.jhighlight.renderer.CppXhtmlRenderer;
 import com.uwyn.jhighlight.renderer.JavaXhtmlRenderer;
 import com.uwyn.jhighlight.renderer.XhtmlRenderer;
 import com.uwyn.jhighlight.renderer.XmlXhtmlRenderer;
+import java.io.IOException;
+import org.apache.commons.codec.binary.Base64;
+import org.codesearch.commons.plugins.highlighting.HighlightingPlugin;
+import org.codesearch.commons.plugins.highlighting.HighlightingPluginException;
 
 /**
  * A highlighting plugin used to highlight Java, CPP, XML, and HTML source code.

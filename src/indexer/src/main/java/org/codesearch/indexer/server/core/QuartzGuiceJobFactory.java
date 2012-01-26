@@ -21,17 +21,15 @@
 
 package org.codesearch.indexer.server.core;
 
+import com.google.inject.Inject;
+import com.google.inject.Injector;
 import javax.inject.Singleton;
-
 import org.quartz.Job;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.spi.JobFactory;
 import org.quartz.spi.TriggerFiredBundle;
-
-import com.google.inject.Inject;
-import com.google.inject.Injector;
 
 /**
  * Instantiates Quartz jobs using Guice DI.

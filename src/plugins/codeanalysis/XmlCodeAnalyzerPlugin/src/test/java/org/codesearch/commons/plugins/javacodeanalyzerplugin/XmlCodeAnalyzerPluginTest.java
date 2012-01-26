@@ -23,7 +23,6 @@ package org.codesearch.commons.plugins.javacodeanalyzerplugin;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import org.apache.log4j.Logger;
-
 import org.codesearch.commons.plugins.codeanalyzing.CodeAnalyzerPlugin;
 import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
 import org.codesearch.commons.plugins.codeanalyzing.xml.XmlCodeAnalyzerPlugin;

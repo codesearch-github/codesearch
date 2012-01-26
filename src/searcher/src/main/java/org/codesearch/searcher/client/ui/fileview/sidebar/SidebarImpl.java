@@ -21,8 +21,6 @@
 
 package org.codesearch.searcher.client.ui.fileview.sidebar;
 
-import org.codesearch.searcher.shared.SidebarNode;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
@@ -31,6 +29,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Tree;
 import com.google.gwt.user.client.ui.TreeItem;
 import com.google.gwt.user.client.ui.Widget;
+import org.codesearch.searcher.shared.SidebarNode;
 
 /**
  * A side bar that can display a tree.

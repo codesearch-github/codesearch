@@ -20,16 +20,14 @@
  */
 package org.codesearch.commons.plugins;
 
+import com.google.inject.Inject;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
-
 import org.codesearch.commons.configuration.ConfigurationReader;
 import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
 import org.codesearch.commons.plugins.vcs.VersionControlPluginException;
-
-import com.google.inject.Inject;
 
 /**
  * A class that provides access to dynamically loaded plugins.
@@ -93,7 +91,7 @@ public class PluginLoaderImpl implements PluginLoader {
                 } catch (VersionControlPluginException ex) {
                     throw new PluginLoaderException("VersionControlPlugin failed to load because an invalid cache directory was specified: " + ex);
                 }
-            } 
+            }
             return (T) validPlugin;
         }
         throw new PluginLoaderException("No Plugin found for purpose: " + purpose + " and Class: " + clazz);

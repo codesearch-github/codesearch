@@ -21,14 +21,13 @@
 
 package org.codesearch.indexer.client;
 
+import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.event.shared.SimpleEventBus;
+import com.google.gwt.place.shared.PlaceController;
 import org.codesearch.indexer.client.ui.dashboard.DashboardView;
 import org.codesearch.indexer.client.ui.dashboard.DashboardViewImpl;
 import org.codesearch.indexer.client.ui.log.LogView;
 import org.codesearch.indexer.client.ui.log.LogViewImpl;
-
-import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.event.shared.SimpleEventBus;
-import com.google.gwt.place.shared.PlaceController;
 import org.codesearch.indexer.client.ui.manualIndexing.ManualIndexingView;
 import org.codesearch.indexer.client.ui.manualIndexing.ManualIndexingViewImpl;
 
@@ -49,7 +48,7 @@ public class ClientFactoryImpl extends ClientFactory {
     public ManualIndexingView getManualIndexingView() {
         return manualIndexingView;
     }
-    
+
     /** {@inheritDoc} */
     @Override
     public EventBus getEventBus() {
@@ -70,5 +69,5 @@ public class ClientFactoryImpl extends ClientFactory {
 	@Override
 	public LogView getLogView() {
 		return logView;
-	}  
+	}
 }

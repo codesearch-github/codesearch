@@ -28,7 +28,6 @@ package org.codesearch.commons.database;
 
 import java.util.List;
 import java.util.Map;
-
 import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
 import org.codesearch.commons.plugins.codeanalyzing.ast.ExternalUsage;
 import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
@@ -41,12 +40,12 @@ public class MockDBAccessImpl implements DBAccess{
 
     @Override
     public void clearTablesForRepository(String repoName) throws DatabaseAccessException {
-        
+
     }
 
     @Override
     public void createRepositoryEntry(String repositoryName) throws DatabaseAccessException {
-        
+
     }
 
     @Override
@@ -113,5 +112,5 @@ public class MockDBAccessImpl implements DBAccess{
     public void deleteFile(String filePath, String repository) throws DatabaseAccessException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
-    
+
 }

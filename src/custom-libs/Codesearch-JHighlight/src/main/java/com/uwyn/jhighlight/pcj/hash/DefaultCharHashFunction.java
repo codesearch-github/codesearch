@@ -21,8 +21,6 @@
 
 package com.uwyn.jhighlight.pcj.hash;
 
-import com.uwyn.jhighlight.pcj.hash.CharHashFunction;
-import com.uwyn.jhighlight.pcj.hash.DefaultCharHashFunction;
 import java.io.Serializable;
 
 /**
@@ -36,17 +34,17 @@ import java.io.Serializable;
  */
 public class DefaultCharHashFunction implements CharHashFunction, Serializable
 {
-	
+
     /** Default instance of this hash function. */
     public static final CharHashFunction INSTANCE = new DefaultCharHashFunction();
-	
+
     /** Default constructor to be invoked by sub-classes. */
     protected DefaultCharHashFunction()
 	{ }
-	
+
     public int hash(char v)
 	{
         return (int)v;
     }
-	
+
 }

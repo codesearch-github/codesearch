@@ -25,9 +25,6 @@ import com.uwyn.jhighlight.pcj.CharIterator;
 import com.uwyn.jhighlight.pcj.hash.CharHashFunction;
 import com.uwyn.jhighlight.pcj.hash.DefaultCharHashFunction;
 import com.uwyn.jhighlight.pcj.hash.Primes;
-import com.uwyn.jhighlight.pcj.map.AbstractCharKeyMap;
-import com.uwyn.jhighlight.pcj.map.CharKeyMap;
-import com.uwyn.jhighlight.pcj.map.CharKeyMapIterator;
 import com.uwyn.jhighlight.pcj.set.AbstractCharSet;
 import com.uwyn.jhighlight.pcj.set.CharSet;
 import com.uwyn.jhighlight.pcj.util.Exceptions;
@@ -52,106 +49,106 @@ import java.util.Iterator;
  */
 public class CharKeyOpenHashMap extends AbstractCharKeyMap implements CharKeyMap, Cloneable, Serializable
 {
-	
+
     /** Constant indicating relative growth policy. */
     private static final int    GROWTH_POLICY_RELATIVE      = 0;
-	
+
     /** Constant indicating absolute growth policy. */
     private static final int    GROWTH_POLICY_ABSOLUTE      = 1;
-	
+
     /**
      *  The default growth policy of this map.
      *  @see    #GROWTH_POLICY_RELATIVE
      *  @see    #GROWTH_POLICY_ABSOLUTE
      */
     private static final int    DEFAULT_GROWTH_POLICY       = GROWTH_POLICY_RELATIVE;
-	
+
     /** The default factor with which to increase the capacity of this map. */
     public static final double DEFAULT_GROWTH_FACTOR        = 1.0;
-	
+
     /** The default chunk size with which to increase the capacity of this map. */
     public static final int    DEFAULT_GROWTH_CHUNK         = 10;
-	
+
     /** The default capacity of this map. */
     public static final int    DEFAULT_CAPACITY             = 11;
-	
+
     /** The default load factor of this map. */
     public static final double DEFAULT_LOAD_FACTOR          = 0.75;
-	
+
     /**
      *  The hash function used to hash keys in this map.
      *  @serial
      */
     private CharHashFunction keyhash;
-	
+
     /**
      *  The size of this map.
      *  @serial
      */
     private int size;
-	
+
     /**
      *  The keys of this map. Contains key values directly.
      *  Due to the use of a secondary hash function, the length of this
      *  array must be a prime.
      */
     private transient char[] keys;
-	
+
     /**
      *  The values of this map. Contains values directly.
      *  Due to the use of a secondary hash function, the length of this
      *  array must be a prime.
      */
     private transient Object[] values;
-	
+
     /** The states of each cell in the keys[] and values[]. */
     private transient byte[] states;
-	
+
     private static final byte EMPTY = 0;
     private static final byte OCCUPIED = 1;
     private static final byte REMOVED = 2;
-	
+
     /** The number of entries in use (removed or occupied). */
     private transient int used;
-	
+
     /**
      *  The growth policy of this map (0 is relative growth, 1 is absolute growth).
      *  @serial
      */
     private int growthPolicy;
-	
+
     /**
      *  The growth factor of this map, if the growth policy is
      *  relative.
      *  @serial
      */
     private double growthFactor;
-	
+
     /**
      *  The growth chunk size of this map, if the growth policy is
      *  absolute.
      *  @serial
      */
     private int growthChunk;
-	
+
     /**
      *  The load factor of this map.
      *  @serial
      */
     private double loadFactor;
-	
+
     /**
      *  The next size at which to expand the data[].
      *  @serial
      */
     private int expandAt;
-	
+
     /** A set view of the keys of this map. */
     private transient CharSet ckeys;
-	
+
     /** A collection view of the values of this map. */
     private transient Collection cvalues;
-	
+
     private CharKeyOpenHashMap(CharHashFunction keyhash, int capacity, int growthPolicy, double growthFactor, int growthChunk, double loadFactor)
 	{
         if (keyhash==null)
@@ -177,12 +174,12 @@ public class CharKeyOpenHashMap extends AbstractCharKeyMap implements CharKeyMap
         this.growthChunk = growthChunk;
         this.loadFactor = loadFactor;
     }
-	
+
     private CharKeyOpenHashMap(int capacity, int growthPolicy, double growthFactor, int growthChunk, double loadFactor)
 	{
         this(DefaultCharHashFunction.INSTANCE, capacity, growthPolicy, growthFactor, growthChunk, loadFactor);
     }
-	
+
     /**
      *  Creates a new hash map with capacity 11, a relative
      *  growth factor of 1.0, and a load factor of 75%.
@@ -191,7 +188,7 @@ public class CharKeyOpenHashMap extends AbstractCharKeyMap implements CharKeyMap
 	{
         this(DEFAULT_CAPACITY);
     }
-	
+
     /**
      *  Creates a new hash map with the same mappings as a specified map.
      *
@@ -206,7 +203,7 @@ public class CharKeyOpenHashMap extends AbstractCharKeyMap implements CharKeyMap
         this();
         putAll(map);
     }
-	
+
     /**
      *  Creates a new hash map with a specified capacity, a relative
      *  growth factor of 1.0, and a load factor of 75%.
@@ -221,7 +218,7 @@ public class CharKeyOpenHashMap extends AbstractCharKeyMap implements CharKeyMap
 	{
         this(capacity, DEFAULT_GROWTH_POLICY, DEFAULT_GROWTH_FACTOR, DEFAULT_GROWTH_CHUNK, DEFAULT_LOAD_FACTOR);
     }
-	
+
     /**
      *  Creates a new hash map with a capacity of 11, a relative
      *  growth factor of 1.0, and a specified load factor.
@@ -237,7 +234,7 @@ public class CharKeyOpenHashMap extends AbstractCharKeyMap implements CharKeyMap
 	{
         this(DEFAULT_CAPACITY, DEFAULT_GROWTH_POLICY, DEFAULT_GROWTH_FACTOR, DEFAULT_GROWTH_CHUNK, loadFactor);
     }
-	
+
     /**
      *  Creates a new hash map with a specified capacity and
      *  load factor, and a relative growth factor of 1.0.
@@ -256,7 +253,7 @@ public class CharKeyOpenHashMap extends AbstractCharKeyMap implements CharKeyMap
 	{
         this(capacity, DEFAULT_GROWTH_POLICY, DEFAULT_GROWTH_FACTOR, DEFAULT_GROWTH_CHUNK, loadFactor);
     }
-	
+
     /**
      *  Creates a new hash map with a specified capacity,
      *  load factor, and relative growth factor.
@@ -284,7 +281,7 @@ public class CharKeyOpenHashMap extends AbstractCharKeyMap implements CharKeyMap
 	{
         this(capacity, GROWTH_POLICY_RELATIVE, growthFactor, DEFAULT_GROWTH_CHUNK, loadFactor);
     }
-	
+
     /**
      *  Creates a new hash map with a specified capacity,
      *  load factor, and absolute growth factor.
@@ -312,11 +309,11 @@ public class CharKeyOpenHashMap extends AbstractCharKeyMap implements CharKeyMap
 	{
         this(capacity, GROWTH_POLICY_ABSOLUTE, DEFAULT_GROWTH_FACTOR, growthChunk, loadFactor);
     }
-	
+
     // ---------------------------------------------------------------
     //      Constructors with hash function argument
     // ---------------------------------------------------------------
-	
+
     /**
      *  Creates a new hash map with capacity 11, a relative
      *  growth factor of 1.0, and a load factor of 75%.
@@ -331,7 +328,7 @@ public class CharKeyOpenHashMap extends AbstractCharKeyMap implements CharKeyMap
 	{
         this(keyhash, DEFAULT_CAPACITY, DEFAULT_GROWTH_POLICY, DEFAULT_GROWTH_FACTOR, DEFAULT_GROWTH_CHUNK, DEFAULT_LOAD_FACTOR);
     }
-	
+
     /**
      *  Creates a new hash map with a specified capacity, a relative
      *  growth factor of 1.0, and a load factor of 75%.
@@ -352,7 +349,7 @@ public class CharKeyOpenHashMap extends AbstractCharKeyMap implements CharKeyMap
 	{
         this(keyhash, capacity, DEFAULT_GROWTH_POLICY, DEFAULT_GROWTH_FACTOR, DEFAULT_GROWTH_CHUNK, DEFAULT_LOAD_FACTOR);
     }
-	
+
     /**
      *  Creates a new hash map with a capacity of 11, a relative
      *  growth factor of 1.0, and a specified load factor.
@@ -374,7 +371,7 @@ public class CharKeyOpenHashMap extends AbstractCharKeyMap implements CharKeyMap
 	{
         this(keyhash, DEFAULT_CAPACITY, DEFAULT_GROWTH_POLICY, DEFAULT_GROWTH_FACTOR, DEFAULT_GROWTH_CHUNK, loadFactor);
     }
-	
+
     /**
      *  Creates a new hash map with a specified capacity and
      *  load factor, and a relative growth factor of 1.0.
@@ -399,7 +396,7 @@ public class CharKeyOpenHashMap extends AbstractCharKeyMap implements CharKeyMap
 	{
         this(keyhash, capacity, DEFAULT_GROWTH_POLICY, DEFAULT_GROWTH_FACTOR, DEFAULT_GROWTH_CHUNK, loadFactor);
     }
-	
+
     /**
      *  Creates a new hash map with a specified capacity,
      *  load factor, and relative growth factor.
@@ -433,7 +430,7 @@ public class CharKeyOpenHashMap extends AbstractCharKeyMap implements CharKeyMap
 	{
         this(keyhash, capacity, GROWTH_POLICY_RELATIVE, growthFactor, DEFAULT_GROWTH_CHUNK, loadFactor);
     }
-	
+
     /**
      *  Creates a new hash map with a specified capacity,
      *  load factor, and absolute growth factor.
@@ -467,11 +464,11 @@ public class CharKeyOpenHashMap extends AbstractCharKeyMap implements CharKeyMap
 	{
         this(keyhash, capacity, GROWTH_POLICY_ABSOLUTE, DEFAULT_GROWTH_FACTOR, growthChunk, loadFactor);
     }
-	
+
     // ---------------------------------------------------------------
     //      Hash table management
     // ---------------------------------------------------------------
-	
+
     private void ensureCapacity(int elements)
 	{
         if (elements>=expandAt)
@@ -485,11 +482,11 @@ public class CharKeyOpenHashMap extends AbstractCharKeyMap implements CharKeyMap
                 newcapacity = (int)Math.round(((double)elements/loadFactor));
             newcapacity = Primes.nextPrime(newcapacity);
             expandAt = (int)Math.round(loadFactor*newcapacity);
-			
+
             char[] newkeys = new char[newcapacity];
             Object[] newvalues = (Object[])new Object[newcapacity];
             byte[] newstates = new byte[newcapacity];
-			
+
             used = 0;
             //  re-hash
             for (int i = 0; i<keys.length; i++)
@@ -520,28 +517,28 @@ public class CharKeyOpenHashMap extends AbstractCharKeyMap implements CharKeyMap
                     newkeys[n] = k;
                 }
             }
-			
+
             keys = newkeys;
             values = newvalues;
             states = newstates;
         }
     }
-	
+
     // ---------------------------------------------------------------
     //      Operations not supported by abstract implementation
     // ---------------------------------------------------------------
-	
+
     public CharSet keySet()
 	{
         if (ckeys==null)
             ckeys = new KeySet();
         return ckeys;
     }
-	
+
     public Object put(char key, Object value)
 	{
         Object result;
-		
+
         //  first hash
         int h = Math.abs(keyhash.hash(key));
         int i = h%keys.length;
@@ -571,7 +568,7 @@ public class CharKeyOpenHashMap extends AbstractCharKeyMap implements CharKeyMap
                 }
             }
         }
-		
+
         if (states[i]==EMPTY)
             used++;
         states[i] = OCCUPIED;
@@ -581,14 +578,14 @@ public class CharKeyOpenHashMap extends AbstractCharKeyMap implements CharKeyMap
         ensureCapacity(used);
         return null;
     }
-	
+
     public Collection values()
 	{
         if (cvalues==null)
             cvalues = new ValueCollection();
         return cvalues;
     }
-	
+
     /**
      *  Returns a clone of this hash map.
      *
@@ -617,25 +614,25 @@ public class CharKeyOpenHashMap extends AbstractCharKeyMap implements CharKeyMap
             Exceptions.cloning(); return null;
         }
     }
-	
+
     public CharKeyMapIterator entries()
 	{
         return new CharKeyMapIterator() {
             int nextEntry = nextEntry(0);
             int lastEntry = -1;
-			
+
             int nextEntry(int index)
 			{
                 while (index<keys.length&&states[index]!=OCCUPIED)
                     index++;
                 return index;
             }
-			
+
             public boolean hasNext()
 			{
                 return nextEntry<keys.length;
             }
-			
+
             public void next()
 			{
                 if (!hasNext())
@@ -643,7 +640,7 @@ public class CharKeyOpenHashMap extends AbstractCharKeyMap implements CharKeyMap
                 lastEntry = nextEntry;
                 nextEntry = nextEntry(nextEntry+1);
             }
-			
+
             public void remove()
 			{
                 if (lastEntry==-1)
@@ -653,14 +650,14 @@ public class CharKeyOpenHashMap extends AbstractCharKeyMap implements CharKeyMap
                 size--;
                 lastEntry = -1;
             }
-			
+
             public char getKey()
 			{
                 if (lastEntry==-1)
                     Exceptions.noElementToGet();
                 return keys[lastEntry];
             }
-			
+
             public Object getValue()
 			{
                 if (lastEntry==-1)
@@ -669,36 +666,36 @@ public class CharKeyOpenHashMap extends AbstractCharKeyMap implements CharKeyMap
             }
         };
     }
-	
+
     private class KeySet extends AbstractCharSet
 	{
-		
+
         public void clear()
         { CharKeyOpenHashMap.this.clear(); }
-		
+
         public boolean contains(char v)
 		{
             return containsKey(v);
         }
-		
+
         public CharIterator iterator()
 		{
             return new CharIterator() {
                 int nextEntry = nextEntry(0);
                 int lastEntry = -1;
-				
+
                 int nextEntry(int index)
 				{
                     while (index<keys.length&&states[index]!=OCCUPIED)
                         index++;
                     return index;
                 }
-				
+
                 public boolean hasNext()
 				{
                     return nextEntry<keys.length;
                 }
-				
+
                 public char next()
 				{
                     if (!hasNext())
@@ -707,7 +704,7 @@ public class CharKeyOpenHashMap extends AbstractCharKeyMap implements CharKeyMap
                     nextEntry = nextEntry(nextEntry+1);
                     return keys[lastEntry];
                 }
-				
+
                 public void remove()
 				{
                     if (lastEntry==-1)
@@ -719,7 +716,7 @@ public class CharKeyOpenHashMap extends AbstractCharKeyMap implements CharKeyMap
                 }
             };
         }
-		
+
         public boolean remove(char v)
 		{
             boolean result = containsKey(v);
@@ -727,42 +724,42 @@ public class CharKeyOpenHashMap extends AbstractCharKeyMap implements CharKeyMap
                 CharKeyOpenHashMap.this.remove(v);
             return result;
         }
-		
+
         public int size()
         { return size; }
-		
+
     }
-	
-	
+
+
     private class ValueCollection extends AbstractCollection
 	{
-		
+
         public void clear()
         { CharKeyOpenHashMap.this.clear(); }
-		
+
         public boolean contains(Object v)
 		{
             return containsValue(v);
         }
-		
+
         public Iterator iterator()
 		{
             return new Iterator() {
                 int nextEntry = nextEntry(0);
                 int lastEntry = -1;
-				
+
                 int nextEntry(int index)
 				{
                     while (index<keys.length&&states[index]!=OCCUPIED)
                         index++;
                     return index;
                 }
-				
+
                 public boolean hasNext()
 				{
                     return nextEntry<keys.length;
                 }
-				
+
                 public Object next()
 				{
                     if (!hasNext())
@@ -771,7 +768,7 @@ public class CharKeyOpenHashMap extends AbstractCharKeyMap implements CharKeyMap
                     nextEntry = nextEntry(nextEntry+1);
                     return values[lastEntry];
                 }
-				
+
                 public void remove()
 				{
                     if (lastEntry==-1)
@@ -783,16 +780,16 @@ public class CharKeyOpenHashMap extends AbstractCharKeyMap implements CharKeyMap
                 }
             };
         }
-		
+
         public int size()
         { return size; }
-		
+
     }
-	
+
     // ---------------------------------------------------------------
     //      Operations overwritten for efficiency
     // ---------------------------------------------------------------
-	
+
     public void clear()
 	{
         java.util.Arrays.fill(states, EMPTY);
@@ -800,7 +797,7 @@ public class CharKeyOpenHashMap extends AbstractCharKeyMap implements CharKeyMap
         size = 0;
         used = 0;
     }
-	
+
     public boolean containsKey(char key)
 	{
         int h = Math.abs(keyhash.hash(key));
@@ -809,7 +806,7 @@ public class CharKeyOpenHashMap extends AbstractCharKeyMap implements CharKeyMap
 		{
             if (states[i]==OCCUPIED&&keys[i]==key)
                 return true;
-			
+
             //  second hash
             int c = 1+(h%(keys.length-2));
             for (;;)
@@ -825,7 +822,7 @@ public class CharKeyOpenHashMap extends AbstractCharKeyMap implements CharKeyMap
         }
         return false;
     }
-	
+
     public boolean containsValue(Object value)
 	{
         if (value==null)
@@ -842,7 +839,7 @@ public class CharKeyOpenHashMap extends AbstractCharKeyMap implements CharKeyMap
         }
         return false;
     }
-	
+
     public Object get(char key)
 	{
         int h = Math.abs(keyhash.hash(key));
@@ -852,7 +849,7 @@ public class CharKeyOpenHashMap extends AbstractCharKeyMap implements CharKeyMap
             if (states[i]==OCCUPIED&&keys[i]==key)
                 return values[i];
             //  second hash
-			
+
             int c = 1+(h%(keys.length-2));
             for (;;)
 			{
@@ -867,10 +864,10 @@ public class CharKeyOpenHashMap extends AbstractCharKeyMap implements CharKeyMap
         }
         return null;
     }
-	
+
     public boolean isEmpty()
     { return size==0; }
-	
+
     public Object remove(char key)
 	{
         int h = Math.abs(keyhash.hash(key));
@@ -908,14 +905,14 @@ public class CharKeyOpenHashMap extends AbstractCharKeyMap implements CharKeyMap
         }
         return null;
     }
-	
+
     public int size()
     { return size; }
-	
+
     // ---------------------------------------------------------------
     //      Serialization
     // ---------------------------------------------------------------
-	
+
     /**
      *  @serialData     Default fields; the capacity of the
      *                  map (<tt>int</tt>); the maps's entries
@@ -935,7 +932,7 @@ public class CharKeyOpenHashMap extends AbstractCharKeyMap implements CharKeyMap
             s.writeObject(i.getValue());
         }
     }
-	
+
     /**
      *  @since          1.1
      */
@@ -946,12 +943,12 @@ public class CharKeyOpenHashMap extends AbstractCharKeyMap implements CharKeyMap
         states = new byte[keys.length];
         values = (Object[])new Object[keys.length];
         used = size;
-		
+
         for (int n = 0; n<size; n++)
 		{
             char key = s.readChar();
             Object value = s.readObject();
-			
+
             //  first hash
             int h = Math.abs(keyhash.hash(key));
             int i = h%keys.length;
@@ -973,5 +970,5 @@ public class CharKeyOpenHashMap extends AbstractCharKeyMap implements CharKeyMap
             values[i] = value;
         }
     }
-	
+
 }

@@ -25,7 +25,6 @@
 package org.codesearch.indexer.manager;
 
 import java.util.Date;
-
 import org.apache.log4j.Logger;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
@@ -45,11 +44,11 @@ public class MockIndexingJob implements Job {
             LOG.info("Mockup test executing");
             Thread.sleep(1000);
         } catch (InterruptedException ex) {
-            
+
         }
-        
+
         Date finished = (Date) context.getJobDetail().getJobDataMap().get(TIME_FINISHED);
         finished.setTime(new Date().getTime());
     }
-    
+
 }

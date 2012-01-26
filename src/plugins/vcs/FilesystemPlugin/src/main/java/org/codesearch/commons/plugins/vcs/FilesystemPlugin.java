@@ -20,8 +20,6 @@
  */
 package org.codesearch.commons.plugins.vcs;
 
-import org.codesearch.commons.configuration.dto.RepositoryDto;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -30,6 +28,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.codesearch.commons.configuration.dto.RepositoryDto;
 import org.codesearch.commons.validator.ValidationException;
 
 /**

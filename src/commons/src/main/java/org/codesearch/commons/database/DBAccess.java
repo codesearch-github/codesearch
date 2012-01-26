@@ -24,7 +24,6 @@ package org.codesearch.commons.database;
 
 import java.util.List;
 import java.util.Map;
-
 import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
 import org.codesearch.commons.plugins.codeanalyzing.ast.ExternalUsage;
 import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;

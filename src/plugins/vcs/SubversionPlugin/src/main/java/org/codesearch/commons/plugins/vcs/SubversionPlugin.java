@@ -20,10 +20,6 @@
  */
 package org.codesearch.commons.plugins.vcs;
 
-import java.util.logging.Level;
-import org.codesearch.commons.configuration.dto.BasicAuthentication;
-import org.codesearch.commons.configuration.dto.RepositoryDto;
-
 import java.io.ByteArrayOutputStream;
 import java.util.Collection;
 import java.util.HashSet;
@@ -33,8 +29,9 @@ import java.util.List;
 import java.util.Set;
 import org.apache.log4j.Logger;
 import org.codesearch.commons.configuration.dto.AuthenticationType;
+import org.codesearch.commons.configuration.dto.BasicAuthentication;
 import org.codesearch.commons.configuration.dto.NoAuthentication;
-import org.codesearch.commons.validator.ValidationException;
+import org.codesearch.commons.configuration.dto.RepositoryDto;
 import org.tmatesoft.svn.core.ISVNDirEntryHandler;
 import org.tmatesoft.svn.core.SVNDirEntry;
 import org.tmatesoft.svn.core.SVNException;
@@ -215,7 +212,7 @@ public class SubversionPlugin implements VersionControlPlugin {
         while (iterator.hasNext()) {
             SVNDirEntry entry = (SVNDirEntry) iterator.next();
             if (entry.getKind() == SVNNodeKind.DIR) {
-                listEntries((path.equals("")) ? entry.getName() : path + "/" + entry.getName(), identifiers);
+                listEntries((path.isEmpty()) ? entry.getName() : path + "/" + entry.getName(), identifiers);
             } else if (entry.getKind() == SVNNodeKind.FILE) {
                 identifiers.add(new FileIdentifier(path + "/" + entry.getName(), false, false, repository));
             }

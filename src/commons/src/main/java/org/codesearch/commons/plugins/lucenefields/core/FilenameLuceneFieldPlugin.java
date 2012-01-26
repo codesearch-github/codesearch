@@ -36,7 +36,7 @@ public class FilenameLuceneFieldPlugin extends LuceneFieldPlugin {
     @Override
     public String getFieldValue(FileDto fileDto) throws LuceneFieldValueException {
         try {
-            return fileDto.getFilePath().substring(fileDto.getFilePath().lastIndexOf("/") + 1);
+            return fileDto.getFilePath().substring(fileDto.getFilePath().lastIndexOf('/') + 1);
         } catch (StringIndexOutOfBoundsException ex) {
             return fileDto.getFilePath();
         }

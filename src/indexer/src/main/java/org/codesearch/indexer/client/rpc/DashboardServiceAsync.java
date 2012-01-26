@@ -19,13 +19,12 @@
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * 
+ *
  */
 package org.codesearch.indexer.client.rpc;
 
-import org.codesearch.indexer.shared.DashboardData;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import org.codesearch.indexer.shared.DashboardData;
 
 /**
  * @author Samuel Kogler

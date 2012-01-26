@@ -21,9 +21,6 @@
 
 package org.codesearch.indexer.client.ui.manualIndexing;
 
-import org.codesearch.indexer.client.ClientFactory;
-
-
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.EventBus;
@@ -31,6 +28,7 @@ import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
+import org.codesearch.indexer.client.ClientFactory;
 import org.codesearch.indexer.client.rpc.ManualIndexingService;
 import org.codesearch.indexer.client.rpc.ManualIndexingServiceAsync;
 import org.codesearch.indexer.client.ui.manualIndexing.ManualIndexingView.Presenter;
@@ -42,12 +40,12 @@ import org.codesearch.indexer.shared.ManualIndexingData;
  */
 public class ManualIndexingActivity extends AbstractActivity implements Presenter {
 
-    
+
 
     private ClientFactory clientFactory;
     private ManualIndexingView manualIndexingView;
     private ManualIndexingServiceAsync manualIndexingServiceAsync = GWT.create(ManualIndexingService.class);
-    
+
     public ManualIndexingActivity(ClientFactory clientFactory, ManualIndexingPlace place) {
         this.clientFactory = clientFactory;
     }
@@ -72,7 +70,7 @@ public class ManualIndexingActivity extends AbstractActivity implements Presente
         manualIndexingView.disconnectEventHandlers();
         manualIndexingView.cleanup();
     }
-    
+
     @Override
     public void refresh() {
     	manualIndexingView.cleanup();
@@ -83,7 +81,7 @@ public class ManualIndexingActivity extends AbstractActivity implements Presente
     public void startManualIndexing() {
         manualIndexingServiceAsync.startManualIndexing(manualIndexingView.getRepositories(), manualIndexingView.getRepositoryGroups(), manualIndexingView.getClear().getValue(), new ManualIndexingCallback());
     }
-    
+
     private class ManualIndexingCallback implements AsyncCallback<Void>{
 
         @Override
@@ -95,9 +93,9 @@ public class ManualIndexingActivity extends AbstractActivity implements Presente
         public void onSuccess(Void result) {
             Window.alert("Started manual indexing job");//TODO maybe move message to some kind of notification area
         }
-        
+
     }
-    
+
     private class GetDataCallback implements AsyncCallback<ManualIndexingData> {
 
         public GetDataCallback() {

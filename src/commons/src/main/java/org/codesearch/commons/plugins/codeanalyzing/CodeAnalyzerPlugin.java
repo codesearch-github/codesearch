@@ -22,7 +22,6 @@
 package org.codesearch.commons.plugins.codeanalyzing;
 
 import java.util.List;
-
 import org.codesearch.commons.plugins.Plugin;
 import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
 import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
@@ -33,7 +32,7 @@ import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
  * @author David Froehlich
  */
 public interface CodeAnalyzerPlugin extends Plugin {
-    
+
     /**
      * returns all a list of all type declarations created in the file
      * @return the type declarations
@@ -55,7 +54,7 @@ public interface CodeAnalyzerPlugin extends Plugin {
      * @throws CodeAnalyzerPluginException if the analysis failed
      */
      void analyzeFile(String fileContent) throws CodeAnalyzerPluginException;
-     
+
      AstNode getAst();
 
     /**

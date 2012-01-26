@@ -19,15 +19,14 @@
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * 
+ *
  */
 package org.codesearch.commons.configuration.dto;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 import java.io.File;
 import java.net.URI;
 import java.util.List;
-
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  * Simple bean representing the configuration of codesearch.
@@ -35,7 +34,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  */
 @XStreamAlias("configuration")
 public class CodesearchConfiguration {
-    
+
     @XStreamAlias("searcher-location")
     private URI searcherLocation;
     @XStreamAlias("cache-directory")
@@ -55,7 +54,7 @@ public class CodesearchConfiguration {
     private List<String> repositoryGroups;
     @XStreamAlias("database")
     private DatabaseConfiguration databaseConfiguration;
-    
+
     public URI getSearcherLocation() {
         return searcherLocation;
     }

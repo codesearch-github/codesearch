@@ -25,14 +25,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashSet;
 import java.util.Set;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 /**
  * Utility class that provides methods to guess mime types via file endings and stores mime types of most files as
  * constants
- * 
+ *
  * @author David Froehlich
  */
 public class MimeTypeUtil {
@@ -49,7 +48,7 @@ public class MimeTypeUtil {
 
     /**
      * guesses the mime type via the file ending
-     * 
+     *
      * @param fileName the file name of the file, the ending is parsed from the fileName
      * @return the mime type or null if no mime type was found for the file
      */
@@ -71,7 +70,7 @@ public class MimeTypeUtil {
 
     /**
      * Checks whether the given mime type is considered a binary (non-human-readable) format.
-     * 
+     *
      * @param mime The given mime
      * @return Whether the mime is considered a binary format.
      */

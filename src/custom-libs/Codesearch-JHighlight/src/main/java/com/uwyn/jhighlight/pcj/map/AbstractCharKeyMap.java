@@ -22,8 +22,6 @@
 package com.uwyn.jhighlight.pcj.map;
 
 import com.uwyn.jhighlight.pcj.hash.DefaultCharHashFunction;
-import com.uwyn.jhighlight.pcj.map.CharKeyMap;
-import com.uwyn.jhighlight.pcj.map.CharKeyMapIterator;
 
 /**
  *  This class represents an abstract base for implementing
@@ -39,11 +37,11 @@ import com.uwyn.jhighlight.pcj.map.CharKeyMapIterator;
  */
 public abstract class AbstractCharKeyMap implements CharKeyMap
 {
-	
+
     /** Default constructor to be invoked by sub-classes. */
     protected AbstractCharKeyMap()
 	{ }
-	
+
     public void clear()
 	{
         CharKeyMapIterator i = entries();
@@ -53,7 +51,7 @@ public abstract class AbstractCharKeyMap implements CharKeyMap
             i.remove();
         }
     }
-	
+
     public Object remove(char key)
 	{
         CharKeyMapIterator i = entries();
@@ -69,7 +67,7 @@ public abstract class AbstractCharKeyMap implements CharKeyMap
         }
         return null;
     }
-	
+
     public void putAll(CharKeyMap map)
 	{
         CharKeyMapIterator i = map.entries();
@@ -79,7 +77,7 @@ public abstract class AbstractCharKeyMap implements CharKeyMap
             put(i.getKey(), i.getValue());
         }
     }
-	
+
     public boolean containsKey(char key)
 	{
         CharKeyMapIterator i = entries();
@@ -91,7 +89,7 @@ public abstract class AbstractCharKeyMap implements CharKeyMap
         }
         return false;
     }
-	
+
     public Object get(char key)
 	{
         CharKeyMapIterator i = entries();
@@ -103,7 +101,7 @@ public abstract class AbstractCharKeyMap implements CharKeyMap
         }
         return null;
     }
-	
+
     public boolean containsValue(Object value)
 	{
         CharKeyMapIterator i = entries();
@@ -127,7 +125,7 @@ public abstract class AbstractCharKeyMap implements CharKeyMap
         }
         return false;
     }
-	
+
     public boolean equals(Object obj)
 	{
         if (!(obj instanceof CharKeyMap))
@@ -156,7 +154,7 @@ public abstract class AbstractCharKeyMap implements CharKeyMap
         }
         return true;
     }
-	
+
     public int hashCode()
 	{
         int h = 0;
@@ -168,10 +166,10 @@ public abstract class AbstractCharKeyMap implements CharKeyMap
         }
         return h;
     }
-	
+
     public boolean isEmpty()
     { return size()==0; }
-	
+
     public int size()
 	{
         int size = 0;
@@ -183,7 +181,7 @@ public abstract class AbstractCharKeyMap implements CharKeyMap
         }
         return size;
     }
-	
+
     /**
      *  Returns a string representation of this map.
      *
@@ -191,7 +189,7 @@ public abstract class AbstractCharKeyMap implements CharKeyMap
      */
     public String toString()
 	{
-        StringBuffer s = new StringBuffer();
+        StringBuilder s = new StringBuilder();
         s.append('[');
         CharKeyMapIterator i = entries();
         while (i.hasNext())
@@ -206,7 +204,7 @@ public abstract class AbstractCharKeyMap implements CharKeyMap
         s.append(']');
         return s.toString();
     }
-	
+
     /**
      *  Does nothing. Sub-classes may provide an implementation to
      *  minimize memory usage, but this is not required since many
@@ -214,5 +212,5 @@ public abstract class AbstractCharKeyMap implements CharKeyMap
      */
     public void trimToSize()
     { }
-	
+
 }
