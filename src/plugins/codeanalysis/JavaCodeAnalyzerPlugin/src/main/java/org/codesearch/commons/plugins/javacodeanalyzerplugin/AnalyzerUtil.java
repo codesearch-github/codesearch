@@ -1,24 +1,21 @@
 /**
- * Copyright 2010 David Froehlich   <david.froehlich@businesssoftware.at>,
- *                Samuel Kogler     <samuel.kogler@gmail.com>,
- *                Stephan Stiboller <stistc06@htlkaindorf.at>
+ * Copyright 2010 David Froehlich <david.froehlich@businesssoftware.at>, Samuel
+ * Kogler <samuel.kogler@gmail.com>, Stephan Stiboller <stistc06@htlkaindorf.at>
  *
  * This file is part of Codesearch.
  *
- * Codesearch is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Codesearch is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
  *
- * Codesearch is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * Codesearch is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with
+ * Codesearch. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.codesearch.commons.plugins.javacodeanalyzerplugin;
 
 import japa.parser.ast.Node;
@@ -46,13 +43,18 @@ import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.VariableNode;
 
 /**
  * Provides several methods needed for Java CodeAnalysis
+ *
  * @author David Froehlich
  */
 public class AnalyzerUtil {
 
-    /** the fileNode that was parsed during analysis */
+    /**
+     * the fileNode that was parsed during analysis
+     */
     private FileNode fileNode;
-    /** the list of all usages that are created with the util methods */
+    /**
+     * the list of all usages that are created with the util methods
+     */
     private List<Usage> usages = new LinkedList<Usage>();
 
     public List<Usage> getUsages() {
@@ -60,7 +62,9 @@ public class AnalyzerUtil {
     }
 
     /**
-     * creates a new instance of AnalyzerUtil with the given FileNode as foundation for all methods
+     * creates a new instance of AnalyzerUtil with the given FileNode as
+     * foundation for all methods
+     *
      * @param fileNode
      */
     public AnalyzerUtil(FileNode fileNode) {
@@ -68,7 +72,9 @@ public class AnalyzerUtil {
     }
 
     /**
-     * adds a usage to the usages list if a reference variable is found by getVariableDeclarationForUsage
+     * adds a usage to the usages list if a reference variable is found by
+     * getVariableDeclarationForUsage
+     *
      * @param lineNumber the lineNumber of the usage
      * @param startColumn the startColumn of the usage
      * @param varName the name of the variable
@@ -85,6 +91,7 @@ public class AnalyzerUtil {
 
     /**
      * adds a link to the external links list
+     *
      * @param lineNumber the lineNumber of the usage
      * @param startColumn the startColumn of the usage
      * @param className the name of the class that is used
@@ -95,6 +102,7 @@ public class AnalyzerUtil {
 
     /**
      * adds a link to the external links list
+     *
      * @param lineNumber the lineNumber of the usage
      * @param startColumn the startColumn of the usage
      * @param varName the name of the variable
@@ -108,6 +116,7 @@ public class AnalyzerUtil {
 
     /**
      * adds a usage to the usage list
+     *
      * @param n the MethodCallExpr containing the information about the usage
      */
     public void addLinkToMethodDeclaration(MethodCallExpr n) {
@@ -116,17 +125,21 @@ public class AnalyzerUtil {
         int startColumn = n.getBeginColumn();
         int startLine = n.getBeginLine();
         int length = methodName.length();
-        MethodNode methodNode = getMethodDeclarationForUsage(methodName, parameterList, n);
-        if (methodNode != null) {
-            int referenceLine = methodNode.getStartLine();
-            usages.add(new Usage(startColumn, startLine, length, referenceLine, methodName));
-        } else {
-            //    throw new NotImplementedException(); //FIXME
+        if (n.getBeginLine() == n.getEndLine()) {
+            MethodNode methodNode = getMethodDeclarationForUsage(methodName, parameterList, n);
+            if (methodNode != null) {
+                int referenceLine = methodNode.getStartLine();
+                usages.add(new Usage(startColumn, startLine, length, referenceLine, methodName));
+            } else {
+                //    throw new NotImplementedException(); //FIXME
+            }
         }
+
     }
 
     /**
      * adds a link to the external link list
+     *
      * @param n the MethodCallExpr that contains the information of the usage
      */
     public void addLinkToExternalMethodDeclaration(MethodCallExpr n) {
@@ -161,8 +174,10 @@ public class AnalyzerUtil {
     }
 
     /**
-     * adds a link to the scope of the field (either an object in the current class or a class of which a static variable is referenced)
-     * adds a link to the field itself
+     * adds a link to the scope of the field (either an object in the current
+     * class or a class of which a static variable is referenced) adds a link to
+     * the field itself
+     *
      * @param ex the FieldAccessExpr
      * @param parent the parentNode of the field access
      */
@@ -184,6 +199,7 @@ public class AnalyzerUtil {
 
     /**
      * returns the type of the parameter so it can be compared to variable types
+     *
      * @param ex the expression containing the parameter
      * @param parent the parent node containing the expression
      * @return the type of the parameter
@@ -225,6 +241,7 @@ public class AnalyzerUtil {
 
     /**
      * returns the method that is valid at the lineNumber
+     *
      * @param lineNumber
      * @return the method
      */
@@ -243,8 +260,9 @@ public class AnalyzerUtil {
     }
 
     /**
-     * gets the MethodNode of the declaration of the usage
-     * is not guaranteed to work, since external types or polymorphed types can not be recognized
+     * gets the MethodNode of the declaration of the usage is not guaranteed to
+     * work, since external types or polymorphed types can not be recognized
+     *
      * @param methodName the name of the method
      * @param params all parameters as expressions
      * @param parent the parent node of the method call
@@ -285,6 +303,7 @@ public class AnalyzerUtil {
 
     /**
      * returns the VariableNode of the declaration of the used variable
+     *
      * @param lineNumber the lineNumber of the usage
      * @param name the name of the variable
      * @param parent the parent node of the usage
@@ -331,7 +350,10 @@ public class AnalyzerUtil {
     }
 
     /**
-     * checks whether the variable is valid within a certain node, so a local variable is only valid in the node it is declared in and in all child nodes
+     * checks whether the variable is valid within a certain node, so a local
+     * variable is only valid in the node it is declared in and in all child
+     * nodes
+     *
      * @param node
      * @param variable
      * @return whether the variable is valid
@@ -349,8 +371,10 @@ public class AnalyzerUtil {
     }
 
     /**
-     * returns the class that is valid at the lineNumber
-     * so if the lineNumber is of an internal class within another class the inner class will be returned
+     * returns the class that is valid at the lineNumber so if the lineNumber is
+     * of an internal class within another class the inner class will be
+     * returned
+     *
      * @param lineNumber
      * @return the class that is valid at the line
      */
@@ -366,6 +390,7 @@ public class AnalyzerUtil {
 
     /**
      * parses the modifier from the JavaParser to a visibility
+     *
      * @param modifier the modifier the JavaParser has determined
      * @return the visibility
      */
