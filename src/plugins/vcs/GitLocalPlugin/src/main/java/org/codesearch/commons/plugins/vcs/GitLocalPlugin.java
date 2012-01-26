@@ -154,7 +154,7 @@ public class GitLocalPlugin implements VersionControlPlugin {
     /** {@inheritDoc} */
     @Override
     public String getRepositoryRevision() throws VersionControlPluginException {
-        return new String(executeGitCommand("rev-parse", "HEAD"));
+        return new String(executeGitCommand("rev-parse", "HEAD")).replace("\n", "");
     }
 
     @Override
@@ -205,7 +205,7 @@ public class GitLocalPlugin implements VersionControlPlugin {
                 processBuilder = new ProcessBuilder();
                 processBuilder.directory(branchDirectory);
                 processBuilder.command(command);
-                LOG.trace("Executing git command: " + processBuilder.command());
+                LOG.debug("Executing git command: " + processBuilder.command());
                 process = processBuilder.start();
 
                 byte[] output = IOUtils.toByteArray(process.getInputStream());
