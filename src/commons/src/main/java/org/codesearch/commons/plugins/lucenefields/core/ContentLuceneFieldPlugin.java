@@ -26,9 +26,9 @@
 package org.codesearch.commons.plugins.lucenefields.core;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.codesearch.commons.plugins.lucenefields.SimpleSourceCodeAnalyzer;
 import org.codesearch.commons.plugins.lucenefields.LuceneFieldPlugin;
 import org.codesearch.commons.plugins.lucenefields.LuceneFieldValueException;
+import org.codesearch.commons.plugins.lucenefields.SimpleSourceCodeAnalyzer;
 import org.codesearch.commons.plugins.vcs.FileDto;
 import org.codesearch.commons.utils.mime.MimeTypeUtil;
 

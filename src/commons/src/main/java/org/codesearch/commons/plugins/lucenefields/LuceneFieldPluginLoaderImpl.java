@@ -30,14 +30,10 @@ public class LuceneFieldPluginLoaderImpl implements LuceneFieldPluginLoader {
         }
 
         for (LuceneFieldPlugin currentPlugin : luceneFieldPlugins) {
-            if (currentPlugin.getRegularCaseAnalyzer() != null) {
-                caseSensitivePfaw.addAnalyzer(currentPlugin.getFieldName(), currentPlugin.getRegularCaseAnalyzer());
-                caseSensitivePfaw.addAnalyzer(currentPlugin.getFieldName() + IndexConstants.LC_POSTFIX, currentPlugin.getLowerCaseAnalyzer());
-            }
-            if (currentPlugin.getLowerCaseAnalyzer() != null) {
-                caseInsensitivePfaw.addAnalyzer(currentPlugin.getFieldName(), currentPlugin.getRegularCaseAnalyzer());
-                caseInsensitivePfaw.addAnalyzer(currentPlugin.getFieldName() + IndexConstants.LC_POSTFIX, currentPlugin.getLowerCaseAnalyzer());
-            }
+            caseSensitivePfaw.addAnalyzer(currentPlugin.getFieldName(), currentPlugin.getRegularCaseAnalyzer());
+            caseInsensitivePfaw.addAnalyzer(currentPlugin.getFieldName(), currentPlugin.getRegularCaseAnalyzer());
+            caseSensitivePfaw.addAnalyzer(currentPlugin.getFieldName() + IndexConstants.LC_POSTFIX, currentPlugin.getLowerCaseAnalyzer());
+            caseInsensitivePfaw.addAnalyzer(currentPlugin.getFieldName() + IndexConstants.LC_POSTFIX, currentPlugin.getLowerCaseAnalyzer());
         }
     }
 

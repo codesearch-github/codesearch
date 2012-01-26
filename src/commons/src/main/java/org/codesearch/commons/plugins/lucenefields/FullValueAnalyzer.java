@@ -33,11 +33,11 @@ import org.codesearch.commons.constants.IndexConstants;
  * @author David Froehlich
  * @author Samuel Kogler
  */
-public class FullValueAnalyzer extends Analyzer 
+public class FullValueAnalyzer extends Analyzer
 {
     /** whether or not the output should be parsed to lower case */
     private boolean caseSensitive;
-    
+
     /**
      * creates a new instance of FullValueAnalyzer
      * @param caseSensitive uses a FullValueTokenizer if false and a FullValueLowercaseTokenizer if true
@@ -45,7 +45,7 @@ public class FullValueAnalyzer extends Analyzer
     public FullValueAnalyzer(boolean caseSensitive){
         this.caseSensitive = caseSensitive;
     }
-    
+
     /** {@inheritDoc} */
     @Override
     public TokenStream tokenStream(String fieldName, Reader reader) {
@@ -55,7 +55,7 @@ public class FullValueAnalyzer extends Analyzer
             return new FullValueLowercaseTokenizer(IndexConstants.LUCENE_VERSION, reader);
         }
     }
-    
+
     /**
      * Tokenizer that never splits the term.
      */
@@ -66,10 +66,10 @@ public class FullValueAnalyzer extends Analyzer
 
         @Override
         protected boolean isTokenChar(int c) {
-            return false;
+            return true;
         }
     }
-    
+
     /**
      * Tokenizer that never splits the term but converts the input to lowercase.
      */
@@ -78,7 +78,7 @@ public class FullValueAnalyzer extends Analyzer
         public FullValueLowercaseTokenizer(Version matchVersion, Reader input) {
             super(matchVersion, input);
         }
-        
+
         @Override
         protected int normalize(int c) {
             return Character.toLowerCase(c);

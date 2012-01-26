@@ -19,7 +19,6 @@
 package org.codesearch.indexer.server.tasks;
 
 import com.google.inject.Inject;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
@@ -42,7 +41,6 @@ import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.FSDirectory;
 import org.codesearch.commons.configuration.dto.RepositoryDto;
 import org.codesearch.commons.configuration.properties.PropertiesManager;
 import org.codesearch.commons.constants.IndexConstants;
@@ -62,7 +60,6 @@ import org.codesearch.commons.plugins.vcs.FileIdentifier;
 import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
 import org.codesearch.commons.plugins.vcs.VersionControlPluginException;
 import org.codesearch.commons.utils.mime.MimeTypeUtil;
-import org.codesearch.indexer.server.exceptions.InvalidIndexLocationException;
 import org.codesearch.indexer.server.exceptions.NotifySearcherException;
 import org.codesearch.indexer.server.exceptions.TaskExecutionException;
 import org.codesearch.indexer.server.manager.IndexingJob;
@@ -140,7 +137,7 @@ public class IndexingTask implements Task {
         this.indexDirectory = indexDirectory;
         this.job = job;
         IndexWriterConfig config = new IndexWriterConfig(IndexConstants.LUCENE_VERSION, caseInsensitiveAnalyzer);
-        
+
         indexWriter = new IndexWriter(indexDirectory, config);
         LOG.debug("IndexWriter initialization successful");
     }
