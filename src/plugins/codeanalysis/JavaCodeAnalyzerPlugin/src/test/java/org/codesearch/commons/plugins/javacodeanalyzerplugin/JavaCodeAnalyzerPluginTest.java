@@ -24,13 +24,9 @@
  */
 package org.codesearch.commons.plugins.javacodeanalyzerplugin;
 
-import java.util.List;
-import org.apache.log4j.Logger;
 import org.codesearch.commons.plugins.codeanalyzing.CodeAnalyzerPluginException;
-import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
 import org.codesearch.commons.plugins.codeanalyzing.ast.Visibility;
 import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.ClassNode;
-import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.ExternalClassOrEnumUsage;
 import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.FileNode;
 import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.MethodNode;
 import org.junit.After;
@@ -46,11 +42,9 @@ import org.junit.Test;
  */
 public class JavaCodeAnalyzerPluginTest {
     /* Logger */
-
-    private static final Logger LOG = Logger.getLogger(JavaCodeAnalyzerPluginTest.class);
-    private String repository = "test";
-
+    
     public JavaCodeAnalyzerPluginTest() {
+        
     }
 
     @BeforeClass
@@ -107,102 +101,8 @@ public class JavaCodeAnalyzerPluginTest {
 
     }
 
-    /**
-     * Test of parseLineNumberAndFileNameOfUsage method, of class JavaCodeAnalyzerPlugin.
-     */
     @Test
-    public void testParseLineNumberAndFileNameOfUsage() throws Exception {
-        System.out.println("parseLineNumberAndFileNameOfUsage");
-        ExternalClassOrEnumUsage usage = null;
-        String repository = "";
-        List<String> fileImports = null;
-        String originFilePath = "";
-        JavaCodeAnalyzerPlugin instance = new JavaCodeAnalyzerPlugin();
-        instance.parseLineNumberAndFileNameOfUsage(usage, repository, fileImports, originFilePath);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of analyzeFile method, of class JavaCodeAnalyzerPlugin.
-     */
-    @Test
-    public void testAnalyzeFile() throws Exception {
-        System.out.println("analyzeFile");
-        String fileContent = "";
-        JavaCodeAnalyzerPlugin instance = new JavaCodeAnalyzerPlugin();
-        instance.analyzeFile(fileContent);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of getPurposes method, of class JavaCodeAnalyzerPlugin.
-     */
-    @Test
-    public void testGetPurposes() {
-        System.out.println("getPurposes");
-        JavaCodeAnalyzerPlugin instance = new JavaCodeAnalyzerPlugin();
-        String expResult = "";
-        String result = instance.getPurposes();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of getTypeDeclarations method, of class JavaCodeAnalyzerPlugin.
-     */
-    @Test
-    public void testGetTypeDeclarations() throws Exception {
-        System.out.println("getTypeDeclarations");
-        JavaCodeAnalyzerPlugin instance = new JavaCodeAnalyzerPlugin();
-        List expResult = null;
-        List result = instance.getTypeDeclarations();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of getUsages method, of class JavaCodeAnalyzerPlugin.
-     */
-    @Test
-    public void testGetUsages() throws Exception {
-        System.out.println("getUsages");
-        JavaCodeAnalyzerPlugin instance = new JavaCodeAnalyzerPlugin();
-        List expResult = null;
-        List result = instance.getUsages();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of getImports method, of class JavaCodeAnalyzerPlugin.
-     */
-    @Test
-    public void testGetImports() {
-        System.out.println("getImports");
-        JavaCodeAnalyzerPlugin instance = new JavaCodeAnalyzerPlugin();
-        List expResult = null;
-        List result = instance.getImports();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of getAst method, of class JavaCodeAnalyzerPlugin.
-     */
-    @Test
-    public void testGetAst() {
-        System.out.println("getAst");
-        JavaCodeAnalyzerPlugin instance = new JavaCodeAnalyzerPlugin();
-        AstNode expResult = null;
-        AstNode result = instance.getAst();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+    public void testMultiLineMethodCall() throws CodeAnalyzerPluginException {
+        
     }
 }
