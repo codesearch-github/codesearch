@@ -1,57 +1,53 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright 2010 David Froehlich <david.froehlich@businesssoftware.at>, 
-	Samuel Kogler <samuel.kogler@gmail.com>, Stephan Stiboller <stistc06@htlkaindorf.at> 
-	This file is part of Codesearch. Codesearch is free software: you can redistribute 
-	it and/or modify it under the terms of the GNU General Public License as 
-	published by the Free Software Foundation, either version 3 of the License, 
-	or (at your option) any later version. Codesearch is distributed in the hope 
-	that it will be useful, but WITHOUT ANY WARRANTY; without even the implied 
-	warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
-	GNU General Public License for more details. You should have received a copy 
+<!-- Copyright 2010 David Froehlich <david.froehlich@businesssoftware.at>,
+	Samuel Kogler <samuel.kogler@gmail.com>, Stephan Stiboller <stistc06@htlkaindorf.at>
+	This file is part of Codesearch. Codesearch is free software: you can redistribute
+	it and/or modify it under the terms of the GNU General Public License as
+	published by the Free Software Foundation, either version 3 of the License,
+	or (at your option) any later version. Codesearch is distributed in the hope
+	that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+	warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+	GNU General Public License for more details. You should have received a copy
 	of the GNU General Public License along with Codesearch. If not, see <http://www.gnu.org/licenses/>. -->
 
 <root>
-	<database>
-		<hostname>127.0.0.1</hostname>
-		<port-number>3306</port-number>
-		<database-name>codesearch</database-name>
-		<protocol>mysql</protocol>
-		<driver>com.mysql.jdbc.Driver</driver>
-		<username>codesearch</username>
-		<password>dota!123</password>
-		<max-connections>100</max-connections>
-	</database>
+    <database>
+        <hostname>127.0.0.1</hostname>
+        <port-number>3306</port-number>
+        <database-name>codesearch</database-name>
+        <protocol>mysql</protocol>
+        <driver>com.mysql.jdbc.Driver</driver>
+        <username>codesearch</username>
+        <password>dota!123</password>
+        <max-connections>100</max-connections>
+    </database>
 
-	<searcher-location>http://127.0.0.1:8080/codesearch/searcher/</searcher-location>
-	<cache-directory>/tmp/</cache-directory>
-	<index-directory>/tmp/</index-directory>
+    <searcher-location>http://127.0.0.1:8080/codesearch/searcher/</searcher-location>
+    <cache-directory>/tmp/</cache-directory>
+    <index-directory>/tmp/</index-directory>
 
-	<global-blacklist-filenames>
-		<filename>.*\.svn.*</filename>
-		<filename>.*\.class</filename>
-		<filename>.*\.o</filename>
-		<filename>.*\.bin</filename>
-	</global-blacklist-filenames>
+    <global-blacklist-filenames>
+        <filename>.*\.svn.*</filename>
+        <filename>.*\.class</filename>
+        <filename>.*\.o</filename>
+        <filename>.*\.bin</filename>
+    </global-blacklist-filenames>
 
-	<index-jobs>
-		<index-job>
-			<repositories>jdownloader-repo</repositories>
-			<cron-expression>0 * * * * ?</cron-expression>
-			<clear>true</clear>
-		</index-job>
-	</index-jobs>
+    <index-jobs>
+        <index-job>
+            <repositories>jdownloader-repo</repositories>
+            <cron-expression>0 * * * * ?</cron-expression>
+            <clear>true</clear>
+        </index-job>
+    </index-jobs>
 
-	<repository-groups>group1</repository-groups>
-
-	<repositories>
-		<repository>
-			<name>jdownloader-repo</name>
-			<version-control-system>SVN</version-control-system>
-			<repository-groups>
-				<repo-group>group1</repo-group>
-			</repository-groups>
-			<url>svn://svn.jdownloader.org/jdownloader</url>
-			<code-navigation-enabled>true</code-navigation-enabled>
-		</repository>
-	</repositories>
+    <repositories>
+        <repository>
+            <name>jdownloader-repo</name>
+            <version-control-system>SVN</version-control-system>
+            <groups>group1 group2</groups>
+            <url>svn://svn.jdownloader.org/jdownloader</url>
+            <code-navigation-enabled>true</code-navigation-enabled>
+        </repository>
+    </repositories>
 </root>

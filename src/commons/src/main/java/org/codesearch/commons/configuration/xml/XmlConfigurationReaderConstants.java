@@ -72,9 +72,6 @@ public final class XmlConfigurationReaderConstants {
     protected static final String GLOBAL_WHITELIST = "global-whitelist-filenames.filename";
     /** Used to retrieve all repositories in the xml-config file */
     protected static final String REPOSITORY_LIST = "repositories.repository";
-    //REPOSITORY GROUP CONSTANT
-    /** Used to retrieve the repository group list */
-    protected static final String REPOSITORY_GROUP_LIST = "repository-groups";
 
     //REPOSITORY CONSTANTS
     /** Used to access the repository version control system type parameter */
@@ -92,7 +89,7 @@ public final class XmlConfigurationReaderConstants {
     /** Used to find out if code navigation is enabled for a repository */
     protected static final String REPOSITORY_CODE_NAVIGATION_ENABLED = "code-navigation-enabled";
     /** Used to find out in which repository group the repository is  */
-    protected static final String REPOSITORY_GROUPS = "repository-groups.repo-group";
+    protected static final String REPOSITORY_GROUPS = "groups";
     /** Used to retrieve the filename-patterns files have to match to be indexed */
     protected static final String REPOSITORY_WHITELIST_FILENAMES = "whitelist-filenames.filename";
     /** Used to retrieve the used authentication method */
@@ -127,7 +124,7 @@ public final class XmlConfigurationReaderConstants {
     protected static final String JOB_REPOSITORY = "repositories";
     /** Clear index before indexing? */
     protected static final String JOB_CLEAR = "clear";
-    
+
     //DATABASE CONSTANTS
     protected static final String DB_SECTION = "database";
     protected static final String DB_USERNAME = "username";

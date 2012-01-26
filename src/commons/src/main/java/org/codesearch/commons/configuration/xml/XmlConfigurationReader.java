@@ -1,16 +1,20 @@
 /**
- * Copyright 2010 David Froehlich <david.froehlich@businesssoftware.at>, Samuel Kogler <samuel.kogler@gmail.com>, Stephan Stiboller
- * <stistc06@htlkaindorf.at>
+ * Copyright 2010 David Froehlich <david.froehlich@businesssoftware.at>, Samuel
+ * Kogler <samuel.kogler@gmail.com>, Stephan Stiboller <stistc06@htlkaindorf.at>
  *
  * This file is part of Codesearch.
  *
- * Codesearch is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * Codesearch is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
  *
- * Codesearch is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * Codesearch is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with Codesearch. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with
+ * Codesearch. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.codesearch.commons.configuration.xml;
 
@@ -18,9 +22,11 @@ import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -42,8 +48,8 @@ import org.codesearch.commons.configuration.dto.RepositoryDto;
 import org.codesearch.commons.configuration.dto.SshAuthentication;
 
 /**
- * Xml implementation of the configuration reader. By default, the properties are loaded from a file in the classpath called
- * codesearch_config.xml.
+ * Xml implementation of the configuration reader. By default, the properties
+ * are loaded from a file in the classpath called codesearch_config.xml.
  *
  * @author Stephan Stiboller
  * @author David Froehlich
@@ -53,17 +59,23 @@ import org.codesearch.commons.configuration.dto.SshAuthentication;
 public class XmlConfigurationReader implements ConfigurationReader {
 
     private static final Logger LOG = Logger.getLogger(XmlConfigurationReader.class);
-    /** The XMLConfiguration object that is used to read the properties from the XML-file */
+    /**
+     * The XMLConfiguration object that is used to read the properties from the
+     * XML-file
+     */
     private XMLConfiguration config;
-    /** The path to the configuration file. */
+    /**
+     * The path to the configuration file.
+     */
     private String configPath = "codesearch_config.xml";
-
     private CodesearchConfiguration codesearchConfiguration;
+
     /**
      * creates a new instance of XmlConfigurationReader
      *
      * @param configPath the classpath of the config file
-     * @throws InvalidConfigurationException if the configuration file was invalid
+     * @throws InvalidConfigurationException if the configuration file was
+     * invalid
      */
     @Inject
     public XmlConfigurationReader(@Named("configpath") String configPath) throws InvalidConfigurationException {
@@ -75,19 +87,25 @@ public class XmlConfigurationReader implements ConfigurationReader {
         loadConfig();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized List<IndexerUserDto> getIndexerUsers() {
         return codesearchConfiguration.getIndexerUsers();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized List<JobDto> getJobs() {
         return codesearchConfiguration.getJobs();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized RepositoryDto getRepositoryByName(String name) {
         for (RepositoryDto repo : codesearchConfiguration.getRepositories()) {
@@ -99,33 +117,41 @@ public class XmlConfigurationReader implements ConfigurationReader {
     }
 
     /**
-     * returns a list of all globally whitelisted filenames, so every filename has to match at least one of the whitelist names (only if the
-     * whitelist is not empty)
+     * returns a list of all globally whitelisted filenames, so every filename
+     * has to match at least one of the whitelist names (only if the whitelist
+     * is not empty)
      */
     public synchronized List<String> getGlobalWhitelistEntries() {
         return codesearchConfiguration.getGlobalWhitelist();
     }
 
     /**
-     * returns a list of all file name patterns that are listed to be ignored on the entire system
+     * returns a list of all file name patterns that are listed to be ignored on
+     * the entire system
      */
     private synchronized List<String> getGlobalBlacklistEntries() {
         return codesearchConfiguration.getGlobalBlacklist();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized List<RepositoryDto> getRepositories() {
         return codesearchConfiguration.getRepositories();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized List<String> getRepositoryGroups() {
-        return codesearchConfiguration.getRepositoryGroups();
+        return new LinkedList<String>(codesearchConfiguration.getRepositoryGroups());
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized List<String> getRepositoriesForGroup(String groupName) {
         List<String> repos = new LinkedList<String>();
@@ -137,31 +163,41 @@ public class XmlConfigurationReader implements ConfigurationReader {
         return repos;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized DatabaseConfiguration getDatabaseConfiguration() {
         return codesearchConfiguration.getDatabaseConfiguration();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized File getCacheDirectory() {
         return codesearchConfiguration.getCacheDirectory();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized File getIndexLocation() {
         return codesearchConfiguration.getIndexLocation();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized URI getSearcherLocation() {
         return codesearchConfiguration.getSearcherLocation();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized void refresh() {
         try {
@@ -176,7 +212,7 @@ public class XmlConfigurationReader implements ConfigurationReader {
         codesearchConfiguration = new CodesearchConfiguration();
         try {
             config = new XMLConfiguration(this.configPath);
-            if(config == null) {
+            if (config == null) {
                 throw new InvalidConfigurationException("Config was null at: " + this.configPath);
             }
         } catch (ConfigurationException ex) {
@@ -187,7 +223,6 @@ public class XmlConfigurationReader implements ConfigurationReader {
         loadSearcherLocation();
         loadGlobalBlacklist();
         loadGlobalWhitelist();
-        loadRepositoryGroups();
         loadRepositories();
         loadJobs();
         loadIndexerUsers();
@@ -216,7 +251,7 @@ public class XmlConfigurationReader implements ConfigurationReader {
         }
         File index = new File(indexLocation);
         if (!(index.isDirectory() && index.canWrite())) {
-            throw new InvalidConfigurationException("Index location \""+indexLocation+"\" is invalid.");
+            throw new InvalidConfigurationException("Index location \"" + indexLocation + "\" is invalid.");
         }
         codesearchConfiguration.setIndexLocation(index);
     }
@@ -230,22 +265,24 @@ public class XmlConfigurationReader implements ConfigurationReader {
         }
     }
 
-    private void loadRepositoryGroups() throws InvalidConfigurationException {
-        List<String> repositoryGroups = Arrays.asList(config.getString(XmlConfigurationReaderConstants.REPOSITORY_GROUP_LIST).split(" "));
-        codesearchConfiguration.setRepositoryGroups(repositoryGroups);
-    }
-
     private void loadRepositories() throws InvalidConfigurationException {
-        LinkedList<RepositoryDto> repositories = new LinkedList<RepositoryDto>();
+        List<RepositoryDto> repositories = new LinkedList<RepositoryDto>();
+        Set<String> repositoryGroups = new HashSet<String>();
+
         List<HierarchicalConfiguration> repositoryConfigs = config.configurationsAt(XmlConfigurationReaderConstants.REPOSITORY_LIST);
         for (HierarchicalConfiguration repositoryConfig : repositoryConfigs) {
-            repositories.add(loadRepository(repositoryConfig));
+            RepositoryDto repo = loadRepository(repositoryConfig);
+            repositoryGroups.addAll(repo.getRepositoryGroups());
+            repositories.add(repo);
         }
+
+        codesearchConfiguration.setRepositoryGroups(new LinkedList<String>(repositoryGroups));
         codesearchConfiguration.setRepositories(repositories);
     }
 
     /**
-     * retrieves all required data about the given repository from the configuration via the HierarchicalConfiguration and returns it as a
+     * retrieves all required data about the given repository from the
+     * configuration via the HierarchicalConfiguration and returns it as a
      * RepositoryDto
      */
     private RepositoryDto loadRepository(HierarchicalConfiguration hc) {
@@ -265,7 +302,7 @@ public class XmlConfigurationReader implements ConfigurationReader {
         }
         whitelistFileNames.addAll(getGlobalWhitelistEntries());
 
-        List<String> repositoryGroups = hc.getList(XmlConfigurationReaderConstants.REPOSITORY_GROUPS);
+        List<String> repositoryGroups = Arrays.asList(hc.getString(XmlConfigurationReaderConstants.REPOSITORY_GROUPS).split(" "));
         if (repositoryGroups == null) {
             repositoryGroups = new LinkedList<String>();
         }
@@ -285,9 +322,7 @@ public class XmlConfigurationReader implements ConfigurationReader {
             usedAuthentication = new SshAuthentication(sshFilePath);
         }
 
-        repo = new RepositoryDto(name, hc.getString(XmlConfigurationReaderConstants.REPOSITORY_URL), usedAuthentication, hc
-                .getBoolean(XmlConfigurationReaderConstants.REPOSITORY_CODE_NAVIGATION_ENABLED), hc
-                .getString(XmlConfigurationReaderConstants.REPOSITORY_VCS), blacklistEntries, whitelistFileNames, repositoryGroups);
+        repo = new RepositoryDto(name, hc.getString(XmlConfigurationReaderConstants.REPOSITORY_URL), usedAuthentication, hc.getBoolean(XmlConfigurationReaderConstants.REPOSITORY_CODE_NAVIGATION_ENABLED), hc.getString(XmlConfigurationReaderConstants.REPOSITORY_VCS), blacklistEntries, whitelistFileNames, repositoryGroups);
         LOG.info("reading repository from configuration: " + repo.toString());
         return repo;
     }
@@ -367,9 +402,11 @@ public class XmlConfigurationReader implements ConfigurationReader {
     }
 
     /**
-     * Takes a string of repository names and returns a {@link List} of the corresponding {@link RepositoryDto} objects.
+     * Takes a string of repository names and returns a {@link List} of the
+     * corresponding {@link RepositoryDto} objects.
      *
-     * @param repositoryNames The names of the repositories in a single string separated by spaces.
+     * @param repositoryNames The names of the repositories in a single string
+     * separated by spaces.
      * @return the {@link List} of {@link RepositoryDto}s.
      */
     private List<RepositoryDto> getRepositoriesByNames(String repositoryNames) {
@@ -386,5 +423,4 @@ public class XmlConfigurationReader implements ConfigurationReader {
         }
         return repos;
     }
-
 }

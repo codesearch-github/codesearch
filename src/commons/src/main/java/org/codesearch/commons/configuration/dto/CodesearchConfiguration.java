@@ -27,6 +27,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import java.io.File;
 import java.net.URI;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Simple bean representing the configuration of codesearch.

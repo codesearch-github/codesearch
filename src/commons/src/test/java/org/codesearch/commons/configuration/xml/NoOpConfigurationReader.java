@@ -67,7 +67,7 @@ public class NoOpConfigurationReader implements ConfigurationReader{
 
     @Override
     public void refresh() {
-        
+
     }
-    
+
 }
