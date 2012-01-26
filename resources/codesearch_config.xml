@@ -28,8 +28,6 @@
         </index-job>
     </index-jobs>
 
-    <repository-groups>group1 group2</repository-groups>
-
     <repositories>
         <repository>
             <name>rpgunnamed</name>
@@ -37,9 +35,7 @@
             <authentication-data type='none'></authentication-data>
             <url>git://rpgunnamed.git.sourceforge.net/gitroot/rpgunnamed/rpgunnamed</url>
             <code-navigation-enabled>false</code-navigation-enabled>
-            <repository-groups>
-                <repo-group>group1</repo-group>
-            </repository-groups>
+            <groups>group1</groups>
         </repository>
         <repository>
             <name>jdownloader</name>
@@ -47,9 +43,7 @@
             <authentication-data type='none'></authentication-data>
             <url>svn://svn.jdownloader.org/jdownloader</url>
             <code-navigation-enabled>true</code-navigation-enabled>
-            <repository-groups>
-                <repo-group>group1</repo-group>
-            </repository-groups>
+            <groups>group1</groups>
         </repository>
     </repositories>
 </root>

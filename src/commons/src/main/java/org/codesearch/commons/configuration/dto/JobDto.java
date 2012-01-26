@@ -1,41 +1,43 @@
 /**
- * Copyright 2010 David Froehlich   <david.froehlich@businesssoftware.at>,
- *                Samuel Kogler     <samuel.kogler@gmail.com>,
- *                Stephan Stiboller <stistc06@htlkaindorf.at>
+ *  Copyright 2010 David Froehlich <david.froehlich@businesssoftware.at>, Samuel
+ * Kogler <samuel.kogler@gmail.com>, Stephan Stiboller <stistc06@htlkaindorf.at>
  *
- * This file is part of Codesearch.
+ *  This file is part of Codesearch.
  *
- * Codesearch is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ *  Codesearch is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
  *
- * Codesearch is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *  Codesearch is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
+ *  You should have received a copy of the GNU General Public License along with
+ * Codesearch. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.codesearch.commons.configuration.dto;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 import java.util.List;
 
 /**
- * Represents an Indexing Job.
- * @author David Froehlich
+ *  Represents an Indexing Job.
+ *
+ *  @author David Froehlich
  */
 public class JobDto {
 
-    /** The affected repositories. */
+    /**
+     * The affected repositories.
+     */
     private List<RepositoryDto> repositories;
-    /** The cron expression for the job. */
-    @XStreamAlias("cron-expression")
+    /**
+     * The cron expression for the job.
+     */
     private String cronExpression;
-    /** whether the index will be cleared before indexing */
-    @XStreamAlias("clear")
+    /**
+     * whether the index will be cleared before indexing
+     */
     private boolean clearIndex;
 
     public JobDto() {
@@ -65,7 +67,9 @@ public class JobDto {
         this.clearIndex = clearIndex;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {
