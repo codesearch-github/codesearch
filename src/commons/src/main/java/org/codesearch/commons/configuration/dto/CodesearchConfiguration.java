@@ -18,42 +18,27 @@
  * You should have received a copy of the GNU General Public License
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
-/**
- *
- */
 package org.codesearch.commons.configuration.dto;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 import java.io.File;
 import java.net.URI;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Simple bean representing the configuration of codesearch.
  * @author Samuel Kogler
  */
-@XStreamAlias("configuration")
 public class CodesearchConfiguration {
 
-    @XStreamAlias("searcher-location")
     private URI searcherLocation;
-    @XStreamAlias("cache-directory")
     private File cacheDirectory;
-    @XStreamAlias("index-directory")
     private File indexLocation;
-    @XStreamAlias("indexer-users")
     private List<IndexerUserDto> indexerUsers;
-    @XStreamAlias("index-jobs")
     private List<JobDto> jobs;
     private List<RepositoryDto> repositories;
-    @XStreamAlias("global-whitelist")
     private List<String> globalWhitelist;
-    @XStreamAlias("global-blacklist")
     private List<String> globalBlacklist;
-    @XStreamAlias("repository-groups")
     private List<String> repositoryGroups;
-    @XStreamAlias("database")
     private DatabaseConfiguration databaseConfiguration;
 
     public URI getSearcherLocation() {
