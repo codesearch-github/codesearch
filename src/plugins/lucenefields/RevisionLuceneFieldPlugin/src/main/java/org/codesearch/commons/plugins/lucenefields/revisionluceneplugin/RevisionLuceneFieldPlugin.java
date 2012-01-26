@@ -46,7 +46,7 @@ public class RevisionLuceneFieldPlugin extends LuceneFieldPlugin {
     /**  {@inheritDoc} */
     @Override
     public boolean isStored() {
-        return false;
+        return true;
     }
 
     /**  {@inheritDoc} */
