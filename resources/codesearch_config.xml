@@ -1,4 +1,8 @@
 <root>
+    <!-- 
+    Database connection, used for storing code analysis data. 
+    If no code navigation is needed, these fields can be left empty.
+    -->
  	<database>
 		<hostname>127.0.0.1</hostname>
 		<port-number>3306</port-number>
@@ -9,9 +13,12 @@
 		<password></password>
 		<max-connections>100</max-connections>
 	</database> 
-
+    
+    <!-- The url of the searcher, used to notify the searcher of changes to the index -->
     <searcher-location>http://127.0.0.1:8080/searcher/</searcher-location>
+    <!-- The directory that is used by version control plugins to store checked out repositories -->
     <cache-directory>/var/cache/codesearch/vcs/</cache-directory>
+    <!-- The directory where the Lucene search index is stored -->
     <index-directory>/var/index/</index-directory>
 
     <global-blacklist-filenames>
@@ -20,6 +27,13 @@
         <filename>.*\.bin</filename>
     </global-blacklist-filenames>
 
+    <!--
+    Indexing jobs can be scheduled using cron expressions. 
+    If no cron expressions are defined, the job is executed once at startup.
+    
+    The clear option specifies whether the index should be cleared before each execution.
+    The names of the specified repositories must be separated by spaces.
+    -->
     <index-jobs>
         <index-job>
             <repositories>codesearch jdownloader</repositories>
@@ -28,6 +42,12 @@
         </index-job>
     </index-jobs>
 
+    <!-- 
+    The repositories that can be used for indexing and searching. 
+    The names of version control systems must be specified EXACTLY as in the corresponding plugin.
+    Groups may be specified to organize a large number of repositories and can be used for 
+    searching and in the manual indexing web interface.
+    -->
     <repositories>
         <repository>
             <name>codesearch</name>
