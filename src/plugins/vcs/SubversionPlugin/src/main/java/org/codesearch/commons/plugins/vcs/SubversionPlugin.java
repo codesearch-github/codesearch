@@ -1,22 +1,20 @@
 /**
- * Copyright 2010 David Froehlich   <david.froehlich@businesssoftware.at>,
- *                Samuel Kogler     <samuel.kogler@gmail.com>,
- *                Stephan Stiboller <stistc06@htlkaindorf.at>
+ * Copyright 2010 David Froehlich <david.froehlich@businesssoftware.at>, Samuel
+ * Kogler <samuel.kogler@gmail.com>, Stephan Stiboller <stistc06@htlkaindorf.at>
  *
  * This file is part of Codesearch.
  *
- * Codesearch is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Codesearch is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
  *
- * Codesearch is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * Codesearch is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with
+ * Codesearch. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.codesearch.commons.plugins.vcs;
 
@@ -46,11 +44,13 @@ import org.tmatesoft.svn.core.auth.ISVNAuthenticationManager;
 import org.tmatesoft.svn.core.internal.io.dav.DAVRepositoryFactory;
 import org.tmatesoft.svn.core.internal.io.fs.FSRepositoryFactory;
 import org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryFactoryImpl;
+import org.tmatesoft.svn.core.internal.util.SVNPathUtil;
 import org.tmatesoft.svn.core.io.SVNRepository;
 import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
 
 /**
  * A plugin used to access files stored in Subversion repositories.
+ *
  * @author David Froehlich
  * @author Stephan Stiboller
  * @author Samuel Kogler
@@ -58,14 +58,17 @@ import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
 public class SubversionPlugin implements VersionControlPlugin {
 
     private static final Logger LOG = Logger.getLogger(SubversionPlugin.class);
-    /** The repository that is currently accessed. */
+    /**
+     * The repository that is currently accessed.
+     */
     private SVNRepository svnRepo;
     private ISVNAuthenticationManager authManager;
     private RepositoryDto repository;
-    //TODO make this solution less ugly
+    private String entryPoint = "";
 
     /**
-     * creates a new instance of SubversionPlugin and sets up all factories required for connections
+     * creates a new instance of SubversionPlugin and sets up all factories
+     * required for connections
      */
     public SubversionPlugin() {
         DAVRepositoryFactory.setup();
@@ -73,20 +76,26 @@ public class SubversionPlugin implements VersionControlPlugin {
         FSRepositoryFactory.setup();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getPurposes() {
         return "SVN";
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setRepository(RepositoryDto repository) throws VersionControlPluginException {
         this.repository = repository;
         establishConnectionToRepo();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public FileDto getFileDtoForFileIdentifierAtRevision(FileIdentifier identifier, String revision) throws VersionControlPluginException {
         try {
@@ -116,18 +125,19 @@ public class SubversionPlugin implements VersionControlPlugin {
         }
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Set<FileIdentifier> getChangedFilesSinceRevision(String revision) throws VersionControlPluginException {
-        Set<FileIdentifier> identifiers = new HashSet();
+        Set<FileIdentifier> identifiers = new HashSet<FileIdentifier>();
         try {
-            if (revision.equals("0")) {
-                listEntries("/", identifiers);
+            if (revision.equals(VersionControlPlugin.UNDEFINED_VERSION)) {
+                listEntriesRecursively(entryPoint, identifiers);
             } else {
-                List logs = null;
-                logs = (LinkedList) svnRepo.log(new String[]{}, null, Long.parseLong(revision) + 1, -1, true, false);
-                for (int i = 0; i < logs.size(); i++) {
-                    SVNLogEntry entry = (SVNLogEntry) logs.get(i);
+                Collection logs = svnRepo.log(new String[]{}, null, Long.parseLong(revision) + 1, -1, true, false);
+                for (Object o : logs) {
+                    SVNLogEntry entry = (SVNLogEntry) o;
                     Iterator entryIterator = entry.getChangedPaths().values().iterator();
                     while (entryIterator.hasNext()) {
                         SVNLogEntryPath currentPath = (SVNLogEntryPath) entryIterator.next();
@@ -155,7 +165,9 @@ public class SubversionPlugin implements VersionControlPlugin {
         return identifiers;
     }
 
-    /**{@inheritDoc }*/
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public String getRepositoryRevision() throws VersionControlPluginException {
         try {
@@ -169,11 +181,15 @@ public class SubversionPlugin implements VersionControlPlugin {
     public List<String> getFilesInDirectory(String directoryPath, String revision) throws VersionControlPluginException {
         List<String> fileNames = new LinkedList<String>();
         try {
-            directoryPath = svnRepo.getRepositoryRoot(true).getPath();
-            svnRepo.getDir(directoryPath, Long.parseLong(revision), null, new ListDirectoryDirEntryHandler(fileNames));
+            Collection entries = svnRepo.getDir(SVNPathUtil.append(entryPoint, directoryPath), -1, null, (Collection) null);
+            for (Object o : entries) {
+                SVNDirEntry dirEntry = (SVNDirEntry) o;
+                fileNames.add(dirEntry.getName());
+            }
         } catch (SVNException ex) {
             throw new VersionControlPluginException(ex.getMessage());
         }
+
         return fileNames;
     }
 
@@ -201,20 +217,28 @@ public class SubversionPlugin implements VersionControlPlugin {
                 //TODO add support for ssh files
                 throw new VersionControlPluginException("SSH authentication not yet supported.");
             }
+            svnRepo.testConnection();
+            String repoUrl = svnRepo.getRepositoryRoot(true).toString();
+            if (!repository.getUrl().equals(repoUrl)) {
+                entryPoint = repository.getUrl().replace(repoUrl, "");
+                if (entryPoint.equals("/")) {
+                    entryPoint = "";
+                }
+            }
         } catch (SVNException ex) {
             throw new VersionControlPluginException("Connection to specified repository could not be established:\n" + ex);
         }
     }
 
-    private void listEntries(String path, Set<FileIdentifier> identifiers) throws SVNException {
+    private void listEntriesRecursively(String path, Set<FileIdentifier> identifiers) throws SVNException {
         Collection entries = svnRepo.getDir(path, -1, null, (Collection) null);
         Iterator iterator = entries.iterator();
         while (iterator.hasNext()) {
             SVNDirEntry entry = (SVNDirEntry) iterator.next();
             if (entry.getKind() == SVNNodeKind.DIR) {
-                listEntries((path.isEmpty()) ? entry.getName() : path + "/" + entry.getName(), identifiers);
+                listEntriesRecursively(path + "/" + entry.getName(), identifiers);
             } else if (entry.getKind() == SVNNodeKind.FILE) {
-                identifiers.add(new FileIdentifier(path + "/" + entry.getName(), false, false, repository));
+                identifiers.add(new FileIdentifier(SVNPathUtil.getRelativePath(entryPoint, path + "/" + entry.getName()), false, false, repository));
             }
         }
     }
@@ -226,15 +250,15 @@ public class SubversionPlugin implements VersionControlPlugin {
 
     private class ListDirectoryDirEntryHandler implements ISVNDirEntryHandler {
 
-        List<String> fileNames;
+        private Set<FileIdentifier> fileIdentifiers;
 
-        public ListDirectoryDirEntryHandler(List<String> fileNames) {
-            this.fileNames = fileNames;
+        public ListDirectoryDirEntryHandler(Set<FileIdentifier> fileIdentifiers) {
+            this.fileIdentifiers = fileIdentifiers;
         }
 
         @Override
         public void handleDirEntry(SVNDirEntry dirEntry) throws SVNException {
-            fileNames.add(dirEntry.getRelativePath());
+            fileIdentifiers.add(new FileIdentifier(dirEntry.getRelativePath(), false, false, repository));
         }
     }
 }
