@@ -21,7 +21,6 @@ package org.codesearch.commons.plugins.vcs;
 import java.io.ByteArrayOutputStream;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -31,10 +30,9 @@ import org.codesearch.commons.configuration.dto.BasicAuthentication;
 import org.codesearch.commons.configuration.dto.NoAuthentication;
 import org.codesearch.commons.configuration.dto.RepositoryDto;
 import org.tmatesoft.svn.core.ISVNDirEntryHandler;
+import org.tmatesoft.svn.core.SVNDepth;
 import org.tmatesoft.svn.core.SVNDirEntry;
 import org.tmatesoft.svn.core.SVNException;
-import org.tmatesoft.svn.core.SVNLogEntry;
-import org.tmatesoft.svn.core.SVNLogEntryPath;
 import org.tmatesoft.svn.core.SVNNodeKind;
 import org.tmatesoft.svn.core.SVNProperties;
 import org.tmatesoft.svn.core.SVNProperty;
@@ -47,6 +45,13 @@ import org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryFactoryImpl;
 import org.tmatesoft.svn.core.internal.util.SVNPathUtil;
 import org.tmatesoft.svn.core.io.SVNRepository;
 import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
+import org.tmatesoft.svn.core.wc.ISVNDiffStatusHandler;
+import org.tmatesoft.svn.core.wc.ISVNOptions;
+import org.tmatesoft.svn.core.wc.SVNDiffClient;
+import org.tmatesoft.svn.core.wc.SVNDiffStatus;
+import org.tmatesoft.svn.core.wc.SVNRevision;
+import org.tmatesoft.svn.core.wc.SVNStatusType;
+import org.tmatesoft.svn.core.wc.SVNWCUtil;
 
 /**
  * A plugin used to access files stored in Subversion repositories.
@@ -130,39 +135,22 @@ public class SubversionPlugin implements VersionControlPlugin {
      */
     @Override
     public Set<FileIdentifier> getChangedFilesSinceRevision(String revision) throws VersionControlPluginException {
-        Set<FileIdentifier> identifiers = new HashSet<FileIdentifier>();
+        Set<FileIdentifier> fileIdentifiers = new HashSet<FileIdentifier>();
         try {
             if (revision.equals(VersionControlPlugin.UNDEFINED_VERSION)) {
-                listEntriesRecursively(entryPoint, identifiers);
-            } else {
-                Collection logs = svnRepo.log(new String[]{}, null, Long.parseLong(revision) + 1, -1, true, false);
-                for (Object o : logs) {
-                    SVNLogEntry entry = (SVNLogEntry) o;
-                    Iterator entryIterator = entry.getChangedPaths().values().iterator();
-                    while (entryIterator.hasNext()) {
-                        SVNLogEntryPath currentPath = (SVNLogEntryPath) entryIterator.next();
-
-                        //attribute values for the new fileIdentifier
-                        String filePath = currentPath.getPath();
-                        boolean deleted = false;
-                        if (currentPath.getType() == 'D') { //The file has been deleted
-                            deleted = true;
-                        }
-                        FileIdentifier fileIdentifier = new FileIdentifier(filePath, false, deleted, repository);
-                        if (identifiers.contains(fileIdentifier)) {
-                            identifiers.remove(fileIdentifier);
-                        }
-                        identifiers.add(fileIdentifier);
-                        LOG.debug("Add file to indexing list: " + filePath);
-                    }
-                }
+                revision = "1";
             }
+            ISVNOptions options = SVNWCUtil.createDefaultOptions(true);
+            SVNDiffClient diffClient = new SVNDiffClient(svnRepo.getAuthenticationManager(), options);
+            diffClient.doDiffStatus(svnRepo.getLocation(), SVNRevision.create(Long.parseLong(revision)), svnRepo.getLocation(), SVNRevision.HEAD, SVNDepth.INFINITY, true, new DiffStatusHandler(fileIdentifiers));
         } catch (NullPointerException e) {
             throw new VersionControlPluginException("No repository specified");
         } catch (SVNException ex) {
-            return identifiers;
+            return fileIdentifiers;
+        } catch (NumberFormatException ex) {
+            throw new VersionControlPluginException("Invalid revision specifed");
         }
-        return identifiers;
+        return fileIdentifiers;
     }
 
     /**
@@ -230,22 +218,26 @@ public class SubversionPlugin implements VersionControlPlugin {
         }
     }
 
-    private void listEntriesRecursively(String path, Set<FileIdentifier> identifiers) throws SVNException {
-        Collection entries = svnRepo.getDir(path, -1, null, (Collection) null);
-        Iterator iterator = entries.iterator();
-        while (iterator.hasNext()) {
-            SVNDirEntry entry = (SVNDirEntry) iterator.next();
-            if (entry.getKind() == SVNNodeKind.DIR) {
-                listEntriesRecursively(path + "/" + entry.getName(), identifiers);
-            } else if (entry.getKind() == SVNNodeKind.FILE) {
-                identifiers.add(new FileIdentifier(SVNPathUtil.getRelativePath(entryPoint, path + "/" + entry.getName()), false, false, repository));
-            }
-        }
-    }
-
     @Override
     public void validate() {
         //TODO add validation logic
+    }
+
+    private class DiffStatusHandler implements ISVNDiffStatusHandler {
+
+        private Set<FileIdentifier> fileIdentifiers;
+
+        public DiffStatusHandler(Set<FileIdentifier> fileIdentifiers) {
+            this.fileIdentifiers = fileIdentifiers;
+        }
+
+        @Override
+        public void handleDiffStatus(SVNDiffStatus diffStatus) throws SVNException {
+            if (diffStatus.getKind() == SVNNodeKind.FILE) {
+                boolean deleted = diffStatus.getModificationType() == SVNStatusType.STATUS_DELETED;
+                fileIdentifiers.add(new FileIdentifier(diffStatus.getPath(), false, deleted, repository));
+            }
+        }
     }
 
     private class ListDirectoryDirEntryHandler implements ISVNDirEntryHandler {

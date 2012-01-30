@@ -59,12 +59,30 @@ public class SubversionPluginTest {
     }
 
     /**
-     * Tests whether the paths that are returned by the
-     * getChangedFilesSinceRevision are valid
+     * Tests whether the paths that are returned by
+     * getChangedFilesSinceRevision are valid.
+     * Does not define a start revision.
      */
     @Test
-    public void testGetFiles() throws VersionControlPluginException {
+    public void testGetFilesFromStart() throws VersionControlPluginException {
         Set<FileIdentifier> changedFilesSinceRevision = sp.getChangedFilesSinceRevision(VersionControlPlugin.UNDEFINED_VERSION);
+        assert (!changedFilesSinceRevision.isEmpty());
+        for (FileIdentifier fileIdentifier : changedFilesSinceRevision) {
+            if (!fileIdentifier.isDeleted()) {
+                FileDto fileDto = sp.getFileDtoForFileIdentifierAtRevision(fileIdentifier, VersionControlPlugin.UNDEFINED_VERSION);
+                assert (fileDto != null);
+            }
+        }
+    }
+
+    /**
+     * Tests whether the paths that are returned by
+     * getChangedFilesSinceRevision are valid.
+     * Tests using a start revision.
+     */
+    @Test
+    public void testGetFilesFromRev() throws VersionControlPluginException {
+        Set<FileIdentifier> changedFilesSinceRevision = sp.getChangedFilesSinceRevision("2");
         assert (!changedFilesSinceRevision.isEmpty());
         for (FileIdentifier fileIdentifier : changedFilesSinceRevision) {
             if (!fileIdentifier.isDeleted()) {
@@ -77,6 +95,6 @@ public class SubversionPluginTest {
     @Test
     public void testListDir() throws VersionControlPluginException {
         List<String> filesInDirectory = sp.getFilesInDirectory("/", VersionControlPlugin.UNDEFINED_VERSION);
-        assert(filesInDirectory.size() == 2);
+        assert (filesInDirectory.size() == 2);
     }
 }
