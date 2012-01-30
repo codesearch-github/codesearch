@@ -86,6 +86,7 @@ public class DocumentSearcherImpl implements DocumentSearcher {
      */
     @Inject
     public DocumentSearcherImpl(ConfigurationReader configurationReader, LuceneFieldPluginLoader luceneFieldPluginLoader) {
+        this.configurationReader = configurationReader;
         // Retrieve index location from the configuration
         indexLocation = configurationReader.getIndexLocation();
         LOG.debug("Index location set to: " + indexLocation);
@@ -131,7 +132,7 @@ public class DocumentSearcherImpl implements DocumentSearcher {
                     finalSearchString = finalSearchString.replace(plugin.getFieldName() + ":", plugin.getFieldName() + IndexConstants.LC_POSTFIX + ":");
                 }
             }
-            query = queryParser.parse(finalSearchString.toLowerCase());
+            query = queryParser.parse(finalSearchString);
         }
 
         LOG.info("Searching index with query: " + query.toString());
@@ -188,11 +189,9 @@ public class DocumentSearcherImpl implements DocumentSearcher {
                 repositoryNames.add(repo);
             }
         }
-
         if (repositoryNames.isEmpty()) {
             return query;
         }
-
         StringBuilder repoQuery = new StringBuilder();
         repoQuery.append(" +");
         repoQuery.append(IndexConstants.INDEX_FIELD_REPOSITORY);
@@ -205,9 +204,7 @@ public class DocumentSearcherImpl implements DocumentSearcher {
                 repoQuery.append(" OR ");
             }
         }
-
         repoQuery.append(")");
-
         return query + repoQuery.toString();
     }
 

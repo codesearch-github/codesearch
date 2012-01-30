@@ -22,8 +22,6 @@
 package org.codesearch.commons.plugins.lucenefields.repositorygroupucenefieldplugin;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.WhitespaceAnalyzer;
-import org.codesearch.commons.constants.IndexConstants;
 import org.codesearch.commons.plugins.lucenefields.LuceneFieldPlugin;
 import org.codesearch.commons.plugins.lucenefields.LuceneFieldValueException;
 import org.codesearch.commons.plugins.vcs.FileDto;
@@ -33,11 +31,6 @@ import org.codesearch.commons.plugins.vcs.FileDto;
  * @author Samuel Kogler
  */
 public class RepositoryGroupLuceneFieldPlugin extends LuceneFieldPlugin {
-
-    /** Analyzer used for case sensitive queries. */
-    private Analyzer regularCaseAnalyzer = new WhitespaceAnalyzer(IndexConstants.LUCENE_VERSION);
-    /** Analyzer used for case insensitive queries. */
-    private Analyzer lowerCaseAnalyzer = new LowerCaseWhitespaceAnalyzer();
 
     /** {@inheritDoc} */
     @Override
@@ -66,12 +59,12 @@ public class RepositoryGroupLuceneFieldPlugin extends LuceneFieldPlugin {
     /** {@inheritDoc} */
     @Override
     public Analyzer getRegularCaseAnalyzer() {
-        return regularCaseAnalyzer;
+        return null;
     }
 
     /** {@inheritDoc} */
     @Override
     public Analyzer getLowerCaseAnalyzer() {
-        return lowerCaseAnalyzer;
+        return null;
     }
 }

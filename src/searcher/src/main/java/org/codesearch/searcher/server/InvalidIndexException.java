@@ -26,6 +26,7 @@ package org.codesearch.searcher.server;
  * @author Samuel Kogler
  */
 public class InvalidIndexException extends Exception {
+    private static final long serialVersionUID = 1L;
 
     /**
      * Creates a new instance of <code>InvalidIndexException</code> without detail message.

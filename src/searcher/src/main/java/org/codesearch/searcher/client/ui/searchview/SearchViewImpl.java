@@ -214,6 +214,7 @@ public class SearchViewImpl extends Composite implements SearchView {
         setSearchType(SearchType.REPOSITORIES);
         fileEndingFilterPanel.clear();
         repositoryFilterPanel.clear();
+        filterPanel.setOpen(false);
     }
 
     @Override

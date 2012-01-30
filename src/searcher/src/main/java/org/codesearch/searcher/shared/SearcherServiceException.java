@@ -26,6 +26,7 @@ package org.codesearch.searcher.shared;
  * @author Samuel Kogler
  */
 public class SearcherServiceException extends Exception {
+    private static final long serialVersionUID = 1L;
 
     /**
      * Creates a new instance of <code>SearcherServiceException</code> without detail message.

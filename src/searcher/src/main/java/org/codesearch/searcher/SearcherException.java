@@ -26,6 +26,7 @@ package org.codesearch.searcher;
  * @author Samuel Kogler
  */
 public class SearcherException extends Exception {
+    private static final long serialVersionUID = 1L;
 
     /**
      * Creates a new instance of <code>SearcherException</code> without detail message.

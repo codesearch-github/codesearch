@@ -129,7 +129,7 @@ public class GitLocalPlugin implements VersionControlPlugin {
                 files.add(fileIdentifier);
             }
         } else {
-            List<String> output = bytesToStringList(executeGitCommand("diff", "--name-status"));
+            List<String> output = bytesToStringList(executeGitCommand("diff", revision, "--name-status"));
 
             LOG.debug(output.size() + " changed files since commit " + revision);
 

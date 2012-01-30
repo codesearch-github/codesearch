@@ -1,22 +1,20 @@
 /**
- * Copyright 2010 David Froehlich   <david.froehlich@businesssoftware.at>,
- *                Samuel Kogler     <samuel.kogler@gmail.com>,
- *                Stephan Stiboller <stistc06@htlkaindorf.at>
+ * Copyright 2010 David Froehlich <david.froehlich@businesssoftware.at>, Samuel
+ * Kogler <samuel.kogler@gmail.com>, Stephan Stiboller <stistc06@htlkaindorf.at>
  *
  * This file is part of Codesearch.
  *
- * Codesearch is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Codesearch is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
  *
- * Codesearch is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * Codesearch is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with
+ * Codesearch. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.codesearch.commons.plugins.codeanalyzing.ast;
 
@@ -25,34 +23,42 @@ import java.util.List;
 
 /**
  * Superclass for all ASTNodes used for code analysis.
+ *
  * @author David Froehlich
  */
 public abstract class AstNode implements Serializable, Comparable<AstNode> {
 
-    /** . */
+    /**
+     * .
+     */
     private static final long serialVersionUID = -5265705991596746163L;
     protected int startLine;
     protected int startPositionInLine;
     protected int startPositionAbsolute;
     protected String name;
     protected Visibility visibility;
-    /** the start line of the parent node */
+    /**
+     * the start line of the parent node
+     */
     protected int parentLineDeclaration;
 
     /**
      * Returns the text to be displayed as name in the outline.
+     *
      * @return
      */
     public abstract String getOutlineName();
 
     /**
      * Whether this {@link AstNode} should be shown in the outline.
+     *
      * @return
      */
     public abstract boolean showInOutline();
 
     /**
      * returns a list of all child nodes
+     *
      * @return all child nodes
      */
     public abstract List<AstNode> getChildNodes();
@@ -136,5 +142,15 @@ public abstract class AstNode implements Serializable, Comparable<AstNode> {
             }
         }
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 97 * hash + this.startLine;
+        hash = 97 * hash + this.startPositionInLine;
+        hash = 97 * hash + (this.name != null ? this.name.hashCode() : 0);
+        hash = 97 * hash + (this.visibility != null ? this.visibility.hashCode() : 0);
+        return hash;
     }
 }
