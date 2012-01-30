@@ -235,7 +235,7 @@ public class SubversionPlugin implements VersionControlPlugin {
         public void handleDiffStatus(SVNDiffStatus diffStatus) throws SVNException {
             if (diffStatus.getKind() == SVNNodeKind.FILE) {
                 boolean deleted = diffStatus.getModificationType() == SVNStatusType.STATUS_DELETED;
-                fileIdentifiers.add(new FileIdentifier(diffStatus.getPath(), false, deleted, repository));
+                fileIdentifiers.add(new FileIdentifier(diffStatus.getPath(), deleted, repository));
             }
         }
     }
@@ -250,7 +250,7 @@ public class SubversionPlugin implements VersionControlPlugin {
 
         @Override
         public void handleDirEntry(SVNDirEntry dirEntry) throws SVNException {
-            fileIdentifiers.add(new FileIdentifier(dirEntry.getRelativePath(), false, false, repository));
+            fileIdentifiers.add(new FileIdentifier(dirEntry.getRelativePath(), false, repository));
         }
     }
 }

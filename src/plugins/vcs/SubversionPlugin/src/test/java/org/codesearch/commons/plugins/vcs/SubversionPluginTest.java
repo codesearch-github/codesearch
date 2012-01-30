@@ -48,13 +48,13 @@ public class SubversionPluginTest {
 
     @Test
     public void testGetFile() throws VersionControlPluginException {
-        FileDto file = sp.getFileDtoForFileIdentifierAtRevision(new FileIdentifier("testfile", true, false, null), VersionControlPlugin.UNDEFINED_VERSION);
+        FileDto file = sp.getFileDtoForFileIdentifierAtRevision(new FileIdentifier("testfile", false, null), VersionControlPlugin.UNDEFINED_VERSION);
         assert "version 3\n".equals(new String(file.getContent()));
     }
 
     @Test
     public void testGetOldFile() throws VersionControlPluginException {
-        FileDto file = sp.getFileDtoForFileIdentifierAtRevision(new FileIdentifier("testfile", true, false, null), "2");
+        FileDto file = sp.getFileDtoForFileIdentifierAtRevision(new FileIdentifier("testfile", false, null), "2");
         assert "version 1\n".equals(new String(file.getContent()));
     }
 

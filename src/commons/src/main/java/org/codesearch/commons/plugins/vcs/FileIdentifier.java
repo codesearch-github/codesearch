@@ -23,7 +23,7 @@ package org.codesearch.commons.plugins.vcs;
 import org.codesearch.commons.configuration.dto.RepositoryDto;
 
 /**
- * stores information about a specific file in a repository
+ * Stores information about a specific file in a repository
  * does not contain the actual content of the file
  * the content can be retrieved by using the corresponding vcs plugin to get the FileDto object
  * @author David Froehlich
@@ -31,17 +31,14 @@ import org.codesearch.commons.configuration.dto.RepositoryDto;
 public class FileIdentifier {
 
     private String filePath;
-    /** determines whether the file is binary */
-    private boolean binary;
     private boolean deleted;
     private RepositoryDto repository;
 
     public FileIdentifier() {
     }
 
-    public FileIdentifier(String filePath, boolean binary, boolean deleted, RepositoryDto repository) {
+    public FileIdentifier(String filePath, boolean deleted, RepositoryDto repository) {
         this.filePath = filePath;
-        this.binary = binary;
         this.deleted = deleted;
         this.repository = repository;
     }
@@ -59,14 +56,6 @@ public class FileIdentifier {
 
     public String getFilePath() {
         return filePath;
-    }
-
-    public boolean isBinary() {
-        return binary;
-    }
-
-    public void setBinary(boolean binary) {
-        this.binary = binary;
     }
 
     public void setDeleted(boolean deleted) {
