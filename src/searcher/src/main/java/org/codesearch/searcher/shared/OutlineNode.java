@@ -31,6 +31,7 @@ import org.codesearch.searcher.client.ui.fileview.FileViewImpl;
  * @author Samuel Kogler
  */
 public class OutlineNode implements SidebarNode, Serializable {
+    private static final long serialVersionUID = 1L;
     private List<SidebarNode> childs;
     private String name;
     private int startLine;

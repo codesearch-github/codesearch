@@ -29,7 +29,8 @@ import java.util.List;
  * @author Samuel Kogler
  */
 public class FileDto implements Serializable {
-    
+    private static final long serialVersionUID = 1L;
+
     private String fileContent;
     private boolean binary;
     private List<OutlineNode> outline;

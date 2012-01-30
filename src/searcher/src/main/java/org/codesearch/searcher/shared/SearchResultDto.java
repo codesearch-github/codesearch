@@ -27,6 +27,7 @@ import java.io.Serializable;
  * @author David Froehlich
  */
 public class SearchResultDto implements Serializable {
+    private static final long serialVersionUID = 1L;
 	/** The path to the result file. */
     private String filePath;
     /** The repository. */

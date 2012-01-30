@@ -44,6 +44,7 @@ import org.codesearch.searcher.server.InvalidIndexException;
 public class UpdateIndexerServlet extends HttpServlet {
 
     private static final Logger LOG = Logger.getLogger(UpdateIndexerServlet.class);
+    private static final long serialVersionUID = 1L;
     private DocumentSearcher documentSearcher;
 
     @Inject

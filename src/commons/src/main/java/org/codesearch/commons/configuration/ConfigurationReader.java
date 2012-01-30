@@ -18,7 +18,6 @@ package org.codesearch.commons.configuration;
 import java.io.File;
 import java.net.URI;
 import java.util.List;
-import java.util.Set;
 import org.apache.commons.configuration.ConfigurationException;
 import org.codesearch.commons.configuration.dto.DatabaseConfiguration;
 import org.codesearch.commons.configuration.dto.IndexerUserDto;

@@ -100,7 +100,6 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
     public List<SearchResultDto> doSearch(String query, boolean caseSensitive, SearchType searchType, Set<String> selection, int maxResults) throws SearcherServiceException {
         List<SearchResultDto> resultItems = new LinkedList<SearchResultDto>();
         try {
-            LOG.info("performing search");
             //TODO fix incompatibility
             if (searchType == SearchType.REPOSITORIES) {
                 resultItems = documentSearcher.search(query, caseSensitive, selection, new HashSet<String>(), maxResults);
@@ -151,6 +150,7 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
                         file.setOutline(outline);
                     }
                 } else {
+                    LOG.warn("Code analysis data for repository " + repoName + " is not at the same revision as the index, disabling code navigation.");
                     insertCodeNavigationLinks = false;
                     // in case the last analyzed revision does not match the last indexed revision
                 }
@@ -206,6 +206,8 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
                     processedFileContent = StringEscapeUtils.escapeHtml(new String(vcFile.getContent()));
                 }
                 file.setFileContent(processedFileContent);
+            } else if(insertCodeNavigationLinks){
+                file.setFileContent(new String(addUsageLinksToFileContent(fileContent, filePath, repoName, escapeStartToken, escapeEndToken)));
             } else {
                 file.setFileContent(StringEscapeUtils.escapeHtml(new String(vcFile.getContent())));
             }

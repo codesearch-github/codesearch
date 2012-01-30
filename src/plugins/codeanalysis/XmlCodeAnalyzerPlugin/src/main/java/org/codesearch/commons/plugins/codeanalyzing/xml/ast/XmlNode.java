@@ -31,6 +31,7 @@ import org.codesearch.commons.plugins.codeanalyzing.ast.CompoundNode;
  * @author Samuel Kogler
  */
 public class XmlNode extends CompoundNode {
+    private static final long serialVersionUID = 1L;
 
     private List<XmlNode> xmlNodes = new LinkedList<XmlNode>();
 

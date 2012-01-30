@@ -82,7 +82,7 @@ public final class STAutocompleter {
         writer.setMergeFactor(300);
         writer.setMaxBufferedDocs(150);
         Map<String, Integer> wordsMap = new HashMap<String, Integer>();
-        Iterator<String> iter = (Iterator<String>) dict.getWordsIterator();
+        Iterator<String> iter = dict.getWordsIterator();
         while (iter.hasNext()) {
             String word = iter.next();
             if (word.length() < 0) {

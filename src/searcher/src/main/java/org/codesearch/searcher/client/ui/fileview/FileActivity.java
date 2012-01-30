@@ -1,24 +1,21 @@
 /**
- * Copyright 2010 David Froehlich   <david.froehlich@businesssoftware.at>,
- *                Samuel Kogler     <samuel.kogler@gmail.com>,
- *                Stephan Stiboller <stistc06@htlkaindorf.at>
+ * Copyright 2010 David Froehlich <david.froehlich@businesssoftware.at>, Samuel
+ * Kogler <samuel.kogler@gmail.com>, Stephan Stiboller <stistc06@htlkaindorf.at>
  *
  * This file is part of Codesearch.
  *
- * Codesearch is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Codesearch is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
  *
- * Codesearch is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * Codesearch is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with
+ * Codesearch. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.codesearch.searcher.client.ui.fileview;
 
 import com.google.gwt.activity.shared.AbstractActivity;
@@ -37,6 +34,7 @@ import org.codesearch.searcher.shared.SearchResultDto;
 
 /**
  * Presenter for the file view.
+ *
  * @author Samuel Kogler
  */
 public class FileActivity extends AbstractActivity implements Presenter {
@@ -55,7 +53,9 @@ public class FileActivity extends AbstractActivity implements Presenter {
         this.searchTerm = filePlace.getSearchTerm();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void start(AcceptsOneWidget panel, EventBus eventBus) {
         fileView = clientFactory.getFileView();
@@ -68,13 +68,17 @@ public class FileActivity extends AbstractActivity implements Presenter {
         searcherServiceAsync.getFile(repository, filePath, true, true, new GetFileCallback());
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void goTo(Place place) {
         clientFactory.getPlaceController().goTo(place);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onStop() {
         Window.setTitle("Codesearch");
@@ -82,7 +86,9 @@ public class FileActivity extends AbstractActivity implements Presenter {
         fileView.cleanup();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void goToUsage(int usageId) {
         searcherServiceAsync.resolveUsage(usageId, repository, filePath, new ResolveUsageCallback());
@@ -90,34 +96,42 @@ public class FileActivity extends AbstractActivity implements Presenter {
 
     private class ResolveUsageCallback implements AsyncCallback<SearchResultDto> {
 
-        /** {@inheritDoc} */
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public void onFailure(Throwable caught) {
             Window.alert("Could not resolve usage because: \n" + caught.toString());
         }
 
-        /** {@inheritDoc} */
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public void onSuccess(SearchResultDto result) {
-            goTo(new FilePlace(result.getRepository(), result.getFilePath(), ""));
+            if (result != null) {
+                goTo(new FilePlace(result.getRepository(), result.getFilePath(), ""));
+            }
         }
-
     }
 
-    private class GetFileCallback implements AsyncCallback<FileDto>  {
+    private class GetFileCallback implements AsyncCallback<FileDto> {
 
-        /** {@inheritDoc} */
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public void onFailure(Throwable caught) {
             Window.alert("Error getting file: \n" + caught.toString());
         }
 
-        /** {@inheritDoc} */
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public void onSuccess(FileDto result) {
             fileView.setFileContent(result.getFileContent(), result.isBinary());
             fileView.setOutline(result.getOutline());
         }
-
     }
 }
