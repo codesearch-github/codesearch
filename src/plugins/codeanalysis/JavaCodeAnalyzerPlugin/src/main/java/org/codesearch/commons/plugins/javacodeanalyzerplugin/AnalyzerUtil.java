@@ -120,21 +120,19 @@ public class AnalyzerUtil {
      * @param n the MethodCallExpr containing the information about the usage
      */
     public void addLinkToMethodDeclaration(MethodCallExpr n) {
-        String methodName = n.getName();
+        NameExpr methodNameExpr = n.getNameExpr();
+        String methodName = methodNameExpr.getName();
         List<Expression> parameterList = n.getArgs();
-        int startColumn = n.getBeginColumn();
-        int startLine = n.getBeginLine();
+        int startColumn = methodNameExpr.getBeginColumn();
+        int startLine = methodNameExpr.getBeginLine();
         int length = methodName.length();
-        if (n.getBeginLine() == n.getEndLine()) {
-            MethodNode methodNode = getMethodDeclarationForUsage(methodName, parameterList, n);
-            if (methodNode != null) {
-                int referenceLine = methodNode.getStartLine();
-                usages.add(new Usage(startColumn, startLine, length, referenceLine, methodName));
-            } else {
-                //    throw new NotImplementedException(); //FIXME
-            }
+        MethodNode methodNode = getMethodDeclarationForUsage(methodName, parameterList, n);
+        if (methodNode != null) {
+            int referenceLine = methodNode.getStartLine();
+            usages.add(new Usage(startColumn, startLine, length, referenceLine, methodName));
+        } else {
+            //    throw new NotImplementedException(); //FIXME
         }
-
     }
 
     /**
@@ -144,10 +142,11 @@ public class AnalyzerUtil {
      */
     public void addLinkToExternalMethodDeclaration(MethodCallExpr n) {
         int lineNumber = n.getBeginLine();
-        String methodName = n.getName();
+        NameExpr methodNameExpr = n.getNameExpr();
         String scopeName = n.getScope().toString();
-        int methodCallColumn = n.getBeginColumn() + scopeName.length() + 1;
-        String className = null;
+        int methodCallColumn = methodNameExpr.getBeginColumn();
+        int methodCallLine = methodNameExpr.getBeginLine();
+        String className;
         List<String> paramTypes = new LinkedList<String>();
         int scopeColumn = n.getBeginColumn();
         VariableNode scopeObject = getVariableDeclarationForUsage(n.getBeginLine(), scopeName, n);
@@ -167,9 +166,8 @@ public class AnalyzerUtil {
             }
         }
         if (!className.contains(".")) {
-            if (n.getBeginLine() == n.getEndLine()) {
-                usages.add(new ExternalMethodUsage(methodCallColumn, lineNumber, methodName.length(), methodName, className, paramTypes));
-            }
+            //TODO find out the reason for this check
+            usages.add(new ExternalMethodUsage(methodCallColumn, methodCallLine, methodNameExpr.getName().length(), methodNameExpr.getName(), className, paramTypes));
         }
     }
 
@@ -194,7 +192,7 @@ public class AnalyzerUtil {
             className = refVar.getType();
             startColumn += refVar.getName().length();
         }
-        addLinkToExternalVariableDeclaration(ex.getBeginLine(), startColumn, ex.getField(), parent, className);
+        addLinkToExternalVariableDeclaration(ex.getBeginLine(), startColumn, ex.getField().getName(), parent, className);
     }
 
     /**
@@ -215,7 +213,7 @@ public class AnalyzerUtil {
             }
         } else if (ex instanceof MethodCallExpr) {
             MethodCallExpr methodParamExpr = (MethodCallExpr) ex;
-            MethodNode methodParam = getMethodDeclarationForUsage(methodParamExpr.getName(), methodParamExpr.getArgs(), ex);
+            MethodNode methodParam = getMethodDeclarationForUsage(methodParamExpr.getNameExpr().getName(), methodParamExpr.getArgs(), ex);
             try {
                 paramType = methodParam.getReturnType();
             } catch (NullPointerException exc) {

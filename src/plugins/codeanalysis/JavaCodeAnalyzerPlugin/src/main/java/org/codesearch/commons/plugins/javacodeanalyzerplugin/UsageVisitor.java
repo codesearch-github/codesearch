@@ -122,7 +122,6 @@ public class UsageVisitor extends VoidVisitorAdapter {
             }
         }
 
-
         if (n.getScope() == null || n.getScope().toString().equals("this") || n.getScope().toString().equals(currentClassName)) {
             //in case the method is a method from the current class
             //first add a link to the method declaration

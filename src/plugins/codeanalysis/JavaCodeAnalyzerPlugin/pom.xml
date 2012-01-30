@@ -33,9 +33,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.google.code.javaparser</groupId>
-            <artifactId>javaparser</artifactId>
-            <version>1.0.8</version>
+            <groupId>org.codesearch</groupId>
+            <artifactId>Codesearch-JavaParser</artifactId>
+            <version>0.1-RC</version>
         </dependency>
         <dependency>
             <groupId>org.codesearch</groupId>

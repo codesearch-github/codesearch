@@ -108,4 +108,42 @@ public class Usage implements Comparable<Usage>, Serializable {
         }
         return startLine - other.startLine;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Usage other = (Usage) obj;
+        if (this.length != other.length) {
+            return false;
+        }
+        if (this.startColumn != other.startColumn) {
+            return false;
+        }
+        if (this.startLine != other.startLine) {
+            return false;
+        }
+        if (this.referenceLine != other.referenceLine) {
+            return false;
+        }
+        if ((this.replacedString == null) ? (other.replacedString != null) : !this.replacedString.equals(other.replacedString)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 37 * hash + this.length;
+        hash = 37 * hash + this.startColumn;
+        hash = 37 * hash + this.startLine;
+        hash = 37 * hash + this.referenceLine;
+        hash = 37 * hash + (this.replacedString != null ? this.replacedString.hashCode() : 0);
+        return hash;
+    }
 }

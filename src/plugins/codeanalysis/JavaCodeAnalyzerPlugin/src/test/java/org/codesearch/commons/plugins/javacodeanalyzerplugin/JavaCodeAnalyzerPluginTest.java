@@ -24,27 +24,31 @@
  */
 package org.codesearch.commons.plugins.javacodeanalyzerplugin;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.LinkedList;
+import java.util.List;
 import org.codesearch.commons.plugins.codeanalyzing.CodeAnalyzerPluginException;
+import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
 import org.codesearch.commons.plugins.codeanalyzing.ast.Visibility;
 import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.ClassNode;
 import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.FileNode;
 import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.MethodNode;
-import org.junit.After;
-import org.junit.AfterClass;
-import static org.junit.Assert.*;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import org.junit.*;
 
 /**
  *
  * @author david
  */
 public class JavaCodeAnalyzerPluginTest {
-    /* Logger */
-    
+
+    private JavaCodeAnalyzerPlugin instance;
+
     public JavaCodeAnalyzerPluginTest() {
-        
+        this.instance = new JavaCodeAnalyzerPlugin();
     }
 
     @BeforeClass
@@ -66,7 +70,6 @@ public class JavaCodeAnalyzerPluginTest {
     //all analysis tests
     @Test
     public void testBasicAnalysis() throws CodeAnalyzerPluginException {
-        JavaCodeAnalyzerPlugin instance = new JavaCodeAnalyzerPlugin();
 
         //create mock source code
         String content = "";
@@ -96,13 +99,24 @@ public class JavaCodeAnalyzerPluginTest {
         expResult.getClasses().add(classNode);
         instance.analyzeFile(content);
         FileNode result = (FileNode) instance.getAst();
-
         assertEquals(expResult, result);
-
     }
 
     @Test
-    public void testMultiLineMethodCall() throws CodeAnalyzerPluginException {
-        
+    public void testMultiLineMethodCall() throws CodeAnalyzerPluginException, IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(
+                getClass().getClassLoader().getResourceAsStream(
+                "MultiLineMethodCall.java")));
+        String fileContent = "";
+        String newLine;
+        while ((newLine = reader.readLine()) != null) {
+            fileContent += newLine + "\n";
+        }
+        instance.analyzeFile(fileContent);
+        List<Usage> result = instance.getUsages();
+        List<Usage> expResult = new LinkedList<Usage>();
+        expResult.add(new Usage(9, 11, 3, 9, "foo"));
+        assert (result.size() == 1);
+        assert (expResult.get(0).equals(result.get(0)));
     }
 }
