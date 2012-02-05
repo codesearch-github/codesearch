@@ -1,3 +1,4 @@
+src/releases/*
 *target*
 *lib*
 *.class
@@ -11,7 +12,6 @@
 *build
 *dist
 *gwt
-doc/*
 *.settings
 *.settings*
 *.classpath
