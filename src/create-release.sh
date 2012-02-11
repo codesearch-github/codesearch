@@ -20,8 +20,8 @@ COPYING="../COPYING"
 CONFIG="../resources/codesearch_config.xml"
 RELEASES_DIR="releases"
 
-#./rebuild-plugins.sh
-#mvn clean install
+./rebuild-plugins.sh
+mvn clean install
 
 DOCFILES="$(readlink -f $README) $(readlink -f $AUTHORS) $(readlink -f $COPYING)"
 CONFIG=$(readlink -f $CONFIG)
