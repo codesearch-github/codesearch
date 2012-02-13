@@ -127,6 +127,7 @@ public class DashboardViewImpl extends Composite implements DashboardView {
         scheduledJobs.addColumn(new JobStatusNextExecutionColumn(dateCell), "Next execution");
         scheduledJobs.addColumn(new JobStatusFinishedColumn(dateCell), "Last execution");
         scheduledJobs.setSelectionModel(new NoSelectionModel<JobStatus>());
+        scheduledJobs.setPageSize(Integer.MAX_VALUE);
 
         runningJobs = new CellTable<JobStatus>();
         runningJobs.addColumn(new JobStatusNameColumn(), "Name");
@@ -134,12 +135,14 @@ public class DashboardViewImpl extends Composite implements DashboardView {
         runningJobs.addColumn(new JobStatusCurrentRepoColumn(), "Current repository");
         runningJobs.addColumn(new JobStatusTotalReposColumn(), "Total repositories");
         runningJobs.setSelectionModel(new NoSelectionModel<JobStatus>());
+        runningJobs.setPageSize(Integer.MAX_VALUE);
 
         repositoryStatuses = new CellTable<RepositoryStatus>();
         repositoryStatuses.addColumn(new RepositoryStatusNameColumn(), "Name");
         repositoryStatuses.addColumn(new RepositoryStatusRevisionColumn(), "Revision");
         repositoryStatuses.addColumn(new RepositoryStatusStatusColumn(), "Status");
         repositoryStatuses.setSelectionModel(new NoSelectionModel<RepositoryStatus>());
+        repositoryStatuses.setPageSize(Integer.MAX_VALUE);
     }
 
     private class RepositoryStatusNameColumn extends TextColumn<RepositoryStatus> {
