@@ -66,7 +66,7 @@ public class XmlConfigurationReader implements ConfigurationReader {
      */
     @Inject
     public XmlConfigurationReader(@Named("configpath") String configPath) throws InvalidConfigurationException {
-        if (!configPath.isEmpty()) {
+        if (StringUtils.isNotEmpty(configPath)) {
             this.configPath = configPath;
         }
 
@@ -322,6 +322,7 @@ public class XmlConfigurationReader implements ConfigurationReader {
         }
         repo = new RepositoryDto(name, hc.getString(XmlConfigurationReaderConstants.REPOSITORY_URL), usedAuthentication, hc.getBoolean(XmlConfigurationReaderConstants.REPOSITORY_CODE_NAVIGATION_ENABLED), versionControlSystem, blacklistEntries, whitelistFileNames, repositoryGroups);
 
+        LOG.info("Read repository: " + repo.getName());
         return repo;
     }
 

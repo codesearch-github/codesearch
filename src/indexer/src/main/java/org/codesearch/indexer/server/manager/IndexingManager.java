@@ -59,7 +59,7 @@ public final class IndexingManager {
     private Scheduler scheduler;
     /** The configurated jobs. */
     private List<JobDto> jobs;
-    /** The job listener that mantains a history of job executions. */
+    /** The job listener that maintains a history of job executions. */
     private IndexingJobHistoryListener historyListener;
     private ConfigurationReader configReader;
     /** used to read the repository revision status */

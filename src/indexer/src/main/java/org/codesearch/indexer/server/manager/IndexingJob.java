@@ -1,16 +1,20 @@
 /**
- * Copyright 2010 David Froehlich <david.froehlich@businesssoftware.at>, Samuel Kogler <samuel.kogler@gmail.com>, Stephan Stiboller
- * <stistc06@htlkaindorf.at>
+ * Copyright 2010 David Froehlich <david.froehlich@businesssoftware.at>, Samuel
+ * Kogler <samuel.kogler@gmail.com>, Stephan Stiboller <stistc06@htlkaindorf.at>
  *
  * This file is part of Codesearch.
  *
- * Codesearch is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * Codesearch is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
  *
- * Codesearch is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * Codesearch is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with Codesearch. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with
+ * Codesearch. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.codesearch.indexer.server.manager;
 
@@ -52,34 +56,47 @@ public class IndexingJob implements Job {
     public static final String FIELD_CURRENT_REPOSITORY = "current_repository";
     public static final String FIELD_FINISHED_REPOSITORIES = "finished_repositories";
     public static final String FIELD_STATUS = "status";
-
     public static final String STATUS_CLEARING = "clearing";
     public static final String STATUS_INDEXING = "indexing";
-
     public static final String GROUP_NAME = "INDEXING_JOBS";
     public static final String TRIGGER_GROUP_NAME = "INDEXING_JOB_TRIGGER";
-
-    /** Instantiate a logger */
+    /**
+     * Instantiate a logger
+     */
     private static final Logger LOG = Logger.getLogger(IndexingJob.class);
-    /** The config reader used to read the configuration */
+    /**
+     * The config reader used to read the configuration
+     */
     private ConfigurationReader configReader;
-    /** The database access object */
+    /**
+     * The database access object
+     */
     private DBAccess dba;
-    /** The plugin loader. */
+    /**
+     * The plugin loader.
+     */
     private PluginLoader pluginLoader;
-    /** The lucene field plugin loader. */
+    /**
+     * The lucene field plugin loader.
+     */
     private LuceneFieldPluginLoader luceneFieldPluginLoader;
-    /** The affected repositories. */
+    /**
+     * The affected repositories.
+     */
     private List<RepositoryDto> repositories;
     private PropertiesManager propertiesManager;
-
     /**
-     * whether or not the index should be cleared for the specified repositories before indexing
+     * whether or not the index should be cleared for the specified repositories
+     * before indexing
      */
     private boolean clearIndex;
-    /** The location of the index. */
+    /**
+     * The location of the index.
+     */
     private File indexLocation;
-    /** The current job data map of the job. */
+    /**
+     * The current job data map of the job.
+     */
     private JobDataMap jobDataMap;
 
     @Inject
@@ -95,8 +112,10 @@ public class IndexingJob implements Job {
     /**
      * Executes all tasks from the taskList one after another
      *
-     * @param jec the JobExecutionContext containing the tasks, the id of the job and whether the job is flagged as terminated or not
-     * @throws JobExecutionException if the execution of a task was not successful or if the job was terminated
+     * @param jec the JobExecutionContext containing the tasks, the id of the
+     * job and whether the job is flagged as terminated or not
+     * @throws JobExecutionException if the execution of a task was not
+     * successful or if the job was terminated
      */
     @Override
     public void execute(JobExecutionContext jec) throws JobExecutionException {
@@ -133,7 +152,7 @@ public class IndexingJob implements Job {
             LOG.error(errorMsg);
             //logging + throwing because of quartz
             throw new JobExecutionException(errorMsg);
-        }catch (IOException ex) {
+        } catch (IOException ex) {
             String errorMsg = "Cannot access index directory at: " + indexLocation;
             LOG.error(errorMsg);
             throw new JobExecutionException(errorMsg);
