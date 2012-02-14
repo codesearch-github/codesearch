@@ -176,7 +176,7 @@ public class IndexingTask implements Task {
                         versionControlPlugin.setRepository(repository);
                         String repositoryRevision = versionControlPlugin.getRepositoryRevision();
                         LOG.info("Newest revision is      : " + repositoryRevision);
-                        Set<FileIdentifier> changedFiles = versionControlPlugin.getChangedFilesSinceRevision(lastIndexedRevision);
+                        Set<FileIdentifier> changedFiles = versionControlPlugin.getChangedFilesSinceRevision(lastIndexedRevision, repository.getBlacklistEntries(), repository.getWhitelistEntries());
                         LOG.info(changedFiles.size() + " files have changed since the last indexing");
                         // clear the index of the old verions of the files
                         deleteFilesFromIndex(changedFiles);

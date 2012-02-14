@@ -21,6 +21,7 @@ package org.codesearch.commons.plugins.vcs;
 import java.io.ByteArrayOutputStream;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -134,15 +135,16 @@ public class SubversionPlugin implements VersionControlPlugin {
      * {@inheritDoc}
      */
     @Override
-    public Set<FileIdentifier> getChangedFilesSinceRevision(String revision) throws VersionControlPluginException {
+    public Set<FileIdentifier> getChangedFilesSinceRevision(String revision, List<String> blacklistPatterns, List<String> whitelistPatterns) throws VersionControlPluginException {
         Set<FileIdentifier> fileIdentifiers = new HashSet<FileIdentifier>();
         try {
             if (revision.equals(VersionControlPlugin.UNDEFINED_VERSION)) {
-                revision = "1";
+                listEntries(entryPoint, fileIdentifiers, blacklistPatterns, whitelistPatterns);
+            } else {
+                ISVNOptions options = SVNWCUtil.createDefaultOptions(true);
+                SVNDiffClient diffClient = new SVNDiffClient(svnRepo.getAuthenticationManager(), options);
+                diffClient.doDiffStatus(svnRepo.getLocation(), SVNRevision.create(Long.parseLong(revision)), svnRepo.getLocation(), SVNRevision.HEAD, SVNDepth.INFINITY, true, new DiffStatusHandler(fileIdentifiers));
             }
-            ISVNOptions options = SVNWCUtil.createDefaultOptions(true);
-            SVNDiffClient diffClient = new SVNDiffClient(svnRepo.getAuthenticationManager(), options);
-            diffClient.doDiffStatus(svnRepo.getLocation(), SVNRevision.create(Long.parseLong(revision)), svnRepo.getLocation(), SVNRevision.HEAD, SVNDepth.INFINITY, true, new DiffStatusHandler(fileIdentifiers));
         } catch (NullPointerException e) {
             throw new VersionControlPluginException("No repository specified");
         } catch (SVNException ex) {
@@ -184,6 +186,43 @@ public class SubversionPlugin implements VersionControlPlugin {
     @Override
     public void setCacheDirectory(String directoryPath) {
         // Does not need local cache directory.
+    }
+
+    private void listEntries(String path, Set<FileIdentifier> identifiers, List<String> blacklistPatterns, List<String> whitelistPatterns) throws SVNException {
+        Collection entries = svnRepo.getDir(path, -1, null, (Collection) null);
+        Iterator iterator = entries.iterator();
+        while (iterator.hasNext()) {
+            boolean checkFile = true;
+            SVNDirEntry entry = (SVNDirEntry) iterator.next();
+            String fileUrl = entry.getURL().toString();
+            for (String currentBlacklistPattern : blacklistPatterns) {
+                if (fileUrl.matches(currentBlacklistPattern)) {
+                    checkFile = false;
+                    break;
+                }
+            }
+
+            if (checkFile) {
+                //only check for whitelist patterns if the file wasn't already marked as blacklisted
+                if (!whitelistPatterns.isEmpty()) {
+                    checkFile = false;
+                    for (String currentWhitelistPattern : whitelistPatterns) {
+                        if (fileUrl.matches(currentWhitelistPattern)) {
+                            checkFile = true;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (checkFile) {
+                if (entry.getKind() == SVNNodeKind.DIR) {
+                    listEntries((path.equals("")) ? entry.getName() : path + "/" + entry.getName(), identifiers, blacklistPatterns, whitelistPatterns);
+                } else if (entry.getKind() == SVNNodeKind.FILE) {
+                    identifiers.add(new FileIdentifier(path + "/" + entry.getName(), false, repository));
+                }
+            }
+        }
     }
 
     private void establishConnectionToRepo() throws VersionControlPluginException {
