@@ -18,6 +18,7 @@
  */
 package org.codesearch.commons.configuration.dto;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -55,12 +56,12 @@ public class RepositoryDto {
      * A list of file name patterns that the files that will be indexed have to
      * match (every file has to match at least one of the entries
      */
-    private List<String> whitelistEntries;
+    private List<String> whitelistEntries = new LinkedList<String>();
     /**
      * A list of all file names (in regex) that will not be indexed in this
      * repository
      */
-    private List<String> blacklistEntries;
+    private List<String> blacklistEntries = new LinkedList<String>();
     /**
      * A list of repository groups this repositorie belongs to
      */

@@ -226,24 +226,17 @@ public class XmlConfigurationReader implements ConfigurationReader {
         } catch (NullPointerException ex) {
             throw new InvalidConfigurationException("Cache directory not specified");
         }
-        if (!(cacheDirectory.isDirectory() && cacheDirectory.canWrite())) {
-            throw new InvalidConfigurationException("Cache directory is invalid.");
-        }
         codesearchConfiguration.setCacheDirectory(cacheDirectory);
     }
 
     private void loadIndexLocation() throws InvalidConfigurationException {
-        String indexLocation = null;
+        File indexLocation = null;
         try {
-            indexLocation = config.getString(XmlConfigurationReaderConstants.INDEX_DIR);
+            indexLocation = new File(config.getString(XmlConfigurationReaderConstants.INDEX_DIR));
         } catch (NullPointerException ex) {
             throw new InvalidConfigurationException("Index location not specified");
         }
-        File index = new File(indexLocation);
-        if (!(index.isDirectory() && index.canWrite())) {
-            throw new InvalidConfigurationException("Index location \"" + indexLocation + "\" is invalid.");
-        }
-        codesearchConfiguration.setIndexLocation(index);
+        codesearchConfiguration.setIndexLocation(indexLocation);
     }
 
     private void loadSearcherLocation() throws InvalidConfigurationException {
@@ -279,9 +272,6 @@ public class XmlConfigurationReader implements ConfigurationReader {
         RepositoryDto repo;
         //mandatory field
         String name = hc.getString(XmlConfigurationReaderConstants.REPOSITORY_NAME);
-        if (name == null || name.isEmpty()) {
-            throw new InvalidConfigurationException("Invalid name for repository configured");
-        }
 
         // retrieve the repository blacklisted filenames and add all global filenames
         List<String> blacklistEntries = hc.getList(XmlConfigurationReaderConstants.REPOSITORY_BLACKLIST);
@@ -298,9 +288,6 @@ public class XmlConfigurationReader implements ConfigurationReader {
         whitelistFileNames.addAll(getGlobalWhitelistEntries());
 
         String repoGroupString = hc.getString(XmlConfigurationReaderConstants.REPOSITORY_GROUPS);
-        if (repoGroupString == null || repoGroupString.isEmpty()) {
-            throw new InvalidConfigurationException("No repository groups configured for repository " + name);
-        }
         List<String> repositoryGroups = Arrays.asList(repoGroupString.split(" "));
 
         // retrieve the used authentication system and fill it with the required data
@@ -318,9 +305,6 @@ public class XmlConfigurationReader implements ConfigurationReader {
             usedAuthentication = new SshAuthentication(sshFilePath);
         }
         String versionControlSystem = hc.getString(XmlConfigurationReaderConstants.REPOSITORY_VCS);
-        if (versionControlSystem == null || versionControlSystem.isEmpty()) {
-            throw new InvalidConfigurationException("No VersionControlSystem specified for repository " + name);
-        }
         repo = new RepositoryDto(name, hc.getString(XmlConfigurationReaderConstants.REPOSITORY_URL), usedAuthentication, hc.getBoolean(XmlConfigurationReaderConstants.REPOSITORY_CODE_NAVIGATION_ENABLED), versionControlSystem, blacklistEntries, whitelistFileNames, repositoryGroups);
 
         LOG.info("Read repository: " + repo.getName());
@@ -388,17 +372,11 @@ public class XmlConfigurationReader implements ConfigurationReader {
 
     private void loadGlobalWhitelist() {
         List globalWhitelist = config.getList(XmlConfigurationReaderConstants.GLOBAL_WHITELIST);
-        if (globalWhitelist == null) {
-            globalWhitelist = new LinkedList<String>();
-        }
         codesearchConfiguration.setGlobalWhitelist(globalWhitelist);
     }
 
     private void loadGlobalBlacklist() {
         List globalBlacklist = config.getList(XmlConfigurationReaderConstants.GLOBAL_BLACKLIST);
-        if (globalBlacklist == null) {
-            globalBlacklist = new LinkedList<String>();
-        }
         codesearchConfiguration.setGlobalBlacklist(globalBlacklist);
     }
 
