@@ -204,6 +204,7 @@ public class XmlConfigurationReader implements ConfigurationReader {
             if (config == null) {
                 throw new InvalidConfigurationException("Config was null at: " + this.configPath);
             }
+            config.setDelimiterParsingDisabled(true);
         } catch (ConfigurationException ex) {
             throw new InvalidConfigurationException("Configuration file could not be read:\n" + ex);
         }
