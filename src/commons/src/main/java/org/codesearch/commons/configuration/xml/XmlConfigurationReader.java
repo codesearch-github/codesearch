@@ -18,18 +18,13 @@
  */
 package org.codesearch.commons.configuration.xml;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Set;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import java.util.*;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
@@ -37,15 +32,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.codesearch.commons.configuration.ConfigurationReader;
 import org.codesearch.commons.configuration.InvalidConfigurationException;
-import org.codesearch.commons.configuration.dto.AuthenticationType;
-import org.codesearch.commons.configuration.dto.BasicAuthentication;
-import org.codesearch.commons.configuration.dto.CodesearchConfiguration;
-import org.codesearch.commons.configuration.dto.DatabaseConfiguration;
-import org.codesearch.commons.configuration.dto.IndexerUserDto;
-import org.codesearch.commons.configuration.dto.JobDto;
-import org.codesearch.commons.configuration.dto.NoAuthentication;
-import org.codesearch.commons.configuration.dto.RepositoryDto;
-import org.codesearch.commons.configuration.dto.SshAuthentication;
+import org.codesearch.commons.configuration.dto.*;
 
 /**
  * Xml implementation of the configuration reader. By default, the properties
@@ -217,6 +204,7 @@ public class XmlConfigurationReader implements ConfigurationReader {
             if (config == null) {
                 throw new InvalidConfigurationException("Config was null at: " + this.configPath);
             }
+            config.setDelimiterParsingDisabled(true);
         } catch (ConfigurationException ex) {
             throw new InvalidConfigurationException("Configuration file could not be read:\n" + ex);
         }
@@ -287,10 +275,15 @@ public class XmlConfigurationReader implements ConfigurationReader {
      * configuration via the HierarchicalConfiguration and returns it as a
      * RepositoryDto
      */
-    private RepositoryDto loadRepository(HierarchicalConfiguration hc) {
-        RepositoryDto repo = new RepositoryDto();
-        // retrieve the repository blacklisted filenames and add all global filenames
+    private RepositoryDto loadRepository(HierarchicalConfiguration hc) throws InvalidConfigurationException {
+        RepositoryDto repo;
+        //mandatory field
         String name = hc.getString(XmlConfigurationReaderConstants.REPOSITORY_NAME);
+        if (name == null || name.isEmpty()) {
+            throw new InvalidConfigurationException("Invalid name for repository configured");
+        }
+
+        // retrieve the repository blacklisted filenames and add all global filenames
         List<String> blacklistEntries = hc.getList(XmlConfigurationReaderConstants.REPOSITORY_BLACKLIST);
         if (blacklistEntries == null) {
             blacklistEntries = new LinkedList<String>();
@@ -304,10 +297,11 @@ public class XmlConfigurationReader implements ConfigurationReader {
         }
         whitelistFileNames.addAll(getGlobalWhitelistEntries());
 
-        List<String> repositoryGroups = Arrays.asList(hc.getString(XmlConfigurationReaderConstants.REPOSITORY_GROUPS).split(" "));
-        if (repositoryGroups == null) {
-            repositoryGroups = new LinkedList<String>();
+        String repoGroupString = hc.getString(XmlConfigurationReaderConstants.REPOSITORY_GROUPS);
+        if (repoGroupString == null || repoGroupString.isEmpty()) {
+            throw new InvalidConfigurationException("No repository groups configured for repository " + name);
         }
+        List<String> repositoryGroups = Arrays.asList(repoGroupString.split(" "));
 
         // retrieve the used authentication system and fill it with the required data
         AuthenticationType usedAuthentication = null;
@@ -323,9 +317,13 @@ public class XmlConfigurationReader implements ConfigurationReader {
             String sshFilePath = hc.getString(XmlConfigurationReaderConstants.REPOSITORY_AUTHENTICATION_DATA_SSH_FILE_PATH);
             usedAuthentication = new SshAuthentication(sshFilePath);
         }
+        String versionControlSystem = hc.getString(XmlConfigurationReaderConstants.REPOSITORY_VCS);
+        if (versionControlSystem == null || versionControlSystem.isEmpty()) {
+            throw new InvalidConfigurationException("No VersionControlSystem specified for repository " + name);
+        }
+        repo = new RepositoryDto(name, hc.getString(XmlConfigurationReaderConstants.REPOSITORY_URL), usedAuthentication, hc.getBoolean(XmlConfigurationReaderConstants.REPOSITORY_CODE_NAVIGATION_ENABLED), versionControlSystem, blacklistEntries, whitelistFileNames, repositoryGroups);
 
-        repo = new RepositoryDto(name, hc.getString(XmlConfigurationReaderConstants.REPOSITORY_URL), usedAuthentication, hc.getBoolean(XmlConfigurationReaderConstants.REPOSITORY_CODE_NAVIGATION_ENABLED), hc.getString(XmlConfigurationReaderConstants.REPOSITORY_VCS), blacklistEntries, whitelistFileNames, repositoryGroups);
-        LOG.info("reading repository from configuration: " + repo.toString());
+        LOG.info("Read repository: " + repo.getName());
         return repo;
     }
 
@@ -333,9 +331,9 @@ public class XmlConfigurationReader implements ConfigurationReader {
         List<JobDto> jobs = new LinkedList<JobDto>();
         // read the configuration for the jobs from the config
         List<HierarchicalConfiguration> jobConfig = config.configurationsAt(XmlConfigurationReaderConstants.INDEX_JOB);
+
         for (HierarchicalConfiguration hc : jobConfig) {
             // reads job specific values and adds them to the JobDto
-            // FIXME test this, here was a try catch nullpointerexception
             JobDto job = new JobDto();
             String cronExpression;
             try {
@@ -352,13 +350,14 @@ public class XmlConfigurationReader implements ConfigurationReader {
             // these repositories
             List<RepositoryDto> repositoriesForJob = getRepositoriesByNames(repositoryString);
             job.setRepositories(repositoriesForJob);
-            boolean clearIndex = hc.getBoolean(XmlConfigurationReaderConstants.JOB_CLEAR);
+            boolean clearIndex = hc.getBoolean(XmlConfigurationReaderConstants.JOB_CLEAR, false);
             job.setClearIndex(clearIndex);
             jobs.add(job);
         }
         codesearchConfiguration.setJobs(jobs);
     }
 
+    @Deprecated //users for indexer are not configured yet
     private void loadIndexerUsers() {
         List<IndexerUserDto> indexerUsers = new LinkedList<IndexerUserDto>();
         List<HierarchicalConfiguration> userConfig = config.configurationsAt(XmlConfigurationReaderConstants.INDEXER_USERS);
@@ -373,17 +372,17 @@ public class XmlConfigurationReader implements ConfigurationReader {
 
     private void loadDatabaseConfiguration() {
         DatabaseConfiguration databaseConfiguration = new DatabaseConfiguration();
-        List<HierarchicalConfiguration> dbConfig = config.configurationsAt(XmlConfigurationReaderConstants.DB_SECTION);
-        for (HierarchicalConfiguration hc : dbConfig) {
-            databaseConfiguration.setHostName(hc.getString(XmlConfigurationReaderConstants.DB_HOSTNAME));
-            databaseConfiguration.setPort(hc.getInt(XmlConfigurationReaderConstants.DB_PORT_NUMBER));
-            databaseConfiguration.setDriver(hc.getString(XmlConfigurationReaderConstants.DB_DRIVER));
-            databaseConfiguration.setDatabase(hc.getString(XmlConfigurationReaderConstants.DB_DATABASE));
-            databaseConfiguration.setUsername(hc.getString(XmlConfigurationReaderConstants.DB_USERNAME));
-            databaseConfiguration.setPassword(hc.getString(XmlConfigurationReaderConstants.DB_PASSWORD));
-            databaseConfiguration.setMaxConnections(hc.getInt(XmlConfigurationReaderConstants.DB_MAX_CONNECTIONS));
-            databaseConfiguration.setProtocol(hc.getString(XmlConfigurationReaderConstants.DB_PROTOCOL));
-        }
+        HierarchicalConfiguration hc = config.configurationAt(XmlConfigurationReaderConstants.DB_SECTION);
+
+        databaseConfiguration.setHostName(hc.getString(XmlConfigurationReaderConstants.DB_HOSTNAME));
+        databaseConfiguration.setPort(hc.getInt(XmlConfigurationReaderConstants.DB_PORT_NUMBER));
+        databaseConfiguration.setDriver(hc.getString(XmlConfigurationReaderConstants.DB_DRIVER));
+        databaseConfiguration.setDatabase(hc.getString(XmlConfigurationReaderConstants.DB_DATABASE));
+        databaseConfiguration.setUsername(hc.getString(XmlConfigurationReaderConstants.DB_USERNAME));
+        databaseConfiguration.setPassword(hc.getString(XmlConfigurationReaderConstants.DB_PASSWORD));
+        databaseConfiguration.setMaxConnections(hc.getInt(XmlConfigurationReaderConstants.DB_MAX_CONNECTIONS));
+        databaseConfiguration.setProtocol(hc.getString(XmlConfigurationReaderConstants.DB_PROTOCOL));
+
         codesearchConfiguration.setDatabaseConfiguration(databaseConfiguration);
     }
 

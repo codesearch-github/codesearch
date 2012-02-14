@@ -89,8 +89,19 @@ public class XmlConfigurationReaderTest {
 
     @Test
     public void testGetRepositoryByName() throws Exception {
+        //assert the basic getRepository functionality
         RepositoryDto repo1 = getTestRepo();
         RepositoryDto repo2 = configReader.getRepositoryByName("jdownloader-repo");
         assertEquals(repo1, repo2);
+        
+        //assert that the error handling prevents loading an incomplete repository configuraion
+        //need to create a new ConfigReader because loading all files is done at the beginning
+        try{
+            XmlConfigurationReader configReader2 = new XmlConfigurationReader("codesearch_config_invalid_repository_configuration.xml");
+            assert (false);
+        }catch (InvalidConfigurationException ex){
+            //in case the exception is thrown everything is fine
+        }
+        
     }
 }
