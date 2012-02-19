@@ -51,6 +51,20 @@
         {
             margin-top: 10px;
         }
+
+        .help-box
+        {
+            border: 1px solid gray;
+            background: #AAAAAA;
+            padding: 5px;
+            position: absolute;
+            min-width: 300px;
+        }
+
+        .help-container
+        {
+            position:relative;
+        }
     </ui:style>
     <g:HTMLPanel addStyleNames="{style.scroll-container}">
         <div class='{style.search-form}'>
@@ -69,6 +83,15 @@
                     <g:cell>Search for:</g:cell>
                     <g:customCell>
                         <g:TextBox ui:field='searchBox' visibleLength='100' />
+                    </g:customCell>
+                    <g:customCell>
+                        <g:FlowPanel addStyleNames="{style.help-container}">
+                            <g:Label ui:field='helpLabel'>Help</g:Label>
+                            <g:HTMLPanel ui:field="helpBox" addStyleNames="{style.help-box}">
+                                <b>Available search fields</b>
+                                <g:HTML ui:field="searchFieldsBox" />
+                            </g:HTMLPanel>
+                        </g:FlowPanel>
                     </g:customCell>
                 </g:row>
                 <g:row>

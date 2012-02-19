@@ -1,22 +1,20 @@
 /**
- * Copyright 2010 David Froehlich   <david.froehlich@businesssoftware.at>,
- *                Samuel Kogler     <samuel.kogler@gmail.com>,
- *                Stephan Stiboller <stistc06@htlkaindorf.at>
+ * Copyright 2010 David Froehlich <david.froehlich@businesssoftware.at>, Samuel
+ * Kogler <samuel.kogler@gmail.com>, Stephan Stiboller <stistc06@htlkaindorf.at>
  *
  * This file is part of Codesearch.
  *
- * Codesearch is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Codesearch is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
  *
- * Codesearch is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * Codesearch is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with
+ * Codesearch. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.codesearch.searcher.client.ui.searchview;
 
@@ -24,6 +22,8 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyUpEvent;
+import com.google.gwt.event.dom.client.MouseOutEvent;
+import com.google.gwt.event.dom.client.MouseOverEvent;
 import com.google.gwt.event.logical.shared.OpenEvent;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
@@ -41,11 +41,13 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DisclosurePanel;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.TabLayoutPanel;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.ToggleButton;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
@@ -57,12 +59,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import org.codesearch.searcher.client.ui.fileview.FilePlace;
+import org.codesearch.searcher.shared.SearchField;
 import org.codesearch.searcher.shared.SearchResultDto;
 import org.codesearch.searcher.shared.SearchType;
 
 /**
- * Implements the functionality of the search page.
- * Composite class corresponding to the UiBinder template.
+ * Implements the functionality of the search page. Composite class
+ * corresponding to the UiBinder template.
+ *
  * @author Samuel Kogler
  */
 public class SearchViewImpl extends Composite implements SearchView {
@@ -87,7 +91,9 @@ public class SearchViewImpl extends Composite implements SearchView {
     SimplePager resultTablePager;
     // OTHER UI ELEMENTS
     @UiField
-    HasValue<String> searchBox;
+    TextBox searchBox;
+    @UiField
+    Label helpLabel;
     @UiField
     Button searchButton;
     @UiField
@@ -112,6 +118,10 @@ public class SearchViewImpl extends Composite implements SearchView {
     Label resultStatusLabel;
     @UiField
     Button resetAllFiltersButton = new Button("Reset all filters");
+    @UiField
+    Panel helpBox;
+    @UiField
+    HTML searchFieldsBox;
     private Presenter presenter;
     private SearchType searchType;
     private NumberFormat relevanceFormatter = NumberFormat.getFormat("00.00");
@@ -119,6 +129,7 @@ public class SearchViewImpl extends Composite implements SearchView {
     private boolean filtersInitialized;
     private boolean repositoriesInitialized;
     private boolean repositoryGroupsInitialized;
+    private String searchFieldTooltip = "";
 
     public SearchViewImpl() {
         initResultTable();
@@ -128,6 +139,7 @@ public class SearchViewImpl extends Composite implements SearchView {
         resultView.setVisible(false);
         repositoryList.clear();
         repositoryGroupList.clear();
+        helpBox.setVisible(false);
     }
 
     @UiHandler("searchButton")
@@ -156,6 +168,7 @@ public class SearchViewImpl extends Composite implements SearchView {
     /**
      * Parses the search results and creates the filter buttons when expanding
      * the filters panel.
+     *
      * @param e
      */
     @UiHandler("filterPanel")
@@ -201,6 +214,17 @@ public class SearchViewImpl extends Composite implements SearchView {
         searchResultDataProvider.setList(new ArrayList<SearchResultDto>(unfilteredResults));
     }
 
+    @UiHandler("helpLabel")
+    void onMouseOverHelp(MouseOverEvent e) {
+        searchFieldsBox.setHTML(searchFieldTooltip);
+        helpBox.setVisible(true);
+    }
+
+    @UiHandler("helpLabel")
+    void onMouseOutOfHelp(MouseOutEvent e) {
+        helpBox.setVisible(false);
+    }
+
     @Override
     public void cleanup() {
         repositoryList.setSelectedIndex(-1);
@@ -215,6 +239,7 @@ public class SearchViewImpl extends Composite implements SearchView {
         fileEndingFilterPanel.clear();
         repositoryFilterPanel.clear();
         filterPanel.setOpen(false);
+        helpBox.setVisible(false);
     }
 
     @Override
@@ -247,13 +272,17 @@ public class SearchViewImpl extends Composite implements SearchView {
         }
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setPresenter(Presenter presenter) {
         this.presenter = presenter;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setSearchResults(List<SearchResultDto> results) {
         filtersInitialized = false;
@@ -268,7 +297,9 @@ public class SearchViewImpl extends Composite implements SearchView {
         resultStatusLabel.setText(message);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setAvailableRepositories(List<String> repositories) {
         repositoriesInitialized = true;
@@ -278,7 +309,9 @@ public class SearchViewImpl extends Composite implements SearchView {
         }
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setAvailableRepositoryGroups(List<String> repositoryGroups) {
         repositoryGroupsInitialized = true;
@@ -288,7 +321,18 @@ public class SearchViewImpl extends Composite implements SearchView {
         }
     }
 
-    /** {@inheritDoc} */
+    @Override
+    public void setSearchFields(List<SearchField> searchFields) {
+        for (SearchField searchField : searchFields) {
+            searchFieldTooltip += searchField.getName() + ": " + searchField.getDescription();
+            searchFieldTooltip += "</br>";
+        }
+        searchFieldTooltip = searchFieldTooltip.substring(0, searchFieldTooltip.length() - 5);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setMaxResults(int maxResults) {
         for (int i = 0; i < this.maxResults.getItemCount(); i++) {
@@ -300,49 +344,65 @@ public class SearchViewImpl extends Composite implements SearchView {
         }
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public HasValue<Boolean> getCaseSensitive() {
         return caseSensitive;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ListBox getRepositoryList() {
         return repositoryList;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ListBox getRepositoryGroupList() {
         return repositoryGroupList;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public HasValue<String> getSearchBox() {
         return searchBox;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Panel getResultsView() {
         return resultView;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public SearchType getSearchType() {
         return searchType;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getMaxResults() {
         return Integer.parseInt(maxResults.getItemText(maxResults.getSelectedIndex()));
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isInitialized() {
         return repositoriesInitialized && repositoryGroupsInitialized;
@@ -372,7 +432,9 @@ public class SearchViewImpl extends Composite implements SearchView {
         resultTable = new CellTable<SearchResultDto>(PAGE_SIZE);
         resultTable.addColumn(new TextColumn<SearchResultDto>() {
 
-            /** {@inheritDoc} */
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public String getValue(SearchResultDto dto) {
                 return relevanceFormatter.format(dto.getRelevance());
@@ -381,7 +443,9 @@ public class SearchViewImpl extends Composite implements SearchView {
 
         resultTable.addColumn(new TextColumn<SearchResultDto>() {
 
-            /** {@inheritDoc} */
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public String getValue(SearchResultDto object) {
                 return object.getFilePath();
@@ -389,7 +453,9 @@ public class SearchViewImpl extends Composite implements SearchView {
         }, PATH_TITLE);
         resultTable.addColumn(new TextColumn<SearchResultDto>() {
 
-            /** {@inheritDoc} */
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public String getValue(SearchResultDto dto) {
                 return dto.getRepository();
@@ -398,7 +464,9 @@ public class SearchViewImpl extends Composite implements SearchView {
 
         resultTable.addColumn(new TextColumn<SearchResultDto>() {
 
-            /** {@inheritDoc} */
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public String getValue(SearchResultDto dto) {
                 return dto.getRevision();
@@ -409,7 +477,9 @@ public class SearchViewImpl extends Composite implements SearchView {
         resultTable.setSelectionModel(selectionModel);
         selectionModel.addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
 
-            /** {@inheritDoc} */
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public void onSelectionChange(SelectionChangeEvent event) {
                 SearchResultDto selected = selectionModel.getLastSelectedObject();

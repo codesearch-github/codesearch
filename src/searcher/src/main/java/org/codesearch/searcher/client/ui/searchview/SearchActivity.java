@@ -1,22 +1,20 @@
 /**
- * Copyright 2010 David Froehlich   <david.froehlich@businesssoftware.at>,
- *                Samuel Kogler     <samuel.kogler@gmail.com>,
- *                Stephan Stiboller <stistc06@htlkaindorf.at>
+ * Copyright 2010 David Froehlich <david.froehlich@businesssoftware.at>, Samuel
+ * Kogler <samuel.kogler@gmail.com>, Stephan Stiboller <stistc06@htlkaindorf.at>
  *
  * This file is part of Codesearch.
  *
- * Codesearch is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Codesearch is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
  *
- * Codesearch is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * Codesearch is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with
+ * Codesearch. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.codesearch.searcher.client.ui.searchview;
 
@@ -34,9 +32,11 @@ import org.codesearch.searcher.client.ClientFactory;
 import org.codesearch.searcher.client.rpc.SearcherService;
 import org.codesearch.searcher.client.rpc.SearcherServiceAsync;
 import org.codesearch.searcher.shared.SearchResultDto;
+import org.codesearch.searcher.shared.SearchViewData;
 
 /**
  * Presenter for the search view.
+ *
  * @author Samuel Kogler
  */
 public class SearchActivity extends AbstractActivity implements SearchView.Presenter {
@@ -52,7 +52,9 @@ public class SearchActivity extends AbstractActivity implements SearchView.Prese
         this.searchPlace = searchPlace;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void start(AcceptsOneWidget panel, EventBus eventBus) {
         searchView = clientFactory.getSearchView();
@@ -62,21 +64,24 @@ public class SearchActivity extends AbstractActivity implements SearchView.Prese
         searchView.setMaxResults(searchPlace.getMaxResults());
         panel.setWidget(searchView.asWidget());
         if (!searchView.isInitialized()) {
-            LOG.log(Level.INFO, "Retrieving repository information.");
-            updateRepositories();
-        } else {
-            searchView.setSelection(searchPlace.getSelection());
-            search();
+            LOG.log(Level.INFO, "Retrieving configured data.");
+            getData();
         }
+        searchView.setSelection(searchPlace.getSelection());
+        search();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void goTo(Place place) {
         clientFactory.getPlaceController().goTo(place);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void doSearch() {
         goTo(new SearchPlace(searchView.getSearchBox().getValue(), searchView.getSearchType(), searchView.getSelection(), searchView.getMaxResults()));
@@ -92,37 +97,25 @@ public class SearchActivity extends AbstractActivity implements SearchView.Prese
         }
     }
 
-    private void updateRepositories() {
-        searcherServiceAsync.getAvailableRepositories(new AsyncCallback<List<String>>() {
+    private void getData() {
+        searcherServiceAsync.getSearchViewData(new AsyncCallback<SearchViewData>() {
 
-            /** {@inheritDoc} */
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public void onFailure(Throwable caught) {
                 Window.alert("Remote call trying to fetch available repositories failed:\n" + caught);
             }
 
-            /** {@inheritDoc} */
+            /**
+             * {@inheritDoc}
+             */
             @Override
-            public void onSuccess(List<String> result) {
-                searchView.setAvailableRepositories(result);
-                searchView.setSelection(searchPlace.getSelection());
-                search();
-            }
-        });
-        searcherServiceAsync.getAvailableRepositoryGroups(new AsyncCallback<List<String>>() {
-
-            /** {@inheritDoc} */
-            @Override
-            public void onFailure(Throwable caught) {
-                Window.alert("Remote call trying to fetch available repository groups failed:\n" + caught);
-            }
-
-            /** {@inheritDoc} */
-            @Override
-            public void onSuccess(List<String> result) {
-                searchView.setAvailableRepositoryGroups(result);
-                searchView.setSelection(searchPlace.getSelection());
-                search();
+            public void onSuccess(SearchViewData result) {
+                searchView.setAvailableRepositories(result.getRepositories());
+                searchView.setAvailableRepositoryGroups(result.getGroups());
+                searchView.setSearchFields(result.getSearchFields());
             }
         });
     }
@@ -137,14 +130,18 @@ public class SearchActivity extends AbstractActivity implements SearchView.Prese
      */
     private class DoSearchHandler implements AsyncCallback<List<SearchResultDto>> {
 
-        /** {@inheritDoc} */
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public void onFailure(Throwable caught) {
             Window.alert("Exception calling the search service on the server:\n" + caught);
             searchView.getResultsView().setVisible(false);
         }
 
-        /** {@inheritDoc} */
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public void onSuccess(List<SearchResultDto> resultList) {
             if (resultList != null) {

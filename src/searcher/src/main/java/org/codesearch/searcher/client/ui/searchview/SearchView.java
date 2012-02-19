@@ -29,6 +29,7 @@ import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Panel;
 import java.util.List;
 import java.util.Set;
+import org.codesearch.searcher.shared.SearchField;
 import org.codesearch.searcher.shared.SearchResultDto;
 import org.codesearch.searcher.shared.SearchType;
 
@@ -48,6 +49,7 @@ public interface SearchView extends IsWidget {
     void setMaxResults(int maxResults);
     void setAvailableRepositories(List<String> repositories);
     void setAvailableRepositoryGroups(List<String> repositoryGroups);
+    void setSearchFields(List<SearchField> searchFields);
     void cleanup();
     ListBox getRepositoryList();
     ListBox getRepositoryGroupList();

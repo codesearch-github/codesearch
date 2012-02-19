@@ -44,6 +44,8 @@ import org.codesearch.commons.plugins.codeanalyzing.ast.ExternalUsage;
 import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
 import org.codesearch.commons.plugins.highlighting.HighlightingPlugin;
 import org.codesearch.commons.plugins.highlighting.HighlightingPluginException;
+import org.codesearch.commons.plugins.lucenefields.LuceneFieldPlugin;
+import org.codesearch.commons.plugins.lucenefields.LuceneFieldPluginLoader;
 import org.codesearch.commons.plugins.vcs.FileIdentifier;
 import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
 import org.codesearch.commons.plugins.vcs.VersionControlPluginException;
@@ -76,14 +78,18 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
     private DBAccess dba;
     private List<String> repositories;
     private List<String> repositoryGroups;
+    private LuceneFieldPluginLoader luceneFieldPluginLoader;
 
     @Inject
-    public SearcherServiceImpl(DocumentSearcherImpl documentSearcher, ConfigurationReader configurationReader, PropertiesManager propertiesManager, PluginLoader pluginLoader, DBAccess dba) {
+    public SearcherServiceImpl(DocumentSearcherImpl documentSearcher, ConfigurationReader configurationReader,
+            PropertiesManager propertiesManager, PluginLoader pluginLoader, DBAccess dba,
+            LuceneFieldPluginLoader luceneFieldPluginLoader) {
         this.documentSearcher = documentSearcher;
         this.propertiesManager = propertiesManager;
         this.configurationReader = configurationReader;
         this.pluginLoader = pluginLoader;
         this.dba = dba;
+        this.luceneFieldPluginLoader = luceneFieldPluginLoader;
         repositoryGroups = configurationReader.getRepositoryGroups();
         repositories = new LinkedList<String>();
         for (RepositoryDto dto : configurationReader.getRepositories()) {
@@ -206,7 +212,7 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
                     processedFileContent = StringEscapeUtils.escapeHtml(new String(vcFile.getContent()));
                 }
                 file.setFileContent(processedFileContent);
-            } else if(insertCodeNavigationLinks){
+            } else if (insertCodeNavigationLinks) {
                 file.setFileContent(new String(addUsageLinksToFileContent(fileContent, filePath, repoName, escapeStartToken, escapeEndToken)));
             } else {
                 file.setFileContent(StringEscapeUtils.escapeHtml(new String(vcFile.getContent())));
@@ -284,20 +290,13 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
         return targetFilePath;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public List<String> getAvailableRepositoryGroups() {
-        return repositoryGroups;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<String> getAvailableRepositories() {
-        return repositories;
+    public SearchViewData getSearchViewData() throws SearcherServiceException {
+        List<SearchField> searchFields = new LinkedList<SearchField>();
+        for (LuceneFieldPlugin p : luceneFieldPluginLoader.getAllLuceneFieldPlugins()) {
+            searchFields.add(new SearchField(p.getFieldName(), ""));
+        }
+        return new SearchViewData(repositories, repositoryGroups, searchFields);
     }
 
     private OutlineNode convertAstNodeToOutlineNode(AstNode astNode) {

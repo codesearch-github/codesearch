@@ -28,6 +28,7 @@ import java.util.Set;
 import org.codesearch.searcher.shared.FileDto;
 import org.codesearch.searcher.shared.SearchResultDto;
 import org.codesearch.searcher.shared.SearchType;
+import org.codesearch.searcher.shared.SearchViewData;
 import org.codesearch.searcher.shared.SearcherServiceException;
 
 /**
@@ -49,18 +50,11 @@ public interface SearcherService extends RemoteService {
     List<SearchResultDto> doSearch(String query, boolean caseSensitive, SearchType searchType, Set<String> selection, int maxResults) throws SearcherServiceException;
 
     /**
-     * Returns the repositories that are configured on the server.
-     * @return The list of configured repositories.
+     * Returns the data needed by the SearchView
+     * @return The data
      * @throws SearcherServiceException If an exception occurs on the server.
      */
-    List<String> getAvailableRepositories() throws SearcherServiceException;
-
-    /**
-     * Returns the repository groups that are configured on the server.
-     * @return The list of configured repository groups.
-     * @throws SearcherServiceException If an exception occurs on the server.
-     */
-    List<String> getAvailableRepositoryGroups() throws SearcherServiceException;
+    SearchViewData getSearchViewData() throws SearcherServiceException;
 
     /**
      * Retrieves a file identified by the given repository name and filepath.
