@@ -37,7 +37,7 @@ public class MockVersionControlPluginLoader implements PluginLoader {
                 }
 
                 @Override
-                public Set<FileIdentifier> getChangedFilesSinceRevision(String revision) throws VersionControlPluginException {
+                public Set<FileIdentifier> getChangedFilesSinceRevision(String revision, List<String> blacklistPatterns, List<String> whitelistPatterns) throws VersionControlPluginException {
                     throw new UnsupportedOperationException("Not supported yet.");
                 }
 
