@@ -533,14 +533,17 @@ public class SearchViewImpl extends Composite implements SearchView {
                         String resultFileEnding = result.getFilePath().substring(pos + 1);
                         if (!fileEndingFilters.contains(resultFileEnding.toLowerCase())) {
                             results.remove(i);
+                            continue;
                         }
                     } else {
                         results.remove(i);
+                        continue;
                     }
                 }
 
                 if (!repoFilters.isEmpty() && !repoFilters.contains(result.getRepository())) {
                     results.remove(i);
+                    continue;
                 }
             }
 
