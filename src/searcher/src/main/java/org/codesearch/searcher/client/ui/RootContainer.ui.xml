@@ -49,6 +49,11 @@
         {
             cursor: pointer;
         }
+
+        .content
+        {
+        margin-left: 5px;
+        }
     </ui:style>
     <g:DockLayoutPanel unit='PX'>
         <g:north size='30'>
@@ -57,7 +62,7 @@
             </g:HTMLPanel>
         </g:north>
         <g:center>
-            <g:LayoutPanel ui:field='contentPanel' />
+            <g:LayoutPanel ui:field='contentPanel' addStyleNames='{style.content}'/>
         </g:center>
         <g:south size= '15'>
             <g:FlowPanel ui:field='errorPanel' styleName='{style.errorMessage}' />
