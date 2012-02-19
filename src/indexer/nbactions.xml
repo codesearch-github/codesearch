@@ -22,31 +22,14 @@
 
 --><actions>
         <action>
-            <actionName>CUSTOM-debug_test</actionName>
-            <displayName>debug_test</displayName>
-            <goals>
-                <goal>test</goal>
-            </goals>
-            <properties>
-                <maven.test.skip>false</maven.test.skip>
-                <maven.surefire.debug>true</maven.surefire.debug>
-            </properties>
-        </action>
-        <action>
-            <actionName>CUSTOM-gut run</actionName>
-            <displayName>gut run</displayName>
-            <goals>
-                <goal>gwt</goal>
-                <goal>run</goal>
-            </goals>
-        </action>
-        <action>
             <actionName>CUSTOM-gwt:run</actionName>
             <displayName>gwt:run</displayName>
             <goals>
                 <goal>gwt:run</goal>
             </goals>
         </action>
+        
+        
         
         
     </actions>

@@ -21,13 +21,17 @@
 package org.codesearch.indexer.client.ui;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.place.shared.PlaceChangeEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.Panel;
+import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.web.bindery.event.shared.EventBus;
+import org.codesearch.indexer.client.NamedPlace;
 
 /**
  * The container of all views. Allows to define UI that shows up everywhere.
@@ -36,15 +40,18 @@ import com.google.gwt.user.client.ui.Widget;
 public class RootContainer extends Composite implements AcceptsOneWidget {
 
     private static RootContainerUiBinder uiBinder = GWT.create(RootContainerUiBinder.class);
- 
+
     interface RootContainerUiBinder extends UiBinder<Widget, RootContainer> {
     }
-    @UiField
-    Panel contentPanel;
-   
 
-    public RootContainer() {
+    @UiField
+    LayoutPanel contentPanel;
+    private EventBus eventBus;
+
+    public RootContainer(EventBus eventBus) {
         initWidget(uiBinder.createAndBindUi(this));
+        this.eventBus = eventBus;
+        eventBus.addHandler(PlaceChangeEvent.TYPE, new WindowTitlePlaceChangeListener("Codesearch Index Admin"));
     }
 
     /** {@inheritDoc} */
@@ -55,6 +62,24 @@ public class RootContainer extends Composite implements AcceptsOneWidget {
         if (widget != null) {
             contentPanel.add(w);
         }
+    }
 
+    private class WindowTitlePlaceChangeListener implements PlaceChangeEvent.Handler {
+
+        private String baseTitle = "";
+
+        public WindowTitlePlaceChangeListener(String baseTitle) {
+            this.baseTitle = baseTitle;
+        }
+
+        @Override
+        public void onPlaceChange(PlaceChangeEvent event) {
+            String title = baseTitle;
+            if(event.getNewPlace() instanceof NamedPlace) {
+                NamedPlace np = (NamedPlace) event.getNewPlace();
+                title += " - " + np.getName();
+            }
+            Window.setTitle(title);
+        }
     }
 }

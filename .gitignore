@@ -28,7 +28,6 @@ src/releases/*
 *.lol
 *.lof
 *.bak
-src/searcher/src/main/resources/codesearch_config.xml
 *.launch
 src/searcher/src/main/webapp/META-INF/maven
 src/searcher/src/main/webapp/WEB-INF/deploy

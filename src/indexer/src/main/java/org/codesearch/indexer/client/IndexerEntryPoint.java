@@ -21,18 +21,18 @@
 
 package org.codesearch.indexer.client;
 
-
 import com.google.gwt.activity.shared.ActivityManager;
 import com.google.gwt.activity.shared.ActivityMapper;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceController;
 import com.google.gwt.place.shared.PlaceHistoryHandler;
-import com.google.gwt.user.client.ui.RootPanel;
+import com.google.gwt.user.client.ui.RootLayoutPanel;
+import com.google.web.bindery.event.shared.EventBus;
 import org.codesearch.indexer.client.ui.RootContainer;
 import org.codesearch.indexer.client.ui.dashboard.DashboardPlace;
+
 
 /**
  * The entry point for the searcher.
@@ -40,7 +40,7 @@ import org.codesearch.indexer.client.ui.dashboard.DashboardPlace;
  */
 public class IndexerEntryPoint implements EntryPoint {
 
-    private RootContainer rootContainer = new RootContainer();
+    private RootContainer rootContainer;
     private Place defaultPlace = new DashboardPlace();
 
     /** {@inheritDoc} */
@@ -48,6 +48,8 @@ public class IndexerEntryPoint implements EntryPoint {
     public void onModuleLoad() {
         ClientFactory clientFactory = ClientFactory.getDefaultFactory();
         EventBus eventBus = clientFactory.getEventBus();
+        rootContainer = new RootContainer(eventBus);
+
         PlaceController placeController = clientFactory.getPlaceController();
 
         ActivityMapper activityMapper = new IndexerActivityMapper(clientFactory);
@@ -58,7 +60,7 @@ public class IndexerEntryPoint implements EntryPoint {
         PlaceHistoryHandler historyHandler = new PlaceHistoryHandler(historyMapper);
         historyHandler.register(placeController, eventBus, defaultPlace);
 
-        RootPanel.get().add(rootContainer);
+        RootLayoutPanel.get().add(rootContainer);
         historyHandler.handleCurrentHistory();
     }
 }

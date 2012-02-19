@@ -20,20 +20,25 @@
  */
 package org.codesearch.indexer.client.ui.log;
 
-import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceTokenizer;
 import com.google.gwt.place.shared.Prefix;
+import org.codesearch.indexer.client.NamedPlace;
 
 /**
  * The place token representing the log page.
  *
  * @author Samuel Kogler
  */
-public class LogPlace extends Place {
+public class LogPlace extends NamedPlace {
 
     public LogPlace() {
     }
-    
+
+    @Override
+    public String getName() {
+        return "Log";
+    }
+
     @Prefix("log")
     public static class Tokenizer implements PlaceTokenizer<LogPlace> {
 

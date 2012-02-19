@@ -27,58 +27,62 @@
     <ui:style>
         .header
         {
-        	border-style: none none solid none;
-        	border-width: 1px;
-        	width: 100%;
-        	overflow: hidden;
+        border-style: none none solid none;
+        border-width: 1px;
+        width: 100%;
+        overflow: hidden;
         }
 
         .header > *
         {
-			float: left;
-		}
+        float: left;
+        }
 
         .menu
         {
-			float: left;
-			padding: 5px 0px;
-			border: 1px solid gray;
-			margin-top: 5px;
-		}
+        float: left;
+        padding: 5px 0px;
+        border: 1px solid gray;
+        margin-top: 5px;
+        }
 
-		.menu-link a
-		{
-			display: block;
-			padding-left: 20px;
-			padding-right: 20px;
-		}
+        .menu-link a
+        {
+        display: block;
+        padding-left: 20px;
+        padding-right: 20px;
+        }
 
-		.content
-		{
-			float: left;
-			padding: 5px;
-		}
+        .content
+        {
+        padding: 5px;
+        margin: 5px;
+        }
 
-		.title
-		{
-			font-weight: bold;
-			font-size: 18pt;
-			margin-left: 20px;
-			margin-top: 4px;
-		}
-
+        .title
+        {
+        font-weight: bold;
+        font-size: 18pt;
+        margin-left: 20px;
+        margin-top: 4px;
+        }
     </ui:style>
-    <g:HTMLPanel>
-    <g:FlowPanel addStyleNames="{style.header}">
-    	<g:Image resource="{res.logo}" /> <g:Label text="Index Admin" addStyleNames="{style.title}" />
-    </g:FlowPanel>
-    <g:FlowPanel addStyleNames="{style.menu}">
-    	<g:Hyperlink text="Dashboard" targetHistoryToken="dashboard:" addStyleNames="{style.menu-link}" />
-    	<g:Hyperlink text="View Log" targetHistoryToken="log:" addStyleNames="{style.menu-link}" />
-        <g:Hyperlink text="Manual Indexing" targetHistoryToken="manualIndexing:" addStyleNames="{style.menu-link}" />
-    </g:FlowPanel>
-    <g:SimplePanel ui:field="contentPanel" addStyleNames="{style.content}"/>
-
-    </g:HTMLPanel>
-
+    <g:DockLayoutPanel unit="PX">
+        <g:north size="30">
+            <g:FlowPanel addStyleNames="{style.header}">
+                <g:Image resource="{res.logo}" />
+                <g:Label text="Index Admin" addStyleNames="{style.title}" />
+            </g:FlowPanel>
+        </g:north>
+        <g:center>
+            <g:LayoutPanel ui:field="contentPanel" addStyleNames="{style.content}"/>
+        </g:center>
+        <g:west size="150">
+            <g:FlowPanel addStyleNames="{style.menu}">
+                <g:Hyperlink text="Dashboard" targetHistoryToken="dashboard:" addStyleNames="{style.menu-link}" />
+                <g:Hyperlink text="View Log" targetHistoryToken="log:" addStyleNames="{style.menu-link}" />
+                <g:Hyperlink text="Manual Indexing" targetHistoryToken="manualIndexing:" addStyleNames="{style.menu-link}" />
+            </g:FlowPanel>
+        </g:west>
+    </g:DockLayoutPanel>
 </ui:UiBinder>
