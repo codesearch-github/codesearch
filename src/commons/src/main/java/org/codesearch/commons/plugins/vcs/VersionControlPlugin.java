@@ -52,9 +52,12 @@ public interface VersionControlPlugin extends Plugin {
     /**
      * Returns a list of changed files since the given revision.
      * @param revision The given revision
-     * @return The changed files
+     * @param blacklistPatterns A list of Java regexes for directories that should not be checked, pass Collections.emptyList() if not required
+     * @param whitelistPatterns A list of Java regexes for directories that should be checked (only directories that match at least one whitelist pattern are visited)
+     * if no whitelist is required (so, if all directories that are not blacklisted should be parsed) pass Collections.empyList()
+     * @return The list of {@link} FileIdentifier for the files that have changed
      */
-    Set<FileIdentifier> getChangedFilesSinceRevision(String revision) throws VersionControlPluginException;
+    Set<FileIdentifier> getChangedFilesSinceRevision(String revision, List<String> blacklistPatterns, List<String> whitelistPatterns) throws VersionControlPluginException;
 
     /**
      * Extracts and returns the revision number of the currently set revision.

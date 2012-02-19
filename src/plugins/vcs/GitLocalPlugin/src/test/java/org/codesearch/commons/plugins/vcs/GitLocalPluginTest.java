@@ -22,6 +22,7 @@
  */
 package org.codesearch.commons.plugins.vcs;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Set;
 import org.codesearch.commons.configuration.dto.NoAuthentication;
@@ -98,7 +99,7 @@ public class GitLocalPluginTest {
     public void testGetChangedFilesSinceRevision() throws Exception {
         System.out.println("getChangedFilesSinceRevision");
         String revision = "0";
-        Set<FileIdentifier> changes = plugin.getChangedFilesSinceRevision(revision);
+        Set<FileIdentifier> changes = plugin.getChangedFilesSinceRevision(revision, Collections.<String>emptyList(), Collections.<String>emptyList());
         System.out.println("changes returned");
         assertNotNull(changes);
         assert (!changes.isEmpty());
