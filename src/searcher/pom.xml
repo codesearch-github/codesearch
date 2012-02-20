@@ -11,7 +11,7 @@
     <parent>
         <groupId>org.codesearch</groupId>
         <artifactId>codesearch</artifactId>
-        <version>0.1-RC1</version>
+        <version>0.1-RC2</version>
     </parent>
 
     <properties>
@@ -70,7 +70,7 @@
         <dependency>
             <groupId>org.codesearch</groupId>
             <artifactId>codesearch-commons</artifactId>
-            <version>0.1-RC1</version>
+            <version>0.1-RC2</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>

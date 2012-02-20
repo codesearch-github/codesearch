@@ -21,4 +21,4 @@
     along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
 
 -->
-<Context antiJARLocking="true" path="/codesearch-searcher-0.1-RC1"/>
+<Context antiJARLocking="true" path="/codesearch-searcher-0.1-RC2"/>

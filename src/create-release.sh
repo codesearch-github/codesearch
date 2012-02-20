@@ -1,6 +1,6 @@
 #!/bin/bash
 
-VERSION="0.1-RC1"
+VERSION="0.1-RC2"
 
 TOMCAT_URL="http://tweedo.com/mirror/apache/tomcat/tomcat-7/v7.0.25/bin/apache-tomcat-7.0.25.tar.gz"
 TOMCAT_DIR="apache-tomcat-7.0.25"
@@ -12,15 +12,15 @@ JETTY_DIR="jetty-distribution-$JETTY_VERSION"
 MYSQL_CONNECTOR_URL="http://search.maven.org/remotecontent?filepath=mysql/mysql-connector-java/5.1.18/mysql-connector-java-5.1.18.jar"
 MYSQL_FILENAME="mysql-connector-java-5.1.18.jar"
 
-SEARCHER="searcher/target/codesearch-searcher-0.1-RC1.war"
-INDEXER="indexer/target/codesearch-indexer-0.1-RC1.war"
+SEARCHER="searcher/target/codesearch-searcher-0.1-RC2.war"
+INDEXER="indexer/target/codesearch-indexer-0.1-RC2.war"
 AUTHORS="../AUTHORS"
 README="../README.md"
 COPYING="../COPYING"
 CONFIG="../resources/codesearch_config.xml"
 RELEASES_DIR="releases"
 
-./rebuild-plugins.sh
+#./rebuild-plugins.sh
 mvn clean install
 
 DOCFILES="$(readlink -f $README) $(readlink -f $AUTHORS) $(readlink -f $COPYING)"
