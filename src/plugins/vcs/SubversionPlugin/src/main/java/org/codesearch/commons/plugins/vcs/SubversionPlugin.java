@@ -25,6 +25,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
 import org.codesearch.commons.configuration.dto.AuthenticationType;
 import org.codesearch.commons.configuration.dto.BasicAuthentication;
@@ -136,10 +138,18 @@ public class SubversionPlugin implements VersionControlPlugin {
      */
     @Override
     public Set<FileIdentifier> getChangedFilesSinceRevision(String revision, List<String> blacklistPatterns, List<String> whitelistPatterns) throws VersionControlPluginException {
+        List<Pattern> compiledBlacklist = new LinkedList<Pattern>();
+        List<Pattern> compiledWhitelist = new LinkedList<Pattern>();
+        for(String s : blacklistPatterns) {
+            compiledBlacklist.add(Pattern.compile(s));
+        }
+        for(String s : whitelistPatterns) {
+            compiledWhitelist.add(Pattern.compile(s));
+        }
         Set<FileIdentifier> fileIdentifiers = new HashSet<FileIdentifier>();
         try {
             if (revision.equals(VersionControlPlugin.UNDEFINED_VERSION)) {
-                listEntries(entryPoint, fileIdentifiers, blacklistPatterns, whitelistPatterns);
+                listEntries(entryPoint, fileIdentifiers, compiledBlacklist, compiledWhitelist);
             } else {
                 ISVNOptions options = SVNWCUtil.createDefaultOptions(true);
                 SVNDiffClient diffClient = new SVNDiffClient(svnRepo.getAuthenticationManager(), options);
@@ -188,34 +198,15 @@ public class SubversionPlugin implements VersionControlPlugin {
         // Does not need local cache directory.
     }
 
-    private void listEntries(String path, Set<FileIdentifier> identifiers, List<String> blacklistPatterns, List<String> whitelistPatterns) throws SVNException {
+    private void listEntries(String path, Set<FileIdentifier> identifiers, List<Pattern> blacklistPatterns, List<Pattern> whitelistPatterns) throws SVNException {
         Collection entries = svnRepo.getDir(path, -1, null, (Collection) null);
         Iterator iterator = entries.iterator();
         while (iterator.hasNext()) {
             boolean checkFile = true;
             SVNDirEntry entry = (SVNDirEntry) iterator.next();
             String fileUrl = entry.getURL().toString();
-            for (String currentBlacklistPattern : blacklistPatterns) {
-                if (fileUrl.matches(currentBlacklistPattern)) {
-                    checkFile = false;
-                    break;
-                }
-            }
 
-            if (checkFile) {
-                //only check for whitelist patterns if the file wasn't already marked as blacklisted
-                if (!whitelistPatterns.isEmpty()) {
-                    checkFile = false;
-                    for (String currentWhitelistPattern : whitelistPatterns) {
-                        if (fileUrl.matches(currentWhitelistPattern)) {
-                            checkFile = true;
-                            break;
-                        }
-                    }
-                }
-            }
-
-            if (checkFile) {
+            if (shouldFileBeIncluded(fileUrl, blacklistPatterns, whitelistPatterns)) {
                 if (entry.getKind() == SVNNodeKind.DIR) {
                     listEntries((path.equals("")) ? entry.getName() : path + "/" + entry.getName(), identifiers, blacklistPatterns, whitelistPatterns);
                 } else if (entry.getKind() == SVNNodeKind.FILE) {
@@ -223,6 +214,35 @@ public class SubversionPlugin implements VersionControlPlugin {
                 }
             }
         }
+    }
+
+    private boolean shouldFileBeIncluded(String fileUrl, List<Pattern> blacklistPatterns, List<Pattern> whitelistPatterns) {
+        boolean matchesElementOnWhitelist = false;
+        boolean shouldFileBeIncluded = true;
+        // if no whitelist is specified all files pass the whitelist check
+        if (whitelistPatterns.isEmpty()) {
+            matchesElementOnWhitelist = true;
+        } else {
+            // else check if the filename matches one of the whitelist entries
+            for (Pattern p : whitelistPatterns) {
+                Matcher m = p.matcher(fileUrl);
+                if (m.find()) {
+                    matchesElementOnWhitelist = true;
+                    break;
+                }
+            }
+        }
+        // check if the filename matches one of the blacklist entries, if yes return false
+        if (matchesElementOnWhitelist) {
+            for (Pattern p : blacklistPatterns) {
+                Matcher m = p.matcher(fileUrl);
+                if (m.find()) {
+                    shouldFileBeIncluded = false;
+                    break;
+                }
+            }
+        }
+        return shouldFileBeIncluded && matchesElementOnWhitelist;
     }
 
     private void establishConnectionToRepo() throws VersionControlPluginException {
