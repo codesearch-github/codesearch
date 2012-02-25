@@ -32,20 +32,20 @@
 			padding: 5px;
 			margin-right: 10px;
 		}
-		
+
 		.grid-item .title {
 			font-weight: bold;
 			display: block;
 			border-bottom: 1px solid #CCC;
 		}
-		
+
 		.grid-item .content {
 			display: block;
 		}
     </ui:style>
     <g:HTMLPanel>
         <div class="{style.grid-item}">
-            <g:TabLayoutPanel ui:field='repositoryTabPanel' width='400px' barUnit='PX' barHeight='20' height='200px' width='300px'>
+            <g:TabLayoutPanel ui:field='repositoryTabPanel' width='400px' barUnit='PX' barHeight='20' height='200px'>
                 <g:tab>
                     <g:header>Repositories</g:header>
                     <g:ListBox ui:field='repositories' visibleItemCount='6' multipleSelect='true' width='100%' />
@@ -59,4 +59,4 @@
         <g:CheckBox ui:field='clear' text='Clear before indexing' />
         <g:Button ui:field="indexingButton">Start indexing</g:Button>
     </g:HTMLPanel>
-</ui:UiBinder> 
+</ui:UiBinder>

@@ -146,7 +146,7 @@ public class DocumentSearcherImpl implements DocumentSearcher {
             SearchResultDto searchResult = new SearchResultDto();
             searchResult.setRepository(doc.get(IndexConstants.INDEX_FIELD_REPOSITORY));
             searchResult.setFilePath(doc.get(IndexConstants.INDEX_FIELD_FILEPATH));
-            searchResult.setRevision(doc.get(IndexConstants.INDEX_FIELD_REVISION));
+            searchResult.setLastRevision(doc.get(IndexConstants.INDEX_FIELD_REVISION));
             searchResult.setRelevance(sd.score);
             results.add(searchResult);
         }

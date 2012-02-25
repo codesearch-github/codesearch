@@ -469,7 +469,7 @@ public class SearchViewImpl extends Composite implements SearchView {
              */
             @Override
             public String getValue(SearchResultDto dto) {
-                return dto.getRevision();
+                return dto.getLastRevision();
             }
         }, REVISION_TITLE);
 
