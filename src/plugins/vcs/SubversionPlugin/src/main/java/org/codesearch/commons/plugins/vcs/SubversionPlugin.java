@@ -120,9 +120,9 @@ public class SubversionPlugin implements VersionControlPlugin {
             svnRepo.getFile(filePath, Long.parseLong(revision), properties, baos);
             boolean binary = !SVNProperty.isTextMimeType(properties.getStringValue(SVNProperty.MIME_TYPE));
             String lastAuthor = properties.getStringValue(SVNProperty.LAST_AUTHOR);
-            String lastAlterationDate = properties.getStringValue(SVNProperty.COMMITTED_DATE); //TODO test this
+            String lastAlteration = properties.getStringValue(SVNProperty.COMMITTED_REVISION);
             fileDto.setLastAuthor(lastAuthor);
-            fileDto.setLastAlteration(lastAlterationDate);
+            fileDto.setLastAlteration(lastAlteration);
             fileDto.setContent(baos.toByteArray());
             fileDto.setBinary(binary);
             fileDto.setFilePath(filePath);

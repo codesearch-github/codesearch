@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import org.apache.commons.lang.StringUtils;
 import org.codesearch.commons.configuration.dto.NoAuthentication;
 import org.codesearch.commons.configuration.dto.RepositoryDto;
 import org.junit.Before;
@@ -69,11 +70,11 @@ public class SubversionPluginTest {
     public void testGetChangedFileWithBlacklistEntries() throws VersionControlPluginException {
         List<String> blacklistPatterns = new LinkedList<String>();
         blacklistPatterns.add(".*trunk.*");
-        
+
         Set<FileIdentifier> changedFilesSinceRevision = sp.getChangedFilesSinceRevision(VersionControlPlugin.UNDEFINED_VERSION, blacklistPatterns, Collections.<String>emptyList());
         assert (changedFilesSinceRevision.isEmpty());
     }
-    
+
     /**
      * Tests whether the paths that are returned by
      * getChangedFilesSinceRevision are valid.
@@ -87,6 +88,10 @@ public class SubversionPluginTest {
             if (!fileIdentifier.isDeleted()) {
                 FileDto fileDto = sp.getFileDtoForFileIdentifierAtRevision(fileIdentifier, VersionControlPlugin.UNDEFINED_VERSION);
                 assert (fileDto != null);
+                assert (Integer.parseInt(fileDto.getLastAlteration()) != 0);
+                assert (StringUtils.isNotBlank(fileDto.getLastAuthor()));
+                assert (StringUtils.isNotBlank(fileDto.getFilePath()));
+                assert (StringUtils.isNotBlank(new String(fileDto.getContent())));
             }
         }
     }
