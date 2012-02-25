@@ -27,18 +27,16 @@
     <ui:style>
 		.grid-item {
 			float: left;
-			border: 1px solid gray;
-			border-radius: 5px;
 			padding: 5px;
-			margin-right: 10px;
+			margin-bottom: 10px;
+                        width: 100%;
 		}
-		
+
 		.grid-item .title {
 			font-weight: bold;
 			display: block;
-			border-bottom: 1px solid #CCC;
 		}
-		
+
 		.grid-item .content {
 			display: block;
 		}
@@ -52,12 +50,12 @@
             <span class="{style.title}">Scheduled jobs</span>
             <c:CellTable addStyleNames="{style.content}" ui:field="scheduledJobs" />
         </div>
-		
-        <g:Button ui:field="refreshButton">Refresh</g:Button>
-        
+
         <div class="{style.grid-item}">
             <span class="{style.title}">Repository status</span>
             <c:CellTable addStyleNames="{style.content}" ui:field="repositoryStatuses" />
         </div>
+
+        <g:Button ui:field="refreshButton">Refresh</g:Button>
     </g:HTMLPanel>
-</ui:UiBinder> 
+</ui:UiBinder>

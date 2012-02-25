@@ -1,16 +1,20 @@
 /**
- * Copyright 2010 David Froehlich <david.froehlich@businesssoftware.at>, Samuel Kogler <samuel.kogler@gmail.com>, Stephan Stiboller
- * <stistc06@htlkaindorf.at>
+ * Copyright 2010 David Froehlich <david.froehlich@businesssoftware.at>, Samuel
+ * Kogler <samuel.kogler@gmail.com>, Stephan Stiboller <stistc06@htlkaindorf.at>
  *
  * This file is part of Codesearch.
  *
- * Codesearch is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * Codesearch is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
  *
- * Codesearch is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * Codesearch is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with Codesearch. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with
+ * Codesearch. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.codesearch.indexer.server.manager;
 
@@ -29,6 +33,7 @@ import org.codesearch.commons.configuration.properties.PropertiesManager;
 import org.codesearch.commons.constants.IndexConstants;
 import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
 import org.codesearch.indexer.shared.JobStatus;
+import org.codesearch.indexer.shared.JobStatusStep;
 import org.codesearch.indexer.shared.RepositoryStatus;
 import org.quartz.CronScheduleBuilder;
 import org.quartz.JobBuilder;
@@ -53,22 +58,33 @@ import org.quartz.spi.JobFactory;
 @Singleton
 public final class IndexingManager {
 
-    /** Instantiate a logger */
+    /**
+     * Instantiate a logger
+     */
     private static final Logger LOG = Logger.getLogger(IndexingManager.class);
-    /** The scheduler used to schedule the IndexingJobss */
+    /**
+     * The scheduler used to schedule the IndexingJobss
+     */
     private Scheduler scheduler;
-    /** The configurated jobs. */
+    /**
+     * The configurated jobs.
+     */
     private List<JobDto> jobs;
-    /** The job listener that maintains a history of job executions. */
+    /**
+     * The job listener that maintains a history of job executions.
+     */
     private IndexingJobHistoryListener historyListener;
     private ConfigurationReader configReader;
-    /** used to read the repository revision status */
+    /**
+     * used to read the repository revision status
+     */
     private PropertiesManager propertiesManager;
 
     /**
      * Creates a new instance of IndexingManager
      *
-     * @throws SchedulerException In case the scheduler could not be instantiated
+     * @throws SchedulerException In case the scheduler could not be
+     * instantiated
      * @throws ConfigurationException
      */
     @SuppressWarnings("unchecked")
@@ -88,9 +104,11 @@ public final class IndexingManager {
     }
 
     /**
-     * Reads the jobs from the configuration and adds them to the scheduler, then starts it
+     * Reads the jobs from the configuration and adds them to the scheduler,
+     * then starts it
      *
-     * @throws SchedulerException if a job could not be added to the scheduler or if it could not be started
+     * @throws SchedulerException if a job could not be added to the scheduler
+     * or if it could not be started
      * @throws ConfigurationException if the configuration could not be read
      */
     public void start() throws SchedulerException {
@@ -126,15 +144,15 @@ public final class IndexingManager {
         scheduler.start();
     }
 
-    public List<RepositoryStatus> getRepositoryStatuses()  {
+    public List<RepositoryStatus> getRepositoryStatuses() {
         List<RepositoryStatus> repositoryStatuses = new LinkedList<RepositoryStatus>();
 
-        for(RepositoryDto currentDto : configReader.getRepositories()){
+        for (RepositoryDto currentDto : configReader.getRepositories()) {
             String revision = propertiesManager.getValue(currentDto.getName());
             RepositoryStatus.Status status = RepositoryStatus.Status.INDEXED;
-            if(revision.equals(VersionControlPlugin.UNDEFINED_VERSION)){
+            if (revision.equals(VersionControlPlugin.UNDEFINED_VERSION)) {
                 status = RepositoryStatus.Status.EMPTY;
-            } else if (revision.equals(IndexConstants.REPOSITORY_STATUS_INCONSISTENT)){
+            } else if (revision.equals(IndexConstants.REPOSITORY_STATUS_INCONSISTENT)) {
                 status = RepositoryStatus.Status.INCONSISTENT;
             }
             repositoryStatuses.add(new RepositoryStatus(currentDto.getName(), revision, status));
@@ -154,8 +172,23 @@ public final class IndexingManager {
             jobStatus.setCurrentRepository(jobDataMap.getString(IndexingJob.FIELD_CURRENT_REPOSITORY));
 
             List<RepositoryDto> repos = (List<RepositoryDto>) jobDataMap.get(IndexingJob.FIELD_REPOSITORIES);
-            jobStatus.setTotalRepositories(repos.size());
+            List<String> repoNames = new LinkedList<String>();
+            for (RepositoryDto repositoryDto : repos) {
+                repoNames.add(repositoryDto.getName());
+            }
+            jobStatus.setRepositories(repoNames);
 
+            JobStatusStep jobStatusStep = new JobStatusStep();
+            jobStatusStep.setName(jobDataMap.getString(IndexingJob.FIELD_STEP));
+            try {
+                jobStatusStep.setTotalSteps(jobDataMap.getIntValue(IndexingJob.FIELD_CURRENT_STEPS));
+                jobStatusStep.setFinishedSteps(jobDataMap.getIntValue(IndexingJob.FIELD_FINISHED_STEPS));
+            } catch (RuntimeException ex) {
+                jobStatusStep.setTotalSteps(0);
+                jobStatusStep.setFinishedSteps(0);
+            }
+
+            jobStatus.setCurrentStep(jobStatusStep);
             runningJobs.add(jobStatus);
         }
         return runningJobs;
@@ -196,7 +229,6 @@ public final class IndexingManager {
             }
 
             jobStatus.setName(jobKey.getName());
-            jobStatus.setStatus(JobStatus.Status.INACTIVE);
             jobStatus.setStart(nextFireTime);
             jobStatus.setFinished(previousFireTime);
 
@@ -207,6 +239,7 @@ public final class IndexingManager {
 
     /**
      * Returns the log of job executions.
+     *
      * @return list of log messages.
      */
     public List<String> getLog() {
@@ -226,13 +259,15 @@ public final class IndexingManager {
     }
 
     /**
-     * schedules a job for the given repositories causing them to be indexed once at the time
+     * schedules a job for the given repositories causing them to be indexed
+     * once at the time
+     *
      * @param repositories the repositories that are to be indexed
      * @param repositoryGroups the repo groups containing the repositories
      * @throws SchedulerException
      */
     public void startJobForRepositories(List<String> repositories, List<String> repositoryGroups, boolean clear) throws SchedulerException {
-        JobKey jobKey = new JobKey("manual-job" + new Date().getTime(), IndexingJob.GROUP_NAME);
+        JobKey jobKey = new JobKey("manual-job-" + new Date().getTime(), IndexingJob.GROUP_NAME);
         List<RepositoryDto> repos = new LinkedList<RepositoryDto>();
         for (String currentRepoName : repositories) {
             repos.add(configReader.getRepositoryByName(currentRepoName));

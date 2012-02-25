@@ -55,7 +55,10 @@ public class IndexingJob implements Job {
     public static final String FIELD_CLEAR_INDEX = "clear_index";
     public static final String FIELD_CURRENT_REPOSITORY = "current_repository";
     public static final String FIELD_FINISHED_REPOSITORIES = "finished_repositories";
+    public static final String FIELD_CURRENT_STEPS = "current_steps";
+    public static final String FIELD_FINISHED_STEPS = "finished_steps";
     public static final String FIELD_STATUS = "status";
+    public static final String FIELD_STEP = "step";
     public static final String STATUS_CLEARING = "clearing";
     public static final String STATUS_INDEXING = "indexing";
     public static final String GROUP_NAME = "INDEXING_JOBS";
@@ -122,6 +125,9 @@ public class IndexingJob implements Job {
         jobDataMap = jec.getJobDetail().getJobDataMap();
         jobDataMap.put(FIELD_CURRENT_REPOSITORY, "");
         jobDataMap.put(FIELD_FINISHED_REPOSITORIES, 0);
+        jobDataMap.put(FIELD_CURRENT_STEPS, 0);
+        jobDataMap.put(FIELD_FINISHED_STEPS, 0);
+
         repositories = (List<RepositoryDto>) jobDataMap.get(FIELD_REPOSITORIES);
         clearIndex = (Boolean) jobDataMap.get(FIELD_CLEAR_INDEX);
         LOG.info("Executing " + jec.getJobDetail().getKey().toString() + ", indexing " + repositories.size() + " repositories");
@@ -139,6 +145,8 @@ public class IndexingJob implements Job {
 
             jobDataMap.put(FIELD_CURRENT_REPOSITORY, "");
             jobDataMap.put(FIELD_FINISHED_REPOSITORIES, 0);
+            jobDataMap.put(FIELD_CURRENT_STEPS, 0);
+            jobDataMap.put(FIELD_FINISHED_STEPS, 0);
             jobDataMap.put(FIELD_STATUS, STATUS_INDEXING);
             // execution of regular indexing job
             // By default, fields are indexed case insensitive
@@ -163,7 +171,10 @@ public class IndexingJob implements Job {
     }
 
     public void setCurrentRepository(int index) {
-        jobDataMap.put(FIELD_FINISHED_REPOSITORIES, index + 1);
         jobDataMap.put(FIELD_CURRENT_REPOSITORY, repositories.get(index).getName());
+    }
+
+    public JobDataMap getJobDataMap() {
+        return jobDataMap;
     }
 }

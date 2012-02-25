@@ -22,6 +22,7 @@ package org.codesearch.indexer.client.ui.dashboard;
 
 import com.google.gwt.cell.client.Cell;
 import com.google.gwt.cell.client.DateCell;
+import com.google.gwt.cell.client.NumberCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.HasClickHandlers;
@@ -134,6 +135,9 @@ public class DashboardViewImpl extends Composite implements DashboardView {
         runningJobs.addColumn(new JobStatusNextExecutionColumn(dateCell), "Started");
         runningJobs.addColumn(new JobStatusCurrentRepoColumn(), "Current repository");
         runningJobs.addColumn(new JobStatusTotalReposColumn(), "Total repositories");
+        runningJobs.addColumn(new JobStatusStepColumn(), "Status");
+        runningJobs.addColumn(new JobStatusTotalStepsColumn(), "Total steps");
+        runningJobs.addColumn(new JobStatusFinishedStepsColumn(), "Finished steps");
         runningJobs.setSelectionModel(new NoSelectionModel<JobStatus>());
         runningJobs.setPageSize(Integer.MAX_VALUE);
 
@@ -224,11 +228,43 @@ public class DashboardViewImpl extends Composite implements DashboardView {
         }
     }
 
+    private class JobStatusStepColumn extends TextColumn<JobStatus> {
+
+        @Override
+        public String getValue(JobStatus object) {
+            return object.getCurrentStep().getName();
+        }
+    }
+
+    private class JobStatusTotalStepsColumn extends Column<JobStatus, Number> {
+
+        public JobStatusTotalStepsColumn() {
+            super(new NumberCell());
+        }
+
+        @Override
+        public Number getValue(JobStatus object) {
+            return object.getCurrentStep().getTotalSteps();
+        }
+    }
+
+        private class JobStatusFinishedStepsColumn extends Column<JobStatus, Number> {
+
+        public JobStatusFinishedStepsColumn() {
+            super(new NumberCell());
+        }
+
+        @Override
+        public Number getValue(JobStatus object) {
+            return object.getCurrentStep().getFinishedSteps();
+        }
+    }
+
     private class JobStatusTotalReposColumn extends TextColumn<JobStatus> {
 
         @Override
         public String getValue(JobStatus object) {
-            return String.valueOf(object.getTotalRepositories());
+            return String.valueOf(object.getRepositories().size());
         }
     }
 }

@@ -126,7 +126,10 @@ public class IndexingTask implements Task {
     private PerFieldAnalyzerWrapper caseInsensitiveAnalyzer;
 
     @Inject
-    public IndexingTask(DBAccess dba, PluginLoader pluginLoader, URI searcherUpdatePath, LuceneFieldPluginLoader luceneFieldPluginLoader, PropertiesManager propertiesManager, List<RepositoryDto> repositories, Directory indexDirectory, IndexingJob job) throws IOException {
+    public IndexingTask(DBAccess dba, PluginLoader pluginLoader, URI searcherUpdatePath, LuceneFieldPluginLoader luceneFieldPluginLoader, PropertiesManager propertiesManager, List<RepositoryDto> repositories, Directory indexDirectory, IndexingJob job) throws IOException, TaskExecutionException {
+        if(job == null) {
+            throw new TaskExecutionException("Parent job must be set in constructor, was null");
+        }
         luceneFieldPlugins = luceneFieldPluginLoader.getAllLuceneFieldPlugins();
         caseInsensitiveAnalyzer = luceneFieldPluginLoader.getPerFieldAnalyzerWrapper(false);
         this.propertiesManager = propertiesManager;
@@ -161,11 +164,10 @@ public class IndexingTask implements Task {
             try {
                 int i = 0;
                 for (RepositoryDto repository : repositories) {
-                    if (job != null) {
-                        job.setCurrentRepository(i);
-                    }
+                    job.setCurrentRepository(i);
+                    job.getJobDataMap().put(IndexingJob.FIELD_STEP, "Getting newest revision number");
                     try {
-                        LOG.info("Indexing repository: " + repository.getName() + (repository.isCodeNavigationEnabled() ? " using" : " without") +  " code analyzing");
+                        LOG.info("Indexing repository: " + repository.getName() + (repository.isCodeNavigationEnabled() ? " using" : " without") + " code analyzing");
                         long start = System.currentTimeMillis();
                         // Read the index status file
                         String lastIndexedRevision = propertiesManager.getValue(repository.getName());
@@ -176,8 +178,10 @@ public class IndexingTask implements Task {
                         versionControlPlugin.setRepository(repository);
                         String repositoryRevision = versionControlPlugin.getRepositoryRevision();
                         LOG.info("Newest revision is      : " + repositoryRevision);
+                        job.getJobDataMap().put(IndexingJob.FIELD_STEP, "Getting changed files");
                         Set<FileIdentifier> changedFiles = versionControlPlugin.getChangedFilesSinceRevision(lastIndexedRevision, repository.getBlacklistEntries(), repository.getWhitelistEntries());
                         LOG.info(changedFiles.size() + " files have changed since the last indexing");
+                        job.getJobDataMap().put(IndexingJob.FIELD_STEP, "Deleting changed files");
                         // clear the index of the old verions of the files
                         deleteFilesFromIndex(changedFiles);
                         if (repository.isCodeNavigationEnabled()) {
@@ -192,9 +196,15 @@ public class IndexingTask implements Task {
                                 databaseConnectionValid = false;
                             }
                         }
+
                         // check whether the changed files should be indexed
+                        job.getJobDataMap().put(IndexingJob.FIELD_STEP, "Applying black- and whitelist");
                         removeNotToBeIndexedFiles(changedFiles);
+                        job.getJobDataMap().put(IndexingJob.FIELD_STEP, "Indexing changed files");
+                        job.getJobDataMap().put(IndexingJob.FIELD_CURRENT_STEPS, changedFiles.size());
+                        int finishedFiles = 0;
                         for (FileIdentifier currentIdentifier : changedFiles) {
+                            job.getJobDataMap().put(IndexingJob.FIELD_FINISHED_STEPS, finishedFiles);
                             if (!currentIdentifier.isDeleted()) {
                                 try {
                                     FileDto currentDto = versionControlPlugin.getFileDtoForFileIdentifierAtRevision(currentIdentifier, VersionControlPlugin.UNDEFINED_VERSION);
@@ -216,6 +226,7 @@ public class IndexingTask implements Task {
                                     LOG.debug("VersionControlPlugin threw exception: \n" + ex);
                                 }
                             }
+                            finishedFiles++;
                         }
                         long duration = System.currentTimeMillis() - start;
                         LOG.info("Indexing of repository " + repository.getName() + " took " + duration / 1000 + " seconds");

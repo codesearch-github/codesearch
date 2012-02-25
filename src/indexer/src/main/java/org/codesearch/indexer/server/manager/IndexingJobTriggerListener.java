@@ -97,7 +97,7 @@ public class IndexingJobTriggerListener extends TriggerListenerSupport implement
                 } else {
                     LOG.info("Another indexing job is already running, delaying execution by " + this.delayTime / 1000 + " seconds");
                     // create new job and trigger because the original job should not be modified
-                    JobDetail newJobDetail = newJob(jobDetail.getJobClass()).withIdentity(jobDetail.getKey().getName(), "DELAYED_JOBS")
+                    JobDetail newJobDetail = newJob(jobDetail.getJobClass()).withIdentity(jobDetail.getKey().getName() + "-DLY", IndexingJob.GROUP_NAME)
                             .usingJobData(jobDetail.getJobDataMap()).build();
 
                     Trigger newTrigger = newTrigger().withIdentity("DELAY_BY_" + new Date().getTime(), "DELAYED_TRIGGERS")

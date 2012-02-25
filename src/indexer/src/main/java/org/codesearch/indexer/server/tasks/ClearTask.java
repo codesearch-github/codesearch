@@ -117,6 +117,9 @@ public class ClearTask implements Task {
                 repos.append(repositoryDto.getName()).append(" ");
             }
             LOG.info("Clearing index for repositories: " + repos.toString().trim());
+            if(job != null) {
+                job.getJobDataMap().put(IndexingJob.FIELD_CURRENT_STEPS, repositories.size());
+            }
             IndexSearcher searcher = null;
             try {
                 FSDirectory fsd = FSDirectory.open(indexLocation);
@@ -127,6 +130,7 @@ public class ClearTask implements Task {
                     if (job != null) {
                         // set the status
                         job.setCurrentRepository(index);
+                        job.getJobDataMap().put(IndexingJob.FIELD_FINISHED_STEPS, index);
                     }
                     Term term = new Term(IndexConstants.INDEX_FIELD_REPOSITORY, repositoryDto.getName());
 
