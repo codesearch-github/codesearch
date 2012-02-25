@@ -94,7 +94,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <runTarget>index.html</runTarget>
+                    <runTarget>index.jsp</runTarget>
                     <hostedWebapp>${webappDirectory}</hostedWebapp>
                 </configuration>
             </plugin>

@@ -125,7 +125,7 @@ public class SearchPlace extends Place {
                 int maxResults = 200;
 
                 String[] tokens = token.split(UIConstants.URL_TOKEN_SEPARATOR);
-                if (tokens.length == 4) {
+                if (tokens.length >= 1) {
                     for (String t : tokens) {
                         if (t.indexOf('=') == -1) {
                             return null;
@@ -144,6 +144,9 @@ public class SearchPlace extends Place {
                         } else if (t.startsWith("maxResults=")) {
                             maxResults = Integer.parseInt(UIUtils.unescape(value));
                         }
+                    }
+                    if(searchTerm == null) {
+                        return null;
                     }
                     return new SearchPlace(searchTerm, searchType, selection, maxResults);
                 }

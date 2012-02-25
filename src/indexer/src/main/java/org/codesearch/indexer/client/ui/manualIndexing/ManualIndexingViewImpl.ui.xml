@@ -45,14 +45,14 @@
     </ui:style>
     <g:HTMLPanel>
         <div class="{style.grid-item}">
-            <g:TabLayoutPanel ui:field='repositoryTabPanel' width='400px' barUnit='EM' barHeight='1.7' height='10em'>
+            <g:TabLayoutPanel ui:field='repositoryTabPanel' width='400px' barUnit='PX' barHeight='20' height='200px' width='300px'>
                 <g:tab>
                     <g:header>Repositories</g:header>
-                    <g:ListBox ui:field='repositories' visibleItemCount='6' multipleSelect='true' width='20em' />
+                    <g:ListBox ui:field='repositories' visibleItemCount='6' multipleSelect='true' width='100%' />
                 </g:tab>
                 <g:tab>
                     <g:header>Repository Groups</g:header>
-                    <g:ListBox ui:field='repositoryGroups' visibleItemCount='6' multipleSelect='true' width='20em' />
+                    <g:ListBox ui:field='repositoryGroups' visibleItemCount='6' multipleSelect='true' width='100%' />
                 </g:tab>
             </g:TabLayoutPanel>
         </div>

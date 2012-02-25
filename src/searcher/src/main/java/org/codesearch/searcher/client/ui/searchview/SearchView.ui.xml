@@ -71,11 +71,11 @@
             <g:TabLayoutPanel ui:field='repositoryTabPanel' barUnit='PX' barHeight='20' height='150px' width='300px'>
                 <g:tab>
                     <g:header>Repositories</g:header>
-                    <g:ListBox ui:field='repositoryList' visibleItemCount='6' multipleSelect='true'/>
+                    <g:ListBox ui:field='repositoryList' visibleItemCount='6' multipleSelect='true' width="100%"/>
                 </g:tab>
                 <g:tab>
                     <g:header>Repository Groups</g:header>
-                    <g:ListBox ui:field='repositoryGroupList' visibleItemCount='6' multipleSelect='true' />
+                    <g:ListBox ui:field='repositoryGroupList' visibleItemCount='6' multipleSelect='true' width="100%"/>
                 </g:tab>
             </g:TabLayoutPanel>
             <g:Grid>
