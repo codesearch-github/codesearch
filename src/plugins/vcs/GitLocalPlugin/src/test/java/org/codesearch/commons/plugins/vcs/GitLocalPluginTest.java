@@ -25,9 +25,9 @@ package org.codesearch.commons.plugins.vcs;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Set;
+import org.apache.commons.lang.StringUtils;
 import org.codesearch.commons.configuration.dto.NoAuthentication;
 import org.codesearch.commons.configuration.dto.RepositoryDto;
-import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -79,7 +79,13 @@ public class GitLocalPluginTest {
         fileIdentifier.setRepository(getTestRepo());
 
         FileDto result = plugin.getFileDtoForFileIdentifierAtRevision(fileIdentifier, VersionControlPlugin.UNDEFINED_VERSION);
+        assert (result != null);
         assert ("version 3\n".equals(new String(result.getContent())));
+        assert (StringUtils.isNotBlank(result.getFilePath()));
+        assert (StringUtils.isNotBlank(result.getLastAlteration()));
+        assert (StringUtils.isNotBlank(result.getLastAuthor()));
+        assert (result.getLastAlteration().indexOf('\n') == -1);
+        assert (result.getLastAuthor().indexOf('\n') == -1);
     }
 
     private void testGetOldFile() throws Exception {
@@ -97,15 +103,11 @@ public class GitLocalPluginTest {
     @Test
     @Ignore
     public void testGetChangedFilesSinceRevision() throws Exception {
-        System.out.println("getChangedFilesSinceRevision");
         String revision = "0";
         Set<FileIdentifier> changes = plugin.getChangedFilesSinceRevision(revision, Collections.<String>emptyList(), Collections.<String>emptyList());
-        System.out.println("changes returned");
-        assertNotNull(changes);
-        assert (!changes.isEmpty());
-        System.out.println("Changed files since revision 0: ");
+        assert (changes != null);
         for (FileIdentifier fileDto : changes) {
-            System.out.println(fileDto.getFilePath());
+
         }
     }
 
@@ -114,10 +116,8 @@ public class GitLocalPluginTest {
      */
     @Test
     public void testGetRepositoryRevision() throws Exception {
-        System.out.println("getRepositoryRevision");
         String result = plugin.getRepositoryRevision();
-        System.out.println("Current revision: " + result);
-        assertNotNull(result);
+        assert (result != null);
         assert (!"0".equals(result));
     }
 

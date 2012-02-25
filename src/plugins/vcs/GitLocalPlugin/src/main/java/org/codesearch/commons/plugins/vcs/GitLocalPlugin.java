@@ -32,6 +32,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.codesearch.commons.configuration.dto.NoAuthentication;
 import org.codesearch.commons.configuration.dto.RepositoryDto;
@@ -98,9 +99,8 @@ public class GitLocalPlugin implements VersionControlPlugin {
             revision = "HEAD";
         }
         byte[] fileContent = executeGitCommand("show", revision + ":" + fileIdentifier.getFilePath());
-        String[] logEntry = new String(executeGitCommand("log", revision, "--pretty=\"format:%H$$$%an\"", fileIdentifier.getFilePath())).split("$$$");
-        String lastRevision = logEntry[0];
-        String lastAuthor = logEntry[1];
+        String lastRevision = StringUtils.chomp(new String(executeGitCommand("log", revision, "-n1", "--pretty=%H", fileIdentifier.getFilePath())));
+        String lastAuthor = StringUtils.chomp(new String(executeGitCommand("log", revision, "-n1", "--pretty=%an", fileIdentifier.getFilePath())));
 
         FileDto file = new FileDto();
         file.setContent(fileContent);
@@ -111,7 +111,7 @@ public class GitLocalPlugin implements VersionControlPlugin {
         return file;
     }
 
-    /** {@inheritDoc} 
+    /** {@inheritDoc}
      WARNING: The GitLocalPlugin does not support black-/whitelist patterns when retrieving changed files, these lists will simply be ignored
      */
     @Override
@@ -156,7 +156,7 @@ public class GitLocalPlugin implements VersionControlPlugin {
     /** {@inheritDoc} */
     @Override
     public String getRepositoryRevision() throws VersionControlPluginException {
-        return new String(executeGitCommand("rev-parse", "HEAD")).replace("\n", "");
+        return StringUtils.chomp(new String(executeGitCommand("rev-parse", "HEAD")));
     }
 
     @Override
