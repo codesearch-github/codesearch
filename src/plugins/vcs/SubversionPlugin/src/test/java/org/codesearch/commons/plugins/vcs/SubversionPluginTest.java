@@ -26,6 +26,7 @@ import org.apache.commons.lang.StringUtils;
 import org.codesearch.commons.configuration.dto.NoAuthentication;
 import org.codesearch.commons.configuration.dto.RepositoryDto;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -62,9 +63,8 @@ public class SubversionPluginTest {
     }
 
     /**
-     * Tests whether the paths that are returned by
-     * getChangedFilesSinceRevision are valid.
-     * Does not define a start revision.
+     * Tests whether the paths that are returned by getChangedFilesSinceRevision
+     * are valid. Does not define a start revision.
      */
     @Test
     public void testGetChangedFileWithBlacklistEntries() throws VersionControlPluginException {
@@ -76,9 +76,8 @@ public class SubversionPluginTest {
     }
 
     /**
-     * Tests whether the paths that are returned by
-     * getChangedFilesSinceRevision are valid.
-     * Does not define a start revision.
+     * Tests whether the paths that are returned by getChangedFilesSinceRevision
+     * are valid. Does not define a start revision.
      */
     @Test
     public void testGetFilesFromStart() throws VersionControlPluginException {
@@ -96,22 +95,21 @@ public class SubversionPluginTest {
         }
     }
 
-//    /**
-//     * Tests whether the paths that are returned by
-//     * getChangedFilesSinceRevision are valid.
-//     * Tests using a start revision.
-//     */
-//    @Test
-//    public void testGetFilesFromRev() throws VersionControlPluginException {
-//        Set<FileIdentifier> changedFilesSinceRevision = sp.getChangedFilesSinceRevision("2");
-//        assert (!changedFilesSinceRevision.isEmpty());
-//        for (FileIdentifier fileIdentifier : changedFilesSinceRevision) {
-//            if (!fileIdentifier.isDeleted()) {
-//                FileDto fileDto = sp.getFileDtoForFileIdentifierAtRevision(fileIdentifier, VersionControlPlugin.UNDEFINED_VERSION);
-//                assert (fileDto != null);
-//            }
-//        }
-//    }
+    /**
+     * Tests whether the paths that are returned by getChangedFilesSinceRevision
+     * are valid. Tests using a start revision.
+     */
+    @Test
+    public void testGetFilesFromRev() throws VersionControlPluginException {
+        Set<FileIdentifier> changedFilesSinceRevision = sp.getChangedFilesSinceRevision("2", new LinkedList<String>(), new LinkedList<String>());
+        assert (!changedFilesSinceRevision.isEmpty());
+        for (FileIdentifier fileIdentifier : changedFilesSinceRevision) {
+            if (!fileIdentifier.isDeleted()) {
+                FileDto fileDto = sp.getFileDtoForFileIdentifierAtRevision(fileIdentifier, VersionControlPlugin.UNDEFINED_VERSION);
+                assert (fileDto != null);
+            }
+        }
+    }
 
     @Test
     public void testListDir() throws VersionControlPluginException {

@@ -140,16 +140,18 @@ public class SubversionPlugin implements VersionControlPlugin {
     public Set<FileIdentifier> getChangedFilesSinceRevision(String revision, List<String> blacklistPatterns, List<String> whitelistPatterns) throws VersionControlPluginException {
         List<Pattern> compiledBlacklist = new LinkedList<Pattern>();
         List<Pattern> compiledWhitelist = new LinkedList<Pattern>();
-        for(String s : blacklistPatterns) {
+        for (String s : blacklistPatterns) {
             compiledBlacklist.add(Pattern.compile(s));
         }
-        for(String s : whitelistPatterns) {
+        for (String s : whitelistPatterns) {
             compiledWhitelist.add(Pattern.compile(s));
         }
         Set<FileIdentifier> fileIdentifiers = new HashSet<FileIdentifier>();
         try {
             if (revision.equals(VersionControlPlugin.UNDEFINED_VERSION)) {
-                listEntries(entryPoint, fileIdentifiers, compiledBlacklist, compiledWhitelist);
+                if (shouldFileBeIncluded(entryPoint, compiledWhitelist, compiledWhitelist)) {
+                    listEntries(entryPoint, fileIdentifiers, compiledBlacklist, compiledWhitelist);
+                }
             } else {
                 ISVNOptions options = SVNWCUtil.createDefaultOptions(true);
                 SVNDiffClient diffClient = new SVNDiffClient(svnRepo.getAuthenticationManager(), options);
@@ -204,13 +206,13 @@ public class SubversionPlugin implements VersionControlPlugin {
         while (iterator.hasNext()) {
             boolean checkFile = true;
             SVNDirEntry entry = (SVNDirEntry) iterator.next();
-            String fileUrl = entry.getURL().toString();
+            String fileUrl = path.equals("") ? entry.getName() : path + "/" + entry.getName();
 
             if (shouldFileBeIncluded(fileUrl, blacklistPatterns, whitelistPatterns)) {
                 if (entry.getKind() == SVNNodeKind.DIR) {
-                    listEntries((path.equals("")) ? entry.getName() : path + "/" + entry.getName(), identifiers, blacklistPatterns, whitelistPatterns);
+                    listEntries(fileUrl, identifiers, blacklistPatterns, whitelistPatterns);
                 } else if (entry.getKind() == SVNNodeKind.FILE) {
-                    identifiers.add(new FileIdentifier(path + "/" + entry.getName(), false, repository));
+                    identifiers.add(new FileIdentifier(fileUrl.replace(entryPoint + "/", ""), false, repository));
                 }
             }
         }
