@@ -19,7 +19,7 @@
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.codesearch.indexer.manager;
+package org.codesearch.indexer.server.manager;
 
 import java.util.Date;
 

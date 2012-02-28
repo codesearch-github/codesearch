@@ -1,4 +1,4 @@
-package org.codesearch.commons.configuration.xml.dto;
+package org.codesearch.commons.configuration.dto;
 
 /**
  * Identifies different indexing operations.
