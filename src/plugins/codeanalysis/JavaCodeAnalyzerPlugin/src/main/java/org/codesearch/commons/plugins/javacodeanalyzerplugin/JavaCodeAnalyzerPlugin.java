@@ -183,7 +183,9 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
             imports = Collections.EMPTY_LIST;
         } finally {
             try {
-                bais.close();
+                if (bais != null) {
+                    bais.close();
+                }
             } catch (IOException ex) {
             }
         }
