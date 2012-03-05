@@ -104,7 +104,7 @@ public class ManualIndexingActivity extends AbstractActivity implements Presente
 
         @Override
         public void onFailure(Throwable caught) {
-            Window.alert("FAIL!!!");//FIXME
+            Window.alert(caught.getMessage());
         }
 
         @Override

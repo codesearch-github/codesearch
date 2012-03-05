@@ -80,7 +80,6 @@ import org.codesearch.commons.plugins.codeanalyzing.ast.Visibility;
 import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.ClassNode;
 import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.EnumNode;
 import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.EnumValueNode;
-import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.ExternalClassOrEnumUsage;
 import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.FileNode;
 import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.MethodNode;
 import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.VariableNode;
@@ -97,57 +96,6 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
     private List<String> typeDeclarations;
     private List<String> imports;
     private AnalyzerUtil util;
-
-    /**
-     * sets the lineNumber and the targetFilePath for the class usage
-     * @param usage the usage that is parsed
-     * @param repository the repository holding the files
-     * @param fileImports the imports in the file that holds the usage
-     * @param originFilePath the filePath of the file that holds the usage
-     * @throws DatabaseAccessException
-     */
-    public void parseLineNumberAndFileNameOfUsage(ExternalClassOrEnumUsage usage, String repository, List<String> fileImports, String originFilePath) throws DatabaseAccessException {
-        String className = usage.getTargetClassName();
-        String targetFilePath = getFilePathOfDeclaration(repository, fileImports, className);
-        usage.setTargetFilePath(targetFilePath);
-        if (targetFilePath == null) {
-            return;
-        }
-
-        usage.setReferenceLine(-1);
-    }
-
-    /**
-     * returns the file path of the file declaring the given class
-     * @param repository the repository holding the file
-     * @param fileImports the list of imports in the source file, these will be searched through
-     * @param className the name of the class that is searched
-     * @return the path of the file holding the declaration
-     * @throws DatabaseAccessException
-     */
-    //TODO find out why this method is used
-    @Deprecated
-    private String getFilePathOfDeclaration(String repository, List<String> fileImports, String className) throws DatabaseAccessException {
-//        String targetFilePath;
-//        List<String> asteriskImports = new LinkedList<String>();
-//        boolean importMatch = false;
-//        for (String currentImport : fileImports) {
-//            if (currentImport.endsWith("." + className)) {
-//                className = currentImport;
-//                importMatch = true;
-//            } else if (currentImport.endsWith("*")) {
-//                asteriskImports.add(currentImport);
-//            }
-//        }
-//        if (!importMatch) {
-//            targetFilePath = DBAccess.getFilePathForTypeDeclaration(className, repository, asteriskImports);
-//        } else {
-//            targetFilePath = DBAccess.getFilePathForTypeDeclaration(className, repository);
-//        }
-//      return targetFilePath;
-
-        return null;
-    }
 
     /** {@inheritDoc} */
     @Override

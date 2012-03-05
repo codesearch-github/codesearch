@@ -1,22 +1,20 @@
 /**
- * Copyright 2010 David Froehlich   <david.froehlich@businesssoftware.at>,
- *                Samuel Kogler     <samuel.kogler@gmail.com>,
- *                Stephan Stiboller <stistc06@htlkaindorf.at>
+ * Copyright 2010 David Froehlich <david.froehlich@businesssoftware.at>, Samuel
+ * Kogler <samuel.kogler@gmail.com>, Stephan Stiboller <stistc06@htlkaindorf.at>
  *
  * This file is part of Codesearch.
  *
- * Codesearch is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Codesearch is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
  *
- * Codesearch is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * Codesearch is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with
+ * Codesearch. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.codesearch.commons.plugins.javacodeanalyzerplugin.ast;
 
@@ -29,10 +27,11 @@ import org.codesearch.commons.plugins.codeanalyzing.ast.ExternalUsage;
  * @author David Froehlich
  */
 public class ExternalMethodUsage extends ExternalUsage {
+
     private List<String> parameters;
 
-    public ExternalMethodUsage(int startPositionInLine, int startLine, int length, String replacedString, String targetClassName, List<String> parameters) {
-        super(startPositionInLine, startLine, length, replacedString, targetClassName);
+    public ExternalMethodUsage(int startPositionInLine, int startLine, int length, String replacedString, String targetNodeName, List<String> parameters) {
+        super(startPositionInLine, startLine, length, replacedString, targetNodeName);
         this.parameters = parameters;
     }
 
@@ -45,17 +44,19 @@ public class ExternalMethodUsage extends ExternalUsage {
         return parameters;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void resolveLink(String targetFilePath, AstNode ast){
-        super.setTargetFilePath(targetFilePath);
-        for(AstNode currentAst : ast.getChildNodes()){
-            if(currentAst instanceof MethodNode){
-                MethodNode methodNode = (MethodNode)ast;
-                if(super.getReplacedString().equals(methodNode.getName()) && parameters.size() == methodNode.getParameters().size()){
-                    super.setReferenceLine(methodNode.getStartLine());
+    public int findTargetLineNumber(AstNode node) {
+        for (AstNode currentNode : node.getChildNodes()) {
+            if (currentNode instanceof MethodNode) {
+                MethodNode methodNode = (MethodNode) node;
+                if (super.targetNodeName.equals(methodNode.getName()) && parameters.size() == methodNode.getParameters().size()) {
+                    return methodNode.getStartLine();
                 }
             }
         }
+        return -1;
     }
 }

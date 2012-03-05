@@ -31,12 +31,11 @@ import japa.parser.ast.expr.NameExpr;
 import japa.parser.ast.expr.StringLiteralExpr;
 import java.util.LinkedList;
 import java.util.List;
+import org.codesearch.commons.plugins.codeanalyzing.ast.ExternalUsage;
 import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
 import org.codesearch.commons.plugins.codeanalyzing.ast.Visibility;
 import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.ClassNode;
-import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.ExternalClassOrEnumUsage;
 import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.ExternalMethodUsage;
-import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.ExternalVariableOrEnumValueUsage;
 import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.FileNode;
 import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.MethodNode;
 import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.VariableNode;
@@ -97,7 +96,7 @@ public class AnalyzerUtil {
      * @param className the name of the class that is used
      */
     public void addLinkToExternalClassDeclaration(int lineNumber, int startColumn, String className) {
-        usages.add(new ExternalClassOrEnumUsage(startColumn, lineNumber, className.length(), className, className));
+        usages.add(new ExternalUsage(startColumn, lineNumber, className.length(), className, className));
     }
 
     /**
@@ -111,7 +110,7 @@ public class AnalyzerUtil {
      */
     public void addLinkToExternalVariableDeclaration(int lineNumber, int startColumn, String varName, Node parent, String className) {
         //add a link to the variable
-        usages.add(new ExternalVariableOrEnumValueUsage(startColumn, lineNumber, className.length(), varName, className));
+        usages.add(new ExternalUsage(startColumn, lineNumber, className.length(), varName, className));
     }
 
     /**
@@ -153,7 +152,7 @@ public class AnalyzerUtil {
         if (scopeObject == null) { //the method is a static method from another class, and is not simply the return type of some other methods method call
             className = scopeName;
             if (!scopeName.contains(".")) {
-                usages.add(new ExternalClassOrEnumUsage(scopeColumn, lineNumber, className.length(), className, className));
+                usages.add(new ExternalUsage(scopeColumn, lineNumber, className.length(), className, className));
             }
         } else { //the method is called from an object in the class
             className = scopeObject.getType();

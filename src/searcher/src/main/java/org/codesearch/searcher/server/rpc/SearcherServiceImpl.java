@@ -232,21 +232,16 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
         LOG.debug("Looking up usage: " + usageId + " in file: " + filePath + "@" + repository);
         try {
             ExternalUsage usage = dba.getUsageForIdInFile(usageId, filePath, repository);
-            String targetFilePath = getFilePathOfDeclaration(repository, usage.getTargetClassName(), filePath);
-            AstNode ast = getAstOfFileContainingDeclaration(repository, targetFilePath, filePath);
-
-            usage.resolveLink(targetFilePath, ast);
-            LOG.debug(usage.getTargetClassName());
-            LOG.debug(usage.getTargetFilePath());
-            if (usage.getTargetFilePath() != null) {
+            String targetFilePath = getFilePathOfDeclaration(repository, usage.getTargetNodeName(), filePath);
+            //AstNode ast = dba.getBinaryIndexForFile(targetFilePath, repository);
+            //int targetLineNumber = usage.findTargetLineNumber(ast);
+            //TODO return line number for external navigation
+            if (targetFilePath != null) {
                 SearchResultDto searchResultDto = new SearchResultDto();
-                searchResultDto.setFilePath(usage.getTargetFilePath());
-                //FIXME maybe add possibility to jump between repositories
+                searchResultDto.setFilePath(targetFilePath);
                 searchResultDto.setRepository(repository);
                 return searchResultDto;
             }
-        } catch (DatabaseEntryNotFoundException ex) {
-            LOG.error(ex);
         } catch (DatabaseAccessException ex) {
             LOG.error(ex);
         }
@@ -264,9 +259,6 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
 //        }
 //        return "";
 //    }
-    private AstNode getAstOfFileContainingDeclaration(String repository, String targetFilePath, String originFilePath) throws DatabaseAccessException, DatabaseEntryNotFoundException {
-        return dba.getBinaryIndexForFile(targetFilePath, repository);
-    }
 
     private String getFilePathOfDeclaration(String repository, String className, String originFilePath) throws DatabaseAccessException {
         List<String> fileImports = dba.getImportsForFile(originFilePath, repository);
