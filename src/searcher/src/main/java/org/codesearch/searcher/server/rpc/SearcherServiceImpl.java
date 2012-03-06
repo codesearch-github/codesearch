@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 import net.sf.jmimemagic.Magic;
 import net.sf.jmimemagic.MagicMatch;
 import org.apache.commons.lang.StringEscapeUtils;
@@ -228,19 +229,27 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
     }
 
     @Override
-    public SearchResultDto resolveUsage(int usageId, String repository, String filePath) throws SearcherServiceException {
+    public JumpLocation resolveUsage(int usageId, String repository, String filePath) throws SearcherServiceException {
         LOG.debug("Looking up usage: " + usageId + " in file: " + filePath + "@" + repository);
         try {
             ExternalUsage usage = dba.getUsageForIdInFile(usageId, filePath, repository);
             String targetFilePath = getFilePathOfDeclaration(repository, usage.getTargetNodeName(), filePath);
-            //AstNode ast = dba.getBinaryIndexForFile(targetFilePath, repository);
-            //int targetLineNumber = usage.findTargetLineNumber(ast);
-            //TODO return line number for external navigation
+            int targetLineNumber = 1;
+            try {
+                AstNode ast = dba.getBinaryIndexForFile(targetFilePath, repository);
+                targetLineNumber = usage.findTargetLineNumber(ast);
+                if(targetLineNumber < 1) {
+                    targetLineNumber = 1;
+                }
+            } catch (DatabaseEntryNotFoundException ex) {
+                LOG.warn("AST not found for file: " + targetFilePath + "@" + repository);
+            }
             if (targetFilePath != null) {
-                SearchResultDto searchResultDto = new SearchResultDto();
-                searchResultDto.setFilePath(targetFilePath);
-                searchResultDto.setRepository(repository);
-                return searchResultDto;
+                JumpLocation location = new JumpLocation();
+                location.setFilePath(targetFilePath);
+                location.setRepository(repository);
+                location.setLineNumber(targetLineNumber);
+                return location;
             }
         } catch (DatabaseAccessException ex) {
             LOG.error(ex);
@@ -259,7 +268,6 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
 //        }
 //        return "";
 //    }
-
     private String getFilePathOfDeclaration(String repository, String className, String originFilePath) throws DatabaseAccessException {
         List<String> fileImports = dba.getImportsForFile(originFilePath, repository);
         String targetFilePath;

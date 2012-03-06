@@ -25,11 +25,13 @@ import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
+import com.google.gwt.user.client.ui.HTML;
 import org.codesearch.searcher.client.ClientFactory;
 import org.codesearch.searcher.client.rpc.SearcherService;
 import org.codesearch.searcher.client.rpc.SearcherServiceAsync;
 import org.codesearch.searcher.client.ui.fileview.FileView.Presenter;
 import org.codesearch.searcher.shared.FileDto;
+import org.codesearch.searcher.shared.JumpLocation;
 import org.codesearch.searcher.shared.SearchResultDto;
 
 /**
@@ -45,12 +47,14 @@ public class FileActivity extends AbstractActivity implements Presenter {
     private String repository;
     private String filePath;
     private String searchTerm;
+    private FilePlace filePlace;
 
     public FileActivity(ClientFactory clientFactory, FilePlace filePlace) {
         this.clientFactory = clientFactory;
         this.repository = filePlace.getRepository();
         this.filePath = filePlace.getFilePath();
         this.searchTerm = filePlace.getSearchTerm();
+        this.filePlace = filePlace;
     }
 
     /**
@@ -94,23 +98,23 @@ public class FileActivity extends AbstractActivity implements Presenter {
         searcherServiceAsync.resolveUsage(usageId, repository, filePath, new ResolveUsageCallback());
     }
 
-    private class ResolveUsageCallback implements AsyncCallback<SearchResultDto> {
+    private class ResolveUsageCallback implements AsyncCallback<JumpLocation> {
 
         /**
          * {@inheritDoc}
          */
         @Override
         public void onFailure(Throwable caught) {
-            Window.alert("Could not resolve usage because: \n" + caught.toString());
+            Window.alert("Could not resolve usage because: \n" + caught.getMessage());
         }
 
         /**
          * {@inheritDoc}
          */
         @Override
-        public void onSuccess(SearchResultDto result) {
+        public void onSuccess(JumpLocation result) {
             if (result != null) {
-                goTo(new FilePlace(result.getRepository(), result.getFilePath(), ""));
+                goTo(new FilePlace(result.getRepository(), result.getFilePath(), "", result.getLineNumber()));
             }
         }
     }
@@ -132,6 +136,7 @@ public class FileActivity extends AbstractActivity implements Presenter {
         public void onSuccess(FileDto result) {
             fileView.setFileContent(result.getFileContent(), result.isBinary());
             fileView.setOutline(result.getOutline());
+            fileView.goToLine(filePlace.getLineNumber());
         }
     }
 }

@@ -23,21 +23,19 @@ import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
 import org.codesearch.commons.plugins.codeanalyzing.ast.ExternalUsage;
 
 /**
- *
+ * Represents the usage(call) of a method that is defined in a different file(class).
+ * The targetNodeName in this case is the method's class name.
  * @author David Froehlich
  */
 public class ExternalMethodUsage extends ExternalUsage {
+    private static final long serialVersionUID = 1L;
 
     private List<String> parameters;
 
-    public ExternalMethodUsage(int startPositionInLine, int startLine, int length, String replacedString, String targetNodeName, List<String> parameters) {
+    public ExternalMethodUsage(int startPositionInLine, int startLine, int length, String replacedString,
+            String targetNodeName, List<String> parameters) {
         super(startPositionInLine, startLine, length, replacedString, targetNodeName);
         this.parameters = parameters;
-    }
-
-    @Override
-    public int getReferenceLine() {
-        return 0;
     }
 
     public List<String> getParameters() {
@@ -51,10 +49,12 @@ public class ExternalMethodUsage extends ExternalUsage {
     public int findTargetLineNumber(AstNode node) {
         for (AstNode currentNode : node.getChildNodes()) {
             if (currentNode instanceof MethodNode) {
-                MethodNode methodNode = (MethodNode) node;
-                if (super.targetNodeName.equals(methodNode.getName()) && parameters.size() == methodNode.getParameters().size()) {
+                MethodNode methodNode = (MethodNode) currentNode;
+                if (super.replacedString.equals(methodNode.getName()) && parameters.size() == methodNode.getParameters().size()) {
                     return methodNode.getStartLine();
                 }
+            } else if (currentNode.getChildNodes() != null && !currentNode.getChildNodes().isEmpty()) {
+                return findTargetLineNumber(currentNode);
             }
         }
         return -1;

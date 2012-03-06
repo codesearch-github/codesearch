@@ -35,6 +35,7 @@ import org.codesearch.commons.plugins.codeanalyzing.ast.ExternalUsage;
 import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
 import org.codesearch.commons.plugins.codeanalyzing.ast.Visibility;
 import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.ClassNode;
+import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.ExternalFieldUsage;
 import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.ExternalMethodUsage;
 import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.FileNode;
 import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.MethodNode;
@@ -110,7 +111,7 @@ public class AnalyzerUtil {
      */
     public void addLinkToExternalVariableDeclaration(int lineNumber, int startColumn, String varName, Node parent, String className) {
         //add a link to the variable
-        usages.add(new ExternalUsage(startColumn, lineNumber, className.length(), varName, className));
+        usages.add(new ExternalFieldUsage(startColumn, lineNumber, className.length(), varName, className));
     }
 
     /**

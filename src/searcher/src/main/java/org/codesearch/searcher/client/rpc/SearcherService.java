@@ -26,6 +26,7 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import java.util.List;
 import java.util.Set;
 import org.codesearch.searcher.shared.FileDto;
+import org.codesearch.searcher.shared.JumpLocation;
 import org.codesearch.searcher.shared.SearchResultDto;
 import org.codesearch.searcher.shared.SearchType;
 import org.codesearch.searcher.shared.SearchViewData;
@@ -73,8 +74,8 @@ public interface SearcherService extends RemoteService {
      * @param usageId The given usage id.
      * @param repository The repository of the given file.
      * @param filePath The path of the given file.
-     * @return The {@link SearchResultDto} the usage refors to.
+     * @return The {@link JumpLocation} the usage refers to.
      * @throws SearcherServiceException If an exception occurs on the server.
      */
-    SearchResultDto resolveUsage(int usageId, String repository, String filePath) throws SearcherServiceException;
+    JumpLocation resolveUsage(int usageId, String repository, String filePath) throws SearcherServiceException;
 }

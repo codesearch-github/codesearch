@@ -78,6 +78,8 @@ public class ExternalUsage extends Usage {
         for (AstNode currentNode : node.getChildNodes()) {
             if (targetNodeName.equals(currentNode.getName())) {
                 return currentNode.getStartLine();
+            } else if (currentNode.getChildNodes() != null && !currentNode.getChildNodes().isEmpty()) {
+                return findTargetLineNumber(currentNode);
             }
         }
         return -1;
