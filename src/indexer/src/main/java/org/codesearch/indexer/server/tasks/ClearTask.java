@@ -21,8 +21,11 @@ package org.codesearch.indexer.server.tasks;
 import com.google.inject.Inject;
 import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.List;
 import org.apache.log4j.Logger;
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.StaleReaderException;
 import org.apache.lucene.index.Term;
@@ -34,6 +37,7 @@ import org.codesearch.commons.configuration.properties.PropertiesManager;
 import org.codesearch.commons.constants.IndexConstants;
 import org.codesearch.commons.database.DBAccess;
 import org.codesearch.commons.database.DatabaseAccessException;
+import org.codesearch.commons.plugins.lucenefields.LuceneFieldPluginLoader;
 import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
 import org.codesearch.indexer.server.exceptions.TaskExecutionException;
 import org.codesearch.indexer.server.manager.IndexingJob;
@@ -117,7 +121,7 @@ public class ClearTask implements Task {
                 repos.append(repositoryDto.getName()).append(" ");
             }
             LOG.info("Clearing index for repositories: " + repos.toString().trim());
-            if(job != null) {
+            if (job != null) {
                 job.getJobDataMap().put(IndexingJob.FIELD_CURRENT_STEPS, repositories.size());
             }
             IndexSearcher searcher = null;
@@ -132,7 +136,7 @@ public class ClearTask implements Task {
                         job.setCurrentRepository(index);
                         job.getJobDataMap().put(IndexingJob.FIELD_FINISHED_STEPS, index);
                     }
-                    Term term = new Term(IndexConstants.INDEX_FIELD_REPOSITORY, repositoryDto.getName());
+                    Term term = new Term(IndexConstants.INDEX_FIELD_REPOSITORY, repositoryDto.getName().toLowerCase());
 
                     LOG.debug("Deleting documents where field '" + term.field() + "' is '" + term.text() + "'");
                     int deleteCount = 0;

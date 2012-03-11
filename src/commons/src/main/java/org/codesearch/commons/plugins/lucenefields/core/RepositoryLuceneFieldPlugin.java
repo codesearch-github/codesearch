@@ -19,11 +19,7 @@
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-package org.codesearch.commons.plugins.lucenefields.repositorylucenefieldplugin;
+package org.codesearch.commons.plugins.lucenefields.core;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.codesearch.commons.plugins.lucenefields.FullValueAnalyzer;

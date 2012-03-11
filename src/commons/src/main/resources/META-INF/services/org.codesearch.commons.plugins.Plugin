@@ -1,3 +1,4 @@
 org.codesearch.commons.plugins.lucenefields.core.FilepathLuceneFieldPlugin
 org.codesearch.commons.plugins.lucenefields.core.FilenameLuceneFieldPlugin
 org.codesearch.commons.plugins.lucenefields.core.ContentLuceneFieldPlugin
+org.codesearch.commons.plugins.lucenefields.core.RepositoryLuceneFieldPlugin

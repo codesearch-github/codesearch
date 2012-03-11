@@ -62,11 +62,6 @@
         <!--STARTPLUGINS-->
         <dependency>
             <groupId>org.codesearch</groupId>
-            <artifactId>RepositoryLuceneFieldPlugin</artifactId>
-            <version>0.1-RC2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.codesearch</groupId>
             <artifactId>RevisionLuceneFieldPlugin</artifactId>
             <version>0.1-RC2</version>
         </dependency>
