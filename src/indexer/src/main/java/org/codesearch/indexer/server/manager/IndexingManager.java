@@ -19,6 +19,7 @@
 package org.codesearch.indexer.server.manager;
 
 import com.google.inject.Inject;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.LinkedList;
@@ -267,7 +268,7 @@ public final class IndexingManager {
      * @throws SchedulerException
      */
     public void startJobForRepositories(List<String> repositories, List<String> repositoryGroups, boolean clear) throws SchedulerException {
-        JobKey jobKey = new JobKey("manual-job-" + new Date().getTime(), IndexingJob.GROUP_NAME);
+        JobKey jobKey = new JobKey("manual-job-" + DateFormat.getTimeInstance().format(new Date().getTime()), IndexingJob.GROUP_NAME);
         List<RepositoryDto> repos = new LinkedList<RepositoryDto>();
         for (String currentRepoName : repositories) {
             repos.add(configReader.getRepositoryByName(currentRepoName));
