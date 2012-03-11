@@ -54,7 +54,7 @@ public class MockDBAccessImpl implements DBAccess{
     }
 
     @Override
-    public AstNode getBinaryIndexForFile(String filePath, String repository) throws DatabaseAccessException, DatabaseEntryNotFoundException {
+    public AstNode getBinaryIndexForFile(String filePath, String repository) throws DatabaseAccessException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
@@ -89,7 +89,7 @@ public class MockDBAccessImpl implements DBAccess{
     }
 
     @Override
-    public List<Usage> getUsagesForFile(String filePath, String repository) throws DatabaseAccessException, DatabaseEntryNotFoundException {
+    public List<Usage> getUsagesForFile(String filePath, String repository) throws DatabaseAccessException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

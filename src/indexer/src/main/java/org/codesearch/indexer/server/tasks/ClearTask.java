@@ -170,7 +170,7 @@ public class ClearTask implements Task {
                     dba.setLastAnalyzedRevisionOfRepository(repositoryDto.getName(), VersionControlPlugin.UNDEFINED_VERSION);
                     LOG.debug("Cleared code analysis index for repository " + repositoryDto.getName());
                 } catch (DatabaseAccessException ex) {
-                    LOG.warn("Could not clear code analysis index for repository: " + repositoryDto.getName() + ", ignore if code analysis is not enabled \n");
+                    LOG.warn("Could not clear code analysis index for repository: " + repositoryDto.getName() + ", ignore if code analysis is not enabled \n" + ex);
                 }
             }
         }

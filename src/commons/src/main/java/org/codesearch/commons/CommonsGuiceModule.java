@@ -19,6 +19,7 @@
 package org.codesearch.commons;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Scopes;
 import com.google.inject.Singleton;
 import org.apache.log4j.Logger;
 import org.codesearch.commons.configuration.ConfigurationReader;
@@ -55,8 +56,7 @@ public class CommonsGuiceModule extends AbstractModule {
             bind(ConfigurationReader.class).toInstance(configurationReader);
             bind(PluginLoader.class).toInstance(pluginLoader);
             bind(PropertiesManager.class).to(RepositoryRevisionManager.class).in(Singleton.class);
-            bind(ConnectionPool.class).to(ConnectionPoolImpl.class).in(Singleton.class);
-            bind(DBAccess.class).to(DBAccessImpl.class).in(Singleton.class);
+            bind(DBAccess.class).to(DBAccessImpl.class).asEagerSingleton();
             bind(LuceneFieldPluginLoader.class).to(LuceneFieldPluginLoaderImpl.class).in(Singleton.class);
         } catch (InvalidConfigurationException ex) {
             LOG.error("Invalid configuration:", ex);

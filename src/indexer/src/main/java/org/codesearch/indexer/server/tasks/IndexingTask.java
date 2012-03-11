@@ -127,7 +127,7 @@ public class IndexingTask implements Task {
 
     @Inject
     public IndexingTask(DBAccess dba, PluginLoader pluginLoader, URI searcherUpdatePath, LuceneFieldPluginLoader luceneFieldPluginLoader, PropertiesManager propertiesManager, List<RepositoryDto> repositories, Directory indexDirectory, IndexingJob job) throws IOException, TaskExecutionException {
-        if(job == null) {
+        if (job == null) {
             throw new TaskExecutionException("Parent job must be set in constructor, was null");
         }
         luceneFieldPlugins = luceneFieldPluginLoader.getAllLuceneFieldPlugins();
@@ -192,7 +192,7 @@ public class IndexingTask implements Task {
                                             + "The index of the repository must be cleared first");
                                 }
                             } catch (DatabaseAccessException ex) {
-                                LOG.error("Code analyzing failed, will attempt to execute regular indexing but no code analysis will take place: Database error:" + ex);
+                                LOG.error("Code analyzing failed, no code analyzing data will be available: \n" + ex);
                                 databaseConnectionValid = false;
                             }
                         }
@@ -335,15 +335,19 @@ public class IndexingTask implements Task {
                 }
                 plugin = caPlugins.get(fileType);
                 LOG.debug("Analyzing file: " + fileDto.getFilePath());
-                plugin.analyzeFile(new String(fileDto.getContent()));
-                AstNode ast = plugin.getAst();
-                List<String> typeDeclarations = plugin.getTypeDeclarations();
-                List<Usage> usages = plugin.getUsages();
-                List<String> imports = plugin.getImports();
-                // add the externalLinks to the FileDto, so they
-                // can be parsed after the regular indexing is finished
-                // write the AST information into the database
-                dba.setAnalysisDataForFile(fileDto.getFilePath(), fileDto.getRepository().getName(), ast, usages, typeDeclarations, imports);
+                try {
+                    plugin.analyzeFile(new String(fileDto.getContent()));
+                    AstNode ast = plugin.getAst();
+                    List<String> typeDeclarations = plugin.getTypeDeclarations();
+                    List<Usage> usages = plugin.getUsages();
+                    List<String> imports = plugin.getImports();
+                    // add the externalLinks to the FileDto, so they
+                    // can be parsed after the regular indexing is finished
+                    // write the AST information into the database
+                    dba.setAnalysisDataForFile(fileDto.getFilePath(), fileDto.getRepository().getName(), ast, usages, typeDeclarations, imports);
+                } catch (Exception ex) {
+                    LOG.error("Code analyzer plugin threw exception: \n" + ex);
+                }
             }
         } catch (PluginLoaderException ex) {
             //in case no plugin is found for the file just skip it

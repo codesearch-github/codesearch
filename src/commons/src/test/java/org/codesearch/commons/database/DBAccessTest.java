@@ -21,6 +21,13 @@
 
 package org.codesearch.commons.database;
 
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import javax.naming.InitialContext;
+import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
+import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -30,8 +37,10 @@ import org.junit.Test;
  */
 public class DBAccessTest {
 
+    private DBAccess dbAccess;
 
     public DBAccessTest() {
+       dbAccess = new DBAccessImpl();
     }
 
     @Test
@@ -53,12 +62,13 @@ public class DBAccessTest {
      */
     @Test
     public void testSerializeObject() throws Exception {
-//        String filePath = "asdf";
-//        String repository = "local_repo";
-//        List<Usage> usages = new LinkedList<Usage>();
-//        usages.add(new Usage(0, 0, 0, 0, ""));
-//        dbAccess.setAnalysisDataForFile(filePath, repository, usages, Collections.EMPTY_LIST, Collections.EMPTY_LIST);
-      //  assert (List<Usage>)(DBAccessImpl.getBinaryIndexForFile(filePath, repository)) != null;
+        String filePath = "asdf";
+        String repository = "local_repo";
+        List<Usage> usages = new LinkedList<Usage>();
+        usages.add(new Usage(0, 0, 0, 0, ""));
+        AstNode mockAstNode = new MockAstNode();
+        dbAccess.setAnalysisDataForFile(filePath, repository, mockAstNode, usages, Collections.EMPTY_LIST, Collections.EMPTY_LIST);
+        assert dbAccess.getBinaryIndexForFile(filePath, repository) != null;
     }
 
     /**

@@ -65,7 +65,7 @@ public interface DBAccess {
      * @return the binary index of the file
      * @throws DatabaseAccessException
      */
-    AstNode getBinaryIndexForFile(String filePath, String repository) throws DatabaseAccessException, DatabaseEntryNotFoundException;
+    AstNode getBinaryIndexForFile(String filePath, String repository) throws DatabaseAccessException;
 
     /**
      * retrieves the path of the file in which the from the database
@@ -129,7 +129,7 @@ public interface DBAccess {
      * @return the usages ordered by line number / column
      * @throws DatabaseAccessException
      */
-    List<Usage> getUsagesForFile(String filePath, String repository) throws DatabaseAccessException, DatabaseEntryNotFoundException;
+    List<Usage> getUsagesForFile(String filePath, String repository) throws DatabaseAccessException;
 
     void purgeDatabaseEntries() throws DatabaseAccessException;
 

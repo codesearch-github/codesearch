@@ -155,16 +155,15 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
                             outline.add(convertAstNodeToOutlineNode(a));
                         }
                         file.setOutline(outline);
+                    } else {
+                        LOG.debug("No AST could be found, disabling code navigation links.");
+                        insertCodeNavigationLinks = false;
                     }
                 } else {
+                    // in case the last analyzed revision does not match the last indexed revision
                     LOG.warn("Code analysis data for repository " + repoName + " is not at the same revision as the index, disabling code navigation.");
                     insertCodeNavigationLinks = false;
-                    // in case the last analyzed revision does not match the last indexed revision
                 }
-
-            } catch (DatabaseEntryNotFoundException ex) {
-                insertCodeNavigationLinks = false;
-                //in case the file has no binary index it is simply displayed without an outline
             } catch (DatabaseAccessException ex) {
                 insertCodeNavigationLinks = false;
                 LOG.error("Could not access database: \n" + ex);
@@ -234,17 +233,17 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
         try {
             ExternalUsage usage = dba.getUsageForIdInFile(usageId, filePath, repository);
             String targetFilePath = getFilePathOfDeclaration(repository, usage.getTargetNodeName(), filePath);
-            int targetLineNumber = 1;
-            try {
-                AstNode ast = dba.getBinaryIndexForFile(targetFilePath, repository);
-                targetLineNumber = usage.findTargetLineNumber(ast);
-                if(targetLineNumber < 1) {
-                    targetLineNumber = 1;
-                }
-            } catch (DatabaseEntryNotFoundException ex) {
-                LOG.warn("AST not found for file: " + targetFilePath + "@" + repository);
-            }
             if (targetFilePath != null) {
+                int targetLineNumber = 1;
+                AstNode ast = dba.getBinaryIndexForFile(targetFilePath, repository);
+                if (ast == null) {
+                    LOG.warn("AST not found for file: " + targetFilePath + "@" + repository);
+                } else {
+                    targetLineNumber = usage.findTargetLineNumber(ast);
+                    if (targetLineNumber < 1) {
+                        targetLineNumber = 1;
+                    }
+                }
                 JumpLocation location = new JumpLocation();
                 location.setFilePath(targetFilePath);
                 location.setRepository(repository);
@@ -321,18 +320,12 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
 
     private byte[] addUsageLinksToFileContent(byte[] fileContentBytes, String filePath, String repository, String hlEscapeStartToken, String hlEscapeEndToken) {
         try {
-            List<Usage> usages;
-            try {
-                usages = dba.getUsagesForFile(filePath, repository);
-            } catch (DatabaseEntryNotFoundException ex) {
-                //in case the file does not have a binary index just display it without links
-                usages = null;
-            }
-            String resultString = "";
+            List<Usage> usages = dba.getUsagesForFile(filePath, repository);
             if (usages == null) {
                 //in case there is no entry for the filePath it is a file that has not been analyzed
                 return fileContentBytes;
             }
+            String resultString = "";
             String[] contentLines = new String(fileContentBytes).split("\n");
             int usageIndex = 0;
             outer:

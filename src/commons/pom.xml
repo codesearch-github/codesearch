@@ -52,6 +52,11 @@
             <artifactId>mysql-connector-java</artifactId>
             <version>5.1.17</version>
         </dependency>
+        <dependency>
+            <groupId>commons-dbutils</groupId>
+            <artifactId>commons-dbutils</artifactId>
+            <version>1.4</version>
+        </dependency>
 
        		<!-- Default included plugins -->
         <!--STARTPLUGINS-->

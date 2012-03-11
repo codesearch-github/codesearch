@@ -122,7 +122,13 @@
                 <artifactId>jmimemagic</artifactId>
                 <version>0.1.2</version>
             </dependency>
-            
+
+            <dependency>
+                <groupId>commons-dbutils</groupId>
+                <artifactId>commons-dbutils</artifactId>
+                <version>1.4</version>
+            </dependency>
+
 			<!-- TEST DEPENDENCIES -->
             <dependency>
                 <groupId>junit</groupId>
