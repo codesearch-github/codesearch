@@ -46,11 +46,6 @@ public class NoOpConfigurationReader implements ConfigurationReader{
     }
 
     @Override
-    public DatabaseConfiguration getDatabaseConfiguration() {
-        return null;
-    }
-
-    @Override
     public File getCacheDirectory() {
         return null;
     }

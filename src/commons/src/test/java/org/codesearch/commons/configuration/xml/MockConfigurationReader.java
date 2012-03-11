@@ -50,11 +50,6 @@ public class MockConfigurationReader implements ConfigurationReader {
     }
 
     @Override
-    public DatabaseConfiguration getDatabaseConfiguration() {
-        return configuration.getDatabaseConfiguration();
-    }
-
-    @Override
     public File getCacheDirectory() {
         return configuration.getCacheDirectory();
     }

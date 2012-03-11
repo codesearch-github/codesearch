@@ -79,13 +79,6 @@ public interface ConfigurationReader {
     List<String> getRepositoryGroups();
 
     /**
-     * Retrieves the configuration data for the database connection.
-     *
-     * @return The configuration
-     */
-    DatabaseConfiguration getDatabaseConfiguration();
-
-    /**
      * Returns the path to the directory that is used to store version control data like checked out repositories.
      *
      * @return The path to the cache directory

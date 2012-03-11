@@ -11,17 +11,6 @@
 	of the GNU General Public License along with Codesearch. If not, see <http://www.gnu.org/licenses/>. -->
 
 <root>
-    <database>
-        <hostname>127.0.0.1</hostname>
-        <port-number>3306</port-number>
-        <database-name>codesearch</database-name>
-        <protocol>mysql</protocol>
-        <driver>com.mysql.jdbc.Driver</driver>
-        <username>codesearch</username>
-        <password>dota!123</password>
-        <max-connections>100</max-connections>
-    </database>
-
     <searcher-location>http://127.0.0.1:8080/codesearch/searcher/</searcher-location>
     <cache-directory>/tmp/</cache-directory>
     <index-directory>/tmp/</index-directory>
@@ -41,7 +30,7 @@
         </index-job>
     </index-jobs>
 
-    
+
     <repositories>
         <repository>
             <name>jdownloader-repo</name>

@@ -1,19 +1,4 @@
 <root>
-    <!-- 
-    Database connection, used for storing code analysis data. 
-    If no code navigation is needed, these fields can be left empty.
-    -->
- 	<database>
-		<hostname>127.0.0.1</hostname>
-		<port-number>3306</port-number>
-		<database-name>codesearch</database-name>
-		<protocol>mysql</protocol>
-		<driver>com.mysql.jdbc.Driver</driver>
-		<username>codesearch</username>
-		<password></password>
-		<max-connections>100</max-connections>
-	</database> 
-    
     <!-- The url of the searcher, used to notify the searcher of changes to the index -->
     <searcher-location>http://127.0.0.1:8080/searcher/</searcher-location>
     <!-- The directory that is used by version control plugins to store checked out repositories -->

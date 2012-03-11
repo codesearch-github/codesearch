@@ -19,7 +19,6 @@
 package org.codesearch.commons;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.Scopes;
 import com.google.inject.Singleton;
 import org.apache.log4j.Logger;
 import org.codesearch.commons.configuration.ConfigurationReader;
@@ -28,8 +27,6 @@ import org.codesearch.commons.configuration.InvalidConfigurationException;
 import org.codesearch.commons.configuration.properties.PropertiesManager;
 import org.codesearch.commons.configuration.properties.RepositoryRevisionManager;
 import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
-import org.codesearch.commons.database.ConnectionPool;
-import org.codesearch.commons.database.ConnectionPoolImpl;
 import org.codesearch.commons.database.DBAccess;
 import org.codesearch.commons.database.DBAccessImpl;
 import org.codesearch.commons.plugins.PluginLoader;

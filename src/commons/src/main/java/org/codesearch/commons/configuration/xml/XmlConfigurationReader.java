@@ -156,14 +156,6 @@ public class XmlConfigurationReader implements ConfigurationReader {
      * {@inheritDoc}
      */
     @Override
-    public synchronized DatabaseConfiguration getDatabaseConfiguration() {
-        return codesearchConfiguration.getDatabaseConfiguration();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public synchronized File getCacheDirectory() {
         return codesearchConfiguration.getCacheDirectory();
     }
@@ -216,7 +208,6 @@ public class XmlConfigurationReader implements ConfigurationReader {
         loadRepositories();
         loadJobs();
         loadIndexerUsers();
-        loadDatabaseConfiguration();
     }
 
     private void loadCacheDirectory() throws InvalidConfigurationException {
@@ -352,22 +343,6 @@ public class XmlConfigurationReader implements ConfigurationReader {
             indexerUsers.add(userDto);
         }
         codesearchConfiguration.setIndexerUsers(indexerUsers);
-    }
-
-    private void loadDatabaseConfiguration() {
-        DatabaseConfiguration databaseConfiguration = new DatabaseConfiguration();
-        HierarchicalConfiguration hc = config.configurationAt(XmlConfigurationReaderConstants.DB_SECTION);
-
-        databaseConfiguration.setHostName(hc.getString(XmlConfigurationReaderConstants.DB_HOSTNAME));
-        databaseConfiguration.setPort(hc.getInt(XmlConfigurationReaderConstants.DB_PORT_NUMBER));
-        databaseConfiguration.setDriver(hc.getString(XmlConfigurationReaderConstants.DB_DRIVER));
-        databaseConfiguration.setDatabase(hc.getString(XmlConfigurationReaderConstants.DB_DATABASE));
-        databaseConfiguration.setUsername(hc.getString(XmlConfigurationReaderConstants.DB_USERNAME));
-        databaseConfiguration.setPassword(hc.getString(XmlConfigurationReaderConstants.DB_PASSWORD));
-        databaseConfiguration.setMaxConnections(hc.getInt(XmlConfigurationReaderConstants.DB_MAX_CONNECTIONS));
-        databaseConfiguration.setProtocol(hc.getString(XmlConfigurationReaderConstants.DB_PROTOCOL));
-
-        codesearchConfiguration.setDatabaseConfiguration(databaseConfiguration);
     }
 
     private void loadGlobalWhitelist() {

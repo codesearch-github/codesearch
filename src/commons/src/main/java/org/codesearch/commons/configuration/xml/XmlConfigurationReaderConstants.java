@@ -124,15 +124,4 @@ public final class XmlConfigurationReaderConstants {
     protected static final String JOB_REPOSITORY = "repositories";
     /** Clear index before indexing? */
     protected static final String JOB_CLEAR = "clear";
-
-    //DATABASE CONSTANTS
-    protected static final String DB_SECTION = "database";
-    protected static final String DB_USERNAME = "username";
-    protected static final String DB_PASSWORD = "password";
-    protected static final String DB_DRIVER = "driver";
-    protected static final String DB_HOSTNAME = "hostname";
-    protected static final String DB_PORT_NUMBER = "port-number";
-    protected static final String DB_DATABASE = "database-name";
-    protected static final String DB_MAX_CONNECTIONS = "max-connections";
-    protected static final String DB_PROTOCOL = "protocol";
 }

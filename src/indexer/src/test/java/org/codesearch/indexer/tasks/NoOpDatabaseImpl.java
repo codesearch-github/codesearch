@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 import org.codesearch.commons.database.DBAccess;
 import org.codesearch.commons.database.DatabaseAccessException;
-import org.codesearch.commons.database.DatabaseEntryNotFoundException;
 import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
 import org.codesearch.commons.plugins.codeanalyzing.ast.ExternalUsage;
 import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
@@ -51,7 +50,7 @@ public class NoOpDatabaseImpl implements DBAccess {
     }
 
     @Override
-    public AstNode getBinaryIndexForFile(String filePath, String repository) throws DatabaseAccessException, DatabaseEntryNotFoundException {
+    public AstNode getBinaryIndexForFile(String filePath, String repository) throws DatabaseAccessException {
         return null;
     }
 
@@ -86,7 +85,7 @@ public class NoOpDatabaseImpl implements DBAccess {
     }
 
     @Override
-    public List<Usage> getUsagesForFile(String filePath, String repository) throws DatabaseAccessException, DatabaseEntryNotFoundException {
+    public List<Usage> getUsagesForFile(String filePath, String repository) throws DatabaseAccessException {
         return null;
     }
 
