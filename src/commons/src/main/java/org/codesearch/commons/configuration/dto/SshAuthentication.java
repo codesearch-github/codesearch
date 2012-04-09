@@ -31,12 +31,50 @@ package org.codesearch.commons.configuration.dto;
  * @author David Froehlich
  */
 public class SshAuthentication implements AuthenticationType {
-    public String sshFilePath;
+    private String sshFilePath;
+    private String username;
+    private String password;
+    private String port;
     
-    public SshAuthentication(String sshFilePath) {
+    public SshAuthentication(String username, String password, String port, String sshFilePath) {
+        this.sshFilePath = sshFilePath;
+        this.username = username;
+        this.password = password;
+        this.port = port;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getPort() {
+        return port;
+    }
+
+    public void setPort(String port) {
+        this.port = port;
+    }
+
+    public String getSshFilePath() {
+        return sshFilePath;
+    }
+
+    public void setSshFilePath(String sshFilePath) {
         this.sshFilePath = sshFilePath;
     }
 
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+    
     @Override
     public String toString() {
         return "SshAuthentication{" + "sshFilePath=" + sshFilePath + '}';

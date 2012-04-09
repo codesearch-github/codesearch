@@ -293,7 +293,10 @@ public class XmlConfigurationReader implements ConfigurationReader {
             usedAuthentication = new BasicAuthentication(username, password);
         } else if (authenticationType.equals("ssh")) {
             String sshFilePath = hc.getString(XmlConfigurationReaderConstants.REPOSITORY_AUTHENTICATION_DATA_SSH_FILE_PATH);
-            usedAuthentication = new SshAuthentication(sshFilePath);
+            String username = hc.getString(XmlConfigurationReaderConstants.REPOSITORY_AUTHENTICATION_DATA_USERNAME);
+            String password = hc.getString(XmlConfigurationReaderConstants.REPOSITORY_AUTHENTICATION_DATA_PASSWORD);
+            String port = hc.getString(XmlConfigurationReaderConstants.REPOSITORY_AUTHENTICATION_DATA_PORT);
+            usedAuthentication = new SshAuthentication(username, password, port, sshFilePath);
         }
         String versionControlSystem = hc.getString(XmlConfigurationReaderConstants.REPOSITORY_VCS);
         repo = new RepositoryDto(name, hc.getString(XmlConfigurationReaderConstants.REPOSITORY_URL), usedAuthentication, hc.getBoolean(XmlConfigurationReaderConstants.REPOSITORY_CODE_NAVIGATION_ENABLED), versionControlSystem, blacklistEntries, whitelistFileNames, repositoryGroups);

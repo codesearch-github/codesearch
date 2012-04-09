@@ -19,6 +19,7 @@
 package org.codesearch.commons.plugins.vcs;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -28,10 +29,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
-import org.codesearch.commons.configuration.dto.AuthenticationType;
-import org.codesearch.commons.configuration.dto.BasicAuthentication;
-import org.codesearch.commons.configuration.dto.NoAuthentication;
-import org.codesearch.commons.configuration.dto.RepositoryDto;
+import org.codesearch.commons.configuration.dto.*;
 import org.tmatesoft.svn.core.ISVNDirEntryHandler;
 import org.tmatesoft.svn.core.SVNDepth;
 import org.tmatesoft.svn.core.SVNDirEntry;
@@ -262,9 +260,15 @@ public class SubversionPlugin implements VersionControlPlugin {
                 BasicAuthentication basicAuth = (BasicAuthentication) type;
                 authManager = new BasicAuthenticationManager(basicAuth.getUsername(), basicAuth.getPassword());
                 svnRepo.setAuthenticationManager(authManager);
-            } else {
-                //TODO add support for ssh files
-                throw new VersionControlPluginException("SSH authentication not yet supported.");
+            } else if (type instanceof SshAuthentication) {
+                SshAuthentication sshAuth = (SshAuthentication) type;
+                File sshFile = new File(sshAuth.getSshFilePath());
+                if (sshFile.exists() && sshFile.canRead()) {
+                    authManager = new BasicAuthenticationManager(sshAuth.getUsername(), sshFile, sshAuth.getPassword(), Integer.parseInt(sshAuth.getPort()));
+                    svnRepo.setAuthenticationManager(authManager);
+                } else {
+                    throw new VersionControlPluginException("SSH key file could not be read");
+                }
             }
             svnRepo.testConnection();
             String repoUrl = svnRepo.getRepositoryRoot(true).toString();

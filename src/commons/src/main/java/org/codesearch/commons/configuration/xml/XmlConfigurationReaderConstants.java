@@ -106,7 +106,9 @@ public final class XmlConfigurationReaderConstants {
     protected static final String REPOSITORY_AUTHENTICATION_DATA_PASSWORD = "authentication-data.password";
     /** used to retrieve the location of the SSH file in case the used authentication is 'SSH' */
     protected static final String REPOSITORY_AUTHENTICATION_DATA_SSH_FILE_PATH = "authentication-data.file-path";
-
+    /** used to retrieve the port in case the used authentication is 'ssh' */
+    protected static final String REPOSITORY_AUTHENTICATION_DATA_PORT = "authentication-data.port";
+    
     //TASK CONSTANTS
     /** Used to access a single task */
     protected static final String TASK = "task";
