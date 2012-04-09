@@ -97,6 +97,15 @@ public class AnalyzerUtil {
      * @param className the name of the class that is used
      */
     public void addLinkToExternalClassDeclaration(int lineNumber, int startColumn, String className) {
+        //check if there already is a usage with the exact same start position, in which case the previous usage will be replaced
+        //this prevents the analysis data of the JavaParser library to create overlapping usages (as would otherwise happen with fully qualified names
+        for(Usage usage : usages) {
+            if(usage.getStartLine() == lineNumber && usage.getStartColumn() == startColumn){
+                usages.remove(usage);
+                break;
+            }
+        }
+        
         usages.add(new ExternalUsage(startColumn, lineNumber, className.length(), className, className));
     }
 

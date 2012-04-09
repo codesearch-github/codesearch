@@ -31,6 +31,7 @@ import java.io.InputStreamReader;
 import java.util.LinkedList;
 import java.util.List;
 import org.codesearch.commons.plugins.codeanalyzing.CodeAnalyzerPluginException;
+import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
 import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
 import org.codesearch.commons.plugins.codeanalyzing.ast.Visibility;
 import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.ClassNode;
@@ -49,6 +50,18 @@ public class JavaCodeAnalyzerPluginTest {
 
     public JavaCodeAnalyzerPluginTest() {
         this.instance = new JavaCodeAnalyzerPlugin();
+    }
+    
+    private String getResourceFileContent(String filename) throws IOException{
+        BufferedReader reader = new BufferedReader(new InputStreamReader(
+                getClass().getClassLoader().getResourceAsStream(
+                filename)));
+        String fileContent = "";
+        String newLine;
+        while ((newLine = reader.readLine()) != null) {
+            fileContent += newLine + "\n";
+        }
+        return fileContent;
     }
 
     //all analysis tests
@@ -88,19 +101,22 @@ public class JavaCodeAnalyzerPluginTest {
 
     @Test
     public void testMultiLineMethodCall() throws CodeAnalyzerPluginException, IOException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(
-                getClass().getClassLoader().getResourceAsStream(
-                "MultiLineMethodCall.java")));
-        String fileContent = "";
-        String newLine;
-        while ((newLine = reader.readLine()) != null) {
-            fileContent += newLine + "\n";
-        }
+        String fileContent = this.getResourceFileContent("MultiLineMethodCall.java");
         instance.analyzeFile(fileContent);
         List<Usage> result = instance.getUsages();
         List<Usage> expResult = new LinkedList<Usage>();
         expResult.add(new Usage(9, 11, 3, 9, "foo"));
         assert (result.size() == 1);
         assert (expResult.get(0).equals(result.get(0)));
+    }
+    
+    @Test
+    public void testFullyQualifiedName() throws IOException, CodeAnalyzerPluginException {
+        String fileContent = this.getResourceFileContent("FullyQualifiedName.java");
+        instance.analyzeFile(fileContent);
+        AstNode ast = instance.getAst();
+        List<Usage> usages = instance.getUsages();
+        assert(usages.size() == 1);
+        assert(usages.get(0).getStartColumn() == 11);
     }
 }
