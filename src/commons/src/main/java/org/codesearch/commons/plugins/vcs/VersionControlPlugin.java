@@ -33,6 +33,15 @@ import org.codesearch.commons.validator.ValidationException;
  */
 public interface VersionControlPlugin extends Plugin {
     public final String UNDEFINED_VERSION = "-1";
+
+    /**
+     * Plugins that cache on the local filesystem can implement this
+     * method to pull new changes from their remote sources.
+     * This method is called in Codesearch whenever new changes are
+     * desired, e.g. before indexing.
+     */
+    void pullChanges() throws VersionControlPluginException;
+
     /**
      * Sets the current repository.
      * It is required that the repository is set before calling any of the
@@ -47,7 +56,7 @@ public interface VersionControlPlugin extends Plugin {
      * @param revision The revision for which the content should be retrieved (use VersionControlPlugin.CURRENT_VERSION for the current version)
      * @return The retrieved file
      */
-    FileDto getFileDtoForFileIdentifierAtRevision(FileIdentifier fileInfo, String revision) throws VersionControlPluginException;
+    FileDto getFile(FileIdentifier fileInfo, String revision) throws VersionControlPluginException, VcsFileNotFoundException;
 
     /**
      * Returns a list of changed files since the given revision.

@@ -1,22 +1,20 @@
 /**
- * Copyright 2010 David Froehlich   <david.froehlich@businesssoftware.at>,
- *                Samuel Kogler     <samuel.kogler@gmail.com>,
- *                Stephan Stiboller <stistc06@htlkaindorf.at>
+ * Copyright 2010 David Froehlich <david.froehlich@businesssoftware.at>, Samuel
+ * Kogler <samuel.kogler@gmail.com>, Stephan Stiboller <stistc06@htlkaindorf.at>
  *
  * This file is part of Codesearch.
  *
- * Codesearch is free software: you can redistribute it andor modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Codesearch is free software: you can redistribute it andor modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
  *
- * Codesearch is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * Codesearch is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Codesearch.  If not, see <http:www.gnu.orglicenses>.
+ * You should have received a copy of the GNU General Public License along with
+ * Codesearch. If not, see <http:www.gnu.orglicenses>.
  */
 package org.codesearch.commons.plugins.vcs;
 
@@ -38,8 +36,9 @@ import org.codesearch.commons.configuration.dto.RepositoryDto;
 import org.codesearch.commons.validator.ValidationException;
 
 /**
- * A plugin used to access files stored in Mercurial repositories.
- * Checks out repositories to the local filesystem.
+ * A plugin used to access files stored in Mercurial repositories. Checks out
+ * repositories to the local filesystem.
+ *
  * @author Samuel Kogler
  */
 public class HgLocalPlugin implements VersionControlPlugin {
@@ -62,7 +61,9 @@ public class HgLocalPlugin implements VersionControlPlugin {
         }
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setRepository(RepositoryDto repo) throws VersionControlPluginException {
         currentRepository = repo;
@@ -72,28 +73,25 @@ public class HgLocalPlugin implements VersionControlPlugin {
         }
 
         if (branchDirectory.isDirectory()) {
-            LOG.info("It seems repository " + repo.getName() + " is already cloned locally, trying to pull new changes...");
-            try {
-                executeHgCommand("pull");
-                return;
-            } catch (VersionControlPluginException ex) {
-                LOG.warn("Existent directory not a valid hg repository, removing...");
-            }
-        }
+            LOG.info("Repository " + repo.getName() + " already exists locally.");
 
-        branchDirectory.mkdirs();
-        LOG.info("Cloning repository " + repo.getName() + " ...");
-
-        if (repo.getUsedAuthentication() instanceof NoAuthentication) {
-            executeHgCommand("clone", repo.getUrl(), branchDirectory.getAbsolutePath());
         } else {
-            throw new VersionControlPluginException("Authentication not supported yet.");
+            branchDirectory.mkdirs();
+            LOG.info("Cloning repository " + repo.getName() + " ...");
+
+            if (repo.getUsedAuthentication() instanceof NoAuthentication) {
+                executeHgCommand("clone", repo.getUrl(), branchDirectory.getAbsolutePath());
+            } else {
+                throw new VersionControlPluginException("Authentication not supported yet.");
+            }
         }
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public FileDto getFileDtoForFileIdentifierAtRevision(FileIdentifier fileIdentifier, String revision) throws VersionControlPluginException {
+    public FileDto getFile(FileIdentifier fileIdentifier, String revision) throws VersionControlPluginException {
         if (revision == null || revision.isEmpty()) {
             revision = ".";
         }
@@ -111,8 +109,10 @@ public class HgLocalPlugin implements VersionControlPlugin {
         return file;
     }
 
-    /** {@inheritDoc} 
-     WARNING: The HgLocalPlugin does not support black-/whitelist patterns when retrieving changed files, these lists will simply be ignored
+    /**
+     * {@inheritDoc} WARNING: The HgLocalPlugin does not support
+     * black-/whitelist patterns when retrieving changed files, these lists will
+     * simply be ignored
      */
     @Override
     public Set<FileIdentifier> getChangedFilesSinceRevision(String revision, List<String> blacklistPatterns, List<String> whitelistPatterns) throws VersionControlPluginException {
@@ -153,13 +153,17 @@ public class HgLocalPlugin implements VersionControlPlugin {
         return files;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getRepositoryRevision() throws VersionControlPluginException {
         return new String(executeHgCommand("hg log -l 1 --template \"{node}\""));
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<String> getFilesInDirectory(String directoryPath, String revision) throws VersionControlPluginException {
         //TODO fix revision check
@@ -169,20 +173,24 @@ public class HgLocalPlugin implements VersionControlPlugin {
         }
 
         File absolutePath = new File(branchDirectory, directoryPath);
-        if(absolutePath.isDirectory()) {
+        if (absolutePath.isDirectory()) {
             return Arrays.asList(absolutePath.list());
         } else {
             throw new VersionControlPluginException("Cannot list files in directory " + directoryPath + ": File does not exist or is not a directory.");
         }
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getPurposes() {
         return "HG";
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setCacheDirectory(String directoryPath) throws VersionControlPluginException {
         this.cacheDirectory = new File(directoryPath);
@@ -191,7 +199,9 @@ public class HgLocalPlugin implements VersionControlPlugin {
         }
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void validate() throws ValidationException {
         //TODO add validation logic
@@ -272,5 +282,14 @@ public class HgLocalPlugin implements VersionControlPlugin {
         }
 
         return lines;
+    }
+
+    @Override
+    public void pullChanges() throws VersionControlPluginException {
+        try {
+            executeHgCommand("pull");
+        } catch (VersionControlPluginException ex) {
+            throw new VersionControlPluginException("Pulling new changes failed: \n" + ex);
+        }
     }
 }

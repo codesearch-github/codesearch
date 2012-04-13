@@ -23,7 +23,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
@@ -57,6 +62,7 @@ import org.codesearch.commons.plugins.lucenefields.LuceneFieldPluginLoader;
 import org.codesearch.commons.plugins.lucenefields.LuceneFieldValueException;
 import org.codesearch.commons.plugins.vcs.FileDto;
 import org.codesearch.commons.plugins.vcs.FileIdentifier;
+import org.codesearch.commons.plugins.vcs.VcsFileNotFoundException;
 import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
 import org.codesearch.commons.plugins.vcs.VersionControlPluginException;
 import org.codesearch.commons.utils.mime.MimeTypeUtil;
@@ -171,13 +177,16 @@ public class IndexingTask implements Task {
                         long start = System.currentTimeMillis();
                         // Read the index status file
                         String lastIndexedRevision = propertiesManager.getValue(repository.getName());
-                        LOG.info("Last indexed revision is: " + lastIndexedRevision);
+                        LOG.info("Last indexed revision: " + lastIndexedRevision);
                         // Get the version control plugins
                         versionControlPlugin = pluginLoader.getPlugin(VersionControlPlugin.class, repository.getVersionControlSystem());
                         // get the changed files
                         versionControlPlugin.setRepository(repository);
+                        LOG.info("Pulling new changes of the repository");
+                        job.getJobDataMap().put(IndexingJob.FIELD_STEP, "Pulling repository changes");
+                        versionControlPlugin.pullChanges();
                         String repositoryRevision = versionControlPlugin.getRepositoryRevision();
-                        LOG.info("Newest revision is      : " + repositoryRevision);
+                        LOG.info("Newest revision      : " + repositoryRevision);
                         job.getJobDataMap().put(IndexingJob.FIELD_STEP, "Getting changed files");
                         Set<FileIdentifier> changedFiles = versionControlPlugin.getChangedFilesSinceRevision(lastIndexedRevision, repository.getBlacklistEntries(), repository.getWhitelistEntries());
                         LOG.info(changedFiles.size() + " files have changed since the last indexing");
@@ -207,12 +216,14 @@ public class IndexingTask implements Task {
                             job.getJobDataMap().put(IndexingJob.FIELD_FINISHED_STEPS, finishedFiles);
                             if (!currentIdentifier.isDeleted()) {
                                 try {
-                                    FileDto currentDto = versionControlPlugin.getFileDtoForFileIdentifierAtRevision(currentIdentifier, VersionControlPlugin.UNDEFINED_VERSION);
+                                    FileDto currentDto = versionControlPlugin.getFile(currentIdentifier, VersionControlPlugin.UNDEFINED_VERSION);
                                     addFileToIndex(currentDto);
 
                                     if (repository.isCodeNavigationEnabled() && databaseConnectionValid) {
                                         executeCodeAnalysisForFile(currentDto);
                                     }
+                                } catch (VcsFileNotFoundException ex) {
+                                    LOG.error("File not found: " + currentIdentifier + " , skipping file.");
                                 } catch (CodeAnalyzerPluginException ex) {
                                     LOG.error("Code analyzing failed, skipping file\n" + ex);
                                     //in case either of those exceptions occurs try to keep indexing the remaining files
@@ -262,24 +273,6 @@ public class IndexingTask implements Task {
         } else {
             LOG.warn("No repositories specified, skipping indexing.");
         }
-    }
-
-    /**
-     * retrieves the set of all FileDtos for the given FileIdentifiers
-     *
-     * @param fileIdentifiers
-     * @param plugin
-     * @return
-     * @throws VersionControlPluginException
-     */
-    @Deprecated
-    private Set<FileDto> retrieveFileDtosForIdentifiers(Set<FileIdentifier> fileIdentifiers, VersionControlPlugin plugin) throws VersionControlPluginException {
-        //TODO find out if this method is still needed
-        Set<FileDto> fileDtos = new HashSet<FileDto>();
-        for (FileIdentifier currentIdentifier : fileIdentifiers) {
-            fileDtos.add(plugin.getFileDtoForFileIdentifierAtRevision(currentIdentifier, VersionControlPlugin.UNDEFINED_VERSION));
-        }
-        return fileDtos;
     }
 
     /**

@@ -1,22 +1,20 @@
 /**
- * Copyright 2010 David Froehlich   <david.froehlich@businesssoftware.at>,
- *                Samuel Kogler     <samuel.kogler@gmail.com>,
- *                Stephan Stiboller <stistc06@htlkaindorf.at>
+ * Copyright 2010 David Froehlich <david.froehlich@businesssoftware.at>, Samuel
+ * Kogler <samuel.kogler@gmail.com>, Stephan Stiboller <stistc06@htlkaindorf.at>
  *
  * This file is part of Codesearch.
  *
- * Codesearch is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Codesearch is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
  *
- * Codesearch is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * Codesearch is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with
+ * Codesearch. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.codesearch.commons.plugins.vcs;
 
@@ -31,6 +29,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -39,8 +38,9 @@ import org.codesearch.commons.configuration.dto.RepositoryDto;
 import org.codesearch.commons.validator.ValidationException;
 
 /**
- * A plugin used to access files stored in Git repositories.
- * Checks out repositories to the local filesystem.
+ * A plugin used to access files stored in Git repositories. Checks out
+ * repositories to the local filesystem.
+ *
  * @author Samuel Kogler
  */
 public class GitLocalPlugin implements VersionControlPlugin {
@@ -63,7 +63,9 @@ public class GitLocalPlugin implements VersionControlPlugin {
         }
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setRepository(RepositoryDto repo) throws VersionControlPluginException {
         currentRepository = repo;
@@ -73,32 +75,35 @@ public class GitLocalPlugin implements VersionControlPlugin {
         }
 
         if (branchDirectory.isDirectory()) {
-            LOG.info("It seems repository " + repo.getName() + " is already cloned locally, trying to pull new changes...");
-            try {
-                executeGitCommand("pull");
-                return;
-            } catch (VersionControlPluginException ex) {
-                LOG.warn("Existent directory not a valid git repository, removing...");
-            }
-        }
-
-        branchDirectory.mkdirs();
-        LOG.info("Cloning repository " + repo.getName() + " ...");
-
-        if (repo.getUsedAuthentication() instanceof NoAuthentication) {
-            executeGitCommand("clone", repo.getUrl(), branchDirectory.getAbsolutePath());
+            LOG.info("Repository " + repo.getName() + " already exists locally.");
         } else {
-            throw new VersionControlPluginException("Authentication not supported yet.");
+
+            branchDirectory.mkdirs();
+            LOG.info("Cloning repository " + repo.getName() + " ...");
+
+            if (repo.getUsedAuthentication() instanceof NoAuthentication) {
+                executeGitCommand("clone", repo.getUrl(), branchDirectory.getAbsolutePath());
+            } else {
+                throw new VersionControlPluginException("Authentication not supported yet.");
+            }
         }
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public FileDto getFileDtoForFileIdentifierAtRevision(FileIdentifier fileIdentifier, String revision) throws VersionControlPluginException {
+    public FileDto getFile(FileIdentifier fileIdentifier, String revision) throws VersionControlPluginException, VcsFileNotFoundException {
         if (revision == null || revision.isEmpty() || revision.equals(VersionControlPlugin.UNDEFINED_VERSION)) {
             revision = "HEAD";
         }
-        byte[] fileContent = executeGitCommand("show", revision + ":" + fileIdentifier.getFilePath());
+        String gitIdentifier = revision + ":" + fileIdentifier.getFilePath();
+        //Check if file exists
+        if(!checkFile(gitIdentifier)) {
+            throw new VcsFileNotFoundException("File " + fileIdentifier + "@" + revision + " does not exist. Try pulling new changes.");
+        }
+
+        byte[] fileContent = executeGitCommand("show", gitIdentifier);
         String lastRevision = StringUtils.chomp(new String(executeGitCommand("log", revision, "-n1", "--pretty=%H", fileIdentifier.getFilePath())));
         String lastAuthor = StringUtils.chomp(new String(executeGitCommand("log", revision, "-n1", "--pretty=%an", fileIdentifier.getFilePath())));
 
@@ -111,8 +116,10 @@ public class GitLocalPlugin implements VersionControlPlugin {
         return file;
     }
 
-    /** {@inheritDoc}
-     WARNING: The GitLocalPlugin does not support black-/whitelist patterns when retrieving changed files, these lists will simply be ignored
+    /**
+     * {@inheritDoc} WARNING: The GitLocalPlugin does not support
+     * black-/whitelist patterns when retrieving changed files, these lists will
+     * simply be ignored
      */
     @Override
     public Set<FileIdentifier> getChangedFilesSinceRevision(String revision, List<String> blacklistPatterns, List<String> whitelistPatterns) throws VersionControlPluginException {
@@ -153,7 +160,9 @@ public class GitLocalPlugin implements VersionControlPlugin {
         return files;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getRepositoryRevision() throws VersionControlPluginException {
         return StringUtils.chomp(new String(executeGitCommand("rev-parse", "HEAD")));
@@ -175,7 +184,9 @@ public class GitLocalPlugin implements VersionControlPlugin {
         return files;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getPurposes() {
         return "GIT";
@@ -269,5 +280,23 @@ public class GitLocalPlugin implements VersionControlPlugin {
         }
 
         return lines;
+    }
+
+    private boolean checkFile(String gitIdentifier) {
+        try {
+            executeGitCommand("rev-parse", "--verify", gitIdentifier);
+            return true;
+        } catch (VersionControlPluginException ex) {
+            return false;
+        }
+    }
+
+    @Override
+    public void pullChanges() throws VersionControlPluginException {
+        try {
+            executeGitCommand("pull");
+        } catch (VersionControlPluginException ex) {
+            throw new VersionControlPluginException("Pulling new changes failed: \n" + ex);
+        }
     }
 }

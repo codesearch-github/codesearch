@@ -25,6 +25,8 @@ package org.codesearch.commons.plugins.vcs;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.commons.lang.StringUtils;
 import org.codesearch.commons.configuration.dto.NoAuthentication;
 import org.codesearch.commons.configuration.dto.RepositoryDto;
@@ -67,6 +69,7 @@ public class GitLocalPluginTest {
     public void testSetRepository() throws Exception {
         //Checking out code
         plugin.setRepository(getTestRepo());
+        plugin.pullChanges();
     }
 
     /**
@@ -78,7 +81,7 @@ public class GitLocalPluginTest {
         fileIdentifier.setFilePath("test.java");
         fileIdentifier.setRepository(getTestRepo());
 
-        FileDto result = plugin.getFileDtoForFileIdentifierAtRevision(fileIdentifier, VersionControlPlugin.UNDEFINED_VERSION);
+        FileDto result = plugin.getFile(fileIdentifier, VersionControlPlugin.UNDEFINED_VERSION);
         assert (result != null);
         assert ("version 3\n".equals(new String(result.getContent())));
         assert (StringUtils.isNotBlank(result.getFilePath()));
@@ -88,27 +91,39 @@ public class GitLocalPluginTest {
         assert (result.getLastAuthor().indexOf('\n') == -1);
     }
 
-    private void testGetOldFile() throws Exception {
+    @Test
+    public void testGetOldFile() throws Exception {
         FileIdentifier fileIdentifier = new FileIdentifier();
         fileIdentifier.setFilePath("test.java");
         fileIdentifier.setRepository(getTestRepo());
 
-        FileDto result = plugin.getFileDtoForFileIdentifierAtRevision(fileIdentifier, "a471655110aba4ce116335fba6e0de5fa4cc5870"); //version 2
-        assert ("version 2".equals(new String(result.getContent())));
+        FileDto result = plugin.getFile(fileIdentifier, "a471655110aba4ce116335fba6e0de5fa4cc5870"); //version 2
+        assert ("version 2\n".equals(new String(result.getContent())));
+    }
+
+    @Test
+    public void testGetInvalidFile() throws Exception {
+        FileIdentifier fileIdentifier = new FileIdentifier();
+        fileIdentifier.setFilePath("testt.java");
+        fileIdentifier.setRepository(getTestRepo());
+        boolean notFound = false;
+        try {
+            FileDto result = plugin.getFile(fileIdentifier, "a471655110aba4ce116335fba6e0de5fa4cc5870");
+        } catch (VcsFileNotFoundException ex) {
+            notFound = true;
+        }
+        assert notFound;
     }
 
     /**
      * Test of getChangedFilesSinceRevision method, of class GitLocalPlugin.
      */
     @Test
-    @Ignore
     public void testGetChangedFilesSinceRevision() throws Exception {
-        String revision = "0";
+        String revision = VersionControlPlugin.UNDEFINED_VERSION;
         Set<FileIdentifier> changes = plugin.getChangedFilesSinceRevision(revision, Collections.<String>emptyList(), Collections.<String>emptyList());
         assert (changes != null);
-        for (FileIdentifier fileDto : changes) {
-
-        }
+        assert (changes.size() == 3);
     }
 
     /**
@@ -120,5 +135,4 @@ public class GitLocalPluginTest {
         assert (result != null);
         assert (!"0".equals(result));
     }
-
 }

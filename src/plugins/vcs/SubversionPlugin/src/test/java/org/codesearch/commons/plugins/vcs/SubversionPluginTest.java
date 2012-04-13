@@ -26,7 +26,6 @@ import org.apache.commons.lang.StringUtils;
 import org.codesearch.commons.configuration.dto.NoAuthentication;
 import org.codesearch.commons.configuration.dto.RepositoryDto;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -51,14 +50,14 @@ public class SubversionPluginTest {
     }
 
     @Test
-    public void testGetFile() throws VersionControlPluginException {
-        FileDto file = sp.getFileDtoForFileIdentifierAtRevision(new FileIdentifier("testfile", false, null), VersionControlPlugin.UNDEFINED_VERSION);
+    public void testGetFile() throws Exception {
+        FileDto file = sp.getFile(new FileIdentifier("testfile", false, null), VersionControlPlugin.UNDEFINED_VERSION);
         assert "version 3\n".equals(new String(file.getContent()));
     }
 
     @Test
-    public void testGetOldFile() throws VersionControlPluginException {
-        FileDto file = sp.getFileDtoForFileIdentifierAtRevision(new FileIdentifier("testfile", false, null), "2");
+    public void testGetOldFile() throws Exception {
+        FileDto file = sp.getFile(new FileIdentifier("testfile", false, null), "2");
         assert "version 1\n".equals(new String(file.getContent()));
     }
 
@@ -80,12 +79,12 @@ public class SubversionPluginTest {
      * are valid. Does not define a start revision.
      */
     @Test
-    public void testGetFilesFromStart() throws VersionControlPluginException {
+    public void testGetFilesFromStart() throws Exception {
         Set<FileIdentifier> changedFilesSinceRevision = sp.getChangedFilesSinceRevision(VersionControlPlugin.UNDEFINED_VERSION, Collections.<String>emptyList(), Collections.<String>emptyList());
         assert (!changedFilesSinceRevision.isEmpty());
         for (FileIdentifier fileIdentifier : changedFilesSinceRevision) {
             if (!fileIdentifier.isDeleted()) {
-                FileDto fileDto = sp.getFileDtoForFileIdentifierAtRevision(fileIdentifier, VersionControlPlugin.UNDEFINED_VERSION);
+                FileDto fileDto = sp.getFile(fileIdentifier, VersionControlPlugin.UNDEFINED_VERSION);
                 assert (fileDto != null);
                 assert (Integer.parseInt(fileDto.getLastAlteration()) != 0);
                 assert (StringUtils.isNotBlank(fileDto.getLastAuthor()));
@@ -100,12 +99,12 @@ public class SubversionPluginTest {
      * are valid. Tests using a start revision.
      */
     @Test
-    public void testGetFilesFromRev() throws VersionControlPluginException {
+    public void testGetFilesFromRev() throws Exception {
         Set<FileIdentifier> changedFilesSinceRevision = sp.getChangedFilesSinceRevision("2", new LinkedList<String>(), new LinkedList<String>());
         assert (!changedFilesSinceRevision.isEmpty());
         for (FileIdentifier fileIdentifier : changedFilesSinceRevision) {
             if (!fileIdentifier.isDeleted()) {
-                FileDto fileDto = sp.getFileDtoForFileIdentifierAtRevision(fileIdentifier, VersionControlPlugin.UNDEFINED_VERSION);
+                FileDto fileDto = sp.getFile(fileIdentifier, VersionControlPlugin.UNDEFINED_VERSION);
                 assert (fileDto != null);
             }
         }

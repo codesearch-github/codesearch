@@ -26,7 +26,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
 import net.sf.jmimemagic.Magic;
 import net.sf.jmimemagic.MagicMatch;
 import org.apache.commons.lang.StringEscapeUtils;
@@ -37,7 +36,6 @@ import org.codesearch.commons.configuration.dto.RepositoryDto;
 import org.codesearch.commons.configuration.properties.PropertiesManager;
 import org.codesearch.commons.database.DBAccess;
 import org.codesearch.commons.database.DatabaseAccessException;
-import org.codesearch.commons.database.DatabaseEntryNotFoundException;
 import org.codesearch.commons.plugins.PluginLoader;
 import org.codesearch.commons.plugins.PluginLoaderException;
 import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
@@ -48,13 +46,22 @@ import org.codesearch.commons.plugins.highlighting.HighlightingPluginException;
 import org.codesearch.commons.plugins.lucenefields.LuceneFieldPlugin;
 import org.codesearch.commons.plugins.lucenefields.LuceneFieldPluginLoader;
 import org.codesearch.commons.plugins.vcs.FileIdentifier;
+import org.codesearch.commons.plugins.vcs.VcsFileNotFoundException;
 import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
 import org.codesearch.commons.plugins.vcs.VersionControlPluginException;
 import org.codesearch.commons.utils.mime.MimeTypeUtil;
 import org.codesearch.searcher.client.rpc.SearcherService;
 import org.codesearch.searcher.server.DocumentSearcherImpl;
 import org.codesearch.searcher.server.InvalidIndexException;
-import org.codesearch.searcher.shared.*;
+import org.codesearch.searcher.shared.FileDto;
+import org.codesearch.searcher.shared.JumpLocation;
+import org.codesearch.searcher.shared.OutlineNode;
+import org.codesearch.searcher.shared.SearchField;
+import org.codesearch.searcher.shared.SearchResultDto;
+import org.codesearch.searcher.shared.SearchType;
+import org.codesearch.searcher.shared.SearchViewData;
+import org.codesearch.searcher.shared.SearcherServiceException;
+import org.codesearch.searcher.shared.SidebarNode;
 
 /**
  * Service used for search operations.
@@ -139,7 +146,18 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
             FileIdentifier fileIdentifier = new FileIdentifier();
             fileIdentifier.setFilePath(filePath);
             fileIdentifier.setRepository(repositoryDto);
-            org.codesearch.commons.plugins.vcs.FileDto vcFile = vcPlugin.getFileDtoForFileIdentifierAtRevision(fileIdentifier, indexedRevision);
+            org.codesearch.commons.plugins.vcs.FileDto vcFile;
+            try {
+                vcFile = vcPlugin.getFile(fileIdentifier, indexedRevision);
+            } catch (VcsFileNotFoundException ex) {
+                // Pull changes and try again
+                vcPlugin.pullChanges();
+                try {
+                    vcFile = vcPlugin.getFile(fileIdentifier, indexedRevision);
+                } catch (VcsFileNotFoundException ex1) {
+                    throw new SearcherServiceException("File not found: " + fileIdentifier + "@" + indexedRevision);
+                }
+            }
 
             // GET OUTLINE IF EXISTING
             try {
@@ -191,7 +209,7 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
             byte[] fileContent = vcFile.getContent().clone();
             String escapeStartToken = "";
             String escapeEndToken = "";
-            String processedFileContent = "";
+            String processedFileContent;
             if (highlight) {
                 try {
                     HighlightingPlugin hlPlugin = null;
@@ -219,7 +237,7 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
             }
 
         } catch (VersionControlPluginException ex) {
-            throw new SearcherServiceException("Could not get file: \n" + ex);
+            throw new SearcherServiceException("Error retrieving file: \n" + ex);
         } catch (PluginLoaderException ex) {
             throw new SearcherServiceException("Problem loading plugin: \n" + ex);
         }

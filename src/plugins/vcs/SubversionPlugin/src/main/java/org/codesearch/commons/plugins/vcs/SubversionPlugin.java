@@ -103,14 +103,14 @@ public class SubversionPlugin implements VersionControlPlugin {
      * {@inheritDoc}
      */
     @Override
-    public FileDto getFileDtoForFileIdentifierAtRevision(FileIdentifier identifier, String revision) throws VersionControlPluginException {
+    public FileDto getFile(FileIdentifier identifier, String revision) throws VersionControlPluginException, VcsFileNotFoundException {
         try {
             String filePath = identifier.getFilePath();
             LOG.debug("Retrieving and checking file: " + filePath);
             FileDto fileDto = new FileDto();
             SVNNodeKind nodeKind = svnRepo.checkPath(filePath, -1);
             if (nodeKind != SVNNodeKind.FILE) {
-                throw new VersionControlPluginException("The file is either a folder or has been deleted");
+                throw new VcsFileNotFoundException("The file is either a folder or has been deleted");
             }
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
@@ -286,6 +286,11 @@ public class SubversionPlugin implements VersionControlPlugin {
     @Override
     public void validate() {
         //TODO add validation logic
+    }
+
+    @Override
+    public void pullChanges() throws VersionControlPluginException {
+        //Not needed by this plugin.
     }
 
     private class DiffStatusHandler implements ISVNDiffStatusHandler {

@@ -32,7 +32,7 @@ public class MockVersionControlPluginLoader implements PluginLoader {
                 }
 
                 @Override
-                public FileDto getFileDtoForFileIdentifierAtRevision(FileIdentifier fileInfo, String revision) throws VersionControlPluginException {
+                public FileDto getFile(FileIdentifier fileInfo, String revision) throws VersionControlPluginException {
                     throw new UnsupportedOperationException("Not supported yet.");
                 }
 
@@ -63,6 +63,11 @@ public class MockVersionControlPluginLoader implements PluginLoader {
 
                 @Override
                 public String getPurposes() {
+                    throw new UnsupportedOperationException("Not supported yet.");
+                }
+
+                @Override
+                public void pullChanges() {
                     throw new UnsupportedOperationException("Not supported yet.");
                 }
             });
