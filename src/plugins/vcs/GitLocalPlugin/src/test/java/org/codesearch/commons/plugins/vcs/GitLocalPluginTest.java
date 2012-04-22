@@ -22,14 +22,16 @@
  */
 package org.codesearch.commons.plugins.vcs;
 
+import java.io.File;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
+import org.codesearch.commons.configuration.dto.BasicAuthentication;
 import org.codesearch.commons.configuration.dto.NoAuthentication;
 import org.codesearch.commons.configuration.dto.RepositoryDto;
+import org.codesearch.commons.configuration.dto.SshAuthentication;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -61,12 +63,27 @@ public class GitLocalPluginTest {
         return testRepo;
     }
 
+    private RepositoryDto getTestBasicAuthRepo() {
+        RepositoryDto repo = getTestRepo();
+        repo.setUrl("https://github.com/codesearch-github/codesearch-test-repo.git");
+        repo.setUsedAuthentication(new BasicAuthentication("user", "pass"));
+        return repo;
+    }
+
+    private RepositoryDto getTestSshAuthRepo() {
+        RepositoryDto repo = getTestRepo();
+        repo.setUrl("git@github.com:codesearch-github/codesearch.git");
+        repo.setUsedAuthentication(new SshAuthentication("user", "pass", "23", "~/.ssh/_id_rsa"));
+        return repo;
+    }
+
     /**
      * Test of setRepository method, of class GitLocalPlugin.
      */
     @Test
     @Before
     public void testSetRepository() throws Exception {
+        FileUtils.deleteDirectory(new File("/tmp/codesearch-test-repo"));
         //Checking out code
         plugin.setRepository(getTestRepo());
         plugin.pullChanges();
@@ -134,5 +151,27 @@ public class GitLocalPluginTest {
         String result = plugin.getRepositoryRevision();
         assert (result != null);
         assert (!"0".equals(result));
+    }
+
+    //TODO: can't leave username and password here, so this test is ignored
+    @Ignore
+    @Test
+    public void testRepoWithBasicAuthentication() throws Exception {
+        FileUtils.deleteDirectory(new File("/tmp/codesearch-test-repo"));
+        RepositoryDto r = getTestBasicAuthRepo();
+        plugin.setRepository(r);
+        plugin.pullChanges();
+        System.out.println(plugin.getFilesInDirectory("/", VersionControlPlugin.UNDEFINED_VERSION));
+    }
+
+    //TODO: can't leave username and password here, so this test is ignored
+    @Ignore
+    @Test
+    public void testRepoWithSshAuthentication() throws Exception {
+        FileUtils.deleteDirectory(new File("/tmp/codesearch-test-repo"));
+        RepositoryDto r = getTestSshAuthRepo();
+        plugin.setRepository(r);
+        plugin.pullChanges();
+        System.out.println(plugin.getFilesInDirectory("/", VersionControlPlugin.UNDEFINED_VERSION));
     }
 }

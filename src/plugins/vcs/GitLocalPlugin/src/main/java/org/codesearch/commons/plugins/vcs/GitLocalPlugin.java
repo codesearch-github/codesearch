@@ -25,16 +25,19 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.codesearch.commons.configuration.dto.BasicAuthentication;
 import org.codesearch.commons.configuration.dto.NoAuthentication;
 import org.codesearch.commons.configuration.dto.RepositoryDto;
+import org.codesearch.commons.configuration.dto.SshAuthentication;
 import org.codesearch.commons.validator.ValidationException;
 
 /**
@@ -52,6 +55,7 @@ public class GitLocalPlugin implements VersionControlPlugin {
     private final String GIT_BINARY_LOCATION = "/usr/bin/git";
     private final String GIT_DEFAULT_ARGUMENTS = "--no-pager";
     private ProcessBuilder processBuilder = new ProcessBuilder();
+    private String sshWrapperCommandTemplate = "/usr/bin/ssh-agent /bin/bash -c 'ssh-add %1s; %2s'";
 
     /**
      * Creates a new instance of the GitLocalPlugin
@@ -77,14 +81,25 @@ public class GitLocalPlugin implements VersionControlPlugin {
         if (branchDirectory.isDirectory()) {
             LOG.info("Repository " + repo.getName() + " already exists locally.");
         } else {
-
             branchDirectory.mkdirs();
             LOG.info("Cloning repository " + repo.getName() + " ...");
-
             if (repo.getUsedAuthentication() instanceof NoAuthentication) {
                 executeGitCommand("clone", repo.getUrl(), branchDirectory.getAbsolutePath());
-            } else {
-                throw new VersionControlPluginException("Authentication not supported yet.");
+            } else if (repo.getUsedAuthentication() instanceof BasicAuthentication) {
+                BasicAuthentication ba = (BasicAuthentication) repo.getUsedAuthentication();
+                String repoUrl = repo.getUrl();
+                if (repoUrl.startsWith("https://")) {
+                    repoUrl = repoUrl.replace("://", "://" + ba.getUsername() + ":" + ba.getPassword() + "@");
+                } else {
+                    throw new VersionControlPluginException("Unsupported protocol for basic authentication.");
+                }
+                executeGitCommand("clone", repoUrl, branchDirectory.getAbsolutePath());
+            } else if (repo.getUsedAuthentication() instanceof SshAuthentication) {
+                SshAuthentication sa = (SshAuthentication) repo.getUsedAuthentication();
+                String gitCloneCommand = GIT_BINARY_LOCATION + " " + GIT_DEFAULT_ARGUMENTS + " clone "
+                        + repo.getUrl() + " " + branchDirectory.getAbsolutePath();
+                String cloneCommandSSH = String.format(sshWrapperCommandTemplate, sa.getSshFilePath(), gitCloneCommand);
+                executeCommand("/bin/bash", "-c", cloneCommandSSH);
             }
         }
     }
@@ -94,12 +109,10 @@ public class GitLocalPlugin implements VersionControlPlugin {
      */
     @Override
     public FileDto getFile(FileIdentifier fileIdentifier, String revision) throws VersionControlPluginException, VcsFileNotFoundException {
-        if (revision == null || revision.isEmpty() || revision.equals(VersionControlPlugin.UNDEFINED_VERSION)) {
-            revision = "HEAD";
-        }
+        revision = parseRevision(revision);
         String gitIdentifier = revision + ":" + fileIdentifier.getFilePath();
         //Check if file exists
-        if(!checkFile(gitIdentifier)) {
+        if (!checkFile(gitIdentifier)) {
             throw new VcsFileNotFoundException("File " + fileIdentifier + "@" + revision + " does not exist. Try pulling new changes.");
         }
 
@@ -170,6 +183,7 @@ public class GitLocalPlugin implements VersionControlPlugin {
 
     @Override
     public List<String> getFilesInDirectory(String directoryPath, String revision) throws VersionControlPluginException {
+        revision = parseRevision(revision);
         if (directoryPath != null && directoryPath.startsWith("/")) {
             directoryPath = directoryPath.substring(1);
         }
@@ -206,35 +220,46 @@ public class GitLocalPlugin implements VersionControlPlugin {
     }
 
     private byte[] executeGitCommand(String... arguments) throws VersionControlPluginException {
-        try {
-            List<String> command = new LinkedList<String>();
-            command.add(GIT_BINARY_LOCATION);
-            command.add(GIT_DEFAULT_ARGUMENTS);
-            command.addAll(Arrays.asList(arguments));
+        List<String> cmd = new LinkedList<String>();
+        cmd.add(GIT_BINARY_LOCATION);
+        cmd.add(GIT_DEFAULT_ARGUMENTS);
+        Collections.addAll(cmd, arguments);
+        return executeCommand(cmd.toArray(new String[0]));
+    }
 
+    private byte[] executeCommand(String... commands) throws VersionControlPluginException {
+        try {
             Process process = null;
 
             synchronized (this) {
                 processBuilder = new ProcessBuilder();
                 processBuilder.directory(branchDirectory);
-                processBuilder.command(command);
-                LOG.debug("Executing git command: " + processBuilder.command());
+                processBuilder.command(commands);
+                LOG.debug("Executing command: " + processBuilder.command());
                 process = processBuilder.start();
 
                 byte[] output = IOUtils.toByteArray(process.getInputStream());
 
                 process.waitFor();
                 if (process.exitValue() != 0) {
-                    throw new VersionControlPluginException("Git returned error code: " + process.exitValue() + "\n    Git output: " + IOUtils.toString(process.getErrorStream()));
+                    throw new VersionControlPluginException("Command returned error code: " + process.exitValue() + "\n    Output: " + IOUtils.toString(process.getErrorStream()));
                 }
                 cleanupProcess(process);
 
                 return output;
             }
         } catch (InterruptedException ex) {
-            throw new VersionControlPluginException("Execution of git interrupted by operating system");
+            throw new VersionControlPluginException("Execution of command interrupted by operating system");
         } catch (IOException ex) {
-            throw new VersionControlPluginException("Error executing git command: " + ex);
+            throw new VersionControlPluginException("Error executing command: " + ex);
+        }
+    }
+
+    private String parseRevision(String revision) {
+        if (revision == null || revision.isEmpty() || revision.equals(VersionControlPlugin.UNDEFINED_VERSION)) {
+            return "HEAD";
+        } else {
+            return revision;
         }
     }
 
@@ -294,7 +319,14 @@ public class GitLocalPlugin implements VersionControlPlugin {
     @Override
     public void pullChanges() throws VersionControlPluginException {
         try {
-            executeGitCommand("pull");
+            if (currentRepository.getUsedAuthentication() instanceof SshAuthentication) {
+                SshAuthentication sa = (SshAuthentication) currentRepository.getUsedAuthentication();
+                String gitPullCommand = GIT_BINARY_LOCATION + " " + GIT_DEFAULT_ARGUMENTS + " pull";
+                String pullCommandSSH = String.format(sshWrapperCommandTemplate, sa.getSshFilePath(), gitPullCommand);
+                executeCommand("/bin/bash", "-c", pullCommandSSH);
+            } else {
+                executeGitCommand("pull");
+            }
         } catch (VersionControlPluginException ex) {
             throw new VersionControlPluginException("Pulling new changes failed: \n" + ex);
         }
