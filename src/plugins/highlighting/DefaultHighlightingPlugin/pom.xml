@@ -2,15 +2,13 @@
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <modelVersion>4.0.0</modelVersion>
-
     <artifactId>DefaultHighlightingPlugin</artifactId>
-
-    <name>DefaultHighlightingPlugin</name>
+    <name>Codesearch: DefaultHighlightingPlugin</name>
 
     <parent>
-        <artifactId>codesearch</artifactId>
-        <groupId>org.codesearch</groupId>
-        <version>0.1-RC2</version>
+        <groupId>org.codesearch.plugins</groupId>
+        <artifactId>highlighting-plugins</artifactId>
+	    <version>0.1-RC2</version>
     </parent>
 
     <dependencies>

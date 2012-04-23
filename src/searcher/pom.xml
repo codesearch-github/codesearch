@@ -114,6 +114,20 @@
                     <webappDirectory>${webappDirectory}</webappDirectory>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.4</version>
+                <executions>
+                    <execution>
+                      <id>copy-plugins</id> <!-- this is used for inheritance merges -->
+                      <phase>package</phase> <!-- bind to the packaging phase -->
+                      <goals>
+                          <goal>copy</goal>
+                      </goals>
+                  </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 </project>

@@ -6,8 +6,14 @@
   <artifactId>Codesearch-JavaParser</artifactId>
   <version>0.1-RC</version>
   <packaging>jar</packaging>
-
-  <name>Codesearch-JavaParser</name>
+  <name>Codesearch: JavaParser</name>
+    
+	<parent>
+        <groupId>org.codesearch.customlibs</groupId>
+        <artifactId>customlibs</artifactId>
+        <version>0.1-RC2</version>
+    </parent>
+	
   <url>http://maven.apache.org</url>
     <build>
         <plugins>
