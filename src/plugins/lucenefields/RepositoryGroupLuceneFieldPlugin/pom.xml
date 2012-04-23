@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>RepositoryGroupLuceneFieldPlugin</artifactId>
     <packaging>jar</packaging>
-    <name>CodeSearch: RepositoryGroupLuceneFieldPlugin</name>
+    <name>Codesearch: RepositoryGroupLuceneFieldPlugin</name>
 
     <parent>
         <groupId>org.codesearch.plugins</groupId>

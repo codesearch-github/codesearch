@@ -12,7 +12,6 @@
         <version>0.1-RC2</version>
     </parent>
 
-    <url>http://maven.apache.org</url>
     <dependencies>
         <dependency>
             <groupId>junit</groupId>

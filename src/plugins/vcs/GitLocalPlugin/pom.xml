@@ -5,7 +5,7 @@
 
     <artifactId>GitLocalPlugin</artifactId>
 
-    <name>CodeSearch: Git Local Plugin</name>
+    <name>Codesearch: Git Local Plugin</name>
     <description>A plugin for codesearch used to access files stored in GIT repositories.</description>
 
     <parent>

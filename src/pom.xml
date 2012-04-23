@@ -156,27 +156,27 @@
                                 <artifactItems>
                                     <!--STARTPLUGINS-->
                                     <artifactItem>
-                                        <groupId>org.codesearch</groupId>
+                                        <groupId>org.codesearch.plugins</groupId>
                                         <artifactId>RevisionLuceneFieldPlugin</artifactId>
                                         <version>0.1-RC2</version>
                                     </artifactItem>
                                     <artifactItem>
-                                        <groupId>org.codesearch</groupId>
+                                        <groupId>org.codesearch.plugins</groupId>
                                         <artifactId>RepositoryGroupLuceneFieldPlugin</artifactId>
                                         <version>0.1-RC2</version>
                                     </artifactItem>
                                     <artifactItem>
-                                        <groupId>org.codesearch</groupId>
+                                        <groupId>org.codesearch.plugins</groupId>
                                         <artifactId>JavaCodeAnalyzerPlugin</artifactId>
                                         <version>0.1-RC2</version>
                                     </artifactItem>
                                     <artifactItem>
-                                        <groupId>org.codesearch</groupId>
+                                        <groupId>org.codesearch.plugins</groupId>
                                         <artifactId>XmlCodeAnalyzerPlugin</artifactId>
                                         <version>0.1-RC2</version>
                                     </artifactItem>
                                     <artifactItem>
-                                        <groupId>org.codesearch</groupId>
+                                        <groupId>org.codesearch.plugins</groupId>
                                         <artifactId>DefaultHighlightingPlugin</artifactId>
                                         <version>0.1-RC2</version>
                                     </artifactItem>
@@ -186,12 +186,12 @@
                                         <version>0.1-RC2</version>
                                     </artifactItem>
                                     <artifactItem>
-                                        <groupId>org.codesearch</groupId>
+                                        <groupId>org.codesearch.plugins</groupId>
                                         <artifactId>GitLocalPlugin</artifactId>
                                         <version>0.1-RC2</version>
                                     </artifactItem>
                                     <artifactItem>
-                                        <groupId>org.codesearch</groupId>
+                                        <groupId>org.codesearch.plugins</groupId>
                                         <artifactId>SubversionPlugin</artifactId>
                                         <version>0.1-RC2</version>
                                     </artifactItem>
