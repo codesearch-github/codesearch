@@ -76,6 +76,40 @@
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
         </dependency>
+		<!--STARTPLUGINS-->
+		<dependency>
+			<groupId>org.codesearch</groupId>
+			<artifactId>RevisionLuceneFieldPlugin</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.codesearch</groupId>
+			<artifactId>RepositoryGroupLuceneFieldPlugin</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.codesearch</groupId>
+			<artifactId>JavaCodeAnalyzerPlugin</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.codesearch</groupId>
+			<artifactId>XmlCodeAnalyzerPlugin</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.codesearch</groupId>
+			<artifactId>DefaultHighlightingPlugin</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.codesearch</groupId>
+			<artifactId>codesearch-jhighlight</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.codesearch</groupId>
+			<artifactId>GitLocalPlugin</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.codesearch</groupId>
+			<artifactId>SubversionPlugin</artifactId>
+		</dependency>
+		<!--ENDPLUGINS-->
     </dependencies>
 
     <build>
@@ -113,20 +147,6 @@
                 <configuration>
                     <webappDirectory>${webappDirectory}</webappDirectory>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>2.4</version>
-                <executions>
-                    <execution>
-                      <id>copy-plugins</id> <!-- this is used for inheritance merges -->
-                      <phase>prepare-package</phase> <!-- bind to the packaging phase -->
-                      <goals>
-                          <goal>copy</goal>
-                      </goals>
-                  </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>
