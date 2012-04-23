@@ -83,6 +83,7 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <module>org.codesearch.indexer.Indexer</module>
                     <runTarget>index.html</runTarget>
                     <hostedWebapp>${webappDirectory}</hostedWebapp>
                 </configuration>
@@ -119,4 +120,23 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>gwt-maven-plugin</artifactId>
+                        <configuration>
+                            <module>org.codesearch.indexer.IndexerDev</module>
+                            <draftCompile>true</draftCompile>
+                        </configuration>
+                    </plugin>
+                </plugins>
+           </build>
+        </profile>
+    </profiles>
+
 </project>

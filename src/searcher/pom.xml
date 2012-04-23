@@ -18,16 +18,6 @@
         <webappDirectory>${project.build.directory}/${project.build.finalName}</webappDirectory>
     </properties>
 
-    <repositories>
-        <repository>
-            <id>javaparser</id>
-            <name>JavaParser Repository</name>
-            <url>http://javaparser.googlecode.com/svn/maven2</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
     <dependencies>
         <dependency>
             <groupId>com.google.inject.extensions</groupId>
@@ -94,6 +84,7 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <module>org.codesearch.searcher.Searcher</module>
                     <runTarget>index.jsp</runTarget>
                     <hostedWebapp>${webappDirectory}</hostedWebapp>
                 </configuration>
@@ -130,6 +121,24 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>gwt-maven-plugin</artifactId>
+                        <configuration>
+                            <module>org.codesearch.searcher.SearcherDev</module>
+                            <draftCompile>true</draftCompile>
+                        </configuration>
+                    </plugin>
+                </plugins>
+           </build>
+        </profile>
+    </profiles>
 </project>
 
 
