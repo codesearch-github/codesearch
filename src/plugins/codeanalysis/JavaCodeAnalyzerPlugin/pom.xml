@@ -12,16 +12,6 @@
 	    <version>0.1-RC2</version>
     </parent>
 
-    <repositories>
-        <repository>
-            <id>javaparser</id>
-            <name>JavaParser Repository</name>
-            <url>http://javaparser.googlecode.com/svn/maven2</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
@@ -29,7 +19,7 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.codesearch</groupId>
+            <groupId>org.codesearch.customlibs</groupId>
             <artifactId>Codesearch-JavaParser</artifactId>
             <version>0.1-RC</version>
         </dependency>
