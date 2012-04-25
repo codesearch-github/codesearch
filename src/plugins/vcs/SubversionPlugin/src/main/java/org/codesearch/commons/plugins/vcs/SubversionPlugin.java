@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.codesearch.commons.configuration.dto.*;
 import org.tmatesoft.svn.core.ISVNDirEntryHandler;
@@ -216,7 +218,11 @@ public class SubversionPlugin implements VersionControlPlugin {
                 if (entry.getKind() == SVNNodeKind.DIR) {
                     listEntries(fileUrl, identifiers, blacklistPatterns, whitelistPatterns);
                 } else if (entry.getKind() == SVNNodeKind.FILE) {
-                    identifiers.add(new FileIdentifier(fileUrl.replace(entryPoint + "/", ""), false, repository));
+                    String replacedUrl = fileUrl;
+                    if (StringUtils.isNotBlank(entryPoint)) {
+                        replacedUrl = fileUrl.replace(entryPoint + "/", "");
+                    }
+                    identifiers.add(new FileIdentifier(replacedUrl, false, repository));
                 }
             }
         }
