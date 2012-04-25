@@ -23,6 +23,7 @@ package org.codesearch.commons.plugins.vcs;
 
 /**
  * An Exception that can be thrown by the version control plugins.
+ *
  * @author Samuel Kogler
  */
 public class VersionControlPluginException extends Exception {
@@ -40,9 +41,20 @@ public class VersionControlPluginException extends Exception {
 
     /**
      * Constructs an instance of <code>VersionControlPluginException</code> with the specified detail message.
+     *
      * @param msg the detail message.
      */
     public VersionControlPluginException(String msg) {
         super(msg);
+    }
+
+    /**
+     * Constructs an instance of <code>VersionControlPluginException</code> with the specified detail message.
+     *
+     * @param msg the detail message.
+     * @param t root cause
+     */
+    public VersionControlPluginException(String msg, Throwable t) {
+        super(msg, t);
     }
 }

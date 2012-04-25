@@ -23,6 +23,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
+import org.codesearch.commons.configuration.dto.RepositoryDto;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.Before;
@@ -30,6 +32,7 @@ import org.junit.Test;
 import org.tmatesoft.svn.core.SVNDirEntry;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNNodeKind;
+import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.io.SVNRepository;
 
 import static org.junit.Assert.assertEquals;
@@ -43,6 +46,8 @@ import static org.easymock.EasyMock.expect;
  */
 public class SubversionPluginMockedTest {
 
+    private static final String SVN_URL = "/url/with";
+
     private static final String FILE_NAME = "file.txt";
 
     private static final String DIRECTORY_NAME = "directory";
@@ -51,31 +56,46 @@ public class SubversionPluginMockedTest {
 
     private IMocksControl mockControl = EasyMock.createControl();
 
-    protected SVNRepository repo;
+    private SVNRepository svnRepoMock;
+
 
     @Before
     public void setUp() throws SVNException {
-        initSVNRepoMocks();
-
         plugin = new SubversionPlugin() {
 
             @Override
             protected SVNRepository getSvnRepo() {
-                return repo;
+                return svnRepoMock;
+            }
+
+            @Override
+            protected void createSvnRepo(RepositoryDto repository) throws SVNException, VersionControlPluginException {
+
             }
         };
 
     }
 
-    private void initSVNRepoMocks() throws SVNException {
-        repo = mockControl.createMock(SVNRepository.class);
+    private void initSVNRepoMocks(String url, String entrypoint) throws SVNException {
+        svnRepoMock = mockControl.createMock(SVNRepository.class);
+
+        SVNURL svnURL = mockControl.createMock(SVNURL.class);
+        expect(svnURL.toDecodedString()).andReturn(url);
+        expect(svnRepoMock.getRepositoryRoot(true)).andReturn(svnURL);
 
         SVNDirEntry entryDir = createSVNDirEntry(SVNNodeKind.DIR, DIRECTORY_NAME);
-        expect(repo.getDir("", -1, null, (Collection)null)).andReturn(Arrays.asList(entryDir));
+        expect(svnRepoMock.getDir(entrypoint, -1, null, (Collection)null)).andReturn(Arrays.asList(entryDir));
 
         SVNDirEntry entryFile = createSVNDirEntry(SVNNodeKind.FILE, FILE_NAME);
-        expect(repo.getDir(DIRECTORY_NAME, -1, null, (Collection)null)).andReturn(Arrays.asList(entryFile));
+        expect(svnRepoMock.getDir(getEntryPointPrefix(entrypoint) + DIRECTORY_NAME, -1, null, (Collection)null))
+            .andReturn(Arrays.asList(entryFile));
+    }
 
+    private String getEntryPointPrefix(String entrypoint) {
+        if (StringUtils.isNotBlank(entrypoint)) {
+            return entrypoint + "/";
+        }
+        return "";
     }
 
     private SVNDirEntry createSVNDirEntry(SVNNodeKind kind, String name) {
@@ -87,7 +107,10 @@ public class SubversionPluginMockedTest {
 
     @Test
     public void getFilesFromSubversionWithEntryPoint() throws Exception {
+        RepositoryDto repositoryDto = createRepositoryDto("/entryPoint");
+        initSVNRepoMocks(SVN_URL, "/entryPoint");
         mockControl.replay();
+        plugin.setRepository(repositoryDto);
         Set<FileIdentifier> changedFilesSinceRevision = plugin.getChangedFilesSinceRevision(
             VersionControlPlugin.UNDEFINED_VERSION, new ArrayList<String>(), new ArrayList<String>());
         mockControl.verify();
@@ -95,11 +118,22 @@ public class SubversionPluginMockedTest {
         assertEquals(DIRECTORY_NAME + "/" + FILE_NAME, changedFilesSinceRevision.iterator().next().getFilePath());
     }
 
+    private RepositoryDto createRepositoryDto(String entryPoint) {
+        RepositoryDto repository = new RepositoryDto();
+        repository.setUrl(SVN_URL + entryPoint);
+        return repository;
+    }
+
     @Test
     public void getFilesFromSubversionWithoutEntryPoint() throws Exception {
+
+        RepositoryDto repositoryDto = createRepositoryDto("");
+        initSVNRepoMocks(SVN_URL, "");
         mockControl.replay();
-        Set<FileIdentifier> changedFilesSinceRevision = plugin.getChangedFilesSinceRevision(VersionControlPlugin.UNDEFINED_VERSION, new ArrayList<String>(),
-            new ArrayList<String>());
+
+        plugin.setRepository(repositoryDto);
+        Set<FileIdentifier> changedFilesSinceRevision = plugin.getChangedFilesSinceRevision(
+            VersionControlPlugin.UNDEFINED_VERSION, new ArrayList<String>(), new ArrayList<String>());
         mockControl.verify();
         assertEquals(1, changedFilesSinceRevision.size());
         assertEquals(DIRECTORY_NAME + "/" + FILE_NAME, changedFilesSinceRevision.iterator().next().getFilePath());
