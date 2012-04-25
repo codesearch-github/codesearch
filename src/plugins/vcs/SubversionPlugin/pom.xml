@@ -5,7 +5,7 @@
 
     <artifactId>SubversionPlugin</artifactId>
 
-    <name>CodeSearch: SubversionPlugin</name>
+    <name>Codesearch: SubversionPlugin</name>
     <description>A plugin for codesearch used to access files stored in Subversion repositories.</description>
 
     <parent>

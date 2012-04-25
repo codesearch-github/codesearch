@@ -2,7 +2,6 @@
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.codesearch</groupId>
     <artifactId>codesearch-jhighlight</artifactId>
     <name>Codesearch: codesearch-jhighlight</name>
 
@@ -12,7 +11,6 @@
         <version>0.1-RC2</version>
     </parent>
 
-    <url>http://maven.apache.org</url>
     <dependencies>
         <dependency>
             <groupId>junit</groupId>

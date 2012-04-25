@@ -39,9 +39,6 @@
     <source path="client"/>
     <source path="shared"/>
 
-    <!-- FIXME: this is only for testing -->
-    <!--set-property name="user.agent" value="gecko1_8" /-->
-
     <replace-with class="org.codesearch.commons.searcher.client.ClientFactoryImpl">
         <when-type-is class="org.codesearch.commons.searcher.client.ClientFactory" />
     </replace-with>
