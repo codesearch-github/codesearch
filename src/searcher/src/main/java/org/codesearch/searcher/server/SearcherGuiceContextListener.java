@@ -21,10 +21,11 @@
 
 package org.codesearch.searcher.server;
 
+import org.codesearch.commons.CommonsGuiceModule;
+
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.servlet.GuiceServletContextListener;
-import org.codesearch.commons.CommonsGuiceModule;
 
 /**
  *

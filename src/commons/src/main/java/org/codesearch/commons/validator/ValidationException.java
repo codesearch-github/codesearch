@@ -27,6 +27,9 @@ package org.codesearch.commons.validator;
  */
 public class ValidationException extends Exception {
     
+    /** . */
+    private static final long serialVersionUID = 114713151921103984L;
+
     public ValidationException() {
         
     }

@@ -23,10 +23,8 @@
  */
 package org.codesearch.indexer.server.rpc;
 
-import com.google.gwt.user.server.rpc.RemoteServiceServlet;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import java.util.List;
+
 import org.codesearch.indexer.client.rpc.DashboardService;
 import org.codesearch.indexer.server.manager.IndexingManager;
 import org.codesearch.indexer.shared.DashboardData;
@@ -34,6 +32,10 @@ import org.codesearch.indexer.shared.DashboardServiceException;
 import org.codesearch.indexer.shared.JobStatus;
 import org.codesearch.indexer.shared.RepositoryStatus;
 import org.quartz.SchedulerException;
+
+import com.google.gwt.user.server.rpc.RemoteServiceServlet;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 /**
  * @author Samuel Kogler

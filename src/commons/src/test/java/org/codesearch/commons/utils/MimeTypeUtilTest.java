@@ -20,8 +20,9 @@
  */
 package org.codesearch.commons.utils;
 
-import org.codesearch.commons.utils.mime.MimeTypeUtil;
 import static org.junit.Assert.assertEquals;
+
+import org.codesearch.commons.utils.mime.MimeTypeUtil;
 import org.junit.Test;
 
 /**

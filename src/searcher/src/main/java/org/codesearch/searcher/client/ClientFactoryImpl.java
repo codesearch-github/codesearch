@@ -21,16 +21,17 @@
 
 package org.codesearch.searcher.client;
 
-import com.google.gwt.place.shared.Place;
-import com.google.gwt.place.shared.PlaceController;
-import com.google.web.bindery.event.shared.EventBus;
-import com.google.web.bindery.event.shared.SimpleEventBus;
 import org.codesearch.searcher.client.ui.fileview.FileView;
 import org.codesearch.searcher.client.ui.fileview.FileViewImpl;
 import org.codesearch.searcher.client.ui.searchview.SearchPlace;
 import org.codesearch.searcher.client.ui.searchview.SearchView;
 import org.codesearch.searcher.client.ui.searchview.SearchViewImpl;
 import org.codesearch.searcher.shared.SearchType;
+
+import com.google.gwt.place.shared.Place;
+import com.google.gwt.place.shared.PlaceController;
+import com.google.web.bindery.event.shared.EventBus;
+import com.google.web.bindery.event.shared.SimpleEventBus;
 
 /**
  * Implementation of the factory.

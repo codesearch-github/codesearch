@@ -1,13 +1,28 @@
 package japa.parser;
 
 import japa.parser.ast.CompilationUnit;
-import japa.parser.ast.body.*;
-import japa.parser.ast.expr.*;
+import japa.parser.ast.body.BodyDeclaration;
+import japa.parser.ast.body.FieldDeclaration;
+import japa.parser.ast.body.MethodDeclaration;
+import japa.parser.ast.body.Parameter;
+import japa.parser.ast.body.TypeDeclaration;
+import japa.parser.ast.body.VariableDeclarator;
+import japa.parser.ast.body.VariableDeclaratorId;
+import japa.parser.ast.expr.Expression;
+import japa.parser.ast.expr.MethodCallExpr;
+import japa.parser.ast.expr.NameExpr;
+import japa.parser.ast.expr.QualifiedNameExpr;
+import japa.parser.ast.expr.VariableDeclarationExpr;
 import japa.parser.ast.stmt.BlockStmt;
 import japa.parser.ast.stmt.ExpressionStmt;
 import japa.parser.ast.stmt.Statement;
+import japa.parser.ast.type.ClassOrInterfaceType;
+import japa.parser.ast.type.PrimitiveType;
 import japa.parser.ast.type.PrimitiveType.Primitive;
-import japa.parser.ast.type.*;
+import japa.parser.ast.type.ReferenceType;
+import japa.parser.ast.type.Type;
+import japa.parser.ast.type.VoidType;
+
 import java.util.ArrayList;
 import java.util.List;
 

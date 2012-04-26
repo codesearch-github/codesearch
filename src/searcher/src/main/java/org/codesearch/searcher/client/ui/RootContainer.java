@@ -20,6 +20,8 @@
  */
 package org.codesearch.searcher.client.ui;
 
+import org.codesearch.searcher.client.Resources;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -37,10 +39,10 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.Widget;
-import org.codesearch.searcher.client.Resources;
 
 /**
  * The container of all views. Allows to define UI that shows up everywhere.
+ * 
  * @author Samuel Kogler
  * @author Stiboller Stephan
  */
@@ -50,6 +52,7 @@ public class RootContainer extends Composite implements AcceptsOneWidget {
 
     interface RootContainerUiBinder extends UiBinder<Widget, RootContainer> {
     }
+
     @UiField
     LayoutPanel contentPanel;
     @UiField
@@ -89,29 +92,28 @@ public class RootContainer extends Composite implements AcceptsOneWidget {
 
     /**
      * Creates an error panel display for the given errorMessage
+     * 
      * @param errorMessage Message to be displayed
      * @return VerticalPanel the error display
      */
     public FlowPanel addErrorPanel(String errorMessage) {
-        //Button
+        // Button
         PushButton pushButton = new PushButton(new Image(Resources.INSTANCE.errorMessageClose()));
         pushButton.getElement().setAttribute("style", "float: left");
         pushButton.setSize("8px", "8px");
-        pushButton.addClickHandler(new ClickHandler()
-        {
+        pushButton.addClickHandler(new ClickHandler() {
             @Override
-            public void onClick(ClickEvent event)
-            {
-                ((PushButton)event.getSource()).getParent().setVisible(false);
-                Widget wi = ((PushButton)event.getSource()).getParent().getParent().getParent();
+            public void onClick(ClickEvent event) {
+                ((PushButton) event.getSource()).getParent().setVisible(false);
+                Widget wi = ((PushButton) event.getSource()).getParent().getParent().getParent();
 
             }
         });
-        //Label
+        // Label
         Label label = new Label();
         label.getElement().setAttribute("style", "float: left");
         label.setText(errorMessage);
-        //Panel
+        // Panel
         FlowPanel flowP = new FlowPanel();
         flowP.add(pushButton);
         flowP.add(label);

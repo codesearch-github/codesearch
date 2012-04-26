@@ -20,9 +20,13 @@
  */
 package com.uwyn.jhighlight.renderer;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+
 import com.uwyn.jhighlight.highlighter.ExplicitStateHighlighter;
 import com.uwyn.jhighlight.tools.StringUtils;
-import java.io.*;
 
 /**
  * Provides an abstract base class to perform source code to XHTML syntax

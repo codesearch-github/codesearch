@@ -21,15 +21,17 @@
 
 package org.codesearch.indexer.client;
 
-import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.event.shared.SimpleEventBus;
-import com.google.gwt.place.shared.PlaceController;
+
 import org.codesearch.indexer.client.ui.dashboard.DashboardView;
 import org.codesearch.indexer.client.ui.dashboard.DashboardViewImpl;
 import org.codesearch.indexer.client.ui.log.LogView;
 import org.codesearch.indexer.client.ui.log.LogViewImpl;
 import org.codesearch.indexer.client.ui.manualIndexing.ManualIndexingView;
 import org.codesearch.indexer.client.ui.manualIndexing.ManualIndexingViewImpl;
+
+import com.google.gwt.place.shared.PlaceController;
+import com.google.web.bindery.event.shared.EventBus;
+import com.google.web.bindery.event.shared.SimpleEventBus;
 
 /**
  * Implementation of the factory.

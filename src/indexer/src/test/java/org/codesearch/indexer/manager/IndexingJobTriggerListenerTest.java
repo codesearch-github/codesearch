@@ -25,19 +25,21 @@
 package org.codesearch.indexer.manager;
 
 
+import static org.quartz.JobBuilder.newJob;
+import static org.quartz.TriggerBuilder.newTrigger;
+
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+
 import org.codesearch.commons.configuration.dto.RepositoryDto;
 import org.codesearch.indexer.server.manager.IndexingJob;
 import org.codesearch.indexer.server.manager.IndexingJobTriggerListener;
 import org.junit.Test;
-import static org.quartz.JobBuilder.newJob;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
-import static org.quartz.TriggerBuilder.newTrigger;
 import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.impl.matchers.EverythingMatcher;
 
@@ -50,6 +52,7 @@ public class IndexingJobTriggerListenerTest {
     /**
      * Test of vetoJobExecution method, of class IndexingJobTriggerListener.
      */
+    @SuppressWarnings("unchecked")
     @Test
     public void testVetoJobExecution() throws SchedulerException {
         try {

@@ -3,10 +3,9 @@ package org.codesearch.commons.configuration.xml;
 import java.io.File;
 import java.net.URI;
 import java.util.List;
+
 import org.codesearch.commons.configuration.ConfigurationReader;
 import org.codesearch.commons.configuration.dto.CodesearchConfiguration;
-import org.codesearch.commons.configuration.dto.DatabaseConfiguration;
-import org.codesearch.commons.configuration.dto.IndexerUserDto;
 import org.codesearch.commons.configuration.dto.JobDto;
 import org.codesearch.commons.configuration.dto.RepositoryDto;
 
@@ -18,11 +17,6 @@ import org.codesearch.commons.configuration.dto.RepositoryDto;
 public class MockConfigurationReader implements ConfigurationReader {
 
     public CodesearchConfiguration configuration = new CodesearchConfiguration();
-
-    @Override
-    public List<IndexerUserDto> getIndexerUsers() {
-        return configuration.getIndexerUsers();
-    }
 
     @Override
     public List<JobDto> getJobs() {

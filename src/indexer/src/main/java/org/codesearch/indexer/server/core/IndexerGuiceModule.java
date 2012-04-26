@@ -21,11 +21,10 @@
 
 package org.codesearch.indexer.server.core;
 
-import com.google.inject.Singleton;
-import com.google.inject.servlet.ServletModule;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+
 import org.apache.log4j.Logger;
 import org.codesearch.indexer.server.manager.IndexingManager;
 import org.codesearch.indexer.server.rpc.DashboardServiceImpl;
@@ -36,6 +35,9 @@ import org.quartz.SchedulerException;
 import org.quartz.SchedulerFactory;
 import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.spi.JobFactory;
+
+import com.google.inject.Singleton;
+import com.google.inject.servlet.ServletModule;
 
 /**
  *

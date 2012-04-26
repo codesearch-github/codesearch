@@ -18,9 +18,8 @@ package org.codesearch.commons.configuration;
 import java.io.File;
 import java.net.URI;
 import java.util.List;
+
 import org.apache.commons.configuration.ConfigurationException;
-import org.codesearch.commons.configuration.dto.DatabaseConfiguration;
-import org.codesearch.commons.configuration.dto.IndexerUserDto;
 import org.codesearch.commons.configuration.dto.JobDto;
 import org.codesearch.commons.configuration.dto.RepositoryDto;
 
@@ -30,13 +29,6 @@ import org.codesearch.commons.configuration.dto.RepositoryDto;
  * @author Samuel Kogler
  */
 public interface ConfigurationReader {
-
-    /**
-     * returns all users authorized to access the indexer via the web interface
-     *
-     * @return the users as a list of IndexerUserDto
-     */
-    List<IndexerUserDto> getIndexerUsers();
 
     /**
      * Retrieves a list of all indexer_jobs from the configuration and returns it as a list of JobDto

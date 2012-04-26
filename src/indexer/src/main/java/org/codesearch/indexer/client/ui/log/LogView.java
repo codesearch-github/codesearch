@@ -21,9 +21,10 @@
 
 package org.codesearch.indexer.client.ui.log;
 
+import java.util.List;
+
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.IsWidget;
-import java.util.List;
 
 /**
  * Displays general information like current status and errors.

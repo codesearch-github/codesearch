@@ -18,14 +18,13 @@
  */
 package org.codesearch.searcher.server;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.CorruptIndexException;
@@ -41,6 +40,9 @@ import org.codesearch.commons.constants.IndexConstants;
 import org.codesearch.commons.plugins.lucenefields.LuceneFieldPlugin;
 import org.codesearch.commons.plugins.lucenefields.LuceneFieldPluginLoader;
 import org.codesearch.searcher.shared.SearchResultDto;
+
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 @Singleton
 public class DocumentSearcherImpl implements DocumentSearcher {

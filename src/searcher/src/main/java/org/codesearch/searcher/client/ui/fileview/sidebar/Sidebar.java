@@ -22,8 +22,9 @@
 
 package org.codesearch.searcher.client.ui.fileview.sidebar;
 
-import com.google.gwt.user.client.ui.Composite;
 import org.codesearch.searcher.shared.SidebarNode;
+
+import com.google.gwt.user.client.ui.Composite;
 
 /**
  * A simple sidebar widget that can display a tree {@link SidebarNode}.

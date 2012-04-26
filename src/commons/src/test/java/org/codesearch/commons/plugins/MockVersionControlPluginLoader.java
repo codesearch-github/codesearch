@@ -2,6 +2,7 @@ package org.codesearch.commons.plugins;
 
 import java.util.List;
 import java.util.Set;
+
 import org.codesearch.commons.configuration.dto.RepositoryDto;
 import org.codesearch.commons.plugins.vcs.FileDto;
 import org.codesearch.commons.plugins.vcs.FileIdentifier;

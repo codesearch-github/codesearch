@@ -25,16 +25,19 @@
  */
 package org.codesearch.searcher.server.servlets;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import java.io.IOException;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.apache.log4j.Logger;
 import org.codesearch.searcher.server.DocumentSearcher;
 import org.codesearch.searcher.server.InvalidIndexException;
+
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 /**
  * servlet that is called from the indexer when the index in the searcher has to be refreshed

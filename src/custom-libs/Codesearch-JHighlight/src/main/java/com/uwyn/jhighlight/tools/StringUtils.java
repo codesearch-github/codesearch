@@ -21,10 +21,11 @@
 
 package com.uwyn.jhighlight.tools;
 
-import com.uwyn.jhighlight.pcj.map.CharKeyOpenHashMap;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.regex.Pattern;
+
+import com.uwyn.jhighlight.pcj.map.CharKeyOpenHashMap;
 
 /**
  * General purpose class containing common <code>String</code> manipulation

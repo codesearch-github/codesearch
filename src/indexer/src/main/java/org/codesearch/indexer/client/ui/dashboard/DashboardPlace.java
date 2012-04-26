@@ -20,10 +20,10 @@
  */
 package org.codesearch.indexer.client.ui.dashboard;
 
-import com.google.gwt.place.shared.Place;
+import org.codesearch.indexer.client.NamedPlace;
+
 import com.google.gwt.place.shared.PlaceTokenizer;
 import com.google.gwt.place.shared.Prefix;
-import org.codesearch.indexer.client.NamedPlace;
 
 /**
  * The place token representing the default page called dashboard.

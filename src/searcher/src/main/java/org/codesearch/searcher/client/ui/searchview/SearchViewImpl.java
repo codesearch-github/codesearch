@@ -18,6 +18,17 @@
  */
 package org.codesearch.searcher.client.ui.searchview;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
+import org.codesearch.searcher.client.ui.fileview.FilePlace;
+import org.codesearch.searcher.shared.SearchField;
+import org.codesearch.searcher.shared.SearchResultDto;
+import org.codesearch.searcher.shared.SearchType;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -53,15 +64,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.NoSelectionModel;
 import com.google.gwt.view.client.SelectionChangeEvent;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import org.codesearch.searcher.client.ui.fileview.FilePlace;
-import org.codesearch.searcher.shared.SearchField;
-import org.codesearch.searcher.shared.SearchResultDto;
-import org.codesearch.searcher.shared.SearchType;
 
 /**
  * Implements the functionality of the search page. Composite class

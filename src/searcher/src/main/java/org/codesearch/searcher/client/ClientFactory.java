@@ -20,11 +20,12 @@
  */
 package org.codesearch.searcher.client;
 
+import org.codesearch.searcher.client.ui.fileview.FileView;
+import org.codesearch.searcher.client.ui.searchview.SearchView;
+
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceController;
 import com.google.web.bindery.event.shared.EventBus;
-import org.codesearch.searcher.client.ui.fileview.FileView;
-import org.codesearch.searcher.client.ui.searchview.SearchView;
 
 /**
  * Provides the implementations of classes used throughout the client.

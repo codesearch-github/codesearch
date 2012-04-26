@@ -20,13 +20,15 @@
  */
 package org.codesearch.indexer.server.core;
 
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+
+import org.codesearch.commons.CommonsGuiceModule;
+import org.codesearch.indexer.server.manager.IndexingManager;
+
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.servlet.GuiceServletContextListener;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-import org.codesearch.commons.CommonsGuiceModule;
-import org.codesearch.indexer.server.manager.IndexingManager;
 
 /**
  * Creates the Guice Injector and handles shutdown cleanup.

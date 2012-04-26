@@ -18,7 +18,6 @@
  */
 package org.codesearch.indexer.server.tasks;
 
-import com.google.inject.Inject;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
@@ -31,6 +30,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.PerFieldAnalyzerWrapper;
 import org.apache.lucene.document.Document;
@@ -69,6 +69,8 @@ import org.codesearch.commons.utils.mime.MimeTypeUtil;
 import org.codesearch.indexer.server.exceptions.NotifySearcherException;
 import org.codesearch.indexer.server.exceptions.TaskExecutionException;
 import org.codesearch.indexer.server.manager.IndexingJob;
+
+import com.google.inject.Inject;
 
 /**
  * This task performs basic indexing of one repository.

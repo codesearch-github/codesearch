@@ -18,14 +18,16 @@
  */
 package org.codesearch.searcher.client.rpc;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import java.util.List;
 import java.util.Set;
+
 import org.codesearch.searcher.shared.FileDto;
 import org.codesearch.searcher.shared.JumpLocation;
 import org.codesearch.searcher.shared.SearchResultDto;
 import org.codesearch.searcher.shared.SearchType;
 import org.codesearch.searcher.shared.SearchViewData;
+
+import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public interface SearcherServiceAsync {
 

@@ -20,6 +20,8 @@
  */
 package org.codesearch.indexer.client.ui;
 
+import org.codesearch.indexer.client.NamedPlace;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.place.shared.PlaceChangeEvent;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -31,7 +33,6 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.web.bindery.event.shared.EventBus;
-import org.codesearch.indexer.client.NamedPlace;
 
 /**
  * The container of all views. Allows to define UI that shows up everywhere.
@@ -46,11 +47,9 @@ public class RootContainer extends Composite implements AcceptsOneWidget {
 
     @UiField
     LayoutPanel contentPanel;
-    private EventBus eventBus;
 
     public RootContainer(EventBus eventBus) {
         initWidget(uiBinder.createAndBindUi(this));
-        this.eventBus = eventBus;
         eventBus.addHandler(PlaceChangeEvent.TYPE, new WindowTitlePlaceChangeListener("Codesearch Index Admin"));
     }
 

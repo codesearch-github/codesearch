@@ -18,6 +18,13 @@
  */
 package org.codesearch.searcher.client.ui.fileview;
 
+import org.codesearch.searcher.client.ClientFactory;
+import org.codesearch.searcher.client.rpc.SearcherService;
+import org.codesearch.searcher.client.rpc.SearcherServiceAsync;
+import org.codesearch.searcher.client.ui.fileview.FileView.Presenter;
+import org.codesearch.searcher.shared.FileDto;
+import org.codesearch.searcher.shared.JumpLocation;
+
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.EventBus;
@@ -25,14 +32,6 @@ import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
-import com.google.gwt.user.client.ui.HTML;
-import org.codesearch.searcher.client.ClientFactory;
-import org.codesearch.searcher.client.rpc.SearcherService;
-import org.codesearch.searcher.client.rpc.SearcherServiceAsync;
-import org.codesearch.searcher.client.ui.fileview.FileView.Presenter;
-import org.codesearch.searcher.shared.FileDto;
-import org.codesearch.searcher.shared.JumpLocation;
-import org.codesearch.searcher.shared.SearchResultDto;
 
 /**
  * Presenter for the file view.

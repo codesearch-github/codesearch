@@ -19,8 +19,9 @@
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import com.google.gwt.junit.client.GWTTestCase;
 import org.junit.Ignore;
+
+import com.google.gwt.junit.client.GWTTestCase;
 
 /**
  * Tests the searcher interface.

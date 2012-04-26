@@ -23,10 +23,12 @@
  */
 package org.codesearch.indexer.client.rpc;
 
+import java.util.List;
+
+import org.codesearch.indexer.shared.LogServiceException;
+
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
-import java.util.List;
-import org.codesearch.indexer.shared.LogServiceException;
 
 /**
  * @author Samuel Kogler

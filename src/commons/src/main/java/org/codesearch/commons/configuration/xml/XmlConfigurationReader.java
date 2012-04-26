@@ -18,13 +18,16 @@
  */
 package org.codesearch.commons.configuration.xml;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import com.google.inject.name.Named;
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Set;
+
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
@@ -32,7 +35,17 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.codesearch.commons.configuration.ConfigurationReader;
 import org.codesearch.commons.configuration.InvalidConfigurationException;
-import org.codesearch.commons.configuration.dto.*;
+import org.codesearch.commons.configuration.dto.AuthenticationType;
+import org.codesearch.commons.configuration.dto.BasicAuthentication;
+import org.codesearch.commons.configuration.dto.CodesearchConfiguration;
+import org.codesearch.commons.configuration.dto.JobDto;
+import org.codesearch.commons.configuration.dto.NoAuthentication;
+import org.codesearch.commons.configuration.dto.RepositoryDto;
+import org.codesearch.commons.configuration.dto.SshAuthentication;
+
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 
 /**
  * Xml implementation of the configuration reader. By default, the properties
@@ -72,14 +85,6 @@ public class XmlConfigurationReader implements ConfigurationReader {
 
         LOG.debug("Reading config file: " + this.configPath);
         loadConfig();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public synchronized List<IndexerUserDto> getIndexerUsers() {
-        return codesearchConfiguration.getIndexerUsers();
     }
 
     /**
@@ -207,7 +212,6 @@ public class XmlConfigurationReader implements ConfigurationReader {
         loadGlobalWhitelist();
         loadRepositories();
         loadJobs();
-        loadIndexerUsers();
     }
 
     private void loadCacheDirectory() throws InvalidConfigurationException {
@@ -243,6 +247,7 @@ public class XmlConfigurationReader implements ConfigurationReader {
         List<RepositoryDto> repositories = new LinkedList<RepositoryDto>();
         Set<String> repositoryGroups = new HashSet<String>();
 
+        @SuppressWarnings("unchecked")
         List<HierarchicalConfiguration> repositoryConfigs = config.configurationsAt(XmlConfigurationReaderConstants.REPOSITORY_LIST);
         for (HierarchicalConfiguration repositoryConfig : repositoryConfigs) {
             RepositoryDto repo = loadRepository(repositoryConfig);
@@ -259,6 +264,7 @@ public class XmlConfigurationReader implements ConfigurationReader {
      * configuration via the HierarchicalConfiguration and returns it as a
      * RepositoryDto
      */
+    @SuppressWarnings("unchecked")
     private RepositoryDto loadRepository(HierarchicalConfiguration hc) throws InvalidConfigurationException {
         RepositoryDto repo;
         //mandatory field
@@ -305,6 +311,7 @@ public class XmlConfigurationReader implements ConfigurationReader {
         return repo;
     }
 
+    @SuppressWarnings("unchecked")
     private void loadJobs() throws InvalidConfigurationException {
         List<JobDto> jobs = new LinkedList<JobDto>();
         // read the configuration for the jobs from the config
@@ -335,26 +342,15 @@ public class XmlConfigurationReader implements ConfigurationReader {
         codesearchConfiguration.setJobs(jobs);
     }
 
-    @Deprecated //users for indexer are not configured yet
-    private void loadIndexerUsers() {
-        List<IndexerUserDto> indexerUsers = new LinkedList<IndexerUserDto>();
-        List<HierarchicalConfiguration> userConfig = config.configurationsAt(XmlConfigurationReaderConstants.INDEXER_USERS);
-        for (HierarchicalConfiguration hc : userConfig) {
-            IndexerUserDto userDto = new IndexerUserDto();
-            userDto.setUserName(hc.getString(XmlConfigurationReaderConstants.USERNAME));
-            userDto.setPassword((hc.getString(XmlConfigurationReaderConstants.PASSWORD)));
-            indexerUsers.add(userDto);
-        }
-        codesearchConfiguration.setIndexerUsers(indexerUsers);
-    }
-
+    @SuppressWarnings("unchecked")
     private void loadGlobalWhitelist() {
-        List globalWhitelist = config.getList(XmlConfigurationReaderConstants.GLOBAL_WHITELIST);
+        List<String> globalWhitelist = config.getList(XmlConfigurationReaderConstants.GLOBAL_WHITELIST);
         codesearchConfiguration.setGlobalWhitelist(globalWhitelist);
     }
 
+    @SuppressWarnings("unchecked")
     private void loadGlobalBlacklist() {
-        List globalBlacklist = config.getList(XmlConfigurationReaderConstants.GLOBAL_BLACKLIST);
+        List<String> globalBlacklist = config.getList(XmlConfigurationReaderConstants.GLOBAL_BLACKLIST);
         codesearchConfiguration.setGlobalBlacklist(globalBlacklist);
     }
 

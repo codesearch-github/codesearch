@@ -22,15 +22,16 @@
 
 package org.codesearch.indexer.client;
 
-import com.google.gwt.activity.shared.Activity;
-import com.google.gwt.activity.shared.ActivityMapper;
-import com.google.gwt.place.shared.Place;
 import org.codesearch.indexer.client.ui.dashboard.DashboardActivity;
 import org.codesearch.indexer.client.ui.dashboard.DashboardPlace;
 import org.codesearch.indexer.client.ui.log.LogActivity;
 import org.codesearch.indexer.client.ui.log.LogPlace;
 import org.codesearch.indexer.client.ui.manualIndexing.ManualIndexingActivity;
 import org.codesearch.indexer.client.ui.manualIndexing.ManualIndexingPlace;
+
+import com.google.gwt.activity.shared.Activity;
+import com.google.gwt.activity.shared.ActivityMapper;
+import com.google.gwt.place.shared.Place;
 
 /**
  * Manages activities in the searcher.

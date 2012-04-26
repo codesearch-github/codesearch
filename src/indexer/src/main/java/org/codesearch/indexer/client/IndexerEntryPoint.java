@@ -21,6 +21,9 @@
 
 package org.codesearch.indexer.client;
 
+import org.codesearch.indexer.client.ui.RootContainer;
+import org.codesearch.indexer.client.ui.dashboard.DashboardPlace;
+
 import com.google.gwt.activity.shared.ActivityManager;
 import com.google.gwt.activity.shared.ActivityMapper;
 import com.google.gwt.core.client.EntryPoint;
@@ -30,8 +33,6 @@ import com.google.gwt.place.shared.PlaceController;
 import com.google.gwt.place.shared.PlaceHistoryHandler;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.web.bindery.event.shared.EventBus;
-import org.codesearch.indexer.client.ui.RootContainer;
-import org.codesearch.indexer.client.ui.dashboard.DashboardPlace;
 
 
 /**

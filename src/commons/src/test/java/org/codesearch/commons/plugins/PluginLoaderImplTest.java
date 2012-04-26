@@ -1,6 +1,7 @@
 package org.codesearch.commons.plugins;
 
 import java.util.List;
+
 import org.codesearch.commons.configuration.ConfigurationReader;
 import org.codesearch.commons.configuration.xml.NoOpConfigurationReader;
 import org.codesearch.commons.plugins.lucenefields.LuceneFieldPlugin;

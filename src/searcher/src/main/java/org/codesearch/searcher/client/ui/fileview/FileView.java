@@ -21,10 +21,12 @@
 
 package org.codesearch.searcher.client.ui.fileview;
 
+import java.util.List;
+
+import org.codesearch.searcher.shared.OutlineNode;
+
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.IsWidget;
-import java.util.List;
-import org.codesearch.searcher.shared.OutlineNode;
 
 /**
  * View that can display a file.

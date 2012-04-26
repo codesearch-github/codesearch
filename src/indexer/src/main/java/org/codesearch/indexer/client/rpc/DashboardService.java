@@ -23,10 +23,11 @@
  */
 package org.codesearch.indexer.client.rpc;
 
-import com.google.gwt.user.client.rpc.RemoteService;
-import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import org.codesearch.indexer.shared.DashboardData;
 import org.codesearch.indexer.shared.DashboardServiceException;
+
+import com.google.gwt.user.client.rpc.RemoteService;
+import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
 /**
  * @author Samuel Kogler

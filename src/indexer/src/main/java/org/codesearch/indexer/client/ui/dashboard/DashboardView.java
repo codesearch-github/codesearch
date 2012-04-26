@@ -21,12 +21,13 @@
 
 package org.codesearch.indexer.client.ui.dashboard;
 
+import org.codesearch.indexer.shared.JobStatus;
+import org.codesearch.indexer.shared.RepositoryStatus;
+
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.client.ui.IsWidget;
-import org.codesearch.indexer.shared.JobStatus;
-import org.codesearch.indexer.shared.RepositoryStatus;
 
 /**
  * Displays general information like current status and errors.

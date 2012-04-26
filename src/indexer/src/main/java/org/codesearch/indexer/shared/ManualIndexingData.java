@@ -33,6 +33,9 @@ import java.util.List;
  */
 public class ManualIndexingData implements Serializable {
 
+    /** . */
+    private static final long serialVersionUID = -3946566729115794607L;
+    
     private List<String> repositories;
     private List<String> repositoryGroups;
 

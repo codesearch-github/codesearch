@@ -18,6 +18,9 @@
  */
 package org.codesearch.commons.plugins.vcs;
 
+import static org.easymock.EasyMock.expect;
+import static org.junit.Assert.assertEquals;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -34,10 +37,6 @@ import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNNodeKind;
 import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.io.SVNRepository;
-
-import static org.junit.Assert.assertEquals;
-
-import static org.easymock.EasyMock.expect;
 
 /**
  *

@@ -26,6 +26,7 @@ import java.io.File;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Set;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.codesearch.commons.configuration.dto.BasicAuthentication;

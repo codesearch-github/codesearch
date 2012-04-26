@@ -2,6 +2,7 @@ package org.codesearch.commons.configuration;
 
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+
 import org.apache.commons.lang.StringUtils;
 import org.codesearch.commons.configuration.dto.RepositoryDto;
 import org.codesearch.commons.plugins.PluginLoader;

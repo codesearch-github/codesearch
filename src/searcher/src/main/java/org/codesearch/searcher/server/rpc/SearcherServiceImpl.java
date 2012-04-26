@@ -18,16 +18,15 @@
  */
 package org.codesearch.searcher.server.rpc;
 
-import com.google.gwt.user.server.rpc.RemoteServiceServlet;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+
 import net.sf.jmimemagic.Magic;
 import net.sf.jmimemagic.MagicMatch;
+
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.apache.lucene.queryParser.ParseException;
@@ -62,6 +61,10 @@ import org.codesearch.searcher.shared.SearchType;
 import org.codesearch.searcher.shared.SearchViewData;
 import org.codesearch.searcher.shared.SearcherServiceException;
 import org.codesearch.searcher.shared.SidebarNode;
+
+import com.google.gwt.user.server.rpc.RemoteServiceServlet;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 /**
  * Service used for search operations.

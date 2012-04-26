@@ -18,11 +18,11 @@
  */
 package org.codesearch.indexer.server.manager;
 
-import com.google.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
@@ -40,6 +40,8 @@ import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+
+import com.google.inject.Inject;
 
 /**
  * Stores one or more tasks and controls their execution.
@@ -120,6 +122,7 @@ public class IndexingJob implements Job {
      * @throws JobExecutionException if the execution of a task was not
      * successful or if the job was terminated
      */
+    @SuppressWarnings("unchecked")
     @Override
     public void execute(JobExecutionContext jec) throws JobExecutionException {
         jobDataMap = jec.getJobDetail().getJobDataMap();

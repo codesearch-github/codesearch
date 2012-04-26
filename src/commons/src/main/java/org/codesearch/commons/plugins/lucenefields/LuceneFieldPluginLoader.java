@@ -1,6 +1,7 @@
 package org.codesearch.commons.plugins.lucenefields;
 
 import java.util.List;
+
 import org.apache.lucene.analysis.PerFieldAnalyzerWrapper;
 
 /**

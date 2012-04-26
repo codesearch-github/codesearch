@@ -20,11 +20,12 @@
  */
 package org.codesearch.indexer.client;
 
-import com.google.gwt.place.shared.PlaceHistoryMapper;
-import com.google.gwt.place.shared.WithTokenizers;
 import org.codesearch.indexer.client.ui.dashboard.DashboardPlace;
 import org.codesearch.indexer.client.ui.log.LogPlace;
 import org.codesearch.indexer.client.ui.manualIndexing.ManualIndexingPlace;
+
+import com.google.gwt.place.shared.PlaceHistoryMapper;
+import com.google.gwt.place.shared.WithTokenizers;
 
 /**
  * Manages history tokens throughout the searcher.

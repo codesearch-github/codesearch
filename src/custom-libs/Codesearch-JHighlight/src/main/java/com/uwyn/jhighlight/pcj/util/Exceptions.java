@@ -21,8 +21,9 @@
 
 package com.uwyn.jhighlight.pcj.util;
 
-import com.uwyn.jhighlight.pcj.map.NoSuchMappingException;
 import java.util.NoSuchElementException;
+
+import com.uwyn.jhighlight.pcj.map.NoSuchMappingException;
 
 /**
  *  This class provides static methods for throwing exceptions.

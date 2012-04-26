@@ -21,6 +21,8 @@
 
 package org.codesearch.searcher.client;
 
+import org.codesearch.searcher.client.ui.RootContainer;
+
 import com.google.gwt.activity.shared.ActivityManager;
 import com.google.gwt.activity.shared.ActivityMapper;
 import com.google.gwt.core.client.EntryPoint;
@@ -29,7 +31,6 @@ import com.google.gwt.place.shared.PlaceController;
 import com.google.gwt.place.shared.PlaceHistoryHandler;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.web.bindery.event.shared.EventBus;
-import org.codesearch.searcher.client.ui.RootContainer;
 
 /**
  * The entry point for the searcher.

@@ -23,8 +23,9 @@
  */
 package org.codesearch.indexer.client.rpc;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import org.codesearch.indexer.shared.DashboardData;
+
+import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
  * @author Samuel Kogler

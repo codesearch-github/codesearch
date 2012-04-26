@@ -21,16 +21,19 @@
 
 package org.codesearch.searcher.server;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 import org.codesearch.commons.configuration.ConfigurationReader;
 import org.codesearch.commons.configuration.InvalidConfigurationException;
 import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
 import org.codesearch.commons.plugins.PluginLoaderImpl;
 import org.codesearch.commons.plugins.lucenefields.LuceneFieldPluginLoaderImpl;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import org.codesearch.searcher.shared.SearchResultDto;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -55,7 +58,7 @@ public class DocumentSearcherTest {
     @Test
     public void testSearch() throws Exception {
         String searchString = "SVN_NAME";
-        List result = instance.search(searchString, true, new HashSet<String>(), new HashSet<String>(), 500);
+        List<SearchResultDto> result = instance.search(searchString, true, new HashSet<String>(), new HashSet<String>(), 500);
         assertFalse(result.isEmpty());
         searchString = "svn_name";
         result = instance.search(searchString, true, new HashSet<String>(), new HashSet<String>(), 500);

@@ -2,7 +2,9 @@ package org.codesearch.commons.plugins.lucenefields;
 
 import java.util.LinkedList;
 import java.util.List;
+
 import javax.inject.Inject;
+
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.PerFieldAnalyzerWrapper;
 import org.codesearch.commons.constants.IndexConstants;

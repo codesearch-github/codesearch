@@ -5,12 +5,13 @@
 package org.codesearch.commons.configuration.xml;
 
 import java.io.File;
-import org.codesearch.commons.plugins.NullPluginLoader;
+
 import org.codesearch.commons.configuration.ConfigurationReader;
 import org.codesearch.commons.configuration.ConfigurationValidator;
 import org.codesearch.commons.configuration.InvalidConfigurationException;
 import org.codesearch.commons.configuration.dto.RepositoryDto;
 import org.codesearch.commons.plugins.ExceptionThrowingPluginLoader;
+import org.codesearch.commons.plugins.NullPluginLoader;
 import org.codesearch.commons.plugins.PluginLoader;
 import org.junit.Test;
 

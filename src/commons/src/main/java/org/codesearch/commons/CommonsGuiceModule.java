@@ -18,8 +18,6 @@
  */
 package org.codesearch.commons;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Singleton;
 import org.apache.log4j.Logger;
 import org.codesearch.commons.configuration.ConfigurationReader;
 import org.codesearch.commons.configuration.ConfigurationValidator;
@@ -33,6 +31,9 @@ import org.codesearch.commons.plugins.PluginLoader;
 import org.codesearch.commons.plugins.PluginLoaderImpl;
 import org.codesearch.commons.plugins.lucenefields.LuceneFieldPluginLoader;
 import org.codesearch.commons.plugins.lucenefields.LuceneFieldPluginLoaderImpl;
+
+import com.google.inject.AbstractModule;
+import com.google.inject.Singleton;
 
 /**
  * Guice module for commons. Wires everything together.
@@ -48,7 +49,7 @@ public class CommonsGuiceModule extends AbstractModule {
         try {
             ConfigurationReader configurationReader = new XmlConfigurationReader("codesearch_config.xml");
             PluginLoader pluginLoader = new PluginLoaderImpl(configurationReader);
-            ConfigurationValidator configurationValidator = new ConfigurationValidator(configurationReader, pluginLoader);
+            new ConfigurationValidator(configurationReader, pluginLoader);
 
             bind(ConfigurationReader.class).toInstance(configurationReader);
             bind(PluginLoader.class).toInstance(pluginLoader);

@@ -31,7 +31,11 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.codesearch.commons.configuration.dto.*;
+import org.codesearch.commons.configuration.dto.AuthenticationType;
+import org.codesearch.commons.configuration.dto.BasicAuthentication;
+import org.codesearch.commons.configuration.dto.NoAuthentication;
+import org.codesearch.commons.configuration.dto.RepositoryDto;
+import org.codesearch.commons.configuration.dto.SshAuthentication;
 import org.tmatesoft.svn.core.ISVNDirEntryHandler;
 import org.tmatesoft.svn.core.SVNDepth;
 import org.tmatesoft.svn.core.SVNDirEntry;

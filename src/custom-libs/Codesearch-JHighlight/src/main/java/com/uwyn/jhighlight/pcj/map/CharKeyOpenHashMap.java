@@ -21,13 +21,6 @@
 
 package com.uwyn.jhighlight.pcj.map;
 
-import com.uwyn.jhighlight.pcj.CharIterator;
-import com.uwyn.jhighlight.pcj.hash.CharHashFunction;
-import com.uwyn.jhighlight.pcj.hash.DefaultCharHashFunction;
-import com.uwyn.jhighlight.pcj.hash.Primes;
-import com.uwyn.jhighlight.pcj.set.AbstractCharSet;
-import com.uwyn.jhighlight.pcj.set.CharSet;
-import com.uwyn.jhighlight.pcj.util.Exceptions;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -35,6 +28,14 @@ import java.io.Serializable;
 import java.util.AbstractCollection;
 import java.util.Collection;
 import java.util.Iterator;
+
+import com.uwyn.jhighlight.pcj.CharIterator;
+import com.uwyn.jhighlight.pcj.hash.CharHashFunction;
+import com.uwyn.jhighlight.pcj.hash.DefaultCharHashFunction;
+import com.uwyn.jhighlight.pcj.hash.Primes;
+import com.uwyn.jhighlight.pcj.set.AbstractCharSet;
+import com.uwyn.jhighlight.pcj.set.CharSet;
+import com.uwyn.jhighlight.pcj.util.Exceptions;
 
 /**
  *  This class represents open addressing hash table based maps from

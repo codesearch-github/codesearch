@@ -56,8 +56,6 @@ public final class XmlConfigurationReaderConstants {
     protected static final String SEARCHER_LOCATION = "searcher-location";
     /** used to store local checkouts/clones of the configured repositories. */
     protected static final String CACHE_DIR = "cache-directory";
-    /** used to store the data of the users authorized to access the indexer via the web interface */
-    protected static final String INDEXER_USERS = "indexer-users.indexer-user";
     /** used to access the username of a indexing-user */
     protected static final String USERNAME = "username";
     /** Used to access the password of a indexing-user */

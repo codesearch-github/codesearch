@@ -21,6 +21,8 @@
 
 package com.uwyn.jhighlight.pcj;
 
+import java.util.NoSuchElementException;
+
 /**
  *  This class represents iterators over collections of char values.
  *

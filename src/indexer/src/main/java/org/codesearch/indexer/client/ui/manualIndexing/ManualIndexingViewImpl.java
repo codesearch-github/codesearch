@@ -22,6 +22,9 @@ package org.codesearch.indexer.client.ui.manualIndexing;
 
 
 
+import java.util.LinkedList;
+import java.util.List;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.HasClickHandlers;
@@ -32,8 +35,6 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Widget;
-import java.util.LinkedList;
-import java.util.List;
 
 public class ManualIndexingViewImpl extends Composite implements ManualIndexingView {
 

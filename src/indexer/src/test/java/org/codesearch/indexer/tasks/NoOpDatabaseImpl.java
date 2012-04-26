@@ -22,6 +22,7 @@ package org.codesearch.indexer.tasks;
 
 import java.util.List;
 import java.util.Map;
+
 import org.codesearch.commons.database.DBAccess;
 import org.codesearch.commons.database.DatabaseAccessException;
 import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;

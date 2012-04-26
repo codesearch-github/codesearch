@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007 Júlio Vilmar Gesser.
+ * Copyright (C) 2007 Jï¿½lio Vilmar Gesser.
  * 
  * This file is part of Java 1.5 parser and Abstract Syntax Tree.
  *
@@ -23,6 +23,7 @@ package japa.parser.ast.body;
 
 import japa.parser.ast.Node;
 import japa.parser.ast.expr.AnnotationExpr;
+
 import java.util.List;
 
 /**

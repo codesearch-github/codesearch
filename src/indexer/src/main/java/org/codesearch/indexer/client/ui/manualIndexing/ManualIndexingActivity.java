@@ -21,6 +21,13 @@
 
 package org.codesearch.indexer.client.ui.manualIndexing;
 
+import org.codesearch.indexer.client.ClientFactory;
+import org.codesearch.indexer.client.rpc.ManualIndexingService;
+import org.codesearch.indexer.client.rpc.ManualIndexingServiceAsync;
+import org.codesearch.indexer.client.ui.dashboard.DashboardPlace;
+import org.codesearch.indexer.client.ui.manualIndexing.ManualIndexingView.Presenter;
+import org.codesearch.indexer.shared.ManualIndexingData;
+
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.EventBus;
@@ -28,12 +35,6 @@ import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
-import org.codesearch.indexer.client.ClientFactory;
-import org.codesearch.indexer.client.rpc.ManualIndexingService;
-import org.codesearch.indexer.client.rpc.ManualIndexingServiceAsync;
-import org.codesearch.indexer.client.ui.dashboard.DashboardPlace;
-import org.codesearch.indexer.client.ui.manualIndexing.ManualIndexingView.Presenter;
-import org.codesearch.indexer.shared.ManualIndexingData;
 
 /**
  * Presenter for the dashboard.

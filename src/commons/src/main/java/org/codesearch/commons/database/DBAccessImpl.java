@@ -18,7 +18,6 @@
  */
 package org.codesearch.commons.database;
 
-import com.google.inject.Inject;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -31,11 +30,12 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
+
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
+
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.ResultSetHandler;
 import org.apache.commons.lang.StringUtils;
@@ -44,6 +44,8 @@ import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
 import org.codesearch.commons.plugins.codeanalyzing.ast.ExternalUsage;
 import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
 import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
+
+import com.google.inject.Inject;
 
 /**
  * DBUtils provides methods for access to the database specified in the
@@ -149,8 +151,6 @@ public class DBAccessImpl implements DBAccess {
     @SuppressWarnings("unchecked")
     public synchronized List<Usage> getUsagesForFile(String filePath, String repository) throws DatabaseAccessException {
         int repo_id = getRepoIdForRepoName(repository);
-        List<Usage> usages = null;
-
         ResultSetHandler<byte[]> h = new SingleValueByteArrayHandler();
 
         try {

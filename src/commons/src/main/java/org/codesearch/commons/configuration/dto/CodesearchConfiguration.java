@@ -33,13 +33,11 @@ public class CodesearchConfiguration {
     private URI searcherLocation;
     private File cacheDirectory;
     private File indexLocation;
-    private List<IndexerUserDto> indexerUsers = new LinkedList<IndexerUserDto>();
     private List<JobDto> jobs = new LinkedList<JobDto>();
     private List<RepositoryDto> repositories = new LinkedList<RepositoryDto>();
     private List<String> globalWhitelist = new LinkedList<String>();
     private List<String> globalBlacklist = new LinkedList<String>();
     private List<String> repositoryGroups = new LinkedList<String>();
-    private DatabaseConfiguration databaseConfiguration;
 
     public URI getSearcherLocation() {
         return searcherLocation;
@@ -63,14 +61,6 @@ public class CodesearchConfiguration {
 
     public void setIndexLocation(File indexLocation) {
         this.indexLocation = indexLocation;
-    }
-
-    public List<IndexerUserDto> getIndexerUsers() {
-        return indexerUsers;
-    }
-
-    public void setIndexerUsers(List<IndexerUserDto> indexerUsers) {
-        this.indexerUsers = indexerUsers;
     }
 
     public List<JobDto> getJobs() {
@@ -111,13 +101,5 @@ public class CodesearchConfiguration {
 
     public void setRepositoryGroups(List<String> repositoryGroups) {
         this.repositoryGroups = repositoryGroups;
-    }
-
-    public DatabaseConfiguration getDatabaseConfiguration() {
-        return databaseConfiguration;
-    }
-
-    public void setDatabaseConfiguration(DatabaseConfiguration databaseConfiguration) {
-        this.databaseConfiguration = databaseConfiguration;
     }
 }

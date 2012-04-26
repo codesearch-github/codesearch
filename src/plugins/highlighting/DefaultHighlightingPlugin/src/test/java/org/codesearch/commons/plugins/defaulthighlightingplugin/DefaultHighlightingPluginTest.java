@@ -23,6 +23,7 @@ package org.codesearch.commons.plugins.defaulthighlightingplugin;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+
 import org.apache.log4j.Logger;
 import org.junit.Test;
 

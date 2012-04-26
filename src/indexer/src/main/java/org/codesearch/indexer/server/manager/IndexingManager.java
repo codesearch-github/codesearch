@@ -18,14 +18,15 @@
  */
 package org.codesearch.indexer.server.manager;
 
-import com.google.inject.Inject;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+
 import javax.inject.Singleton;
+
 import org.apache.log4j.Logger;
 import org.codesearch.commons.configuration.ConfigurationReader;
 import org.codesearch.commons.configuration.dto.JobDto;
@@ -49,6 +50,8 @@ import org.quartz.TriggerBuilder;
 import org.quartz.impl.matchers.EverythingMatcher;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.quartz.spi.JobFactory;
+
+import com.google.inject.Inject;
 
 /**
  * controls the scheduler used to execute the indexing jobs
@@ -172,6 +175,7 @@ public final class IndexingManager {
             jobStatus.setStart(currentJob.getFireTime());
             jobStatus.setCurrentRepository(jobDataMap.getString(IndexingJob.FIELD_CURRENT_REPOSITORY));
 
+            @SuppressWarnings("unchecked")
             List<RepositoryDto> repos = (List<RepositoryDto>) jobDataMap.get(IndexingJob.FIELD_REPOSITORIES);
             List<String> repoNames = new LinkedList<String>();
             for (RepositoryDto repositoryDto : repos) {

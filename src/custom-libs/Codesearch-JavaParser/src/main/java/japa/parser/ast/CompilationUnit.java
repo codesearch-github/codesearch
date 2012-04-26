@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007 Júlio Vilmar Gesser.
+ * Copyright (C) 2007 Jï¿½lio Vilmar Gesser.
  * 
  * This file is part of Java 1.5 parser and Abstract Syntax Tree.
  *
@@ -21,9 +21,15 @@
  */
 package japa.parser.ast;
 
-import japa.parser.ast.body.*;
+import japa.parser.ast.body.AnnotationDeclaration;
+import japa.parser.ast.body.ClassOrInterfaceDeclaration;
+import japa.parser.ast.body.EmptyTypeDeclaration;
+import japa.parser.ast.body.EnumDeclaration;
+import japa.parser.ast.body.JavadocComment;
+import japa.parser.ast.body.TypeDeclaration;
 import japa.parser.ast.visitor.GenericVisitor;
 import japa.parser.ast.visitor.VoidVisitor;
+
 import java.util.List;
 
 /**

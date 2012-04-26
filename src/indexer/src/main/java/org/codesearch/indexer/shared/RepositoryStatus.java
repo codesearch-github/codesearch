@@ -28,6 +28,9 @@ import java.io.Serializable;
  */
 public class RepositoryStatus implements Serializable {
 
+    /** . */
+    private static final long serialVersionUID = -4238507594081282969L;
+    
     private String repositoryName;
     private String revision;
     private Status status;
