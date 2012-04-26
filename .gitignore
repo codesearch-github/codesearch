@@ -1,6 +1,5 @@
 src/releases/*
 *target*
-*lib*
 *.class
 *classes*
 *.classpath

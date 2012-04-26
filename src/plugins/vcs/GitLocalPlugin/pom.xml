@@ -4,12 +4,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>GitLocalPlugin</artifactId>
-    <name>Git Local Plugin</name>
+    <name>Codesearch: Git Local Plugin</name>
     <description>A plugin for codesearch used to access files stored in GIT repositories.</description>
 
     <parent>
-        <groupId>org.codesearch</groupId>
-        <artifactId>codesearch</artifactId>
+        <groupId>org.codesearch.plugins</groupId>
+        <artifactId>vcs-plugins</artifactId>
         <version>0.1-RC2</version>
     </parent>
 

@@ -2,30 +2,16 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
-
     <artifactId>JavaCodeAnalyzerPlugin</artifactId>
-
-
     <packaging>jar</packaging>
-    <name>JavaCodeAnalyzerPlugin</name>
+    <name>Codesearch: JavaCodeAnalyzerPlugin</name>
 
     <parent>
-        <artifactId>codesearch</artifactId>
-        <groupId>org.codesearch</groupId>
-        <version>0.1-RC2</version>
+        <groupId>org.codesearch.plugins</groupId>
+        <artifactId>codeanalysis-plugins</artifactId>
+	    <version>0.1-RC2</version>
     </parent>
 
-    <repositories>
-        <repository>
-            <id>javaparser</id>
-            <name>JavaParser Repository</name>
-            <url>http://javaparser.googlecode.com/svn/maven2</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
@@ -33,14 +19,13 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.codesearch</groupId>
+            <groupId>org.codesearch.customlibs</groupId>
             <artifactId>Codesearch-JavaParser</artifactId>
-            <version>0.1-RC</version>
         </dependency>
         <dependency>
             <groupId>org.codesearch</groupId>
             <artifactId>codesearch-commons</artifactId>
-            <version>0.1-RC2</version>
+			<version>${project.version}</version>
         </dependency>
     </dependencies>
 </project>

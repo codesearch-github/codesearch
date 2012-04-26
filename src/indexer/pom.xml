@@ -65,6 +65,36 @@
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
+		<!--STARTPLUGINS-->
+		<dependency>
+			<groupId>org.codesearch.plugins</groupId>
+			<artifactId>RevisionLuceneFieldPlugin</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.codesearch.plugins</groupId>
+			<artifactId>RepositoryGroupLuceneFieldPlugin</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.codesearch.plugins</groupId>
+			<artifactId>JavaCodeAnalyzerPlugin</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.codesearch.plugins</groupId>
+			<artifactId>XmlCodeAnalyzerPlugin</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.codesearch.plugins</groupId>
+			<artifactId>GitLocalPlugin</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.codesearch.customlibs</groupId>
+			<artifactId>Codesearch-JavaParser</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.codesearch.plugins</groupId>
+			<artifactId>SubversionPlugin</artifactId>
+		</dependency>
+		<!--ENDPLUGINS-->
     </dependencies>
 
     <build>
@@ -83,6 +113,7 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <module>org.codesearch.indexer.Indexer</module>
                     <runTarget>index.html</runTarget>
                     <hostedWebapp>${webappDirectory}</hostedWebapp>
                 </configuration>
@@ -105,4 +136,23 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>gwt-maven-plugin</artifactId>
+                        <configuration>
+                            <module>org.codesearch.indexer.IndexerDev</module>
+                            <draftCompile>true</draftCompile>
+                        </configuration>
+                    </plugin>
+                </plugins>
+           </build>
+        </profile>
+    </profiles>
+
 </project>

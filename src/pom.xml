@@ -11,7 +11,13 @@
     <description>A java code search appplication</description>
 
     <modules>
+		<!--order for maven dependency plugin important! 
+		    build custom-libs and plugins before indexer and searcher are packaged.
+			to avoid this order add plugin dependencies to indexer and searcher and 
+			remove dependency plugin.-->
         <module>commons</module>
+        <module>custom-libs</module>
+        <module>plugins</module>
         <module>indexer</module>
         <module>searcher</module>
     </modules>
@@ -136,10 +142,59 @@
                 <version>4.8.2</version>
                 <scope>test</scope>
             </dependency>
-        </dependencies>
-    </dependencyManagement>
 
-    <build>
+			<!--STARTPLUGINS-->
+			<dependency>
+                <groupId>org.codesearch.plugins</groupId>
+                <artifactId>RevisionLuceneFieldPlugin</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.codesearch.plugins</groupId>
+				<artifactId>RepositoryGroupLuceneFieldPlugin</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.codesearch.plugins</groupId>
+				<artifactId>JavaCodeAnalyzerPlugin</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.codesearch.plugins</groupId>
+				<artifactId>XmlCodeAnalyzerPlugin</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.codesearch.plugins</groupId>
+				<artifactId>DefaultHighlightingPlugin</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+			    <groupId>org.codesearch.customlibs</groupId>
+			    <artifactId>Codesearch-JavaParser</artifactId>
+				<version>${project.version}</version>
+		    </dependency>
+			<dependency>
+				<groupId>org.codesearch.customlibs</groupId>
+				<artifactId>codesearch-jhighlight</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.codesearch.plugins</groupId>
+				<artifactId>GitLocalPlugin</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.codesearch.plugins</groupId>
+				<artifactId>SubversionPlugin</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<!--ENDPLUGINS-->
+		
+		</dependencies>	
+	</dependencyManagement>
+
+	<build>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

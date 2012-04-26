@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.codesearch.plugins</groupId>
+    <artifactId>codeanalysis-plugins</artifactId>
+
+    <packaging>pom</packaging>
+    <name>Codesearch: CodeAnalysis Plugins</name>
+    <description>package for codeanalysis plugins</description>
+
+    <parent>
+        <groupId>org.codesearch.plugins</groupId>
+        <artifactId>plugins</artifactId>
+        <version>0.1-RC2</version>
+    </parent>
+
+    <modules>
+        <module>JavaCodeAnalyzerPlugin</module>
+        <module>XmlCodeAnalyzerPlugin</module>
+    </modules>
+
+</project>

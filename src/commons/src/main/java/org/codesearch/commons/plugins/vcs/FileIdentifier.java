@@ -20,12 +20,14 @@
  */
 package org.codesearch.commons.plugins.vcs;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
 import org.codesearch.commons.configuration.dto.RepositoryDto;
 
 /**
  * Stores information about a specific file in a repository
  * does not contain the actual content of the file
  * the content can be retrieved by using the corresponding vcs plugin to get the FileDto object
+ *
  * @author David Froehlich
  */
 public class FileIdentifier {
@@ -43,11 +45,12 @@ public class FileIdentifier {
         this.repository = repository;
     }
 
-    public RepositoryDto getRepository(){
+    public RepositoryDto getRepository() {
         return repository;
     }
 
-    /** determines if the file has been deleted since the last indexing process
+    /**
+     * determines if the file has been deleted since the last indexing process
      * is handed to the IndexerTask so all database entries and lucene fields associated to the file get purged
      */
     public boolean isDeleted() {
@@ -81,5 +84,10 @@ public class FileIdentifier {
     @Override
     public int hashCode() {
         return 201 + (this.filePath != null ? this.filePath.hashCode() : 0);
+    }
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this);
     }
 }
