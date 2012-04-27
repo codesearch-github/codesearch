@@ -119,3 +119,6 @@ ALTER TABLE `import`
 --
 ALTER TABLE `type`
   ADD CONSTRAINT `type_ibfk_1` FOREIGN KEY (`file_id`) REFERENCES `file` (`file_id`) ON DELETE CASCADE;
+
+
+CREATE INDEX file_path_file USING BTREE ON file (file_path);
