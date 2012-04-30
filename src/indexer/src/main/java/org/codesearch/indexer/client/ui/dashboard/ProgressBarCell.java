@@ -37,9 +37,9 @@ public class ProgressBarCell extends NumberCell {
     @Override
     public void render(Context context, Number value, SafeHtmlBuilder sb) {
         sb.appendHtmlConstant("<div id='codeSearchProgressBarBackground' style='width:" + progressbarWidth
-            + "px;background: white !important;'>");
+            + "px;border: 1px solid;'>");
         sb.appendHtmlConstant("<div id='codeSearchProgressBarValue' style='width:"
-            + (int)(value.floatValue() * progressbarWidth) + "px;background: lightblue !important;'>&nbsp;");
+            + (int)(value.floatValue() * progressbarWidth) + "px;background: lightblue;'>&nbsp;");
         sb.append((int)(value.floatValue() * 100));
         sb.appendEscaped("%");
         sb.appendHtmlConstant("</div>");
