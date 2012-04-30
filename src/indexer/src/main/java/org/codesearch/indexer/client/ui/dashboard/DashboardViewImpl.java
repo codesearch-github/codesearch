@@ -49,6 +49,7 @@ public class DashboardViewImpl extends Composite implements DashboardView {
 
     interface IndexViewImplUiBinder extends UiBinder<Widget, DashboardViewImpl> {
     }
+
     @UiField(provided = true)
     CellTable<JobStatus> runningJobs;
     @UiField(provided = true)
@@ -56,7 +57,7 @@ public class DashboardViewImpl extends Composite implements DashboardView {
     @UiField
     HasClickHandlers refreshButton;
     @UiField(provided = true)
-    CellTable<RepositoryStatus> repositoryStatuses; //yeah, it's actually statuses, I own a dictionary
+    CellTable<RepositoryStatus> repositoryStatuses; // yeah, it's actually statuses, I own a dictionary
     private Presenter presenter;
 
     public DashboardViewImpl() {
@@ -152,6 +153,7 @@ public class DashboardViewImpl extends Composite implements DashboardView {
     }
 
     private class RepositoryStatusNameColumn extends TextColumn<RepositoryStatus> {
+
         @Override
         public String getValue(RepositoryStatus object) {
             return object.getRepositoryName();
@@ -159,6 +161,7 @@ public class DashboardViewImpl extends Composite implements DashboardView {
     }
 
     private class RepositoryStatusRevisionColumn extends TextColumn<RepositoryStatus> {
+
         @Override
         public String getValue(RepositoryStatus object) {
             return object.getRevision();
@@ -166,19 +169,20 @@ public class DashboardViewImpl extends Composite implements DashboardView {
     }
 
     private class RepositoryStatusStatusColumn extends TextColumn<RepositoryStatus> {
+
         @Override
         public String getValue(RepositoryStatus object) {
             String returnValue = "";
             switch (object.getStatus()) {
-                case EMPTY:
-                    returnValue = "unindexed";
-                    break;
-                case INCONSISTENT:
-                    returnValue = "inconsistent";
-                    break;
-                case INDEXED:
-                    returnValue = "indexed";
-                    break;
+            case EMPTY:
+                returnValue = "unindexed";
+                break;
+            case INCONSISTENT:
+                returnValue = "inconsistent";
+                break;
+            case INDEXED:
+                returnValue = "indexed";
+                break;
             }
             return returnValue;
         }
@@ -250,15 +254,17 @@ public class DashboardViewImpl extends Composite implements DashboardView {
         }
     }
 
-        private class JobStatusFinishedStepsColumn extends Column<JobStatus, Number> {
+    private class JobStatusFinishedStepsColumn extends Column<JobStatus, Number> {
 
         public JobStatusFinishedStepsColumn() {
-            super(new NumberCell());
+            super(new ProgressBarCell(200));
         }
 
         @Override
         public Number getValue(JobStatus object) {
-            return object.getCurrentStep().getFinishedSteps();
+            float current = object.getCurrentStep().getFinishedSteps();
+            float totalSteps = object.getCurrentStep().getTotalSteps();
+            return new Float(current  / totalSteps);
         }
     }
 

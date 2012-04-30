@@ -1,59 +1,43 @@
-<!--
-
-    Copyright 2010 David Froehlich   <david.froehlich@businesssoftware.at>,
-                   Samuel Kogler     <samuel.kogler@gmail.com>,
-                   Stephan Stiboller <stistc06@htlkaindorf.at>
-
-    This file is part of Codesearch.
-
-    Codesearch is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    Codesearch is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
-
--->
+<!-- Copyright 2010 David Froehlich <david.froehlich@businesssoftware.at>, Samuel Kogler <samuel.kogler@gmail.com>, Stephan
+    Stiboller <stistc06@htlkaindorf.at> This file is part of Codesearch. Codesearch is free software: you can redistribute it
+    and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version
+    3 of the License, or (at your option) any later version. Codesearch is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+    General Public License for more details. You should have received a copy of the GNU General Public License along with Codesearch.
+    If not, see <http://www.gnu.org/licenses/>. -->
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui"
-	xmlns:c='urn:import:com.google.gwt.user.cellview.client'>
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    xmlns:c='urn:import:com.google.gwt.user.cellview.client'>
     <ui:style>
-		.grid-item {
-			float: left;
-			padding: 5px;
-			margin-bottom: 10px;
-                        width: 100%;
-		}
+        .grid-item {
+            float: left;
+            padding: 5px;
+            margin-bottom: 10px;
+            width: 100%;
+        }
 
-		.grid-item .title {
-			font-weight: bold;
-			display: block;
-		}
+        .grid-item .title {
+            font-weight: bold;
+            display: block;
+        }
 
-		.grid-item .content {
-			display: block;
-		}
+        .grid-item .content {
+            display: block;
+        }
     </ui:style>
     <g:HTMLPanel>
         <div class="{style.grid-item}">
             <span class="{style.title}">Running jobs</span>
-            <c:CellTable addStyleNames="{style.content}" ui:field="runningJobs" />
+            <c:CellTable addStyleNames="{style.content}" ui:field="runningJobs"/>
         </div>
         <div class="{style.grid-item}">
             <span class="{style.title}">Scheduled jobs</span>
-            <c:CellTable addStyleNames="{style.content}" ui:field="scheduledJobs" />
+            <c:CellTable addStyleNames="{style.content}" ui:field="scheduledJobs"/>
         </div>
 
         <div class="{style.grid-item}">
             <span class="{style.title}">Repository status</span>
-            <c:CellTable addStyleNames="{style.content}" ui:field="repositoryStatuses" />
+            <c:CellTable addStyleNames="{style.content}" ui:field="repositoryStatuses"/>
         </div>
 
         <g:Button ui:field="refreshButton">Refresh</g:Button>
