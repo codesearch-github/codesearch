@@ -25,21 +25,24 @@
             display: block;
         }
     </ui:style>
-    <g:HTMLPanel>
-        <div class="{style.grid-item}">
-            <span class="{style.title}">Running jobs</span>
-            <c:CellTable addStyleNames="{style.content}" ui:field="runningJobs"/>
-        </div>
-        <div class="{style.grid-item}">
-            <span class="{style.title}">Scheduled jobs</span>
-            <c:CellTable addStyleNames="{style.content}" ui:field="scheduledJobs"/>
-        </div>
 
-        <div class="{style.grid-item}">
-            <span class="{style.title}">Repository status</span>
-            <c:CellTable addStyleNames="{style.content}" ui:field="repositoryStatuses"/>
-        </div>
+    <g:ScrollPanel ui:field="scrollWrapper">
+        <g:HTMLPanel>
+            <div class="{style.grid-item}">
+                <span class="{style.title}">Running jobs</span>
+                <c:CellTable addStyleNames="{style.content}" ui:field="runningJobs"/>
+            </div>
+            <div class="{style.grid-item}">
+                <span class="{style.title}">Scheduled jobs</span>
+                <c:CellTable addStyleNames="{style.content}" ui:field="scheduledJobs"/>
+            </div>
 
-        <g:Button ui:field="refreshButton">Refresh</g:Button>
-    </g:HTMLPanel>
+            <div class="{style.grid-item}">
+                <span class="{style.title}">Repository status</span>
+                <c:CellTable addStyleNames="{style.content}" ui:field="repositoryStatuses"/>
+            </div>
+
+            <g:Button ui:field="refreshButton">Refresh</g:Button>
+        </g:HTMLPanel>
+    </g:ScrollPanel>
 </ui:UiBinder>
