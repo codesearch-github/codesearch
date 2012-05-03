@@ -52,8 +52,8 @@ public class ProgressBarCell extends NumberCell {
 
         @Template(// @formatter:off
               "<div id='codeSearchProgressBarBackground' style='{1}border: 1px solid;'>"
-            + "  <div id='codeSearchProgressBarValue' style='{2}background: lightblue;'>"
-            + "&nbsp;{0}"
+            + "  <div id='codeSearchProgressBarValue' style='{2}background: lightblue;text-align: right;'>"
+            + "&nbsp;{0}&nbsp;"
             + "  </div>"
             + "</div>")
         // @formatter:on
