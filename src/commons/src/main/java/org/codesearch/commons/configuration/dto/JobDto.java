@@ -21,9 +21,9 @@ package org.codesearch.commons.configuration.dto;
 import java.util.List;
 
 /**
- *  Represents an Indexing Job.
+ * Represents an Indexing Job.
  *
- *  @author David Froehlich
+ * @author David Froehlich
  */
 public class JobDto {
 
@@ -39,6 +39,10 @@ public class JobDto {
      * whether the index will be cleared before indexing
      */
     private boolean clearIndex;
+    /**
+     * the description of the job.
+     */
+    private String jobDescription;
 
     public JobDto() {
     }
@@ -67,6 +71,14 @@ public class JobDto {
         this.clearIndex = clearIndex;
     }
 
+    public void setJobDescription(String description) {
+        this.jobDescription = description;
+    }
+
+    public String getJobDescription() {
+        return this.jobDescription;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -78,14 +90,16 @@ public class JobDto {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final JobDto other = (JobDto) obj;
+        final JobDto other = (JobDto)obj;
         if (this.clearIndex != other.clearIndex) {
             return false;
         }
-        if ((this.cronExpression == null) ? (other.cronExpression != null) : !this.cronExpression.equals(other.cronExpression)) {
+        if ((this.cronExpression == null) ? (other.cronExpression != null) : !this.cronExpression
+            .equals(other.cronExpression)) {
             return false;
         }
-        if (this.repositories != other.repositories && (this.repositories == null || !this.repositories.equals(other.repositories))) {
+        if (this.repositories != other.repositories
+            && (this.repositories == null || !this.repositories.equals(other.repositories))) {
             return false;
         }
         return true;

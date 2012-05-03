@@ -337,6 +337,7 @@ public class XmlConfigurationReader implements ConfigurationReader {
             job.setRepositories(repositoriesForJob);
             boolean clearIndex = hc.getBoolean(XmlConfigurationReaderConstants.JOB_CLEAR, false);
             job.setClearIndex(clearIndex);
+            job.setJobDescription(hc.getString(XmlConfigurationReaderConstants.JOB_DESCRIPTION, ""));
             jobs.add(job);
         }
         codesearchConfiguration.setJobs(jobs);

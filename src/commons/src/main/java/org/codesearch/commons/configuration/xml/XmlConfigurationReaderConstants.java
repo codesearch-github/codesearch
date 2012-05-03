@@ -44,14 +44,17 @@ package org.codesearch.commons.configuration.xml;
 /**
  * Defines constant values used by the Xml implementation of the configuration reader.
  * The values correspond to xml tags in the config file.
+ *
  * @author Samuel Kogler
  * @author Stephan Stiboller
  */
 public final class XmlConfigurationReaderConstants {
 
-    /** Private constructor so its  not instantiable. */
-    private XmlConfigurationReaderConstants () {}
-    //GLOBAL CONSTANTS
+    /** Private constructor so its not instantiable. */
+    private XmlConfigurationReaderConstants() {
+    }
+
+    // GLOBAL CONSTANTS
     /** The URL to the searcher web application, used to notify the searcher of changes to the index. */
     protected static final String SEARCHER_LOCATION = "searcher-location";
     /** used to store local checkouts/clones of the configured repositories. */
@@ -71,7 +74,7 @@ public final class XmlConfigurationReaderConstants {
     /** Used to retrieve all repositories in the xml-config file */
     protected static final String REPOSITORY_LIST = "repositories.repository";
 
-    //REPOSITORY CONSTANTS
+    // REPOSITORY CONSTANTS
     /** Used to access the repository version control system type parameter */
     protected static final String REPOSITORY_VCS = "version-control-system";
     /** Used to access the repository's blacklisted files */
@@ -86,7 +89,7 @@ public final class XmlConfigurationReaderConstants {
     protected static final String REPOSITORY_PASSWORD = "password";
     /** Used to find out if code navigation is enabled for a repository */
     protected static final String REPOSITORY_CODE_NAVIGATION_ENABLED = "code-navigation-enabled";
-    /** Used to find out in which repository group the repository is  */
+    /** Used to find out in which repository group the repository is */
     protected static final String REPOSITORY_GROUPS = "groups";
     /** Used to retrieve the filename-patterns files have to match to be indexed */
     protected static final String REPOSITORY_WHITELIST_FILENAMES = "whitelist-filenames.filename";
@@ -96,7 +99,7 @@ public final class XmlConfigurationReaderConstants {
     protected static final String REPOSITORY_AUTHENTICATION_DATA_TYPE_NONE = "none";
     /** value for type attribute in authentication-data node in case the repository supports basic authentication */
     protected static final String REPOSITORY_AUTHENTICATION_DATA_TYPE_BASIC = "basic";
-    /** value for type attribute in authentication-data node in case the repository uses SSH authentication*/
+    /** value for type attribute in authentication-data node in case the repository uses SSH authentication */
     protected static final String REPOSITORY_AUTHENTICATION_DATA_TYPE_SSH = "ssh";
     /** used to retrieve the username in case the used authentication is 'basic' */
     protected static final String REPOSITORY_AUTHENTICATION_DATA_USERNAME = "authentication-data.username";
@@ -106,8 +109,8 @@ public final class XmlConfigurationReaderConstants {
     protected static final String REPOSITORY_AUTHENTICATION_DATA_SSH_FILE_PATH = "authentication-data.file-path";
     /** used to retrieve the port in case the used authentication is 'ssh' */
     protected static final String REPOSITORY_AUTHENTICATION_DATA_PORT = "authentication-data.port";
-    
-    //TASK CONSTANTS
+
+    // TASK CONSTANTS
     /** Used to access a single task */
     protected static final String TASK = "task";
     /** Used to find out the type of a task */
@@ -115,7 +118,7 @@ public final class XmlConfigurationReaderConstants {
     /** Used to find out whether an indexing job is set to also add code-navigation specific fields */
     protected static final String CODE_NAVIGATION_ENABLED = "code-navigation-enabled";
 
-    //JOB CONSTANTS
+    // JOB CONSTANTS
     /** Used to access a single job */
     protected static final String JOB = "job";
     /** Used to retrieve the cron expression of a job. */
@@ -124,4 +127,6 @@ public final class XmlConfigurationReaderConstants {
     protected static final String JOB_REPOSITORY = "repositories";
     /** Clear index before indexing? */
     protected static final String JOB_CLEAR = "clear";
+    /** description used for dashboard view. */
+    public static final String JOB_DESCRIPTION = "description";
 }

@@ -27,6 +27,7 @@ import java.util.Set;
 
 import javax.inject.Singleton;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.codesearch.commons.configuration.ConfigurationReader;
 import org.codesearch.commons.configuration.dto.JobDto;
@@ -88,12 +89,13 @@ public final class IndexingManager {
      * Creates a new instance of IndexingManager
      *
      * @throws SchedulerException In case the scheduler could not be
-     * instantiated
+     *             instantiated
      * @throws ConfigurationException
      */
     @SuppressWarnings("unchecked")
     @Inject
-    public IndexingManager(ConfigurationReader configurationReader, PropertiesManager propertiesManager, Scheduler scheduler, JobFactory jobFactory) throws SchedulerException {
+    public IndexingManager(ConfigurationReader configurationReader, PropertiesManager propertiesManager,
+            Scheduler scheduler, JobFactory jobFactory) throws SchedulerException {
         this.jobs = configurationReader.getJobs();
         this.scheduler = scheduler;
         this.historyListener = new IndexingJobHistoryListener();
@@ -102,7 +104,7 @@ public final class IndexingManager {
 
         scheduler.setJobFactory(jobFactory);
         scheduler.getListenerManager().addTriggerListener(new IndexingJobTriggerListener(5 * 60 * 1000),
-                EverythingMatcher.allTriggers()); // delay by 5 minutes if a job is currently running
+            EverythingMatcher.allTriggers()); // delay by 5 minutes if a job is currently running
         scheduler.getListenerManager().addJobListener(historyListener, EverythingMatcher.allJobs());
         start();
     }
@@ -112,7 +114,7 @@ public final class IndexingManager {
      * then starts it
      *
      * @throws SchedulerException if a job could not be added to the scheduler
-     * or if it could not be started
+     *             or if it could not be started
      * @throws ConfigurationException if the configuration could not be read
      */
     public void start() throws SchedulerException {
@@ -125,7 +127,7 @@ public final class IndexingManager {
             jdm.put(IndexingJob.FIELD_TERMINATED, false);
             jdm.put(IndexingJob.FIELD_CLEAR_INDEX, job.isClearIndex());
 
-            JobKey jobKey = new JobKey("IndexJob" + i, IndexingJob.GROUP_NAME);
+            JobKey jobKey = new JobKey(getJobKey(job, i), IndexingJob.GROUP_NAME);
             JobDetail jobDetail = JobBuilder.newJob(IndexingJob.class).withIdentity(jobKey).usingJobData(jdm).build();
 
             try {
@@ -135,17 +137,26 @@ public final class IndexingManager {
                     trigger = TriggerBuilder.newTrigger().forJob(jobKey).startNow().build();
                 } else {
                     trigger = TriggerBuilder.newTrigger().forJob(jobKey).withSchedule(
-                            CronScheduleBuilder.cronSchedule(job.getCronExpression())).build();
+                        CronScheduleBuilder.cronSchedule(job.getCronExpression())).build();
                 }
 
                 scheduler.addJob(jobDetail, true);
                 scheduler.scheduleJob(trigger);
             } catch (ParseException ex) {
-                LOG.error("Indexing job " + i + "for repository ---" + " was configured with invalid cron expression:\n" + ex);
+                LOG.error("Indexing job " + i + "for repository ---"
+                    + " was configured with invalid cron expression:\n" + ex);
             }
             i++;
         }
         scheduler.start();
+    }
+
+    private String getJobKey(JobDto job, int i) {
+        String jobDescription = "IndexJob " + i;
+        if (StringUtils.isNotBlank(job.getJobDescription())) {
+            jobDescription += " - " + job.getJobDescription();
+        }
+        return jobDescription;
     }
 
     public List<RepositoryStatus> getRepositoryStatuses() {
@@ -176,7 +187,7 @@ public final class IndexingManager {
             jobStatus.setCurrentRepository(jobDataMap.getString(IndexingJob.FIELD_CURRENT_REPOSITORY));
 
             @SuppressWarnings("unchecked")
-            List<RepositoryDto> repos = (List<RepositoryDto>) jobDataMap.get(IndexingJob.FIELD_REPOSITORIES);
+            List<RepositoryDto> repos = (List<RepositoryDto>)jobDataMap.get(IndexingJob.FIELD_REPOSITORIES);
             List<String> repoNames = new LinkedList<String>();
             for (RepositoryDto repositoryDto : repos) {
                 repoNames.add(repositoryDto.getName());
@@ -207,7 +218,7 @@ public final class IndexingManager {
         for (JobKey jobKey : scheduledJobKeys) {
             JobStatus jobStatus = new JobStatus();
 
-            List<Trigger> triggersOfJob = (List<Trigger>) scheduler.getTriggersOfJob(jobKey);
+            List<Trigger> triggersOfJob = (List<Trigger>)scheduler.getTriggersOfJob(jobKey);
 
             Date nextFireTime = new Date(0L);
             Date previousFireTime = new Date(0L);
@@ -271,8 +282,10 @@ public final class IndexingManager {
      * @param repositoryGroups the repo groups containing the repositories
      * @throws SchedulerException
      */
-    public void startJobForRepositories(List<String> repositories, List<String> repositoryGroups, boolean clear) throws SchedulerException {
-        JobKey jobKey = new JobKey("manual-job-" + DateFormat.getTimeInstance().format(new Date().getTime()), IndexingJob.GROUP_NAME);
+    public void startJobForRepositories(List<String> repositories, List<String> repositoryGroups, boolean clear)
+            throws SchedulerException {
+        JobKey jobKey = new JobKey("manual-job-" + DateFormat.getTimeInstance().format(new Date().getTime()),
+            IndexingJob.GROUP_NAME);
         List<RepositoryDto> repos = new LinkedList<RepositoryDto>();
         for (String currentRepoName : repositories) {
             repos.add(configReader.getRepositoryByName(currentRepoName));
