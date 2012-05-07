@@ -258,6 +258,7 @@ public class IndexingTask implements Task {
                     }
                     i++;
                 }
+                indexWriter.commit();
                 try {
                     // notify the searcher about the update of the indexer
                     notifySearcher();

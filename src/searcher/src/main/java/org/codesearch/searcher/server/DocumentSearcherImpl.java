@@ -43,6 +43,7 @@ import org.codesearch.searcher.shared.SearchResultDto;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import org.apache.lucene.index.IndexReader;
 
 @Singleton
 public class DocumentSearcherImpl implements DocumentSearcher {
@@ -168,14 +169,20 @@ public class DocumentSearcherImpl implements DocumentSearcher {
      */
     @Override
     public synchronized void refreshIndex() throws InvalidIndexException {
+        // Calling reopen instead of new initialization for performance reasons
         try {
             // Calling reopen instead of new initialization for performance reasons
-            indexSearcher = new IndexSearcher(indexSearcher.getIndexReader().reopen(true));
+            IndexReader newReader = indexSearcher.getIndexReader().reopen(true);
+            if (newReader != indexSearcher.getIndexReader()) {
+                indexSearcher.getIndexReader().close();
+                indexSearcher = new IndexSearcher(newReader);
+            }
         } catch (CorruptIndexException ex) {
             throw new InvalidIndexException("Could not refresh the index because it is corrupt: " + ex);
         } catch (IOException ex) {
             throw new InvalidIndexException("Could not refresh the index: " + ex);
         }
+
     }
 
     /**
