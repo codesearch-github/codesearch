@@ -140,7 +140,7 @@ public class DashboardViewImpl extends Composite implements DashboardView {
         runningJobs.addColumn(new JobStatusTotalReposColumn(), "Total repositories");
         runningJobs.addColumn(new JobStatusStepColumn(), "Status");
         runningJobs.addColumn(new JobStatusTotalStepsColumn(), "Total steps");
-        runningJobs.addColumn(new JobStatusFinishedStepsColumn(), "Finished steps");
+        runningJobs.addColumn(new JobStatusFinishedStepsColumn(), "Progress");
         runningJobs.setSelectionModel(new NoSelectionModel<JobStatus>());
         runningJobs.setPageSize(Integer.MAX_VALUE);
 
