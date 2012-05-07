@@ -155,7 +155,7 @@ public class SubversionPlugin implements VersionControlPlugin {
         Set<FileIdentifier> fileIdentifiers = new HashSet<FileIdentifier>();
         try {
             if (revision.equals(VersionControlPlugin.UNDEFINED_VERSION)) {
-                if (shouldFileBeIncluded(entryPoint, compiledWhitelist, compiledWhitelist)) {
+                if (shouldFileBeIncluded(entryPoint, compiledBlackList, compiledWhitelist)) {
                     listEntries(entryPoint, fileIdentifiers, compiledBlacklist, compiledWhitelist);
                 }
             } else {
