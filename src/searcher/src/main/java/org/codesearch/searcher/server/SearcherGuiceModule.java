@@ -38,7 +38,7 @@ public class SearcherGuiceModule extends ServletModule {
     protected void configureServlets() {
         bind(DocumentSearcher.class).to(DocumentSearcherImpl.class).in(Singleton.class);
         serve("/gwt.rpc").with(SearcherServiceImpl.class);
-        serve("/updateIndexer").with(UpdateIndexerServlet.class);
+        serve("/refresh").with(UpdateIndexerServlet.class);
         serve("/codesearch-opensearch.xml").with(OpenSearchServlet.class);
     }
 }

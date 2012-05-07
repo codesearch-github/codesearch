@@ -119,7 +119,7 @@ public class IndexingTask implements Task {
     /**
      * The URI that is called to update the searcher application.
      */
-    private URI searcherUpdatePath;
+    private URI searcherLocation;
     /**
      * The parent {@link IndexingJob}.
      */
@@ -134,7 +134,7 @@ public class IndexingTask implements Task {
     private PerFieldAnalyzerWrapper caseInsensitiveAnalyzer;
 
     @Inject
-    public IndexingTask(DBAccess dba, PluginLoader pluginLoader, URI searcherUpdatePath, LuceneFieldPluginLoader luceneFieldPluginLoader, PropertiesManager propertiesManager, List<RepositoryDto> repositories, Directory indexDirectory, IndexingJob job) throws IOException, TaskExecutionException {
+    public IndexingTask(DBAccess dba, PluginLoader pluginLoader, URI searcherLocation, LuceneFieldPluginLoader luceneFieldPluginLoader, PropertiesManager propertiesManager, List<RepositoryDto> repositories, Directory indexDirectory, IndexingJob job) throws IOException, TaskExecutionException {
         if (job == null) {
             throw new TaskExecutionException("Parent job must be set in constructor, was null");
         }
@@ -142,7 +142,7 @@ public class IndexingTask implements Task {
         caseInsensitiveAnalyzer = luceneFieldPluginLoader.getPerFieldAnalyzerWrapper(false);
         this.propertiesManager = propertiesManager;
         this.repositories = repositories;
-        this.searcherUpdatePath = searcherUpdatePath;
+        this.searcherLocation = searcherLocation;
         this.dba = dba;
         this.pluginLoader = pluginLoader;
         this.indexDirectory = indexDirectory;
@@ -304,10 +304,10 @@ public class IndexingTask implements Task {
      */
     private void notifySearcher() throws NotifySearcherException {
         try {
-            URL url = searcherUpdatePath.toURL();
+            URL url = new URL(searcherLocation.toURL(), "refresh");
             url.openStream();
         } catch (IOException ex) {
-            throw new NotifySearcherException("Could not connect to searcher at the configured address: " + searcherUpdatePath + "\n"
+            throw new NotifySearcherException("Could not connect to searcher at the configured address: " + searcherLocation + "\n"
                     + ex.toString());
         }
     }
