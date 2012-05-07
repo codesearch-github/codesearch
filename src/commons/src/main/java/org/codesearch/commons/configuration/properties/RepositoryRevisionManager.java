@@ -24,11 +24,11 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
+import java.util.List;
 import java.util.Properties;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
-
 import org.apache.log4j.Logger;
 import org.codesearch.commons.configuration.ConfigurationReader;
 import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
@@ -103,5 +103,10 @@ public class RepositoryRevisionManager implements PropertiesManager {
     public synchronized void setValue(final String key, final String value) throws FileNotFoundException, IOException {
         properties.setProperty(key, value);
         properties.store(new FileOutputStream(repositoryStatusFile), null);
+    }
+
+    @Override
+    public List<String> getAllKeys() {
+        return (List<String>) Collections.list(properties.propertyNames());
     }
 }

@@ -55,20 +55,20 @@ public class DBAccessTest {
 //        dbAccess.getBinaryIndexForFile(filePath, repository);
     //FIXME the whole architecture is so fucked up that its impossible to test properly
     }
-
-    /**
-     * Test of setBinaryIndexForFile method, of class DBUtils.
-     */
-    @Test
-    public void testSerializeObject() throws Exception {
-        String filePath = "asdf";
-        String repository = "local_repo";
-        List<Usage> usages = new LinkedList<Usage>();
-        usages.add(new Usage(0, 0, 0, 0, ""));
-        AstNode mockAstNode = new MockAstNode();
-        dbAccess.setAnalysisDataForFile(filePath, repository, mockAstNode, usages, Collections.<String> emptyList(), Collections.<String> emptyList());
-        assert dbAccess.getBinaryIndexForFile(filePath, repository) != null;
-    }
+//
+//    /**
+//     * Test of setBinaryIndexForFile method, of class DBUtils.
+//     */
+//    @Test
+//    public void testSerializeObject() throws Exception {
+//        String filePath = "asdf";
+//        String repository = "local_repo";
+//        List<Usage> usages = new LinkedList<Usage>();
+//        usages.add(new Usage(0, 0, 0, 0, ""));
+//        AstNode mockAstNode = new MockAstNode();
+//        dbAccess.setAnalysisDataForFile(filePath, repository, mockAstNode, usages, Collections.<String> emptyList(), Collections.<String> emptyList());
+//        assert dbAccess.getBinaryIndexForFile(filePath, repository) != null;
+//    }
 
     /**
      * Test of getLastAnalyzedRevisionOfRepository method, of class DBUtils.

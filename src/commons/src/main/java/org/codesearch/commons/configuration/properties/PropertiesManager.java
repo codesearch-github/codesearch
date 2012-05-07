@@ -3,6 +3,7 @@ package org.codesearch.commons.configuration.properties;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Provides several methods to access properties.
@@ -24,4 +25,6 @@ public interface PropertiesManager {
      */
     void setValue(final String key, final String value) throws FileNotFoundException, IOException;
 
+    
+    List<String> getAllKeys();
 }

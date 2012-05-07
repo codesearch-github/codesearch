@@ -21,6 +21,7 @@ package org.codesearch.commons;
 import org.apache.log4j.Logger;
 import org.codesearch.commons.configuration.ConfigurationReader;
 import org.codesearch.commons.configuration.ConfigurationValidator;
+import org.codesearch.commons.configuration.IndexCleaner;
 import org.codesearch.commons.configuration.InvalidConfigurationException;
 import org.codesearch.commons.configuration.properties.PropertiesManager;
 import org.codesearch.commons.configuration.properties.RepositoryRevisionManager;
@@ -49,12 +50,17 @@ public class CommonsGuiceModule extends AbstractModule {
         try {
             ConfigurationReader configurationReader = new XmlConfigurationReader("codesearch_config.xml");
             PluginLoader pluginLoader = new PluginLoaderImpl(configurationReader);
+            DBAccess dbaccess = new DBAccessImpl();
+            PropertiesManager propertiesManager = new RepositoryRevisionManager(configurationReader);
             new ConfigurationValidator(configurationReader, pluginLoader);
-
+            IndexCleaner indexCleaner = new IndexCleaner(propertiesManager, configurationReader, dbaccess);
+            indexCleaner.cleanIndex();
+            
             bind(ConfigurationReader.class).toInstance(configurationReader);
             bind(PluginLoader.class).toInstance(pluginLoader);
-            bind(PropertiesManager.class).to(RepositoryRevisionManager.class).in(Singleton.class);
-            bind(DBAccess.class).to(DBAccessImpl.class).asEagerSingleton();
+            bind(PropertiesManager.class).toInstance(propertiesManager);
+            bind(DBAccess.class).toInstance(dbaccess);
+            
             bind(LuceneFieldPluginLoader.class).to(LuceneFieldPluginLoaderImpl.class).in(Singleton.class);
         } catch (InvalidConfigurationException ex) {
             LOG.error("Invalid configuration:", ex);
