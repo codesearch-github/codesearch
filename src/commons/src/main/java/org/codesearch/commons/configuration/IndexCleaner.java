@@ -32,7 +32,7 @@ import org.apache.lucene.search.*;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.codesearch.commons.configuration.dto.RepositoryDto;
-import org.codesearch.commons.configuration.properties.PropertiesManager;
+import org.codesearch.commons.configuration.properties.IndexStatusManager;
 import org.codesearch.commons.constants.IndexConstants;
 import org.codesearch.commons.database.DBAccess;
 import org.codesearch.commons.database.DatabaseAccessException;
@@ -46,13 +46,13 @@ import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
  */
 public class IndexCleaner {
 
-    private PropertiesManager propertiesManager;
+    private IndexStatusManager indexStatusManager;
     private ConfigurationReader configReader;
     private DBAccess dbAccess;
     public static Logger LOG = Logger.getLogger(IndexCleaner.class);
 
-    public IndexCleaner(PropertiesManager propertiesManager, ConfigurationReader configReader, DBAccess dbAccess) {
-        this.propertiesManager = propertiesManager;
+    public IndexCleaner(IndexStatusManager indexStatusManager, ConfigurationReader configReader, DBAccess dbAccess) {
+        this.indexStatusManager = indexStatusManager;
         this.configReader = configReader;
         this.dbAccess = dbAccess;
     }
@@ -68,17 +68,17 @@ public class IndexCleaner {
             IndexWriterConfig config = new IndexWriterConfig(IndexConstants.LUCENE_VERSION, analyzer);
             indexWriter = new IndexWriter(indexDirectory, config);
 
-            List<String> invalidRepositories = propertiesManager.getAllKeys();
+            List<String> invalidRepositories = indexStatusManager.getAllSavedRepositoryNames();
 
             BooleanQuery query = new BooleanQuery();
             for (RepositoryDto repository : configReader.getRepositories()) {
                 invalidRepositories.remove(repository.getName());
             }
             for (String invalidRepo : invalidRepositories) {
-                if (!propertiesManager.getValue(invalidRepo).equals(VersionControlPlugin.UNDEFINED_VERSION)) {
+                if (!indexStatusManager.getStatus(invalidRepo).equals(VersionControlPlugin.UNDEFINED_VERSION)) {
                     Query q = new TermQuery(new Term("repository", invalidRepo));
                     query.add(q, BooleanClause.Occur.SHOULD);
-                    propertiesManager.setValue(invalidRepo, VersionControlPlugin.UNDEFINED_VERSION);
+                    indexStatusManager.setStatus(invalidRepo, VersionControlPlugin.UNDEFINED_VERSION);
                     dbAccess.clearTablesForRepository(invalidRepo);
                 }
             }

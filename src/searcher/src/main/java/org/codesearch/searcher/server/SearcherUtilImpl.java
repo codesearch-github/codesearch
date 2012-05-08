@@ -2,7 +2,7 @@ package org.codesearch.searcher.server;
 
 import javax.inject.Inject;
 
-import org.codesearch.commons.configuration.properties.PropertiesManager;
+import org.codesearch.commons.configuration.properties.IndexStatusManager;
 
 
 /**
@@ -12,16 +12,16 @@ import org.codesearch.commons.configuration.properties.PropertiesManager;
 public class SearcherUtilImpl implements SearcherUtil {
 
     private DocumentSearcher documentSearcher;
-    private PropertiesManager propertiesManager;
+    private IndexStatusManager indexStatusManager;
     
     /**
      * @param documentSearcher
-     * @param propertiesManager
+     * @param indexStatusManager
      */
     @Inject
-    public SearcherUtilImpl(DocumentSearcher documentSearcher, PropertiesManager propertiesManager) {
+    public SearcherUtilImpl(DocumentSearcher documentSearcher, IndexStatusManager indexStatusManager) {
         this.documentSearcher = documentSearcher;
-        this.propertiesManager = propertiesManager;
+        this.indexStatusManager = indexStatusManager;
     }
 
 
@@ -30,7 +30,7 @@ public class SearcherUtilImpl implements SearcherUtil {
     @Override
     public void refreshIndexInformation() throws InvalidIndexException {        
         documentSearcher.refreshIndex();
-        propertiesManager.refresh();
+        indexStatusManager.refresh();
     }
 
 }

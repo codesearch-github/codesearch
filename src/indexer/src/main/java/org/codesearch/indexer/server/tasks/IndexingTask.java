@@ -47,7 +47,7 @@ import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.store.Directory;
 import org.codesearch.commons.configuration.dto.RepositoryDto;
-import org.codesearch.commons.configuration.properties.PropertiesManager;
+import org.codesearch.commons.configuration.properties.IndexStatusManager;
 import org.codesearch.commons.constants.IndexConstants;
 import org.codesearch.commons.database.DBAccess;
 import org.codesearch.commons.database.DatabaseAccessException;
@@ -103,7 +103,7 @@ public class IndexingTask implements Task {
     /**
      * used to read the repository revision status
      */
-    private PropertiesManager propertiesManager;
+    private IndexStatusManager indexStatusManager;
     /**
      * the plugins that will be used to create the fields for each document
      */
@@ -134,13 +134,13 @@ public class IndexingTask implements Task {
     private PerFieldAnalyzerWrapper caseInsensitiveAnalyzer;
 
     @Inject
-    public IndexingTask(DBAccess dba, PluginLoader pluginLoader, URI searcherLocation, LuceneFieldPluginLoader luceneFieldPluginLoader, PropertiesManager propertiesManager, List<RepositoryDto> repositories, Directory indexDirectory, IndexingJob job) throws IOException, TaskExecutionException {
+    public IndexingTask(DBAccess dba, PluginLoader pluginLoader, URI searcherLocation, LuceneFieldPluginLoader luceneFieldPluginLoader, IndexStatusManager indexStatusManager, List<RepositoryDto> repositories, Directory indexDirectory, IndexingJob job) throws IOException, TaskExecutionException {
         if (job == null) {
             throw new TaskExecutionException("Parent job must be set in constructor, was null");
         }
         luceneFieldPlugins = luceneFieldPluginLoader.getAllLuceneFieldPlugins();
         caseInsensitiveAnalyzer = luceneFieldPluginLoader.getPerFieldAnalyzerWrapper(false);
-        this.propertiesManager = propertiesManager;
+        this.indexStatusManager = indexStatusManager;
         this.repositories = repositories;
         this.searcherLocation = searcherLocation;
         this.dba = dba;
@@ -178,7 +178,7 @@ public class IndexingTask implements Task {
                         LOG.info("Indexing repository: " + repository.getName() + (repository.isCodeNavigationEnabled() ? " using" : " without") + " code analyzing");
                         long start = System.currentTimeMillis();
                         // Read the index status file
-                        String lastIndexedRevision = propertiesManager.getValue(repository.getName());
+                        String lastIndexedRevision = indexStatusManager.getStatus(repository.getName());
                         LOG.info("Last indexed revision: " + lastIndexedRevision);
                         // Get the version control plugins
                         versionControlPlugin = pluginLoader.getPlugin(VersionControlPlugin.class, repository.getVersionControlSystem());
@@ -243,7 +243,7 @@ public class IndexingTask implements Task {
                         }
                         long duration = System.currentTimeMillis() - start;
                         LOG.info("Indexing of repository " + repository.getName() + " took " + duration / 1000 + " seconds");
-                        propertiesManager.setValue(repository.getName(), repositoryRevision);
+                        indexStatusManager.setStatus(repository.getName(), repositoryRevision);
                         if (repository.isCodeNavigationEnabled()) {
                             try {
                                 dba.setLastAnalyzedRevisionOfRepository(repository.getName(), repositoryRevision);

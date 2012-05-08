@@ -30,7 +30,7 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.LockObtainFailedException;
 import org.codesearch.commons.configuration.dto.RepositoryDto;
-import org.codesearch.commons.configuration.properties.PropertiesManager;
+import org.codesearch.commons.configuration.properties.IndexStatusManager;
 import org.codesearch.commons.constants.IndexConstants;
 import org.codesearch.commons.database.DBAccess;
 import org.codesearch.commons.database.DatabaseAccessException;
@@ -72,12 +72,12 @@ public class ClearTask implements Task {
     /**
      * The properties manager used to reset the indexed revision.
      */
-    private PropertiesManager propertiesManager;
+    private IndexStatusManager indexStatusManager;
 
     @Inject
-    public ClearTask(DBAccess dba, PropertiesManager propertiesManager, List<RepositoryDto> repositories, File indexLocation, IndexingJob job) {
+    public ClearTask(DBAccess dba, IndexStatusManager indexStatusManager, List<RepositoryDto> repositories, File indexLocation, IndexingJob job) {
         this.dba = dba;
-        this.propertiesManager = propertiesManager;
+        this.indexStatusManager = indexStatusManager;
         this.repositories = repositories;
         this.indexLocation = indexLocation;
         this.job = job;
@@ -144,7 +144,7 @@ public class ClearTask implements Task {
                         LOG.error("Error encountered while clearing index: " + ex);
                     }
 
-                    propertiesManager.setValue(repositoryDto.getName(), VersionControlPlugin.UNDEFINED_VERSION);
+                    indexStatusManager.setStatus(repositoryDto.getName(), VersionControlPlugin.UNDEFINED_VERSION);
 
                     LOG.debug("Cleared " + deleteCount + " documents for repository " + repositoryDto.getName());
                     index++;

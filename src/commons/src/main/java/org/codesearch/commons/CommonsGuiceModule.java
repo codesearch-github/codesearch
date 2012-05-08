@@ -23,8 +23,8 @@ import org.codesearch.commons.configuration.ConfigurationReader;
 import org.codesearch.commons.configuration.ConfigurationValidator;
 import org.codesearch.commons.configuration.IndexCleaner;
 import org.codesearch.commons.configuration.InvalidConfigurationException;
-import org.codesearch.commons.configuration.properties.PropertiesManager;
-import org.codesearch.commons.configuration.properties.RepositoryRevisionManager;
+import org.codesearch.commons.configuration.properties.IndexStatusManager;
+import org.codesearch.commons.configuration.properties.IndexStatusManagerPropertiesImpl;
 import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
 import org.codesearch.commons.database.DBAccess;
 import org.codesearch.commons.database.DBAccessImpl;
@@ -54,14 +54,14 @@ public class CommonsGuiceModule extends AbstractModule {
             ConfigurationReader configurationReader = new XmlConfigurationReader("codesearch_config.xml");
             PluginLoader pluginLoader = new PluginLoaderImpl(configurationReader);
             DBAccess dbaccess = new DBAccessImpl();
-            PropertiesManager propertiesManager = new RepositoryRevisionManager(configurationReader);
+            IndexStatusManager indexStatusManager = new IndexStatusManagerPropertiesImpl(configurationReader);
             new ConfigurationValidator(configurationReader, pluginLoader);
-            IndexCleaner indexCleaner = new IndexCleaner(propertiesManager, configurationReader, dbaccess);
+            IndexCleaner indexCleaner = new IndexCleaner(indexStatusManager, configurationReader, dbaccess);
             indexCleaner.cleanIndex();
             
             bind(ConfigurationReader.class).toInstance(configurationReader);
             bind(PluginLoader.class).toInstance(pluginLoader);
-            bind(PropertiesManager.class).toInstance(propertiesManager);
+            bind(IndexStatusManager.class).toInstance(indexStatusManager);
             bind(DBAccess.class).toInstance(dbaccess);
             
             bind(LuceneFieldPluginLoader.class).to(LuceneFieldPluginLoaderImpl.class).in(Singleton.class);
