@@ -33,26 +33,26 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.codesearch.searcher.server.DocumentSearcher;
 import org.codesearch.searcher.server.InvalidIndexException;
+import org.codesearch.searcher.server.SearcherUtil;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 /**
- * servlet that is called from the indexer when the index in the searcher has to be refreshed
+ * Can be called to refresh the current(likely cached) index information.
  * @author David Froehlich
  */
 @Singleton
-public class UpdateIndexerServlet extends HttpServlet {
+public class RefreshServlet extends HttpServlet {
 
-    private static final Logger LOG = Logger.getLogger(UpdateIndexerServlet.class);
+    private static final Logger LOG = Logger.getLogger(RefreshServlet.class);
     private static final long serialVersionUID = 1L;
-    private DocumentSearcher documentSearcher;
+    private SearcherUtil searcherUtil;
 
     @Inject
-    public UpdateIndexerServlet(DocumentSearcher documentSearcher) {
-        this.documentSearcher = documentSearcher;
+    public RefreshServlet(SearcherUtil searcherUtil) {
+        this.searcherUtil = searcherUtil;
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
@@ -67,7 +67,7 @@ public class UpdateIndexerServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
-            documentSearcher.refreshIndex();
+            searcherUtil.refreshIndexInformation();
             LOG.debug("Updated index for searcher");
         } catch (InvalidIndexException ex) {
             LOG.error("Refreshing of index in searcher was not successful\n" + ex);

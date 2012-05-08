@@ -27,4 +27,9 @@ public interface PropertiesManager {
 
     
     List<String> getAllKeys();
+    
+    /** 
+     * Reloads the properties file to reflect changes.
+     */
+    void refresh();
 }

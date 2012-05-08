@@ -169,7 +169,6 @@ public class DocumentSearcherImpl implements DocumentSearcher {
      */
     @Override
     public synchronized void refreshIndex() throws InvalidIndexException {
-        // Calling reopen instead of new initialization for performance reasons
         try {
             // Calling reopen instead of new initialization for performance reasons
             IndexReader newReader = indexSearcher.getIndexReader().reopen(true);
@@ -182,7 +181,6 @@ public class DocumentSearcherImpl implements DocumentSearcher {
         } catch (IOException ex) {
             throw new InvalidIndexException("Could not refresh the index: " + ex);
         }
-
     }
 
     /**

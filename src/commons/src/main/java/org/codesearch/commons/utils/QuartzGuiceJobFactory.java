@@ -19,7 +19,7 @@
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.codesearch.indexer.server.core;
+package org.codesearch.commons.utils;
 
 import javax.inject.Singleton;
 
@@ -38,7 +38,7 @@ import com.google.inject.Injector;
  * @author Samuel Kogler
  */
 @Singleton
-public class QuartzGuiceJobFactory implements JobFactory{
+public class QuartzGuiceJobFactory implements JobFactory {
 
     private final Injector injector;
 

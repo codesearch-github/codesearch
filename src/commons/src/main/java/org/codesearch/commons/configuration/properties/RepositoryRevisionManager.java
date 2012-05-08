@@ -49,6 +49,7 @@ public class RepositoryRevisionManager implements PropertiesManager {
     private Properties properties = new Properties();
     private File repositoryStatusFile;
     private final String REPOSITORY_STATUS_FILENAME = "revisions.properties";
+    private ConfigurationReader configurationReader;
 
     /**
      * Creates a new instance of RepositoryRevisionManager
@@ -57,15 +58,8 @@ public class RepositoryRevisionManager implements PropertiesManager {
      */
     @Inject
     public RepositoryRevisionManager(ConfigurationReader configurationReader) {
-        try {
-            repositoryStatusFile = new File(configurationReader.getIndexLocation(), REPOSITORY_STATUS_FILENAME);
-            if (!repositoryStatusFile.exists()) {
-                repositoryStatusFile.createNewFile();
-            }
-            properties.load(new FileReader(repositoryStatusFile));
-        } catch (IOException ex) {
-            LOG.error("Could not read properties file:\n" + ex);
-        }
+        this.configurationReader = configurationReader;
+        load();
     }
 
     /**
@@ -108,5 +102,24 @@ public class RepositoryRevisionManager implements PropertiesManager {
     @Override
     public List<String> getAllKeys() {
         return (List<String>) Collections.list(properties.propertyNames());
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void refresh() {
+        
+        
+    }
+    
+    private void load() {
+        try {
+            repositoryStatusFile = new File(configurationReader.getIndexLocation(), REPOSITORY_STATUS_FILENAME);
+            if (!repositoryStatusFile.exists()) {
+                repositoryStatusFile.createNewFile();
+            }
+            properties.load(new FileReader(repositoryStatusFile));
+        } catch (IOException ex) {
+            LOG.error("Could not read properties file:\n" + ex);
+        }
     }
 }

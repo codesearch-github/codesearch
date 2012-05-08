@@ -32,6 +32,8 @@ import org.codesearch.commons.plugins.PluginLoader;
 import org.codesearch.commons.plugins.PluginLoaderImpl;
 import org.codesearch.commons.plugins.lucenefields.LuceneFieldPluginLoader;
 import org.codesearch.commons.plugins.lucenefields.LuceneFieldPluginLoaderImpl;
+import org.codesearch.commons.utils.QuartzGuiceJobFactory;
+import org.quartz.spi.JobFactory;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Singleton;
@@ -48,6 +50,7 @@ public class CommonsGuiceModule extends AbstractModule {
     @Override
     protected void configure() {
         try {
+            bind(JobFactory.class).to(QuartzGuiceJobFactory.class).in(Singleton.class);
             ConfigurationReader configurationReader = new XmlConfigurationReader("codesearch_config.xml");
             PluginLoader pluginLoader = new PluginLoaderImpl(configurationReader);
             DBAccess dbaccess = new DBAccessImpl();

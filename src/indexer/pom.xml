@@ -47,12 +47,6 @@
             <artifactId>gwt-servlet</artifactId>
         </dependency>
 
-		<!-- Quartz scheduling -->
-        <dependency>
-            <groupId>org.quartz-scheduler</groupId>
-            <artifactId>quartz</artifactId>
-        </dependency>
-
 		<!-- internal -->
         <dependency>
             <groupId>org.codesearch</groupId>

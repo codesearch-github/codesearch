@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
+import org.codesearch.commons.utils.QuartzGuiceJobFactory;
 import org.codesearch.indexer.server.manager.IndexingManager;
 import org.codesearch.indexer.server.rpc.DashboardServiceImpl;
 import org.codesearch.indexer.server.rpc.LogServiceImpl;
@@ -58,7 +59,7 @@ public class IndexerGuiceModule extends ServletModule {
             Properties properties = new Properties();
             properties.load(configFile);
             // Initialize quartz
-        	SchedulerFactory schedulerFactory = new StdSchedulerFactory(properties);
+            SchedulerFactory schedulerFactory = new StdSchedulerFactory(properties);
             bind(Scheduler.class).toInstance(schedulerFactory.getScheduler());
 
             LOG.debug("Initialized quartz successfully");
@@ -68,7 +69,6 @@ public class IndexerGuiceModule extends ServletModule {
             LOG.error("Could not find configuration file 'quartz.properties':\n" + e);
         }
 
-        bind(JobFactory.class).to(QuartzGuiceJobFactory.class).in(Singleton.class);
         bind(IndexingManager.class).in(Singleton.class);
         serve("/dashboard.rpc").with(DashboardServiceImpl.class);
         serve("/log.rpc").with(LogServiceImpl.class);
