@@ -34,7 +34,7 @@ import org.codesearch.commons.configuration.ConfigurationReader;
 import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
 
 /**
- * Implementation that uses a property file to represent 
+ * Implementation that uses a property file to represent
  * the current index status of a repository.
  * Uses the standard java Properties utility.
  *
@@ -78,7 +78,7 @@ public class IndexStatusManagerPropertiesImpl implements IndexStatusManager {
     /**
      * Gets a new value for the specified key
      *
-     * @param key 
+     * @param key
      * @return The value of the key, or {@link VersionControlPlugin.UNDEFINED_VERSION} if no value is found
      */
     @Override
@@ -108,10 +108,9 @@ public class IndexStatusManagerPropertiesImpl implements IndexStatusManager {
     /** {@inheritDoc} */
     @Override
     public void refresh() {
-        
-        
+        load();
     }
-    
+
     private void load() {
         try {
             repositoryStatusFile = new File(configurationReader.getIndexLocation(), REPOSITORY_STATUS_FILENAME);
