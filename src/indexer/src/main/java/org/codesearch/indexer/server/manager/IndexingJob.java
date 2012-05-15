@@ -28,7 +28,7 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.codesearch.commons.configuration.ConfigurationReader;
 import org.codesearch.commons.configuration.dto.RepositoryDto;
-import org.codesearch.commons.configuration.properties.PropertiesManager;
+import org.codesearch.commons.configuration.properties.IndexStatusManager;
 import org.codesearch.commons.database.DBAccess;
 import org.codesearch.commons.plugins.PluginLoader;
 import org.codesearch.commons.plugins.lucenefields.LuceneFieldPluginLoader;
@@ -89,7 +89,7 @@ public class IndexingJob implements Job {
      * The affected repositories.
      */
     private List<RepositoryDto> repositories;
-    private PropertiesManager propertiesManager;
+    private IndexStatusManager indexStatusManager;
     /**
      * whether or not the index should be cleared for the specified repositories
      * before indexing
@@ -105,10 +105,10 @@ public class IndexingJob implements Job {
     private JobDataMap jobDataMap;
 
     @Inject
-    public IndexingJob(ConfigurationReader configReader, DBAccess dba, PluginLoader pluginLoader, LuceneFieldPluginLoader luceneFieldPluginLoader, PropertiesManager propertiesManager) {
+    public IndexingJob(ConfigurationReader configReader, DBAccess dba, PluginLoader pluginLoader, LuceneFieldPluginLoader luceneFieldPluginLoader, IndexStatusManager indexStatusManager) {
         this.configReader = configReader;
         this.dba = dba;
-        this.propertiesManager = propertiesManager;
+        this.indexStatusManager = indexStatusManager;
         this.pluginLoader = pluginLoader;
         this.luceneFieldPluginLoader = luceneFieldPluginLoader;
         indexLocation = configReader.getIndexLocation();
@@ -142,7 +142,7 @@ public class IndexingJob implements Job {
                 jobDataMap.put(FIELD_STATUS, STATUS_CLEARING);
                 // clear the index of data associated to the specified
                 // repositories
-                ClearTask clearTask = new ClearTask(dba, propertiesManager, repositories, indexLocation, this);
+                ClearTask clearTask = new ClearTask(dba, indexStatusManager, repositories, indexLocation, this);
                 clearTask.execute();
             }
 
@@ -156,7 +156,7 @@ public class IndexingJob implements Job {
 
             Directory indexDirectory = FSDirectory.open(indexLocation);
             LOG.info("Opened index at " + indexDirectory);
-            Task indexingTask = new IndexingTask(dba, pluginLoader, configReader.getSearcherLocation(), luceneFieldPluginLoader, propertiesManager, repositories, indexDirectory, this);
+            Task indexingTask = new IndexingTask(dba, pluginLoader, configReader.getSearcherLocation(), luceneFieldPluginLoader, indexStatusManager, repositories, indexDirectory, this);
             indexingTask.execute();
         } catch (TaskExecutionException ex) {
             String errorMsg = "Execution of IndexingJob threw an exception:\n" + ex;

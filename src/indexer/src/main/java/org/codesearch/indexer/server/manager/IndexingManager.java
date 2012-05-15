@@ -32,7 +32,7 @@ import org.apache.log4j.Logger;
 import org.codesearch.commons.configuration.ConfigurationReader;
 import org.codesearch.commons.configuration.dto.JobDto;
 import org.codesearch.commons.configuration.dto.RepositoryDto;
-import org.codesearch.commons.configuration.properties.PropertiesManager;
+import org.codesearch.commons.configuration.properties.IndexStatusManager;
 import org.codesearch.commons.constants.IndexConstants;
 import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
 import org.codesearch.indexer.shared.JobStatus;
@@ -83,7 +83,7 @@ public final class IndexingManager {
     /**
      * used to read the repository revision status
      */
-    private PropertiesManager propertiesManager;
+    private IndexStatusManager indexStatusManager;
 
     /**
      * Creates a new instance of IndexingManager
@@ -94,12 +94,12 @@ public final class IndexingManager {
      */
     @SuppressWarnings("unchecked")
     @Inject
-    public IndexingManager(ConfigurationReader configurationReader, PropertiesManager propertiesManager,
+    public IndexingManager(ConfigurationReader configurationReader, IndexStatusManager indexStatusManager,
             Scheduler scheduler, JobFactory jobFactory) throws SchedulerException {
         this.jobs = configurationReader.getJobs();
         this.scheduler = scheduler;
         this.historyListener = new IndexingJobHistoryListener();
-        this.propertiesManager = propertiesManager;
+        this.indexStatusManager = indexStatusManager;
         this.configReader = configurationReader;
 
         scheduler.setJobFactory(jobFactory);
@@ -163,7 +163,7 @@ public final class IndexingManager {
         List<RepositoryStatus> repositoryStatuses = new LinkedList<RepositoryStatus>();
 
         for (RepositoryDto currentDto : configReader.getRepositories()) {
-            String revision = propertiesManager.getValue(currentDto.getName());
+            String revision = indexStatusManager.getStatus(currentDto.getName());
             RepositoryStatus.Status status = RepositoryStatus.Status.INDEXED;
             if (revision.equals(VersionControlPlugin.UNDEFINED_VERSION)) {
                 status = RepositoryStatus.Status.EMPTY;

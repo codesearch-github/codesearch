@@ -11,9 +11,9 @@
     <description>A java code search appplication</description>
 
     <modules>
-		<!--order for maven dependency plugin important! 
+		<!--order for maven dependency plugin important!
 		    build custom-libs and plugins before indexer and searcher are packaged.
-			to avoid this order add plugin dependencies to indexer and searcher and 
+			to avoid this order add plugin dependencies to indexer and searcher and
 			remove dependency plugin.-->
         <module>commons</module>
         <module>custom-libs</module>
@@ -190,8 +190,8 @@
 				<version>${project.version}</version>
 			</dependency>
 			<!--ENDPLUGINS-->
-		
-		</dependencies>	
+
+		</dependencies>
 	</dependencyManagement>
 
 	<build>
@@ -226,4 +226,23 @@
         </plugins>
     </build>
 
+
+    <profiles>
+    <profile>
+        <id>tmp</id>
+        <build>
+            <plugins>
+                <plugin>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <inherited>true</inherited>
+                </plugin>
+            </plugins>
+        </build>
+        <properties>
+            <build.dir>/tmp/maven-targets/${project.name}</build.dir>
+            <build.outputDir>/tmp/maven-targets/${project.name}/classes</build.outputDir>
+            <build.testOutputDir>/tmp/maven-targets/${project.name}/test-classes</build.testOutputDir>
+        </properties>
+    </profile>
+    </profiles>
 </project>

@@ -34,21 +34,23 @@ import org.codesearch.commons.configuration.ConfigurationReader;
 import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
 
 /**
- * Implementation that uses a property file to represent the currently indexed revision of a repository.
- * It uses the standard java Properties utility.
+ * Implementation that uses a property file to represent
+ * the current index status of a repository.
+ * Uses the standard java Properties utility.
  *
  * @author Samuel Kogler
  */
 @Singleton
-public class RepositoryRevisionManager implements PropertiesManager {
+public class IndexStatusManagerPropertiesImpl implements IndexStatusManager {
 
-    private static final Logger LOG = Logger.getLogger(RepositoryRevisionManager.class);
+    private static final Logger LOG = Logger.getLogger(IndexStatusManagerPropertiesImpl.class);
+    private final String REPOSITORY_STATUS_FILENAME = "revisions.properties";
     /**
      * The used Property file.
      */
     private Properties properties = new Properties();
     private File repositoryStatusFile;
-    private final String REPOSITORY_STATUS_FILENAME = "revisions.properties";
+    private ConfigurationReader configurationReader;
 
     /**
      * Creates a new instance of RepositoryRevisionManager
@@ -56,16 +58,9 @@ public class RepositoryRevisionManager implements PropertiesManager {
      * @param configurationReader Used to read the index location for the properties file
      */
     @Inject
-    public RepositoryRevisionManager(ConfigurationReader configurationReader) {
-        try {
-            repositoryStatusFile = new File(configurationReader.getIndexLocation(), REPOSITORY_STATUS_FILENAME);
-            if (!repositoryStatusFile.exists()) {
-                repositoryStatusFile.createNewFile();
-            }
-            properties.load(new FileReader(repositoryStatusFile));
-        } catch (IOException ex) {
-            LOG.error("Could not read properties file:\n" + ex);
-        }
+    public IndexStatusManagerPropertiesImpl(ConfigurationReader configurationReader) {
+        this.configurationReader = configurationReader;
+        load();
     }
 
     /**
@@ -73,7 +68,7 @@ public class RepositoryRevisionManager implements PropertiesManager {
      *
      * @param configFile The configuration file
      */
-    public RepositoryRevisionManager(InputStream configFile) {
+    public IndexStatusManagerPropertiesImpl(InputStream configFile) {
         try {
             properties.load(configFile);
         } catch (IOException ex) {
@@ -83,11 +78,11 @@ public class RepositoryRevisionManager implements PropertiesManager {
     /**
      * Gets a new value for the specified key
      *
-     * @param key 
+     * @param key
      * @return The value of the key, or {@link VersionControlPlugin.UNDEFINED_VERSION} if no value is found
      */
     @Override
-    public synchronized String getValue(final String key) {
+    public synchronized String getStatus(final String key) {
         return properties.getProperty(key, VersionControlPlugin.UNDEFINED_VERSION);
     }
 
@@ -100,13 +95,31 @@ public class RepositoryRevisionManager implements PropertiesManager {
      * @throws IOException
      */
     @Override
-    public synchronized void setValue(final String key, final String value) throws FileNotFoundException, IOException {
+    public synchronized void setStatus(final String key, final String value) throws FileNotFoundException, IOException {
         properties.setProperty(key, value);
         properties.store(new FileOutputStream(repositoryStatusFile), null);
     }
 
     @Override
-    public List<String> getAllKeys() {
+    public List<String> getAllSavedRepositoryNames() {
         return (List<String>) Collections.list(properties.propertyNames());
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void refresh() {
+        load();
+    }
+
+    private void load() {
+        try {
+            repositoryStatusFile = new File(configurationReader.getIndexLocation(), REPOSITORY_STATUS_FILENAME);
+            if (!repositoryStatusFile.exists()) {
+                repositoryStatusFile.createNewFile();
+            }
+            properties.load(new FileReader(repositoryStatusFile));
+        } catch (IOException ex) {
+            LOG.error("Could not read properties file:\n" + ex);
+        }
     }
 }

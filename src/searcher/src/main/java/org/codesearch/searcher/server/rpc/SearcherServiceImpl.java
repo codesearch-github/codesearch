@@ -32,7 +32,7 @@ import org.apache.log4j.Logger;
 import org.apache.lucene.queryParser.ParseException;
 import org.codesearch.commons.configuration.ConfigurationReader;
 import org.codesearch.commons.configuration.dto.RepositoryDto;
-import org.codesearch.commons.configuration.properties.PropertiesManager;
+import org.codesearch.commons.configuration.properties.IndexStatusManager;
 import org.codesearch.commons.database.DBAccess;
 import org.codesearch.commons.database.DatabaseAccessException;
 import org.codesearch.commons.plugins.PluginLoader;
@@ -84,7 +84,7 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
      */
     private DocumentSearcherImpl documentSearcher;
     private ConfigurationReader configurationReader;
-    private PropertiesManager propertiesManager;
+    private IndexStatusManager indexStatusManager;
     private PluginLoader pluginLoader;
     private DBAccess dba;
     private List<String> repositories;
@@ -93,10 +93,10 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
 
     @Inject
     public SearcherServiceImpl(DocumentSearcherImpl documentSearcher, ConfigurationReader configurationReader,
-            PropertiesManager propertiesManager, PluginLoader pluginLoader, DBAccess dba,
+            IndexStatusManager indexStatusManager, PluginLoader pluginLoader, DBAccess dba,
             LuceneFieldPluginLoader luceneFieldPluginLoader) {
         this.documentSearcher = documentSearcher;
-        this.propertiesManager = propertiesManager;
+        this.indexStatusManager = indexStatusManager;
         this.configurationReader = configurationReader;
         this.pluginLoader = pluginLoader;
         this.dba = dba;
@@ -140,7 +140,7 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
     public FileDto getFile(String repoName, String filePath, boolean highlight, boolean insertCodeNavigationLinks) throws SearcherServiceException {
         LOG.info("Retrieving file: " + filePath + " @ " + repoName);
         FileDto file = new FileDto();
-        String indexedRevision = propertiesManager.getValue(repoName);
+        String indexedRevision = indexStatusManager.getStatus(repoName);
         try {
             RepositoryDto repositoryDto = configurationReader.getRepositoryByName(repoName);
             VersionControlPlugin vcPlugin = pluginLoader.getPlugin(VersionControlPlugin.class, repositoryDto.getVersionControlSystem());
