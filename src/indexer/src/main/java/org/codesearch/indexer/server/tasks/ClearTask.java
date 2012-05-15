@@ -168,8 +168,7 @@ public class ClearTask implements Task {
 
             for (RepositoryDto repositoryDto : repositories) {
                 try {
-                    dba.clearTablesForRepository(repositoryDto.getName());
-                    dba.setLastAnalyzedRevisionOfRepository(repositoryDto.getName(), VersionControlPlugin.UNDEFINED_VERSION);
+                    dba.deleteRepository(repositoryDto.getName());
                     LOG.debug("Cleared code analysis index for repository " + repositoryDto.getName());
                 } catch (DatabaseAccessException ex) {
                     LOG.warn("Could not clear code analysis index for repository: " + repositoryDto.getName() + ", ignore if code analysis is not enabled \n" + ex);

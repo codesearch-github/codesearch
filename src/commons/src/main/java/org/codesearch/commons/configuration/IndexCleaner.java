@@ -75,11 +75,11 @@ public class IndexCleaner {
                 invalidRepositories.remove(repository.getName());
             }
             for (String invalidRepo : invalidRepositories) {
+                dbAccess.deleteRepository(invalidRepo);
                 if (!propertiesManager.getValue(invalidRepo).equals(VersionControlPlugin.UNDEFINED_VERSION)) {
                     Query q = new TermQuery(new Term("repository", invalidRepo));
                     query.add(q, BooleanClause.Occur.SHOULD);
                     propertiesManager.setValue(invalidRepo, VersionControlPlugin.UNDEFINED_VERSION);
-                    dbAccess.clearTablesForRepository(invalidRepo);
                 }
             }
             

@@ -36,11 +36,11 @@ import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
 public interface DBAccess {
 
     /**
-     * deletes all entries from the file and type table that are associated to the repository
+     * deletes the repository and all data that is associated with it (files, types, etc.)
      * @param repoName the name of the repository
      * @throws DatabaseAccessException
      */
-    void clearTablesForRepository(String repoName) throws DatabaseAccessException;
+    void deleteRepository(String repoName) throws DatabaseAccessException;
 
     /**
      * creates an entry for the repository in the database

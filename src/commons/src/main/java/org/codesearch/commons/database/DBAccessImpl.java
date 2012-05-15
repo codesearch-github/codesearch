@@ -65,17 +65,21 @@ public class DBAccessImpl implements DBAccess {
     private static final String STMT_CLEAR_TYPES_FOR_FILE = "DELETE FROM type WHERE file_id = ?";
     private static final String STMT_GET_FILES_IMPORTING_FILE = "SELECT f.file_path, f.binary_index from file f JOIN import i ON f.file_id = i.source_file_id WHERE i.target_file_path IN (?, ?)";
     private static final String STMT_GET_BINARY_INDEX_FOR_FILE = "SELECT binary_index FROM file where file_path = ? AND repository_id = (SELECT repository_id FROM repository WHERE repository_name = ?)";
-    private static final String STMT_GET_FILE_ID_FOR_FILE_NAME = "SELECT file_id FROM file WHERE file_path = ? AND repository_id = ?";
+    private static final String STMT_GET_FILE_ID_FOR_FILE_NAME = "SELECT file_id FROM file f JOIN repository r ON f.repository_id = r.repository_id WHERE f.file_path = ? AND r.repository_name = ?";
     private static final String STMT_CREATE_FILE_RECORD = "INSERT INTO file (file_path, repository_id) VALUES (?, (SELECT repository_id from repository where repository_name = ?))";
     private static final String STMT_GET_REPO_ID_FOR_NAME = "SELECT repository_id FROM repository where repository_name = ?";
     private static final String STMT_CREATE_TYPES_FOR_FILE = "INSERT INTO type (full_name, file_id, repo_id) VALUES ";
-    private static final String STMT_GET_FILE_PATH_FOR_TYPE_DECLARATION = "SELECT f.file_path FROM file f JOIN type t ON f.file_id = t.file_id WHERE f.repository_id = ? AND t.full_name LIKE ?";
-    private static final String STMT_GET_FILE_PATH_FOR_TYPE_DECLARATION_WITH_PACKAGES = "SELECT f.file_path FROM file f JOIN type t ON f.file_id = t.file_id WHERE f.repository_id = ? AND t.full_name IN (";
-    private static final String STMT_GET_USAGES_FOR_FILE = "SELECT usages FROM file WHERE file_path = ? AND repository_id = ?";
-    private static final String STMT_CLEAR_FILES_FOR_REPOSITORY = "DELETE FROM file WHERE repository_id = ?";
-    private static final String STMT_RESET_REPOSITORY_REVISIONS = "UPDATE repository SET last_analyzed_revision = 0";
+    private static final String STMT_GET_FILE_PATH_FOR_TYPE_DECLARATION = "SELECT f.file_path FROM file f JOIN type t ON f.file_id = t.file_id JOIN repository r ON f.repository_id = r.repository_id WHERE r.repository_name = ? AND t.full_name LIKE ?";
+    private static final String STMT_GET_FILE_PATH_FOR_TYPE_DECLARATION_WITH_PACKAGES = "SELECT f.file_path FROM file f JOIN type t ON f.file_id = t.file_id JOIN repository r ON r.repository_id = f.repository_id WHERE r.repository_name = ? AND t.full_name IN (";
+    private static final String STMT_GET_USAGES_FOR_FILE = "SELECT usages FROM file f JOIN repository r ON f.repository_id = r.repository_id WHERE f.file_path = ? AND r.repository_name = ?";
+    private static final String STMT_DELETE_REPOSITORY = "DELETE FROM repository WHERE repository_name = ?";
+    private static final String STMT_GET_IMPORTS_FOR_FILE = "SELECT target_file_path FROM import i JOIN file f ON i.source_file_id = f.file_id JOIN repository r ON f.repository_id = r.repository_id WHERE r.repository_name = ? AND f.file_path = ?";
     private static final String STMT_PURGE_ALL_RECORDS = "DELETE FROM repository";
     private static final String STMT_DELETE_FILE = "DELETE FROM file WHERE file_path = ? AND repository_id = (SELECT repository_id FROM repository where repository_name = ?)";
+    
+    @Deprecated
+    private static final String STMT_RESET_REPOSITORY_REVISIONS = "UPDATE repository SET last_analyzed_revision = 0";
+    
     private DataSource dataSource;
 
     @Inject
@@ -119,18 +123,12 @@ public class DBAccessImpl implements DBAccess {
      */
     @Override
     public synchronized List<String> getImportsForFile(String filePath, String repository) throws DatabaseAccessException {
-        int repo_id = getRepoIdForRepoName(repository);
-        int file_id = getFileIdForFileName(filePath, repo_id);
-
         ResultSetHandler<List<String>> handler = new ResultSetHandler<List<String>>() {
-
             @Override
             public List<String> handle(ResultSet rs) throws SQLException {
                 List<String> imports = new LinkedList<String>();
-                String currentImport = "";
                 while (rs.next()) {
-                    currentImport = rs.getString("target_file_path");
-                    imports.add(currentImport);
+                    imports.add(rs.getString("target_file_path"));
                 }
                 return imports;
             }
@@ -138,7 +136,7 @@ public class DBAccessImpl implements DBAccess {
 
         QueryRunner run = new QueryRunner(dataSource);
         try {
-            return run.query("SELECT target_file_path FROM import WHERE source_file_id = ?", handler, file_id);
+            return run.query(STMT_GET_IMPORTS_FOR_FILE, handler, repository, filePath);
         } catch (SQLException ex) {
             throw new DatabaseAccessException("SQLException while trying to access the database\n" + ex);
         }
@@ -150,12 +148,11 @@ public class DBAccessImpl implements DBAccess {
     @Override
     @SuppressWarnings("unchecked")
     public synchronized List<Usage> getUsagesForFile(String filePath, String repository) throws DatabaseAccessException {
-        int repo_id = getRepoIdForRepoName(repository);
         ResultSetHandler<byte[]> h = new SingleValueByteArrayHandler();
 
         try {
             QueryRunner run = new QueryRunner(dataSource);
-            byte[] result = run.query(STMT_GET_USAGES_FOR_FILE, h, filePath, repo_id);
+            byte[] result = run.query(STMT_GET_USAGES_FOR_FILE, h, filePath, repository);
             if (result != null) {
                 ObjectInputStream regObjectStream = new ObjectInputStream(new ByteArrayInputStream(result));
                 return (List<Usage>) regObjectStream.readObject();
@@ -176,12 +173,10 @@ public class DBAccessImpl implements DBAccess {
      */
     @Override
     public synchronized String getFilePathForTypeDeclaration(String fullyQualifiedName, String repository) throws DatabaseAccessException {
-        int repo_id = getRepoIdForRepoName(repository);
-
         ResultSetHandler<String> handler = new SingleValueStringHandler();
         QueryRunner run = new QueryRunner(dataSource);
         try {
-            return run.query(STMT_GET_FILE_PATH_FOR_TYPE_DECLARATION, handler, repo_id, fullyQualifiedName);
+            return run.query(STMT_GET_FILE_PATH_FOR_TYPE_DECLARATION, handler, repository, fullyQualifiedName);
         } catch (SQLException ex) {
             throw new DatabaseAccessException("SQLException while trying to access the database\n" + ex);
         }
@@ -191,11 +186,10 @@ public class DBAccessImpl implements DBAccess {
      * {@inheritDoc}
      */
     @Override
-    public synchronized void clearTablesForRepository(String repoName) throws DatabaseAccessException {
-        int repoId = getRepoIdForRepoName(repoName);
+    public synchronized void deleteRepository(String repoName) throws DatabaseAccessException {
         QueryRunner run = new QueryRunner(dataSource);
         try {
-            run.update(STMT_CLEAR_FILES_FOR_REPOSITORY, repoId);
+            run.update(STMT_DELETE_REPOSITORY, repoName);
         } catch (SQLException ex) {
             throw new DatabaseAccessException("SQLException while trying to access the database\n" + ex);
         }
@@ -209,7 +203,6 @@ public class DBAccessImpl implements DBAccess {
         if (asteriskImports.isEmpty()) {
             return null;
         }
-        int repo_id = getRepoIdForRepoName(repository);
         ResultSetHandler<String> handler = new SingleValueStringHandler();
         StringBuilder importString = new StringBuilder();
         for (String currentImport : asteriskImports) {
@@ -219,7 +212,7 @@ public class DBAccessImpl implements DBAccess {
         importString.append(")");
         QueryRunner run = new QueryRunner(dataSource);
         try {
-            return run.query(STMT_GET_FILE_PATH_FOR_TYPE_DECLARATION_WITH_PACKAGES + importString.toString(), handler, repo_id);
+            return run.query(STMT_GET_FILE_PATH_FOR_TYPE_DECLARATION_WITH_PACKAGES + importString.toString(), handler, repository);
         } catch (SQLException ex) {
             throw new DatabaseAccessException("SQLException while trying to access the database\n" + ex);
         }
@@ -409,8 +402,7 @@ public class DBAccessImpl implements DBAccess {
      */
     @Override
     public synchronized int ensureThatRecordExists(String filePath, String repository) throws DatabaseAccessException {
-        int repoId = getRepoIdForRepoName(repository);
-        int fileId = getFileIdForFileName(filePath, repoId);
+        int fileId = getFileIdForFileName(filePath, repository);
         Connection conn = null;
         PreparedStatement statement = null;
         try {
@@ -465,12 +457,12 @@ public class DBAccessImpl implements DBAccess {
      * @return the id if the file, or -1 if it wasn't found
      * @throws DatabaseAccessException
      */
-    private int getFileIdForFileName(String filePath, int repoId) throws DatabaseAccessException {
+    private int getFileIdForFileName(String filePath, String repository) throws DatabaseAccessException {
         int fileId = -1;
         QueryRunner run = new QueryRunner(dataSource);
         SingleValueStringHandler h = new SingleValueStringHandler();
         try {
-            String result = run.query(STMT_GET_FILE_ID_FOR_FILE_NAME, h, filePath, repoId);
+            String result = run.query(STMT_GET_FILE_ID_FOR_FILE_NAME, h, filePath, repository);
             if (StringUtils.isNotEmpty(result)) {
                 fileId = Integer.parseInt(result);
             }

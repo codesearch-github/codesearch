@@ -36,7 +36,7 @@ import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
 public class NoOpDatabaseImpl implements DBAccess {
 
     @Override
-    public void clearTablesForRepository(String repoName) throws DatabaseAccessException {
+    public void deleteRepository(String repoName) throws DatabaseAccessException {
 
     }
 

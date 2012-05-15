@@ -357,7 +357,7 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
                     if (currentUsage.getStartLine() == lineNumber) {
                         int startColumn = currentUsage.getStartColumn();
                         String preamble = currentLine.substring(0, startColumn - 1); //-1
-                        String javaScriptEvent = "";
+                        String javaScriptEvent;
                         if (currentUsage instanceof ExternalUsage) {
                             javaScriptEvent = "goToUsage(" + usageIndex + ");";
                         } else {
