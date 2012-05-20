@@ -35,7 +35,7 @@ import org.quartz.JobListener;
 
 /**
  *
- * Job listener that mantains a history of job executions.
+ * Job listener that maintains a history of job executions.
  * @author Samuel Kogler
  *
  */
@@ -65,7 +65,12 @@ public class IndexingJobHistoryListener implements JobListener {
     /** {@inheritDoc} */
     @Override
     public void jobWasExecuted(JobExecutionContext context, JobExecutionException jobException) {
-        String message = context.getJobDetail().getKey() + " finished.";
+        String message = context.getJobDetail().getKey() + " finished ";
+        if(jobException == null) {
+            message += "successfully.";
+        } else {
+            message += "with an error. See log file for details.";
+        }
         createHistoryMessage(message);
     }
 

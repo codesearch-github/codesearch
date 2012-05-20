@@ -83,12 +83,11 @@ public class PluginLoaderImpl implements PluginLoader {
             }
 
         }
-        //FIXME: very hackish, but I could not think of a better way ATM
+        
         if (validPlugin != null) {
             if (validPlugin instanceof VersionControlPlugin) {
                 VersionControlPlugin vcsPlugin = (VersionControlPlugin) validPlugin;
                 try {
-                    //TODO this is somewhat ridiculous
                     vcsPlugin.setCacheDirectory(configurationReader.getCacheDirectory().getAbsolutePath());
                 } catch (VersionControlPluginException ex) {
                     throw new PluginLoaderException("VersionControlPlugin failed to load because an invalid cache directory was specified: " + ex);
