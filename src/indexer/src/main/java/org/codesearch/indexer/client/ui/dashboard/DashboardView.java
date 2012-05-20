@@ -72,6 +72,12 @@ public interface DashboardView extends IsWidget {
     CellTable<JobStatus> getScheduledJobsTable();
 
     /**
+     * Returns the table that is used to display delayed jobs.
+     * @return The table.
+     */
+    CellTable<JobStatus> getDelayedJobsTable();
+
+    /**
      * Returns the table that is used to display running jobs.
      * @return The table.
      */

@@ -36,9 +36,19 @@ public class DashboardData implements Serializable {
     private List<JobStatus> runningJobs;
     /** All the jobs that are scheduled. */
     private List<JobStatus> scheduledJobs;
+    /** Delayed jobs */
+    private List<JobStatus> delayedJobs;
     /** All the repositories with their indexing statuses */
     private List<RepositoryStatus> repositoryStatuses;
 
+    public List<JobStatus> getDelayedJobs() {
+        return delayedJobs;
+    }
+
+    public void setDelayedJobs(List<JobStatus> delayedJobs) {
+        this.delayedJobs = delayedJobs;
+    }
+    
     public List<RepositoryStatus> getRepositoryStatuses() {
         return repositoryStatuses;
     }
@@ -46,7 +56,7 @@ public class DashboardData implements Serializable {
     public void setRepositoryStatuses(List<RepositoryStatus> repositoryStatuses) {
         this.repositoryStatuses = repositoryStatuses;
     }
-    
+
     public List<JobStatus> getScheduledJobs() {
         return scheduledJobs;
     }

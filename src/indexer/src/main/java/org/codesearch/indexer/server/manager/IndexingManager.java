@@ -21,8 +21,10 @@ package org.codesearch.indexer.server.manager;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.Set;
 
 import javax.inject.Singleton;
@@ -46,6 +48,7 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
+import org.quartz.SimpleScheduleBuilder;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.quartz.impl.matchers.EverythingMatcher;
@@ -86,6 +89,12 @@ public final class IndexingManager {
     private IndexStatusManager indexStatusManager;
 
     /**
+     * Keeps the jobs that have been delayed due to a currently executing job
+     * in a Queue.
+     */
+    private Queue<JobDetail> delayedJobQueue = new LinkedList<JobDetail>();
+
+    /**
      * Creates a new instance of IndexingManager
      *
      * @throws SchedulerException In case the scheduler could not be
@@ -94,8 +103,8 @@ public final class IndexingManager {
      */
     @SuppressWarnings("unchecked")
     @Inject
-    public IndexingManager(ConfigurationReader configurationReader, IndexStatusManager indexStatusManager,
-            Scheduler scheduler, JobFactory jobFactory) throws SchedulerException {
+    public IndexingManager(ConfigurationReader configurationReader, IndexStatusManager indexStatusManager, Scheduler scheduler,
+            JobFactory jobFactory) throws SchedulerException {
         this.jobs = configurationReader.getJobs();
         this.scheduler = scheduler;
         this.historyListener = new IndexingJobHistoryListener();
@@ -103,8 +112,8 @@ public final class IndexingManager {
         this.configReader = configurationReader;
 
         scheduler.setJobFactory(jobFactory);
-        scheduler.getListenerManager().addTriggerListener(new IndexingJobTriggerListener(5 * 60 * 1000),
-            EverythingMatcher.allTriggers()); // delay by 5 minutes if a job is currently running
+        scheduler.getListenerManager().addTriggerListener(new IndexingJobTriggerListener(this), EverythingMatcher.allTriggers());
+        scheduler.getListenerManager().addJobListener(new IndexingJobExecutionListener(this), EverythingMatcher.allJobs());
         scheduler.getListenerManager().addJobListener(historyListener, EverythingMatcher.allJobs());
         start();
     }
@@ -137,14 +146,13 @@ public final class IndexingManager {
                     trigger = TriggerBuilder.newTrigger().forJob(jobKey).startNow().build();
                 } else {
                     trigger = TriggerBuilder.newTrigger().forJob(jobKey).withSchedule(
-                        CronScheduleBuilder.cronSchedule(job.getCronExpression())).build();
+                            CronScheduleBuilder.cronSchedule(job.getCronExpression())).build();
                 }
 
                 scheduler.addJob(jobDetail, true);
                 scheduler.scheduleJob(trigger);
             } catch (ParseException ex) {
-                LOG.error("Indexing job " + i + "for repository ---"
-                    + " was configured with invalid cron expression:\n" + ex);
+                LOG.error("Indexing job " + i + "for repository ---" + " was configured with invalid cron expression:\n" + ex);
             }
             i++;
         }
@@ -187,7 +195,7 @@ public final class IndexingManager {
             jobStatus.setCurrentRepository(jobDataMap.getString(IndexingJob.FIELD_CURRENT_REPOSITORY));
 
             @SuppressWarnings("unchecked")
-            List<RepositoryDto> repos = (List<RepositoryDto>)jobDataMap.get(IndexingJob.FIELD_REPOSITORIES);
+            List<RepositoryDto> repos = (List<RepositoryDto>) jobDataMap.get(IndexingJob.FIELD_REPOSITORIES);
             List<String> repoNames = new LinkedList<String>();
             for (RepositoryDto repositoryDto : repos) {
                 repoNames.add(repositoryDto.getName());
@@ -218,7 +226,7 @@ public final class IndexingManager {
         for (JobKey jobKey : scheduledJobKeys) {
             JobStatus jobStatus = new JobStatus();
 
-            List<Trigger> triggersOfJob = (List<Trigger>)scheduler.getTriggersOfJob(jobKey);
+            List<Trigger> triggersOfJob = (List<Trigger>) scheduler.getTriggersOfJob(jobKey);
 
             Date nextFireTime = new Date(0L);
             Date previousFireTime = new Date(0L);
@@ -253,6 +261,17 @@ public final class IndexingManager {
         return scheduledJobs;
     }
 
+
+    public List<JobStatus> getDelayedJobs() {
+        List<JobStatus> delayedJobsStatus = new LinkedList<JobStatus>();
+        for (JobDetail detail : delayedJobQueue) {
+            JobStatus status = new JobStatus();
+            status.setName(detail.getKey().getName());
+            delayedJobsStatus.add(status);
+        }
+        return delayedJobsStatus;
+    }
+
     /**
      * Returns the log of job executions.
      *
@@ -282,10 +301,8 @@ public final class IndexingManager {
      * @param repositoryGroups the repo groups containing the repositories
      * @throws SchedulerException
      */
-    public void startJobForRepositories(List<String> repositories, List<String> repositoryGroups, boolean clear)
-            throws SchedulerException {
-        JobKey jobKey = new JobKey("manual-job-" + DateFormat.getTimeInstance().format(new Date().getTime()),
-            IndexingJob.GROUP_NAME);
+    public void startJobForRepositories(List<String> repositories, List<String> repositoryGroups, boolean clear) throws SchedulerException {
+        JobKey jobKey = new JobKey("manual-job-" + DateFormat.getTimeInstance().format(new Date().getTime()), IndexingJob.GROUP_NAME);
         List<RepositoryDto> repos = new LinkedList<RepositoryDto>();
         for (String currentRepoName : repositories) {
             repos.add(configReader.getRepositoryByName(currentRepoName));
@@ -310,5 +327,35 @@ public final class IndexingManager {
         scheduler.addJob(jobDetail, true);
         scheduler.scheduleJob(jobTrigger);
         LOG.info("Starting manual indexing job for");
+    }
+
+    public boolean delayJob(JobDetail jobDetail) {
+        boolean isInQueue = false;
+        for (JobDetail d : delayedJobQueue) {
+            if (d.getKey().equals(jobDetail.getKey())) {
+                isInQueue = true;
+                break;
+            }
+        }
+
+        if (isInQueue) {
+            return false;
+        } else {
+            delayedJobQueue.add(jobDetail);
+            return true;
+        }
+    }
+
+    public void executeNextJobInQueue() {
+        JobDetail detail = delayedJobQueue.poll();
+        if (detail != null) {
+            LOG.info("Executing delayed job " + detail.getKey().toString());
+            Trigger trigger = TriggerBuilder.newTrigger().forJob(detail).withIdentity("Delayed Trigger").startNow().build();
+            try {
+                scheduler.scheduleJob(trigger);
+            } catch (SchedulerException e) {
+                LOG.error("Error re-scheduling delayed job: " + e);
+            }
+        }
     }
 }

@@ -48,6 +48,7 @@ public class DashboardActivity extends AbstractActivity implements Presenter {
     private DashboardServiceAsync dashboardServiceAsync = GWT.create(DashboardService.class);
     private ListDataProvider<JobStatus> runningJobsDataProvider = new ListDataProvider<JobStatus>();
     private ListDataProvider<JobStatus> scheduledJobsDataProvider = new ListDataProvider<JobStatus>();
+    private ListDataProvider<JobStatus> delayedJobsDataProvider = new ListDataProvider<JobStatus>();
     private ListDataProvider<RepositoryStatus> repositoryStatuses = new ListDataProvider<RepositoryStatus>();
     private Timer refreshTimer;
 
@@ -66,6 +67,7 @@ public class DashboardActivity extends AbstractActivity implements Presenter {
 
         runningJobsDataProvider.addDataDisplay(dashboardView.getRunningJobsTable());
         scheduledJobsDataProvider.addDataDisplay(dashboardView.getScheduledJobsTable());
+        delayedJobsDataProvider.addDataDisplay(dashboardView.getDelayedJobsTable());
         repositoryStatuses.addDataDisplay(dashboardView.getRepositoryStatuses());
         refresh();
 
@@ -93,6 +95,7 @@ public class DashboardActivity extends AbstractActivity implements Presenter {
         dashboardView.cleanup();
         runningJobsDataProvider.removeDataDisplay(dashboardView.getRunningJobsTable());
         scheduledJobsDataProvider.removeDataDisplay(dashboardView.getScheduledJobsTable());
+        delayedJobsDataProvider.removeDataDisplay(dashboardView.getDelayedJobsTable());
         repositoryStatuses.removeDataDisplay(dashboardView.getRepositoryStatuses());
         refreshTimer.cancel();
     }
@@ -120,6 +123,7 @@ public class DashboardActivity extends AbstractActivity implements Presenter {
         public void onSuccess(DashboardData result) {
             runningJobsDataProvider.setList(result.getRunningJobs());
             scheduledJobsDataProvider.setList(result.getScheduledJobs());
+            delayedJobsDataProvider.setList(result.getDelayedJobs());
             repositoryStatuses.setList(result.getRepositoryStatuses());
         }
     }

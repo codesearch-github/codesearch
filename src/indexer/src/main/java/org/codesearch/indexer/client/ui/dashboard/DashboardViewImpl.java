@@ -1,22 +1,20 @@
 /**
- * Copyright 2010 David Froehlich   <david.froehlich@businesssoftware.at>,
- *                Samuel Kogler     <samuel.kogler@gmail.com>,
- *                Stephan Stiboller <stistc06@htlkaindorf.at>
+ * Copyright 2010 David Froehlich <david.froehlich@businesssoftware.at>, Samuel
+ * Kogler <samuel.kogler@gmail.com>, Stephan Stiboller <stistc06@htlkaindorf.at>
  *
  * This file is part of Codesearch.
  *
- * Codesearch is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Codesearch is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
  *
- * Codesearch is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * Codesearch is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with
+ * Codesearch. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.codesearch.indexer.client.ui.dashboard;
 
@@ -49,11 +47,12 @@ public class DashboardViewImpl extends Composite implements DashboardView {
 
     interface IndexViewImplUiBinder extends UiBinder<Widget, DashboardViewImpl> {
     }
-
     @UiField(provided = true)
     CellTable<JobStatus> runningJobs;
     @UiField(provided = true)
     CellTable<JobStatus> scheduledJobs;
+    @UiField(provided = true)
+    CellTable<JobStatus> delayedJobs;
     @UiField
     HasClickHandlers refreshButton;
     @UiField(provided = true)
@@ -70,57 +69,80 @@ public class DashboardViewImpl extends Composite implements DashboardView {
         presenter.refresh();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void cleanup() {
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setPresenter(Presenter presenter) {
         this.presenter = presenter;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void connectEventHandlers() {
         // TODO Auto-generated method stub
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void disconnectEventHandlers() {
         // TODO Auto-generated method stub
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Presenter getPresenter() {
         return presenter;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public CellTable<RepositoryStatus> getRepositoryStatuses() {
         return repositoryStatuses;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public HasClickHandlers getRefreshButton() {
         return refreshButton;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public CellTable<JobStatus> getScheduledJobsTable() {
         return scheduledJobs;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public CellTable<JobStatus> getRunningJobsTable() {
         return runningJobs;
+    }
+
+    @Override
+    public CellTable<JobStatus> getDelayedJobsTable() {
+        return delayedJobs;
     }
 
     private void initTables() {
@@ -132,6 +154,11 @@ public class DashboardViewImpl extends Composite implements DashboardView {
         scheduledJobs.addColumn(new JobStatusFinishedColumn(dateCell), "Last execution");
         scheduledJobs.setSelectionModel(new NoSelectionModel<JobStatus>());
         scheduledJobs.setPageSize(Integer.MAX_VALUE);
+
+        delayedJobs = new CellTable<JobStatus>();
+        delayedJobs.addColumn(new JobStatusNameColumn(), "Name");
+        delayedJobs.setSelectionModel(new NoSelectionModel<JobStatus>());
+        delayedJobs.setPageSize(Integer.MAX_VALUE);
 
         runningJobs = new CellTable<JobStatus>();
         runningJobs.addColumn(new JobStatusNameColumn(), "Name");
@@ -174,15 +201,15 @@ public class DashboardViewImpl extends Composite implements DashboardView {
         public String getValue(RepositoryStatus object) {
             String returnValue = "";
             switch (object.getStatus()) {
-            case EMPTY:
-                returnValue = "unindexed";
-                break;
-            case INCONSISTENT:
-                returnValue = "inconsistent";
-                break;
-            case INDEXED:
-                returnValue = "indexed";
-                break;
+                case EMPTY:
+                    returnValue = "unindexed";
+                    break;
+                case INCONSISTENT:
+                    returnValue = "inconsistent";
+                    break;
+                case INDEXED:
+                    returnValue = "indexed";
+                    break;
             }
             return returnValue;
         }
@@ -264,7 +291,7 @@ public class DashboardViewImpl extends Composite implements DashboardView {
         public Number getValue(JobStatus object) {
             float current = object.getCurrentStep().getFinishedSteps();
             float totalSteps = object.getCurrentStep().getTotalSteps();
-            return new Float(current  / totalSteps);
+            return new Float(current / totalSteps);
         }
     }
 

@@ -180,4 +180,17 @@ public class IndexingJob implements Job {
     public JobDataMap getJobDataMap() {
         return jobDataMap;
     }
+
+    public List<RepositoryDto> getRepositories() {
+        return repositories;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof IndexingJob) {
+            IndexingJob job = (IndexingJob) obj;
+            return job.getRepositories().equals(repositories);
+        }
+        return false;
+    }
 }

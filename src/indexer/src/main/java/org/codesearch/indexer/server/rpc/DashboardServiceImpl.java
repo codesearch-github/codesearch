@@ -62,10 +62,12 @@ public class DashboardServiceImpl extends RemoteServiceServlet implements Dashbo
 
             List<JobStatus> runningJobs = indexingManager.getRunningJobs();
             List<JobStatus> scheduledJobs = indexingManager.getScheduledJobs();
+            List<JobStatus> delayedJobs = indexingManager.getDelayedJobs();
             List<RepositoryStatus> repositoryStatuses = indexingManager.getRepositoryStatuses();
 
             dashboardData.setRunningJobs(runningJobs);
             dashboardData.setScheduledJobs(scheduledJobs);
+            dashboardData.setDelayedJobs(delayedJobs);
             dashboardData.setRepositoryStatuses(repositoryStatuses);
 
             return dashboardData;

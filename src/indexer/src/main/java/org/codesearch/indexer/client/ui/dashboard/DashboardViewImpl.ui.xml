@@ -7,22 +7,22 @@
     If not, see <http://www.gnu.org/licenses/>. -->
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
-    xmlns:c='urn:import:com.google.gwt.user.cellview.client'>
+             xmlns:c='urn:import:com.google.gwt.user.cellview.client'>
     <ui:style>
         .grid-item {
-            float: left;
-            padding: 5px;
-            margin-bottom: 10px;
-            width: 100%;
+        float: left;
+        padding: 5px;
+        margin-bottom: 10px;
+        width: 100%;
         }
 
         .grid-item .title {
-            font-weight: bold;
-            display: block;
+        font-weight: bold;
+        display: block;
         }
 
         .grid-item .content {
-            display: block;
+        display: block;
         }
     </ui:style>
 
@@ -36,7 +36,10 @@
                 <span class="{style.title}">Scheduled jobs</span>
                 <c:CellTable addStyleNames="{style.content}" ui:field="scheduledJobs"/>
             </div>
-
+            <div class="{style.grid-item}">
+                <span class="{style.title}">Delayed jobs</span>
+                <c:CellTable addStyleNames="{style.content}" ui:field="delayedJobs"/>
+            </div>
             <div class="{style.grid-item}">
                 <span class="{style.title}">Repository status</span>
                 <c:CellTable addStyleNames="{style.content}" ui:field="repositoryStatuses"/>
