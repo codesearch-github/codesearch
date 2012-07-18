@@ -130,7 +130,11 @@ public class JavaCodeAnalyzerPlugin implements CodeAnalyzerPlugin {
             usages = Collections.EMPTY_LIST;
             typeDeclarations = Collections.EMPTY_LIST;
             imports = Collections.EMPTY_LIST;
-        } finally {
+        } catch (Error ex)
+        {
+            throw new CodeAnalyzerPluginException("Unexpected error analyzing Java file:" + ex);
+        }
+        finally {
             try {
                 if (bais != null) {
                     bais.close();
