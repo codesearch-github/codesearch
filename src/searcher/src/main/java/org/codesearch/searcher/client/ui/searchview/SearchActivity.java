@@ -151,6 +151,7 @@ public class SearchActivity extends AbstractActivity implements SearchView.Prese
                 if (!resultList.isEmpty()) {
                     searchView.setSearchResults(resultList);
                     searchView.getResultsView().setVisible(true);
+                    searchView.focusResultList();
                 }
             }
         }

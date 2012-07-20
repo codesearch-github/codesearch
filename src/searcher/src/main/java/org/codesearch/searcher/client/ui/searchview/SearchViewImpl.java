@@ -30,6 +30,7 @@ import org.codesearch.searcher.shared.SearchResultDto;
 import org.codesearch.searcher.shared.SearchType;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyUpEvent;
@@ -40,6 +41,7 @@ import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.i18n.client.NumberFormat;
+import com.google.gwt.place.shared.Place;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -48,6 +50,7 @@ import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.SimplePager.TextLocation;
 import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DisclosurePanel;
@@ -61,9 +64,13 @@ import com.google.gwt.user.client.ui.TabLayoutPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.ToggleButton;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.view.client.CellPreviewEvent;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.NoSelectionModel;
 import com.google.gwt.view.client.SelectionChangeEvent;
+import com.google.gwt.view.client.SelectionModel;
+import com.google.gwt.view.client.SingleSelectionModel;
+import org.codesearch.searcher.client.ClientFactory;
 
 /**
  * Implements the functionality of the search page. Composite class
@@ -79,6 +86,7 @@ public class SearchViewImpl extends Composite implements SearchView {
     private static final String PATH_TITLE = "Path";
     private static final String REPOSITORY_TITLE = "Repository";
     private static final String REVISION_TITLE = "Last Revision";
+
 
     // UIBINDER STUFF
     @UiTemplate("SearchView.ui.xml")
@@ -346,6 +354,14 @@ public class SearchViewImpl extends Composite implements SearchView {
         }
     }
 
+
+    @Override
+    public void focusResultList() {
+        resultTable.getElement().focus();
+        resultTable.setFocus(true);
+    }
+
+
     /**
      * {@inheritDoc}
      */
@@ -475,18 +491,43 @@ public class SearchViewImpl extends Composite implements SearchView {
             }
         }, REVISION_TITLE);
 
-        final NoSelectionModel<SearchResultDto> selectionModel = new NoSelectionModel<SearchResultDto>();
+        final SelectionModel<SearchResultDto> selectionModel = new NoSelectionModel<SearchResultDto>();
         resultTable.setSelectionModel(selectionModel);
-        selectionModel.addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
 
-            /**
-             * {@inheritDoc}
-             */
+        resultTable.addCellPreviewHandler(new CellPreviewEvent.Handler<SearchResultDto>() {
+
             @Override
-            public void onSelectionChange(SelectionChangeEvent event) {
-                SearchResultDto selected = selectionModel.getLastSelectedObject();
-                if (selected != null) {
-                    presenter.goTo(new FilePlace(selected.getRepository(), selected.getFilePath(), searchBox.getValue(), 1));
+            public void onCellPreview(CellPreviewEvent<SearchResultDto> event) {
+                SearchResultDto dto = event.getValue();
+                boolean open = false;
+                boolean newTab = false;
+                if ("click".equals(event.getNativeEvent().getType())) {
+                    if ((NativeEvent.BUTTON_LEFT & event.getNativeEvent().getButton()) == NativeEvent.BUTTON_LEFT) {
+                        open = true;
+                    }
+                    if ((NativeEvent.BUTTON_MIDDLE & event.getNativeEvent().getButton()) == NativeEvent.BUTTON_MIDDLE) {
+                        open = true;
+                        newTab = true;
+                    }
+                } else if ("keyup".equals(event.getNativeEvent().getType())) {
+                    if (KeyCodes.KEY_ENTER == event.getNativeEvent().getKeyCode()) {
+                        open = true;
+                    }
+                }
+                if (open) {
+                    // either CTRL+CLICK or CTRL+ENTER open a new tab
+                    if (event.getNativeEvent().getCtrlKey()) {
+                        newTab = true;
+                    }
+                    Place target = new FilePlace(dto.getRepository(), dto.getFilePath(), searchBox.getValue(), 1);
+                    if (newTab) {
+
+                        String url = Window.Location.getPath() + "#";
+                        url += ClientFactory.getDefaultFactory().getHistoryMapper().getToken(target);
+                        Window.open(url, "_blank", "");
+                    } else {
+                        presenter.goTo(target);
+                    }
                 }
             }
         });

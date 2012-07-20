@@ -25,6 +25,7 @@ import org.codesearch.searcher.client.ui.searchview.SearchView;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceController;
+import com.google.gwt.place.shared.PlaceHistoryMapper;
 import com.google.web.bindery.event.shared.EventBus;
 
 /**
@@ -51,4 +52,6 @@ public abstract class ClientFactory {
     public abstract FileView getFileView();
 
     public abstract Place getDefaultPlace();
+
+    public abstract PlaceHistoryMapper getHistoryMapper();
 }

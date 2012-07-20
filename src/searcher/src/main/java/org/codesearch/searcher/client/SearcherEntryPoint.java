@@ -26,7 +26,6 @@ import org.codesearch.searcher.client.ui.RootContainer;
 import com.google.gwt.activity.shared.ActivityManager;
 import com.google.gwt.activity.shared.ActivityMapper;
 import com.google.gwt.core.client.EntryPoint;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.place.shared.PlaceController;
 import com.google.gwt.place.shared.PlaceHistoryHandler;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
@@ -54,8 +53,7 @@ public class SearcherEntryPoint implements EntryPoint {
         ActivityManager activityManager = new ActivityManager(activityMapper, eventBus);
         activityManager.setDisplay(rootContainer);
 
-        SearcherPlaceHistoryMapper historyMapper = GWT.create(SearcherPlaceHistoryMapper.class);
-        PlaceHistoryHandler historyHandler = new PlaceHistoryHandler(historyMapper);
+        PlaceHistoryHandler historyHandler = new PlaceHistoryHandler(clientFactory.getHistoryMapper());
         historyHandler.register(placeController, eventBus, clientFactory.getDefaultPlace());
 
         RootLayoutPanel.get().add(rootContainer);

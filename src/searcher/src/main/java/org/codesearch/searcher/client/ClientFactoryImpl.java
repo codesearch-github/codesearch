@@ -21,6 +21,7 @@
 
 package org.codesearch.searcher.client;
 
+import com.google.gwt.core.client.GWT;
 import org.codesearch.searcher.client.ui.fileview.FileView;
 import org.codesearch.searcher.client.ui.fileview.FileViewImpl;
 import org.codesearch.searcher.client.ui.searchview.SearchPlace;
@@ -30,6 +31,7 @@ import org.codesearch.searcher.shared.SearchType;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceController;
+import com.google.gwt.place.shared.PlaceHistoryMapper;
 import com.google.web.bindery.event.shared.EventBus;
 import com.google.web.bindery.event.shared.SimpleEventBus;
 
@@ -44,6 +46,7 @@ public class ClientFactoryImpl extends ClientFactory {
     private final SearchView searchView = new SearchViewImpl();
     private final FileView fileView = new FileViewImpl();
     private final Place defaultPlace = new SearchPlace("", SearchType.REPOSITORIES, null, 200);
+    private final PlaceHistoryMapper historyMapper =  GWT.create(SearcherPlaceHistoryMapper.class);
 
     /** {@inheritDoc} */
     public final Place getDefaultPlace() {
@@ -72,5 +75,11 @@ public class ClientFactoryImpl extends ClientFactory {
     @Override
     public FileView getFileView() {
         return fileView;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public PlaceHistoryMapper getHistoryMapper() {
+        return historyMapper;
     }
 }

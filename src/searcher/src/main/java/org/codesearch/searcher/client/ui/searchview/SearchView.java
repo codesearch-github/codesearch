@@ -61,6 +61,7 @@ public interface SearchView extends IsWidget {
     Set<String> getSelection();
     int getMaxResults();
     boolean isInitialized();
+    void focusResultList();
 
     public interface Presenter {
         void goTo(Place place);
