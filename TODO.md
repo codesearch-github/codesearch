@@ -11,11 +11,6 @@
 # Important
  * When the error message display is finished, refactor searcher error handling
    to actually use it!
- * Find out whether the Repository Groups in the configuration are really necessary
-
-# Bugs
- * XmlCodeAnalyzer takes reaaallly long to analyze some files
- * Either find a way to preserve \n chars at parsing or completely replace the JavaParser with the EclipseAstParser
 
 # Minor Bugs
  * usages of parameters in methods are not correctly linked
