@@ -54,10 +54,11 @@ import com.google.gwt.user.client.ui.Widget;
 
 /**
  * Implementation of the File View.
+ * 
  * @author Samuel Kogler
  */
 public class FileViewImpl extends Composite implements FileView {
-    //TODO cleanup this class
+    // TODO cleanup this class
 
     interface FileViewUiBinder extends UiBinder<Widget, FileViewImpl> {
     }
@@ -66,6 +67,7 @@ public class FileViewImpl extends Composite implements FileView {
 
         String hidden();
     }
+
     @UiField
     MyStyle style;
     @UiField
@@ -169,7 +171,7 @@ public class FileViewImpl extends Composite implements FileView {
     }
 
     private native void highlight(String selector, String term)/*-{
-    $wnd.jQuery(selector).highlight(term);
+		$wnd.jQuery(selector).highlight(term);
     }-*/;
 
     /** {@inheritDoc} */
@@ -219,13 +221,19 @@ public class FileViewImpl extends Composite implements FileView {
     /** {@inheritDoc} */
     @Override
     public void goToLine(int lineNumber) {
-        if (!focusDivVisible) {
-            showFocusDiv(true);
-        }
         if (lineNumber > 0 && lineNumber <= lineCount) {
-            focusDiv.setAttribute("style", "top: " + (lineNumber - 1) * 15 + "px");
+            if (!focusDivVisible) {
+                showFocusDiv(true);
+            }
+            int position = (lineNumber - 1) * 15;
+            focusDiv.setAttribute("style", "top: " + position + "px");
+            // scroll all possible parents
+            focusDiv.scrollIntoView();
+            // scroll wrapper manually
+            int scrollPosition = position - scrollWrapper.getElement().getClientHeight() / 2;
+            scrollPosition = Math.min(scrollPosition, scrollWrapper.getMaximumVerticalScrollPosition());
+            scrollWrapper.setVerticalScrollPosition(scrollPosition);
         }
-        focusDiv.scrollIntoView();
     }
 
     /** {@inheritDoc} */
@@ -252,8 +260,8 @@ public class FileViewImpl extends Composite implements FileView {
      * Exports static functions to JavaScript so they can be used from HTML code.
      */
     public static native void exportJSFunctions()/*-{
-    $wnd.goToLine = $entry(@org.codesearch.searcher.client.ui.fileview.FileViewImpl::staticGoToLine(I));
-    $wnd.goToUsage = $entry(@org.codesearch.searcher.client.ui.fileview.FileViewImpl::staticGoToUsage(I));
+		$wnd.goToLine = $entry(@org.codesearch.searcher.client.ui.fileview.FileViewImpl::staticGoToLine(I));
+		$wnd.goToUsage = $entry(@org.codesearch.searcher.client.ui.fileview.FileViewImpl::staticGoToUsage(I));
     }-*/;
 
     private void toggleSidebar() {
@@ -293,6 +301,7 @@ public class FileViewImpl extends Composite implements FileView {
 
     /**
      * Shows or hides the focused line div that highlights the focused line.
+     * 
      * @param show Whether to show the div
      */
     private void showFocusDiv(boolean show) {
@@ -316,10 +325,11 @@ public class FileViewImpl extends Composite implements FileView {
         @Override
         public void onPreviewNativeEvent(NativePreviewEvent event) {
             switch (event.getNativeEvent().getCharCode()) {
-                case 'g':
-                    event.consume();
-                    goToLineWithDialog();
-                    break;
+            case 'g':
+                event.cancel();
+                event.consume();
+                goToLineWithDialog();
+                break;
             }
         }
     }
