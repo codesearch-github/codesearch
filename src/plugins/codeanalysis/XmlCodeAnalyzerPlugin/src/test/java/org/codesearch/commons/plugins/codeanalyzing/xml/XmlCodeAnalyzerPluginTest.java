@@ -18,50 +18,38 @@
  * You should have received a copy of the GNU General Public License
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.codesearch.commons.plugins.javacodeanalyzerplugin;
+package org.codesearch.commons.plugins.codeanalyzing.xml;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 
-import org.apache.log4j.Logger;
+import java.io.IOException;
+
+import org.apache.commons.io.IOUtils;
 import org.codesearch.commons.plugins.codeanalyzing.CodeAnalyzerPlugin;
 import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
-import org.codesearch.commons.plugins.codeanalyzing.xml.XmlCodeAnalyzerPlugin;
-import org.codesearch.commons.plugins.codeanalyzing.xml.ast.XmlNode;
 import org.junit.Test;
 
 /**
- *
+ * Simply tests whether analyzing works and produces a non-null AST.
  * @author Samuel Kogler
  */
 public class XmlCodeAnalyzerPluginTest {
 
-    /* Logger */
-    private static final Logger LOG = Logger.getLogger(XmlCodeAnalyzerPluginTest.class);
-
-    @Test
-    public void testAST() throws Exception {
-        LOG.info("analyzeFile");
-        String fileContent = "";
-        BufferedReader br = new BufferedReader(new FileReader("/home/daasdingo/workspace/svnsearch/src_java/main/webapp/details.xhtml"));
-        while (br.ready()) {
-            fileContent += br.readLine() + "\n";
-        }
-
-        CodeAnalyzerPlugin plugin = new XmlCodeAnalyzerPlugin();
-        plugin.analyzeFile(fileContent);
-        AstNode ast = plugin.getAst();
-        recursiveOutput((XmlNode) ast, 0);
+    private CodeAnalyzerPlugin plugin = new XmlCodeAnalyzerPlugin();
+    private String fileContent;
+    
+    public XmlCodeAnalyzerPluginTest() throws IOException {
+        fileContent = IOUtils.toString(
+                XmlCodeAnalyzerPluginTest.class.getResourceAsStream("test.xml"), "UTF-8");
     }
 
-    private void recursiveOutput(XmlNode node, int level) {
-        for (AstNode childNode : node.getChildNodes()) {
-            recursiveOutput((XmlNode) childNode, level + 1);
-        }
-        String preamble = "";
-        for (int i = 0; i < level; i++) {
-            preamble += "  ";
-        }
-        LOG.info(preamble + node.getOutlineName());
+    @Test
+    public void testAstNotEmpty() throws Exception {
+        plugin.analyzeFile(fileContent);
+        AstNode ast = plugin.getAst();
+        assertNotNull(ast);
+        assertNotNull(ast.getChildNodes());
+        assertFalse(ast.getChildNodes().isEmpty());
     }
 }
