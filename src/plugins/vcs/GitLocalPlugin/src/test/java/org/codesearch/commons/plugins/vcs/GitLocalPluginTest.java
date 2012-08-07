@@ -22,6 +22,8 @@
  */
 package org.codesearch.commons.plugins.vcs;
 
+import static org.junit.Assert.*;
+
 import java.io.File;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -37,9 +39,11 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import com.mchange.util.AssertException;
+
 /**
  * Tests {@link GitLocalPlugin}.
- *
+ * 
  * @author Samuel Kogler
  */
 public class GitLocalPluginTest {
@@ -85,7 +89,7 @@ public class GitLocalPluginTest {
     @Before
     public void testSetRepository() throws Exception {
         FileUtils.deleteDirectory(new File("/tmp/codesearch-test-repo"));
-        //Checking out code
+        // Checking out code
         plugin.setRepository(getTestRepo());
         plugin.pullChanges();
     }
@@ -100,13 +104,13 @@ public class GitLocalPluginTest {
         fileIdentifier.setRepository(getTestRepo());
 
         FileDto result = plugin.getFile(fileIdentifier, VersionControlPlugin.UNDEFINED_VERSION);
-        assert (result != null);
-        assert ("version 3\n".equals(new String(result.getContent())));
-        assert (StringUtils.isNotBlank(result.getFilePath()));
-        assert (StringUtils.isNotBlank(result.getLastAlteration()));
-        assert (StringUtils.isNotBlank(result.getLastAuthor()));
-        assert (result.getLastAlteration().indexOf('\n') == -1);
-        assert (result.getLastAuthor().indexOf('\n') == -1);
+        assertNotNull(result);
+        assertEquals("version 3\n", new String(result.getContent()));
+        assertTrue(StringUtils.isNotBlank(result.getFilePath()));
+        assertTrue(StringUtils.isNotBlank(result.getLastAlteration()));
+        assertTrue(StringUtils.isNotBlank(result.getLastAuthor()));
+        assertEquals(-1, result.getLastAlteration().indexOf('\n'));
+        assertEquals(-1, result.getLastAuthor().indexOf('\n'));
     }
 
     @Test
@@ -115,8 +119,8 @@ public class GitLocalPluginTest {
         fileIdentifier.setFilePath("test.java");
         fileIdentifier.setRepository(getTestRepo());
 
-        FileDto result = plugin.getFile(fileIdentifier, "a471655110aba4ce116335fba6e0de5fa4cc5870"); //version 2
-        assert ("version 2\n".equals(new String(result.getContent())));
+        FileDto result = plugin.getFile(fileIdentifier, "a471655110aba4ce116335fba6e0de5fa4cc5870"); // version 2
+        assertEquals("version 2\n", new String(result.getContent()));
     }
 
     @Test
@@ -130,7 +134,7 @@ public class GitLocalPluginTest {
         } catch (VcsFileNotFoundException ex) {
             notFound = true;
         }
-        assert notFound;
+        assertTrue(notFound);
     }
 
     /**
@@ -139,9 +143,10 @@ public class GitLocalPluginTest {
     @Test
     public void testGetChangedFilesSinceRevision() throws Exception {
         String revision = VersionControlPlugin.UNDEFINED_VERSION;
-        Set<FileIdentifier> changes = plugin.getChangedFilesSinceRevision(revision, Collections.<String>emptyList(), Collections.<String>emptyList());
-        assert (changes != null);
-        assert (changes.size() == 3);
+        Set<FileIdentifier> changes = plugin.getChangedFilesSinceRevision(revision, Collections.<String> emptyList(), Collections
+                .<String> emptyList());
+        assertNotNull(changes);
+        assertEquals(8, changes.size());
     }
 
     /**
@@ -150,11 +155,11 @@ public class GitLocalPluginTest {
     @Test
     public void testGetRepositoryRevision() throws Exception {
         String result = plugin.getRepositoryRevision();
-        assert (result != null);
-        assert (!"0".equals(result));
+        assertNotNull (result);
+        assertNotSame("0", result);
     }
 
-    //TODO: can't leave username and password here, so this test is ignored
+    // TODO: can't leave username and password here, so this test is ignored
     @Ignore
     @Test
     public void testRepoWithBasicAuthentication() throws Exception {
@@ -165,7 +170,7 @@ public class GitLocalPluginTest {
         System.out.println(plugin.getFilesInDirectory("/", VersionControlPlugin.UNDEFINED_VERSION));
     }
 
-    //TODO: can't leave username and password here, so this test is ignored
+    // TODO: can't leave username and password here, so this test is ignored
     @Ignore
     @Test
     public void testRepoWithSshAuthentication() throws Exception {
