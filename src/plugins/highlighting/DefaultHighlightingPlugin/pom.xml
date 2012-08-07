@@ -1,38 +1,46 @@
 <?xml version="1.0"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <modelVersion>4.0.0</modelVersion>
-    <artifactId>DefaultHighlightingPlugin</artifactId>
-    <name>Codesearch: DefaultHighlightingPlugin</name>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>DefaultHighlightingPlugin</artifactId>
+	<name>Codesearch: DefaultHighlightingPlugin</name>
 
-    <parent>
-        <groupId>org.codesearch.plugins</groupId>
-        <artifactId>highlighting-plugins</artifactId>
-	    <version>0.1-RC2</version>
-    </parent>
+	<parent>
+		<groupId>org.codesearch.plugins</groupId>
+		<artifactId>highlighting-plugins</artifactId>
+		<version>0.1-RC2</version>
+	</parent>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.codesearch</groupId>
-            <artifactId>codesearch-commons</artifactId>
-            <version>0.1-RC2</version>
-        </dependency>
+	<dependencies>
+		<dependency>
+			<groupId>org.codesearch</groupId>
+			<artifactId>codesearch-commons</artifactId>
+			<version>0.1-RC2</version>
+		</dependency>
 
-        <dependency>
-            <groupId>commons-codec</groupId>
-            <artifactId>commons-codec</artifactId>
-        </dependency>
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+		</dependency>
 
-        <dependency>
-            <groupId>org.codesearch.customlibs</groupId>
-            <artifactId>codesearch-jhighlight</artifactId>
-            <version>0.1-RC2</version>
-        </dependency>
+		<dependency>
+			<groupId>org.codesearch.customlibs</groupId>
+			<artifactId>codesearch-jhighlight</artifactId>
+			<version>0.1-RC2</version>
+		</dependency>
 
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>1.3.2</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
 </project>

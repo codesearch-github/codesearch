@@ -21,33 +21,31 @@
 
 package org.codesearch.commons.plugins.defaulthighlightingplugin;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
+import static org.junit.Assert.*;
 
-import org.apache.log4j.Logger;
+import java.io.IOException;
+
+import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
 /**
- *
- * @author David Froehlich
+ * Tests whether the highlighting returns a non-null string and whether it has changed
+ * from the original(which it should).
+ * @author Samuel Kogler
  */
 public class DefaultHighlightingPluginTest {
     private DefaultHighlightingPlugin plugin = new DefaultHighlightingPlugin();
+    private String fileContent;
+    
+    public DefaultHighlightingPluginTest() throws IOException {
+        fileContent = IOUtils.toString(getClass().getResourceAsStream("DefaultHighlightingPlugin.java"), "UTF-8");
+    }
 
-     /* Logger */
-    private static final Logger LOG = Logger.getLogger(DefaultHighlightingPluginTest.class);
-    /**
-     * Test of parseToHtml method, of class JavaHighlightingPlugin.
-     */
     @Test
     public void testParseToHtml() throws Exception {
-        BufferedReader br = new BufferedReader(new FileReader("/home/david/workspace/svnsearch/WakMusic/src/java/servlets/AddEvent.java"));
-        String input = "";
-        while(br.ready()){
-            input += br.readLine() + "\n";
-        }
-
-        String result = plugin.parseToHtml(input.getBytes(), "text/x-java-source");
-        LOG.info(result);
+        String result = plugin.parseToHtml(fileContent.getBytes(), "text/x-java-source");
+        assertNotNull(result);
+        assertFalse(result.isEmpty());
+        assertNotSame(result, fileContent);
     }
 }
