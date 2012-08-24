@@ -29,7 +29,7 @@ import org.codesearch.searcher.shared.JumpLocation;
 import org.codesearch.searcher.shared.SearchResultDto;
 import org.codesearch.searcher.shared.SearchType;
 import org.codesearch.searcher.shared.SearchViewData;
-import org.codesearch.searcher.shared.SearcherServiceException;
+import org.codesearch.searcher.shared.exception.SearcherServiceException;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;

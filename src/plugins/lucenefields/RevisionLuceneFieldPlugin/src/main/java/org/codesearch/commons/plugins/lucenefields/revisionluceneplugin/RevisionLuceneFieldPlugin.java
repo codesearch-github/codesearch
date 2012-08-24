@@ -30,7 +30,7 @@ import org.codesearch.commons.plugins.vcs.FileDto;
  *
  * @author David Froehlich
  */
-public class RevisionLuceneFieldPlugin extends LuceneFieldPlugin {
+public class RevisionLuceneFieldPlugin implements LuceneFieldPlugin {
 
     /**  {@inheritDoc} */
     @Override
@@ -60,5 +60,11 @@ public class RevisionLuceneFieldPlugin extends LuceneFieldPlugin {
     @Override
     public Analyzer getLowerCaseAnalyzer() {
         return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public String getPurposes() {
+        return getFieldName();
     }
 }

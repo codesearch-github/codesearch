@@ -26,11 +26,13 @@
 package org.codesearch.commons.plugins.highlighting;
 
 import org.codesearch.commons.plugins.Plugin;
+import org.codesearch.commons.plugins.PluginBase;
 
 /**
  * Base interface for all Highlighting plugins
  * @author David Froehlich
  */
+@PluginBase
 public interface HighlightingPlugin extends Plugin {
 
     /**

@@ -1,5 +1,6 @@
 package org.codesearch.commons.plugins;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -18,12 +19,12 @@ import org.codesearch.commons.validator.ValidationException;
 public class MockVersionControlPluginLoader implements PluginLoader {
 
     @Override
-    public <T extends Plugin> List<T> getMultiplePluginsForPurpose(Class<T> clazz, String purpose) throws PluginLoaderException {
-        return null;
+    public <T extends Plugin> List<T> getAllPluginsOfClass(Class<T> clazz) {
+        return new LinkedList<T>();
     }
 
     @Override
-    public <T extends Plugin> T getPlugin(Class<T> clazz, String purpose) throws PluginLoaderException {
+    public <T extends Plugin> T getPlugin(Class<T> clazz, String purpose)  {
         if (clazz.equals(VersionControlPlugin.class)) {
             return clazz.cast(new VersionControlPlugin() {
 
@@ -70,6 +71,12 @@ public class MockVersionControlPluginLoader implements PluginLoader {
                 @Override
                 public void pullChanges() {
                     throw new UnsupportedOperationException("Not supported yet.");
+                }
+
+                @Override
+                public boolean supportsBlacklistingChanges() {
+                    // TODO Auto-generated method stub
+                    return false;
                 }
             });
         } else {

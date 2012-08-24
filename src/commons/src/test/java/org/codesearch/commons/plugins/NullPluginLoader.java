@@ -1,5 +1,6 @@
 package org.codesearch.commons.plugins;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -9,12 +10,12 @@ import java.util.List;
 public class NullPluginLoader implements PluginLoader{
 
     @Override
-    public <T extends Plugin> List<T> getMultiplePluginsForPurpose(Class<T> clazz, String purpose) throws PluginLoaderException {
-        return null;
+    public <T extends Plugin> List<T> getAllPluginsOfClass(Class<T> clazz) {
+        return new LinkedList<T>();
     }
 
     @Override
-    public <T extends Plugin> T getPlugin(Class<T> clazz, String purpose) throws PluginLoaderException {
+    public <T extends Plugin> T getPlugin(Class<T> clazz, String purpose) {
         return null;
     }
 

@@ -111,9 +111,8 @@ public class HgLocalPlugin implements VersionControlPlugin {
     }
 
     /**
-     * {@inheritDoc} WARNING: The HgLocalPlugin does not support
-     * black-/whitelist patterns when retrieving changed files, these lists will
-     * simply be ignored
+     * {@inheritDoc} 
+     * Does not support black-/whitelist patterns when retrieving changed files.
      */
     @Override
     public Set<FileIdentifier> getChangedFilesSinceRevision(String revision, List<String> blacklistPatterns, List<String> whitelistPatterns) throws VersionControlPluginException {
@@ -292,5 +291,11 @@ public class HgLocalPlugin implements VersionControlPlugin {
         } catch (VersionControlPluginException ex) {
             throw new VersionControlPluginException("Pulling new changes failed: \n" + ex);
         }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean supportsBlacklistingChanges() {
+        return false;
     }
 }

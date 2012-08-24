@@ -1,18 +1,18 @@
 /**
  * Copyright 2010 David Froehlich <david.froehlich@businesssoftware.at>, Samuel
  * Kogler <samuel.kogler@gmail.com>, Stephan Stiboller <stistc06@htlkaindorf.at>
- *
+ * 
  * This file is part of Codesearch.
- *
+ * 
  * Codesearch is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation, either version 3 of the License, or (at your option) any later
  * version.
- *
+ * 
  * Codesearch is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
  * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public License along with
  * Codesearch. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -36,12 +36,10 @@ import org.codesearch.commons.configuration.properties.IndexStatusManager;
 import org.codesearch.commons.database.DBAccess;
 import org.codesearch.commons.database.DatabaseAccessException;
 import org.codesearch.commons.plugins.PluginLoader;
-import org.codesearch.commons.plugins.PluginLoaderException;
 import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
 import org.codesearch.commons.plugins.codeanalyzing.ast.ExternalUsage;
 import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
 import org.codesearch.commons.plugins.highlighting.HighlightingPlugin;
-import org.codesearch.commons.plugins.highlighting.HighlightingPluginException;
 import org.codesearch.commons.plugins.lucenefields.LuceneFieldPlugin;
 import org.codesearch.commons.plugins.lucenefields.LuceneFieldPluginLoader;
 import org.codesearch.commons.plugins.vcs.FileIdentifier;
@@ -59,8 +57,8 @@ import org.codesearch.searcher.shared.SearchField;
 import org.codesearch.searcher.shared.SearchResultDto;
 import org.codesearch.searcher.shared.SearchType;
 import org.codesearch.searcher.shared.SearchViewData;
-import org.codesearch.searcher.shared.SearcherServiceException;
 import org.codesearch.searcher.shared.SidebarNode;
+import org.codesearch.searcher.shared.exception.SearcherServiceException;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.google.inject.Inject;
@@ -68,7 +66,7 @@ import com.google.inject.Singleton;
 
 /**
  * Service used for search operations.
- *
+ * 
  * @author Samuel Kogler
  */
 @Singleton
@@ -93,8 +91,7 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
 
     @Inject
     public SearcherServiceImpl(DocumentSearcherImpl documentSearcher, ConfigurationReader configurationReader,
-            IndexStatusManager indexStatusManager, PluginLoader pluginLoader, DBAccess dba,
-            LuceneFieldPluginLoader luceneFieldPluginLoader) {
+            IndexStatusManager indexStatusManager, PluginLoader pluginLoader, DBAccess dba, LuceneFieldPluginLoader luceneFieldPluginLoader) {
         this.documentSearcher = documentSearcher;
         this.indexStatusManager = indexStatusManager;
         this.configurationReader = configurationReader;
@@ -114,10 +111,11 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
      * {@inheritDoc}
      */
     @Override
-    public List<SearchResultDto> doSearch(String query, boolean caseSensitive, SearchType searchType, Set<String> selection, int maxResults) throws SearcherServiceException {
+    public List<SearchResultDto> doSearch(String query, boolean caseSensitive, SearchType searchType, Set<String> selection, int maxResults)
+            throws SearcherServiceException {
         List<SearchResultDto> resultItems = new LinkedList<SearchResultDto>();
         try {
-            //TODO fix incompatibility
+            // TODO fix incompatibility
             if (searchType == SearchType.REPOSITORIES) {
                 resultItems = documentSearcher.search(query, caseSensitive, selection, new HashSet<String>(), maxResults);
             } else if (searchType == SearchType.REPOSITORY_GROUPS) {
@@ -137,29 +135,40 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
      * {@inheritDoc}
      */
     @Override
-    public FileDto getFile(String repoName, String filePath, boolean highlight, boolean insertCodeNavigationLinks) throws SearcherServiceException {
-        LOG.info("Retrieving file: " + filePath + " @ " + repoName);
-        FileDto file = new FileDto();
-        String indexedRevision = indexStatusManager.getStatus(repoName);
+    public FileDto getFile(String repoName, String filePath, boolean highlight, boolean insertCodeNavigationLinks)
+            throws SearcherServiceException {
         try {
-            RepositoryDto repositoryDto = configurationReader.getRepositoryByName(repoName);
-            VersionControlPlugin vcPlugin = pluginLoader.getPlugin(VersionControlPlugin.class, repositoryDto.getVersionControlSystem());
+            LOG.info("Retrieving file: " + filePath + " @ " + repoName);
 
-            vcPlugin.setRepository(repositoryDto);
-            FileIdentifier fileIdentifier = new FileIdentifier();
-            fileIdentifier.setFilePath(filePath);
-            fileIdentifier.setRepository(repositoryDto);
+            FileDto file = new FileDto();
+            String indexedRevision = indexStatusManager.getStatus(repoName);
             org.codesearch.commons.plugins.vcs.FileDto vcFile;
+
             try {
-                vcFile = vcPlugin.getFile(fileIdentifier, indexedRevision);
-            } catch (VcsFileNotFoundException ex) {
-                // Pull changes and try again
-                vcPlugin.pullChanges();
+                RepositoryDto repositoryDto = configurationReader.getRepositoryByName(repoName);
+                VersionControlPlugin vcPlugin = pluginLoader.getPlugin(VersionControlPlugin.class, repositoryDto.getVersionControlSystem());
+
+                if (vcPlugin == null) {
+                    throw new SearcherServiceException("No VCS plugin found for VCS:" + repositoryDto.getVersionControlSystem());
+                }
+                vcPlugin.setRepository(repositoryDto);
+                FileIdentifier fileIdentifier = new FileIdentifier();
+                fileIdentifier.setFilePath(filePath);
+                fileIdentifier.setRepository(repositoryDto);
+
                 try {
                     vcFile = vcPlugin.getFile(fileIdentifier, indexedRevision);
-                } catch (VcsFileNotFoundException ex1) {
-                    throw new SearcherServiceException("File not found: " + fileIdentifier + "@" + indexedRevision);
+                } catch (VcsFileNotFoundException ex) {
+                    // Pull changes and try again
+                    vcPlugin.pullChanges();
+                    try {
+                        vcFile = vcPlugin.getFile(fileIdentifier, indexedRevision);
+                    } catch (VcsFileNotFoundException ex1) {
+                        throw new SearcherServiceException("File not found: " + fileIdentifier + "@" + indexedRevision);
+                    }
                 }
+            } catch (VersionControlPluginException ex) {
+                throw new SearcherServiceException("Error retrieving file: \n" + ex);
             }
 
             // GET OUTLINE IF EXISTING
@@ -182,7 +191,8 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
                     }
                 } else {
                     // in case the last analyzed revision does not match the last indexed revision
-                    LOG.warn("Code analysis data for repository " + repoName + " is not at the same revision as the index, disabling code navigation.");
+                    LOG.warn("Code analysis data for repository " + repoName
+                            + " is not at the same revision as the index, disabling code navigation.");
                     insertCodeNavigationLinks = false;
                 }
             } catch (DatabaseAccessException ex) {
@@ -212,40 +222,55 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
             byte[] fileContent = vcFile.getContent().clone();
             String escapeStartToken = "";
             String escapeEndToken = "";
-            String processedFileContent;
+            String processedFileContent = null;
             if (highlight) {
-                try {
-                    HighlightingPlugin hlPlugin = null;
-                    hlPlugin = pluginLoader.getPlugin(HighlightingPlugin.class, guessedMimeType);
-                    escapeStartToken = hlPlugin.getEscapeStartToken();
-                    escapeEndToken = hlPlugin.getEscapeEndToken();
-                    if (insertCodeNavigationLinks) {
-                        fileContent = addUsageLinksToFileContent(fileContent, filePath, repoName, escapeStartToken, escapeEndToken);
+                HighlightingPlugin hlPlugin = pluginLoader.getPlugin(HighlightingPlugin.class, guessedMimeType);
+                if (hlPlugin == null) {
+                    LOG.debug("No suitable highlighting plugin found, trying to display raw file");
+                    processedFileContent = StringEscapeUtils.escapeHtml(new String(vcFile.getContent()));
+                } else {
+                    try {
+                        if (!file.isBinary()) {
+                            escapeStartToken = hlPlugin.getEscapeStartToken();
+                            escapeEndToken = hlPlugin.getEscapeEndToken();
+                            if (insertCodeNavigationLinks) {
+                                try {
+                                    byte[] fileContentWithCodeNavLinks = addUsageLinksToFileContent(fileContent, filePath, repoName,
+                                            escapeStartToken, escapeEndToken);
+                                    fileContent = fileContentWithCodeNavLinks;
+                                } catch (Exception ex) {
+                                    // If there is an error, use file content without code navigation links
+                                    LOG.error("Error while inserting code navigation links", ex);
+                                }
+                            }
+                        }
+                        processedFileContent = hlPlugin.parseToHtml(fileContent, guessedMimeType);
+                    } catch (Exception ex) {
+                        LOG.error("Error while highlighting file content", ex);
+                        // If anything went wrong while highlighting, discard changes and escape to HTML
+                        processedFileContent = StringEscapeUtils.escapeHtml(new String(vcFile.getContent()));
                     }
-                    processedFileContent = hlPlugin.parseToHtml(fileContent, guessedMimeType);
-                } catch (PluginLoaderException ex) {
-                    LOG.debug("No suitable highlighting plugin found");
-                    //If anything went wrong, discard changes and escape to HTML
-                    processedFileContent = StringEscapeUtils.escapeHtml(new String(vcFile.getContent()));
-                } catch (HighlightingPluginException ex) {
-                    LOG.error(ex);
-                    //If anything went wrong, discard changes and escape to HTML
-                    processedFileContent = StringEscapeUtils.escapeHtml(new String(vcFile.getContent()));
                 }
-                file.setFileContent(processedFileContent);
             } else if (insertCodeNavigationLinks) {
-                file.setFileContent(new String(addUsageLinksToFileContent(fileContent, filePath, repoName, escapeStartToken, escapeEndToken)));
+                try {
+                    byte[] fileContentWithCodeNavLinks = addUsageLinksToFileContent(fileContent, filePath, repoName,
+                            escapeStartToken, escapeEndToken);
+                    processedFileContent = new String(fileContentWithCodeNavLinks);
+                } catch (Exception ex) {
+                    // If there is an error, use file content without code navigation links
+                    LOG.error("Error while inserting code navigation links", ex);
+                }
+                
             } else {
-                file.setFileContent(StringEscapeUtils.escapeHtml(new String(vcFile.getContent())));
+                processedFileContent = StringEscapeUtils.escapeHtml(new String(vcFile.getContent()));
             }
-
-        } catch (VersionControlPluginException ex) {
-            throw new SearcherServiceException("Error retrieving file: \n" + ex);
-        } catch (PluginLoaderException ex) {
-            throw new SearcherServiceException("Problem loading plugin: \n" + ex);
+            file.setFileContent(processedFileContent);
+            LOG.debug("Finished retrieving file content for file: " + filePath + " @ " + repoName);
+            return file;
+        } catch (NullPointerException ex) {
+            LOG.error("Nullpointer while getting file", ex);
+            throw new SearcherServiceException(ex);
         }
-        LOG.debug("Finished retrieving file content for file: " + filePath + " @ " + repoName);
-        return file;
     }
 
     @Override
@@ -277,17 +302,6 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
         return null;
     }
 
-//TODO: Implement this properly
-//    private String parseToHtml(String input, String escapeStartToken, String escapeEndToken) {
-//        String[] outerParts = input.split(escapeStartToken);
-//        for (String outerPart : outerParts) {
-//            String[] innerParts = outerPart.split(escapeEndToken);
-//            for (String innerPart : innerParts) {
-//
-//            }
-//        }
-//        return "";
-//    }
     private String getFilePathOfDeclaration(String repository, String className, String originFilePath) throws DatabaseAccessException {
         List<String> fileImports = dba.getImportsForFile(originFilePath, repository);
         String targetFilePath;
@@ -339,31 +353,32 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
         }
     }
 
-    private byte[] addUsageLinksToFileContent(byte[] fileContentBytes, String filePath, String repository, String hlEscapeStartToken, String hlEscapeEndToken) {
+    private byte[] addUsageLinksToFileContent(byte[] fileContentBytes, String filePath, String repository, String hlEscapeStartToken,
+            String hlEscapeEndToken) {
         try {
             List<Usage> usages = dba.getUsagesForFile(filePath, repository);
             if (usages == null) {
-                //in case there is no entry for the filePath it is a file that has not been analyzed
+                // in case there is no entry for the filePath it is a file that has not been analyzed
                 return fileContentBytes;
             }
             String resultString = "";
             String[] contentLines = new String(fileContentBytes).split("\n");
             int usageIndex = 0;
-            outer:
-            for (int lineNumber = 1; lineNumber <= contentLines.length; lineNumber++) {
+            outer: for (int lineNumber = 1; lineNumber <= contentLines.length; lineNumber++) {
                 String currentLine = contentLines[lineNumber - 1];
                 while (usageIndex < usages.size()) {
                     Usage currentUsage = usages.get(usageIndex);
                     if (currentUsage.getStartLine() == lineNumber) {
                         int startColumn = currentUsage.getStartColumn();
-                        String preamble = currentLine.substring(0, startColumn - 1); //-1
+                        String preamble = currentLine.substring(0, startColumn - 1); // -1
                         String javaScriptEvent;
                         if (currentUsage instanceof ExternalUsage) {
                             javaScriptEvent = "goToUsage(" + usageIndex + ");";
                         } else {
                             javaScriptEvent = "goToLine(" + currentUsage.getReferenceLine() + ");";
                         }
-                        String anchorBegin = hlEscapeStartToken + "<a class='testLink' onclick='" + javaScriptEvent + "'>" + hlEscapeEndToken;
+                        String anchorBegin = hlEscapeStartToken + "<a class='testLink' onclick='" + javaScriptEvent + "'>"
+                                + hlEscapeEndToken;
                         String anchorEnd = hlEscapeStartToken + "</a>" + hlEscapeEndToken;
                         String remainingLine = currentLine.substring(startColumn - 1 + currentUsage.getReplacedString().length());
                         currentLine = preamble + anchorBegin + currentUsage.getReplacedString() + anchorEnd + remainingLine;
@@ -375,7 +390,7 @@ public class SearcherServiceImpl extends RemoteServiceServlet implements Searche
                 }
                 resultString += currentLine + "\n";
             }
-            resultString = resultString.substring(0, resultString.length() - 1); //Truncates the last \n char
+            resultString = resultString.substring(0, resultString.length() - 1); // Truncates the last \n char
             return resultString.getBytes();
         } catch (DatabaseAccessException ex) {
             LOG.error(ex);

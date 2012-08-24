@@ -31,6 +31,7 @@ import java.util.Set;
 import org.codesearch.commons.configuration.ConfigurationReader;
 import org.codesearch.commons.configuration.InvalidConfigurationException;
 import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
+import org.codesearch.commons.plugins.PluginLoaderException;
 import org.codesearch.commons.plugins.PluginLoaderImpl;
 import org.codesearch.commons.plugins.lucenefields.LuceneFieldPluginLoaderImpl;
 import org.codesearch.searcher.shared.SearchResultDto;
@@ -47,7 +48,7 @@ public class DocumentSearcherTest {
     private DocumentSearcherImpl instance;
 
 
-    public DocumentSearcherTest() throws InvalidConfigurationException {
+    public DocumentSearcherTest() throws InvalidConfigurationException, PluginLoaderException {
         ConfigurationReader configurationReader = new XmlConfigurationReader(null);
         instance = new DocumentSearcherImpl(configurationReader, new LuceneFieldPluginLoaderImpl(new PluginLoaderImpl(configurationReader)));
     }

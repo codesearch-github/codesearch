@@ -125,9 +125,9 @@
                         </g:HTMLPanel>
                     </g:ScrollPanel>
                 </g:center>
-                <g:west size="300">
+                <g:east size="300">
                     <g:TabLayoutPanel ui:field="sidebarTabPanel" barUnit='EM' barHeight='1.7' height="100%" />
-                </g:west>
+                </g:east>
             </g:SplitLayoutPanel>
         </g:center>
     </g:DockLayoutPanel>

@@ -272,12 +272,12 @@ public class FileViewImpl extends Composite implements FileView {
     private void showSidebar(boolean show) {
         if (show) {
             splitWrapper.clear();
-            splitWrapper.addWest(sidebarTabPanel, 300);
+            splitWrapper.addEast(sidebarTabPanel, 300);
             splitWrapper.add(scrollWrapper);
         } else {
             splitWrapper.remove(sidebarTabPanel);
         }
-        splitWrapper.animate(100);
+        splitWrapper.animate(50);
     }
 
     private void updateSidebar() {

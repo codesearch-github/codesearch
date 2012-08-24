@@ -31,7 +31,7 @@ import org.codesearch.commons.plugins.vcs.FileDto;
  * Plugin that adds repository groups to the index.
  * @author Samuel Kogler
  */
-public class RepositoryGroupLuceneFieldPlugin extends LuceneFieldPlugin {
+public class RepositoryGroupLuceneFieldPlugin implements LuceneFieldPlugin {
 
     /** {@inheritDoc} */
     @Override
@@ -42,7 +42,7 @@ public class RepositoryGroupLuceneFieldPlugin extends LuceneFieldPlugin {
     /** {@inheritDoc} */
     @Override
     public String getPurposes() {
-        return "lucene_field_plugin";
+        return getFieldName();
     }
 
     /** {@inheritDoc} */

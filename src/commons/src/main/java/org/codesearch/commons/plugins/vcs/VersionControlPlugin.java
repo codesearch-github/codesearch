@@ -26,12 +26,14 @@ import java.util.Set;
 
 import org.codesearch.commons.configuration.dto.RepositoryDto;
 import org.codesearch.commons.plugins.Plugin;
+import org.codesearch.commons.plugins.PluginBase;
 import org.codesearch.commons.validator.ValidationException;
 
 /**
  * Base for all version control plugins.
  * @author Samuel Kogler
  */
+@PluginBase
 public interface VersionControlPlugin extends Plugin {
     public final String UNDEFINED_VERSION = "-1";
 
@@ -69,6 +71,13 @@ public interface VersionControlPlugin extends Plugin {
      */
     Set<FileIdentifier> getChangedFilesSinceRevision(String revision, List<String> blacklistPatterns, List<String> whitelistPatterns) throws VersionControlPluginException;
 
+    /**
+     * Returns whether this plugin uses the black- and whitelist entries when retrieving changes files.
+     * If false is returned, the caller is responsible for black- and whitelisting.
+     * @return
+     */
+    boolean supportsBlacklistingChanges();
+    
     /**
      * Extracts and returns the revision number of the currently set revision.
      * @return The revision number

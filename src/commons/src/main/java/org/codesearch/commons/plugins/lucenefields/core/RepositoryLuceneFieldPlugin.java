@@ -31,7 +31,7 @@ import org.codesearch.commons.plugins.vcs.FileDto;
  * LuceneFieldPlugin that returns the name of the repository
  * @author David Froehlich
  */
-public class RepositoryLuceneFieldPlugin extends LuceneFieldPlugin {
+public class RepositoryLuceneFieldPlugin implements LuceneFieldPlugin {
 
     /**
      * returns the name of the repository
@@ -47,7 +47,7 @@ public class RepositoryLuceneFieldPlugin extends LuceneFieldPlugin {
     /** {@inheritDoc} */
     @Override
     public String getPurposes() {
-        return "lucene_field_plugin";
+        return getFieldName();
     }
 
     /** {@inheritDoc} */

@@ -321,6 +321,7 @@ public class DBAccessImpl implements DBAccess {
         ObjectInputStream regObjectStream;
         ResultSetHandler<Map<String, byte[]>> h = new ResultSetHandler<Map<String, byte[]>>() {
 
+            @Override
             public Map<String, byte[]> handle(ResultSet rs) throws SQLException {
                 Map<String, byte[]> results = new HashMap<String, byte[]>();
 

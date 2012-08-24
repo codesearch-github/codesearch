@@ -24,6 +24,7 @@ package org.codesearch.commons.plugins.codeanalyzing;
 import java.util.List;
 
 import org.codesearch.commons.plugins.Plugin;
+import org.codesearch.commons.plugins.PluginBase;
 import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
 import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
 
@@ -32,6 +33,7 @@ import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
  * Parses all information necessary to display an outline of the file and provide code navigation
  * @author David Froehlich
  */
+@PluginBase
 public interface CodeAnalyzerPlugin extends Plugin {
 
     /**

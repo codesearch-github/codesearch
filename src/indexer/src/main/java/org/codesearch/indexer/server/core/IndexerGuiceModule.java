@@ -26,7 +26,6 @@ import java.io.InputStream;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
-import org.codesearch.commons.utils.QuartzGuiceJobFactory;
 import org.codesearch.indexer.server.manager.IndexingManager;
 import org.codesearch.indexer.server.rpc.DashboardServiceImpl;
 import org.codesearch.indexer.server.rpc.LogServiceImpl;
@@ -35,7 +34,6 @@ import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SchedulerFactory;
 import org.quartz.impl.StdSchedulerFactory;
-import org.quartz.spi.JobFactory;
 
 import com.google.inject.Singleton;
 import com.google.inject.servlet.ServletModule;

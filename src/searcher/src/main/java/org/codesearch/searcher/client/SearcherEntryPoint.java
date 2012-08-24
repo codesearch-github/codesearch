@@ -26,6 +26,7 @@ import org.codesearch.searcher.client.ui.RootContainer;
 import com.google.gwt.activity.shared.ActivityManager;
 import com.google.gwt.activity.shared.ActivityMapper;
 import com.google.gwt.core.client.EntryPoint;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.place.shared.PlaceController;
 import com.google.gwt.place.shared.PlaceHistoryHandler;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
@@ -58,5 +59,7 @@ public class SearcherEntryPoint implements EntryPoint {
 
         RootLayoutPanel.get().add(rootContainer);
         historyHandler.handleCurrentHistory();
+        
+        GWT.setUncaughtExceptionHandler(new DefaultExceptionHandler());
     }
 }

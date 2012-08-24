@@ -9,11 +9,10 @@ import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.PerFieldAnalyzerWrapper;
 import org.codesearch.commons.constants.IndexConstants;
 import org.codesearch.commons.plugins.PluginLoader;
-import org.codesearch.commons.plugins.PluginLoaderException;
 
 /**
  * Implements {@link LuceneFieldPluginLoader}
- *
+ * 
  * @author Samuel Kogler
  */
 public class LuceneFieldPluginLoaderImpl implements LuceneFieldPluginLoader {
@@ -25,9 +24,8 @@ public class LuceneFieldPluginLoaderImpl implements LuceneFieldPluginLoader {
 
     @Inject
     public LuceneFieldPluginLoaderImpl(PluginLoader pluginLoader) {
-        try {
-            luceneFieldPlugins = pluginLoader.getMultiplePluginsForPurpose(LuceneFieldPlugin.class, "lucene_field_plugin");
-        } catch (PluginLoaderException ex) {
+        luceneFieldPlugins = pluginLoader.getAllPluginsOfClass(LuceneFieldPlugin.class);
+        if (luceneFieldPlugins.isEmpty()) {
             LOG.warn("No LuceneFieldPlugins could be found. Indexing will not create a usable index");
         }
 

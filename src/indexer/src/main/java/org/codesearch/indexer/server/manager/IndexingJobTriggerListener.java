@@ -15,17 +15,12 @@
 package org.codesearch.indexer.server.manager;
 
 import static org.quartz.JobBuilder.newJob;
-import static org.quartz.TriggerBuilder.newTrigger;
 
-import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 
 import javax.inject.Inject;
 
 import org.apache.log4j.Logger;
-import org.codesearch.commons.configuration.dto.RepositoryDto;
-import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.Scheduler;
@@ -59,7 +54,6 @@ public class IndexingJobTriggerListener extends TriggerListenerSupport implement
         return IndexingJobTriggerListener.class.getName();
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public boolean vetoJobExecution(Trigger trigger, JobExecutionContext context) {
         Scheduler scheduler = context.getScheduler();

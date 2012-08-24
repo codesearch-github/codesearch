@@ -2,6 +2,7 @@ package org.codesearch.indexer.server.manager;
 
 import javax.inject.Inject;
 
+import org.apache.log4j.Logger;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.JobListener;
@@ -12,6 +13,7 @@ import org.quartz.JobListener;
  */
 public class IndexingJobExecutionListener implements JobListener {
 
+    private static final Logger LOG = Logger.getLogger(IndexingJobExecutionListener.class);
     private IndexingManager indexingManager;
     
     /**
@@ -31,7 +33,6 @@ public class IndexingJobExecutionListener implements JobListener {
     /** {@inheritDoc} */
     @Override
     public void jobToBeExecuted(JobExecutionContext context) {
-        // TODO Auto-generated method stub
 
     }
 

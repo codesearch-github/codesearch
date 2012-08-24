@@ -22,19 +22,18 @@ import javax.servlet.ServletContextEvent;
 
 import org.apache.log4j.Logger;
 import org.codesearch.commons.CommonsGuiceModule;
-import org.quartz.Scheduler;
-
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.servlet.GuiceServletContextListener;
-import java.util.logging.Level;
 import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
+import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SimpleScheduleBuilder;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.quartz.spi.JobFactory;
+
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.servlet.GuiceServletContextListener;
 
 /**
  *

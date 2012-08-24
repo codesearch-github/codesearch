@@ -18,17 +18,19 @@
  */
 package org.codesearch.commons.configuration;
 
-import com.google.inject.Inject;
 import java.io.IOException;
 import java.util.List;
-import java.util.logging.Level;
+
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.Term;
-import org.apache.lucene.search.*;
+import org.apache.lucene.search.BooleanClause;
+import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.codesearch.commons.configuration.dto.RepositoryDto;
@@ -36,7 +38,6 @@ import org.codesearch.commons.configuration.properties.IndexStatusManager;
 import org.codesearch.commons.constants.IndexConstants;
 import org.codesearch.commons.database.DBAccess;
 import org.codesearch.commons.database.DatabaseAccessException;
-import org.codesearch.commons.plugins.PluginLoader;
 import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
 
 /**

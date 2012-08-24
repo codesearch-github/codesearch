@@ -129,9 +129,8 @@ public class GitLocalPlugin implements VersionControlPlugin {
     }
 
     /**
-     * {@inheritDoc} WARNING: The GitLocalPlugin does not support
-     * black-/whitelist patterns when retrieving changed files, these lists will
-     * simply be ignored
+     * {@inheritDoc} 
+     * Does not support black-/whitelist patterns when retrieving changed files.
      */
     @Override
     public Set<FileIdentifier> getChangedFilesSinceRevision(String revision, List<String> blacklistPatterns, List<String> whitelistPatterns) throws VersionControlPluginException {
@@ -329,5 +328,11 @@ public class GitLocalPlugin implements VersionControlPlugin {
         } catch (VersionControlPluginException ex) {
             throw new VersionControlPluginException("Pulling new changes failed: \n" + ex);
         }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean supportsBlacklistingChanges() {
+        return false;
     }
 }

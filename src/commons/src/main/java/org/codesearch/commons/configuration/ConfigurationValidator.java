@@ -1,33 +1,17 @@
 package org.codesearch.commons.configuration;
 
-import com.google.inject.Inject;
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.index.CorruptIndexException;
-import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.IndexWriterConfig;
-import org.apache.lucene.index.Term;
-import org.apache.lucene.search.*;
-import org.apache.lucene.search.BooleanClause.Occur;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.FSDirectory;
-import org.apache.lucene.util.Version;
 import org.codesearch.commons.configuration.dto.RepositoryDto;
-import org.codesearch.commons.constants.IndexConstants;
-import org.codesearch.commons.database.DBAccess;
 import org.codesearch.commons.plugins.PluginLoader;
-import org.codesearch.commons.plugins.PluginLoaderException;
 import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
 
+import com.google.inject.Inject;
+
 /**
- *
+ * 
  * @author Samuel Kogler
  */
 public class ConfigurationValidator {
@@ -57,19 +41,16 @@ public class ConfigurationValidator {
     private void validateRepositories() throws InvalidConfigurationException {
 
         for (RepositoryDto repository : configurationReader.getRepositories()) {
-            if (StringUtils.isEmpty(repository.getName())
-                    || StringUtils.isEmpty(repository.getUrl())
+            if (StringUtils.isEmpty(repository.getName()) || StringUtils.isEmpty(repository.getUrl())
                     || StringUtils.isEmpty(repository.getVersionControlSystem())) {
                 throw new InvalidConfigurationException("Mandatory repository fields not specified. "
                         + "At least name, url and version-control-system are needed.");
             }
 
-            try {
-                pluginLoader.getPlugin(VersionControlPlugin.class, repository.getVersionControlSystem());
-            } catch (PluginLoaderException ex) {
+            VersionControlPlugin vcsPlugin = pluginLoader.getPlugin(VersionControlPlugin.class, repository.getVersionControlSystem());
+            if (vcsPlugin == null) {
                 throw new InvalidConfigurationException("No version control plugin found for specified purpose: "
-                        + repository.getVersionControlSystem()
-                        + "\nThis value was configured for repository: " + repository.getName());
+                        + repository.getVersionControlSystem() + "\nThis value was configured for repository: " + repository.getName());
             }
 
             for (String s : repository.getBlacklistEntries()) {

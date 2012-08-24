@@ -36,7 +36,7 @@ import org.codesearch.commons.utils.mime.MimeTypeUtil;
  *
  * @author David Froehlich
  */
-public class ContentLuceneFieldPlugin extends LuceneFieldPlugin {
+public class ContentLuceneFieldPlugin implements LuceneFieldPlugin {
 
     /**
      * checks whether the file is flagged as binary
@@ -60,7 +60,7 @@ public class ContentLuceneFieldPlugin extends LuceneFieldPlugin {
     /** {@inheritDoc} */
     @Override
     public String getPurposes() {
-        return "lucene_field_plugin";
+        return getFieldName();
     }
 
     /** {@inheritDoc} */

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.codesearch</groupId>
     <artifactId>codesearch</artifactId>
@@ -11,10 +10,7 @@
     <description>A java code search appplication</description>
 
     <modules>
-		<!--order for maven dependency plugin important!
-		    build custom-libs and plugins before indexer and searcher are packaged.
-			to avoid this order add plugin dependencies to indexer and searcher and
-			remove dependency plugin.-->
+        <!--order for maven dependency plugin important! build custom-libs and plugins before indexer and searcher are packaged. to avoid this order add plugin dependencies to indexer and searcher and remove dependency plugin. -->
         <module>commons</module>
         <module>custom-libs</module>
         <module>plugins</module>
@@ -29,9 +25,14 @@
     </properties>
 
 
-	<!-- DEFINES VERSIONS OF DEPENDENCIES FOR MODULES -->
+    <!-- DEFINES VERSIONS OF DEPENDENCIES FOR MODULES -->
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>13.0</version>
+            </dependency>
             <dependency>
                 <groupId>com.google.inject</groupId>
                 <artifactId>guice</artifactId>
@@ -42,7 +43,7 @@
                 <artifactId>guice-servlet</artifactId>
                 <version>3.0</version>
             </dependency>
-			<!-- COMMONS -->
+            <!-- COMMONS -->
             <dependency>
                 <groupId>commons-configuration</groupId>
                 <artifactId>commons-configuration</artifactId>
@@ -68,7 +69,7 @@
                 <artifactId>commons-io</artifactId>
                 <version>2.0.1</version>
             </dependency>
-			<!-- GOOGLE WEB TOOLKIT -->
+            <!-- GOOGLE WEB TOOLKIT -->
             <dependency>
                 <groupId>com.google.gwt</groupId>
                 <artifactId>gwt-user</artifactId>
@@ -80,7 +81,7 @@
                 <artifactId>gwt-servlet</artifactId>
                 <version>${gwt.version}</version>
             </dependency>
-			<!-- APACHE LUCENE -->
+            <!-- APACHE LUCENE -->
             <dependency>
                 <groupId>org.apache.lucene</groupId>
                 <artifactId>lucene-core</artifactId>
@@ -99,19 +100,19 @@
                 <version>${lucene.version}</version>
             </dependency>
 
-			<!-- QUARTZ SCHEDULING -->
+            <!-- QUARTZ SCHEDULING -->
             <dependency>
                 <groupId>org.quartz-scheduler</groupId>
                 <artifactId>quartz</artifactId>
                 <version>2.0.2</version>
             </dependency>
-			<!-- SERVLET -->
+            <!-- SERVLET -->
             <dependency>
                 <groupId>javax.servlet</groupId>
                 <artifactId>servlet-api</artifactId>
                 <version>2.5</version>
             </dependency>
-			<!-- Log4J -->
+            <!-- Log4J -->
             <dependency>
                 <groupId>log4j</groupId>
                 <artifactId>log4j</artifactId>
@@ -135,7 +136,7 @@
                 <version>1.4</version>
             </dependency>
 
-			<!-- TEST DEPENDENCIES -->
+            <!-- TEST DEPENDENCIES -->
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
@@ -143,58 +144,58 @@
                 <scope>test</scope>
             </dependency>
 
-			<!--STARTPLUGINS-->
-			<dependency>
+            <!--STARTPLUGINS -->
+            <dependency>
                 <groupId>org.codesearch.plugins</groupId>
                 <artifactId>RevisionLuceneFieldPlugin</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.codesearch.plugins</groupId>
-				<artifactId>RepositoryGroupLuceneFieldPlugin</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.codesearch.plugins</groupId>
-				<artifactId>JavaCodeAnalyzerPlugin</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.codesearch.plugins</groupId>
-				<artifactId>XmlCodeAnalyzerPlugin</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.codesearch.plugins</groupId>
-				<artifactId>DefaultHighlightingPlugin</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-			    <groupId>org.codesearch.customlibs</groupId>
-			    <artifactId>Codesearch-JavaParser</artifactId>
-				<version>${project.version}</version>
-		    </dependency>
-			<dependency>
-				<groupId>org.codesearch.customlibs</groupId>
-				<artifactId>codesearch-jhighlight</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.codesearch.plugins</groupId>
-				<artifactId>GitLocalPlugin</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.codesearch.plugins</groupId>
-				<artifactId>SubversionPlugin</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<!--ENDPLUGINS-->
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.codesearch.plugins</groupId>
+                <artifactId>RepositoryGroupLuceneFieldPlugin</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.codesearch.plugins</groupId>
+                <artifactId>JavaCodeAnalyzerPlugin</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.codesearch.plugins</groupId>
+                <artifactId>XmlCodeAnalyzerPlugin</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.codesearch.plugins</groupId>
+                <artifactId>DefaultHighlightingPlugin</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.codesearch.customlibs</groupId>
+                <artifactId>Codesearch-JavaParser</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.codesearch.customlibs</groupId>
+                <artifactId>codesearch-jhighlight</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.codesearch.plugins</groupId>
+                <artifactId>GitLocalPlugin</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.codesearch.plugins</groupId>
+                <artifactId>SubversionPlugin</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <!--ENDPLUGINS -->
 
-		</dependencies>
-	</dependencyManagement>
+        </dependencies>
+    </dependencyManagement>
 
-	<build>
+    <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -228,21 +229,21 @@
 
 
     <profiles>
-    <profile>
-        <id>tmp</id>
-        <build>
-            <plugins>
-                <plugin>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <inherited>true</inherited>
-                </plugin>
-            </plugins>
-        </build>
-        <properties>
-            <build.dir>/tmp/maven-targets/${project.name}</build.dir>
-            <build.outputDir>/tmp/maven-targets/${project.name}/classes</build.outputDir>
-            <build.testOutputDir>/tmp/maven-targets/${project.name}/test-classes</build.testOutputDir>
-        </properties>
-    </profile>
+        <profile>
+            <id>tmp</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <inherited>true</inherited>
+                    </plugin>
+                </plugins>
+            </build>
+            <properties>
+                <build.dir>/tmp/maven-targets/${project.name}</build.dir>
+                <build.outputDir>/tmp/maven-targets/${project.name}/classes</build.outputDir>
+                <build.testOutputDir>/tmp/maven-targets/${project.name}/test-classes</build.testOutputDir>
+            </properties>
+        </profile>
     </profiles>
 </project>

@@ -26,20 +26,13 @@ import org.apache.log4j.Logger;
 import org.codesearch.searcher.server.rpc.SearcherServiceImpl;
 import org.codesearch.searcher.server.servlets.OpenSearchServlet;
 import org.codesearch.searcher.server.servlets.RefreshServlet;
-import org.quartz.JobBuilder;
-import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SchedulerFactory;
-import org.quartz.SimpleScheduleBuilder;
-import org.quartz.SimpleTrigger;
-import org.quartz.Trigger;
-import org.quartz.TriggerBuilder;
 import org.quartz.impl.StdSchedulerFactory;
 
 import com.google.inject.Singleton;
 import com.google.inject.servlet.ServletModule;
-import org.codesearch.commons.utils.QuartzGuiceJobFactory;
 
 /**
  *

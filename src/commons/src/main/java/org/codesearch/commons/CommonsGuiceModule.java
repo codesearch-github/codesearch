@@ -29,6 +29,7 @@ import org.codesearch.commons.configuration.xml.XmlConfigurationReader;
 import org.codesearch.commons.database.DBAccess;
 import org.codesearch.commons.database.DBAccessImpl;
 import org.codesearch.commons.plugins.PluginLoader;
+import org.codesearch.commons.plugins.PluginLoaderException;
 import org.codesearch.commons.plugins.PluginLoaderImpl;
 import org.codesearch.commons.plugins.lucenefields.LuceneFieldPluginLoader;
 import org.codesearch.commons.plugins.lucenefields.LuceneFieldPluginLoaderImpl;
@@ -67,6 +68,8 @@ public class CommonsGuiceModule extends AbstractModule {
             bind(LuceneFieldPluginLoader.class).to(LuceneFieldPluginLoaderImpl.class).in(Singleton.class);
         } catch (InvalidConfigurationException ex) {
             LOG.error("Invalid configuration:", ex);
+        } catch (PluginLoaderException ex) {
+            LOG.error("Plugin loading failed:", ex);
         }
     }
 }

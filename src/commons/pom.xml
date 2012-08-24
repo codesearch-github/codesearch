@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>codesearch-commons</artifactId>
@@ -14,13 +13,13 @@
     </parent>
 
     <dependencies>
-		<!-- TEST DEPENDENCIES -->
+        <!-- TEST DEPENDENCIES -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
         </dependency>
 
-		<!-- NORMAL DEPENDENCIES -->
+        <!-- NORMAL DEPENDENCIES -->
         <dependency>
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>
@@ -40,14 +39,19 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
         </dependency>
-        
-		<!-- Quartz scheduling -->
+
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
+
+        <!-- Quartz scheduling -->
         <dependency>
             <groupId>org.quartz-scheduler</groupId>
             <artifactId>quartz</artifactId>
         </dependency>
 
-		<!-- Lucene API to create/manage index -->
+        <!-- Lucene API to create/manage index -->
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-core</artifactId>
@@ -61,8 +65,6 @@
         <dependency>
             <groupId>commons-dbutils</groupId>
             <artifactId>commons-dbutils</artifactId>
-            <version>1.4</version>
         </dependency>
-
     </dependencies>
 </project>

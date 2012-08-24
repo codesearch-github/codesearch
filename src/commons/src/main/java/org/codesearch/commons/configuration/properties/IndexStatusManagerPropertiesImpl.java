@@ -27,8 +27,10 @@ import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
+
 import org.apache.log4j.Logger;
 import org.codesearch.commons.configuration.ConfigurationReader;
 import org.codesearch.commons.plugins.vcs.VersionControlPlugin;

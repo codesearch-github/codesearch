@@ -351,4 +351,10 @@ public class SubversionPlugin implements VersionControlPlugin {
             fileIdentifiers.add(new FileIdentifier(dirEntry.getRelativePath(), false, repository));
         }
     }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean supportsBlacklistingChanges() {
+        return true;
+    }
 }

@@ -29,7 +29,7 @@ import org.codesearch.commons.plugins.vcs.FileDto;
  *
  * @author David Froehlich
  */
-public class FilepathLuceneFieldPlugin extends LuceneFieldPlugin {
+public class FilepathLuceneFieldPlugin implements LuceneFieldPlugin {
 
     /**
      * returns the filepath of the fileDto
@@ -45,7 +45,7 @@ public class FilepathLuceneFieldPlugin extends LuceneFieldPlugin {
     /** {@inheritDoc} */
     @Override
     public String getPurposes() {
-        return "lucene_field_plugin";
+        return getFieldName();
     }
 
     /** {@inheritDoc} */

@@ -23,52 +23,44 @@ package org.codesearch.commons.plugins.lucenefields;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.codesearch.commons.plugins.Plugin;
+import org.codesearch.commons.plugins.PluginBase;
 import org.codesearch.commons.plugins.vcs.FileDto;
 
 /**
- *
- * @author David Froehlich
+ * Plugin that adds a search field to the index.
  */
-public abstract class LuceneFieldPlugin implements Plugin {
+@PluginBase
+public interface LuceneFieldPlugin extends Plugin {
 
     /**
-     * returns the content that will be written in the field of the lucene index
-     * the field is identified by the String returned by the purpose
-     * @param fileDto the FileDto where the data will be extracted
+     * Returns the value that is to be added to the field in the index for the given file.
+     * @param fileDto 
      * @return the content of the field
      * @throws LuceneFieldValueException
      */
-    public abstract String getFieldValue(FileDto fileDto) throws LuceneFieldValueException;
+    String getFieldValue(FileDto fileDto) throws LuceneFieldValueException;
 
     /**
-     * determines whether the content of the field will be stored as Field.Stored.Yes in the lucene index
-     * @return
+     * Whether values of the field should be stored in the index so the
+     * original value can be retrieved.
      */
-    public abstract boolean isStored();
+    boolean isStored();
 
     /**
-     * returns the name of the field the fieldcontent is gonna be written into
-     * @return
+     * Returns the name of the field which will be seen from and usable from
+     * the search interface.
      */
-    public abstract String getFieldName();
+    String getFieldName();
 
     /**
      * Returns the analyzer used for this field in regular case.
      * If the field should not be analyzed, return null.
-     * @return
      */
-    public abstract Analyzer getRegularCaseAnalyzer();
+    Analyzer getRegularCaseAnalyzer();
 
     /**
      * Returns the analyzer used for the content of the lower case field.
      * If the field should not be analyzed in lower case, return null.
-     * @return
      */
-    public abstract Analyzer getLowerCaseAnalyzer();
-
-    /** {@inheritDoc} */
-    @Override
-    public String getPurposes(){
-        return "lucene_field_plugin";
-    }
+    Analyzer getLowerCaseAnalyzer();
 }

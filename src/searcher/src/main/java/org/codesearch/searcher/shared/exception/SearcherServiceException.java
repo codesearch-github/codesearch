@@ -19,14 +19,19 @@
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.codesearch.searcher.shared;
+package org.codesearch.searcher.shared.exception;
+
+import java.io.Serializable;
 
 /**
  * Thrown when an error in the searcher service server backend occurs.
  * @author Samuel Kogler
  */
-public class SearcherServiceException extends Exception {
-    private static final long serialVersionUID = 1L;
+public class SearcherServiceException extends Exception implements Serializable {
+
+
+    /** . */
+    private static final long serialVersionUID = 8931177812860079002L;
 
     /**
      * Creates a new instance of <code>SearcherServiceException</code> without detail message.
@@ -41,4 +46,23 @@ public class SearcherServiceException extends Exception {
     public SearcherServiceException(String msg) {
         super(msg);
     }
+
+    /**
+     * @param message
+     * @param cause
+     */
+    public SearcherServiceException(String message, Throwable cause) {
+        super(message, cause);
+        // TODO Auto-generated constructor stub
+    }
+
+    /**
+     * @param cause
+     */
+    public SearcherServiceException(Throwable cause) {
+        super(cause);
+        // TODO Auto-generated constructor stub
+    }
+    
+    
 }

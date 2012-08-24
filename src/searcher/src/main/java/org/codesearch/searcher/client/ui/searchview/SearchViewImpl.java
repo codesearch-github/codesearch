@@ -24,6 +24,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.codesearch.searcher.client.ClientFactory;
 import org.codesearch.searcher.client.ui.fileview.FilePlace;
 import org.codesearch.searcher.shared.SearchField;
 import org.codesearch.searcher.shared.SearchResultDto;
@@ -67,10 +68,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.CellPreviewEvent;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.NoSelectionModel;
-import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SelectionModel;
-import com.google.gwt.view.client.SingleSelectionModel;
-import org.codesearch.searcher.client.ClientFactory;
 
 /**
  * Implements the functionality of the search page. Composite class
