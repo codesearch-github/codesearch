@@ -14,10 +14,6 @@
         <version>0.1-RC2</version>
     </parent>
 
-    <properties>
-        <webappDirectory>${project.build.directory}/${project.build.finalName}</webappDirectory>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -92,10 +88,7 @@
     </dependencies>
 
     <build>
-		<!-- Generate compiled stuff in the folder used for developing mode -->
-        <outputDirectory>${webappDirectory}/WEB-INF/classes</outputDirectory>
         <plugins>
-			<!-- GWT Maven Plugin -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>gwt-maven-plugin</artifactId>
@@ -110,22 +103,6 @@
                     <module>org.codesearch.indexer.Indexer</module>
                     <runTarget>index.html</runTarget>
                     <hostedWebapp>${webappDirectory}</hostedWebapp>
-                </configuration>
-            </plugin>
-			<!-- Copy static web files before executing gwt:run -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-war-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>exploded</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <webappDirectory>${webappDirectory}</webappDirectory>
                 </configuration>
             </plugin>
         </plugins>
