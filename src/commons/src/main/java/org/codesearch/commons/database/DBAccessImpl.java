@@ -407,8 +407,8 @@ public class DBAccessImpl implements DBAccess {
         Connection conn = null;
         PreparedStatement statement = null;
         try {
-            conn = dataSource.getConnection();
             if (fileId == -1) {
+                conn = dataSource.getConnection();
                 //In case no record for this data exists
                 statement = conn.prepareStatement(STMT_CREATE_FILE_RECORD, Statement.RETURN_GENERATED_KEYS);
                 statement.setString(1, filePath);
