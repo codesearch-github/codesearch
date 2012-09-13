@@ -26,16 +26,13 @@ import org.apache.log4j.Logger;
 import org.codesearch.searcher.server.rpc.SearcherServiceImpl;
 import org.codesearch.searcher.server.servlets.OpenSearchServlet;
 import org.codesearch.searcher.server.servlets.RefreshServlet;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
-import org.quartz.SchedulerFactory;
-import org.quartz.impl.StdSchedulerFactory;
 
+import com.google.gwt.core.client.Scheduler;
 import com.google.inject.Singleton;
 import com.google.inject.servlet.ServletModule;
 
 /**
- *
+ * 
  * @author Samuel Kogler
  */
 public class SearcherGuiceModule extends ServletModule {
@@ -49,6 +46,7 @@ public class SearcherGuiceModule extends ServletModule {
         serve("/gwt.rpc").with(SearcherServiceImpl.class);
         serve("/refresh").with(RefreshServlet.class);
         serve("/codesearch-opensearch.xml").with(OpenSearchServlet.class);
+        filterRegex("^.*\\.nocache\\..*$").through(NoCacheFilter.class);
 
         // Initialize quartz scheduler
         try {
