@@ -177,6 +177,10 @@ public class UsageVisitor extends VoidVisitorAdapter {
     @Override
     public void visit(ClassOrInterfaceType n, Object arg) {
         super.visit(n, arg);
+        if(n.getName().contains(".")){
+            return;
+            //hotfix to prevent broken output with internal classes, can't really be fixed while we still use this library...
+        }
         util.addLinkToExternalClassDeclaration(n.getBeginLine(), n.getBeginColumn(), n.getName());
     }
 

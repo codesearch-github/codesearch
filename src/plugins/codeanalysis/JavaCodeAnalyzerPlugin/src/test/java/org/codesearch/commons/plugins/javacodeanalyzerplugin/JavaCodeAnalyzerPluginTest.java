@@ -18,10 +18,6 @@
  * You should have received a copy of the GNU General Public License
  * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
  */
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.codesearch.commons.plugins.javacodeanalyzerplugin;
 
 import static org.junit.Assert.assertEquals;
@@ -34,6 +30,7 @@ import java.util.List;
 
 import org.codesearch.commons.plugins.codeanalyzing.CodeAnalyzerPluginException;
 import org.codesearch.commons.plugins.codeanalyzing.ast.AstNode;
+import org.codesearch.commons.plugins.codeanalyzing.ast.ExternalUsage;
 import org.codesearch.commons.plugins.codeanalyzing.ast.Usage;
 import org.codesearch.commons.plugins.codeanalyzing.ast.Visibility;
 import org.codesearch.commons.plugins.javacodeanalyzerplugin.ast.ClassNode;
@@ -119,5 +116,17 @@ public class JavaCodeAnalyzerPluginTest {
         List<Usage> usages = instance.getUsages();
         assert(usages.size() == 1);
         assert(usages.get(0).getStartColumn() == 11);
+    }
+    
+    @Test
+    public void testInnerClass() throws IOException, CodeAnalyzerPluginException {
+        String fileContent = this.getResourceFileContent("InternalClass.java");
+        instance.analyzeFile(fileContent);
+        AstNode ast = instance.getAst();
+        List<Usage> result = instance.getUsages();
+        List<Usage> expected = new LinkedList<Usage>();
+        expected.add(new ExternalUsage(37, 28, 10, "InnerClass", "InnerClass"));
+        expected.add(new ExternalUsage(9, 28, 10, "InnerClass", "InnerClass"));
+        assert(result.equals(expected));
     }
 }

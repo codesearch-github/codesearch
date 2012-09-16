@@ -44,6 +44,8 @@ import org.codesearch.searcher.shared.SearchResultDto;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import org.apache.lucene.queryParser.analyzing.AnalyzingQueryParser;
+import org.apache.lucene.util.Version;
 
 @Singleton
 public class DocumentSearcherImpl implements DocumentSearcher {
@@ -93,9 +95,8 @@ public class DocumentSearcherImpl implements DocumentSearcher {
         // Retrieve index location from the configuration
         indexLocation = configurationReader.getIndexLocation();
         LOG.debug("Index location set to: " + indexLocation);
-
-        queryParser = new QueryParser(IndexConstants.LUCENE_VERSION, IndexConstants.INDEX_FIELD_CONTENT + IndexConstants.LC_POSTFIX,
-                luceneFieldPluginLoader.getPerFieldAnalyzerWrapper(false));
+        queryParser = new AnalyzingQueryParser(IndexConstants.LUCENE_VERSION, IndexConstants.INDEX_FIELD_CONTENT + IndexConstants.LC_POSTFIX,
+                luceneFieldPluginLoader.getPerFieldAnalyzerWrapper(false)); // use AnalyzingQueryParser for case-insensitive parser since the regular QueryParser would not correctly handle search terms with wild cards
         queryParser.setAllowLeadingWildcard(true);
         queryParser.setDefaultOperator(QueryParser.Operator.AND);
         queryParser.setLowercaseExpandedTerms(false);

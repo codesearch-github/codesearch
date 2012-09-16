@@ -24,6 +24,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
@@ -39,7 +40,7 @@ import org.codesearch.commons.plugins.vcs.VersionControlPlugin;
  * Implementation that uses a property file to represent
  * the current index status of a repository.
  * Uses the standard java Properties utility.
- *
+ * 
  * @author Samuel Kogler
  */
 @Singleton
@@ -56,7 +57,7 @@ public class IndexStatusManagerPropertiesImpl implements IndexStatusManager {
 
     /**
      * Creates a new instance of RepositoryRevisionManager
-     *
+     * 
      * @param configurationReader Used to read the index location for the properties file
      */
     @Inject
@@ -67,7 +68,7 @@ public class IndexStatusManagerPropertiesImpl implements IndexStatusManager {
 
     /**
      * Creates a new instance of RepositoryRevisionManager
-     *
+     * 
      * @param configFile The configuration file
      */
     public IndexStatusManagerPropertiesImpl(InputStream configFile) {
@@ -79,7 +80,7 @@ public class IndexStatusManagerPropertiesImpl implements IndexStatusManager {
 
     /**
      * Gets a new value for the specified key
-     *
+     * 
      * @param key
      * @return The value of the key, or {@link VersionControlPlugin.UNDEFINED_VERSION} if no value is found
      */
@@ -90,7 +91,7 @@ public class IndexStatusManagerPropertiesImpl implements IndexStatusManager {
 
     /**
      * Sets a new value for the specified key
-     *
+     * 
      * @param key
      * @param value
      * @throws FileNotFoundException
@@ -104,7 +105,7 @@ public class IndexStatusManagerPropertiesImpl implements IndexStatusManager {
 
     @Override
     public List<String> getAllSavedRepositoryNames() {
-        return (List<String>) Collections.list(properties.propertyNames());
+        return (List<String>)Collections.list(properties.propertyNames());
     }
 
     /** {@inheritDoc} */
@@ -114,14 +115,25 @@ public class IndexStatusManagerPropertiesImpl implements IndexStatusManager {
     }
 
     private void load() {
+        Reader reader = null;
         try {
             repositoryStatusFile = new File(configurationReader.getIndexLocation(), REPOSITORY_STATUS_FILENAME);
             if (!repositoryStatusFile.exists()) {
                 repositoryStatusFile.createNewFile();
             }
-            properties.load(new FileReader(repositoryStatusFile));
+            reader = new FileReader(repositoryStatusFile);
+            properties.load(reader);
+
         } catch (IOException ex) {
-            LOG.error("Could not read properties file:\n" + ex);
+            LOG.error("Could not read properties file:\n", ex);
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException ex) {
+                    LOG.warn("Unable to close reader:\n", ex);
+                }
+            }
         }
     }
 }
