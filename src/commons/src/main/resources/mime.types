@@ -11,11 +11,13 @@ text/x-chdr                 text   h
 text/x-java-source          text   java
 text/css                    text   css
 text/csv                    text   csv
+application/x-sql           text   sql pls plsql pks
 application/rtf             text   rtf
 application/xml             text   xml xslt xhtml
 application/x-bash          text   sh bash
 application/x-tex           text   tex
 application/javascript      text   js
+application/jsp             text   jsp jspf
 
 image/gif                   binary gif
 image/png                   binary png x-png
