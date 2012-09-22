@@ -128,6 +128,9 @@ public class DocumentSearcherImpl implements DocumentSearcher {
         List<SearchResultDto> results = new LinkedList<SearchResultDto>();
         String finalSearchString = parseQuery(searchString, repositoryNames, repositoryGroupNames);
         Query query;
+        for(LuceneFieldPlugin plugin : luceneFieldPlugins){
+            finalSearchString = finalSearchString.replace(plugin.getAbbreviatedFieldName() + ":", plugin.getFieldName() + ":");
+        }
         if (caseSensitive) {
             query = queryParserCaseSensitive.parse(finalSearchString);
         } else {

@@ -73,4 +73,10 @@ public class RepositoryLuceneFieldPlugin implements LuceneFieldPlugin {
     public Analyzer getLowerCaseAnalyzer() {
         return null;
     }
+
+    /** {@inheritDoc} */
+    @Override
+    public String getAbbreviatedFieldName() {
+        return "rp";
+    }
 }

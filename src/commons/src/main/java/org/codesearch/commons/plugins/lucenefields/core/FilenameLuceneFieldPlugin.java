@@ -72,4 +72,10 @@ public class FilenameLuceneFieldPlugin implements LuceneFieldPlugin {
     public String getPurposes() {
         return getFieldName();
     }
+
+    /** {@inheritDoc} */
+    @Override
+    public String getAbbreviatedFieldName() {
+        return "fn";
+    }
 }

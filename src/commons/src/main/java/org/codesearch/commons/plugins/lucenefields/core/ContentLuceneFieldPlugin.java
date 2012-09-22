@@ -87,4 +87,13 @@ public class ContentLuceneFieldPlugin implements LuceneFieldPlugin {
     public Analyzer getLowerCaseAnalyzer() {
         return new SimpleSourceCodeAnalyzer(false);
     }
+
+    /**
+     * Returns an alias for the field name to reduce the amount of typing the user has to do
+     * returns the same as getFieldName since it is the default field, so the name isn't typed anyways
+     */
+    @Override
+    public String getAbbreviatedFieldName() {
+        return "content";
+    }
 }

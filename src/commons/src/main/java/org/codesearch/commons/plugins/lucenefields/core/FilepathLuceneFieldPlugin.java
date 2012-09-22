@@ -71,4 +71,10 @@ public class FilepathLuceneFieldPlugin implements LuceneFieldPlugin {
     public Analyzer getLowerCaseAnalyzer() {
         return new FullValueAnalyzer(false);
     }
+
+    @Override
+    /** {@inheritDoc} */
+    public String getAbbreviatedFieldName() {
+        return "fp";
+    }
 }

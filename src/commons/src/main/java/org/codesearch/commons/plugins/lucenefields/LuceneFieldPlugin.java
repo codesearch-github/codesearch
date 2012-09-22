@@ -53,6 +53,10 @@ public interface LuceneFieldPlugin extends Plugin {
     String getFieldName();
 
     /**
+     * Returns an alias for the field name to reduce the amount of typing the user has to do
+     */
+    String getAbbreviatedFieldName();
+    /**
      * Returns the analyzer used for this field in regular case.
      * If the field should not be analyzed, return null.
      */

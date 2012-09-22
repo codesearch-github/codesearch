@@ -1,5 +1,6 @@
 package org.codesearch.searcher.server;
 
+import com.google.inject.Singleton;
 import java.io.IOException;
 import java.util.Date;
 
@@ -11,6 +12,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
 
+@Singleton
 public class NoCacheFilter implements Filter {
 
     @Override
