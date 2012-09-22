@@ -34,7 +34,7 @@ import org.codesearch.commons.constants.IndexConstants;
  * @author David Froehlich
  * @author Samuel Kogler
  */
-public class FullValueAnalyzer extends Analyzer
+public final class FullValueAnalyzer extends Analyzer
 {
     /** whether or not the output should be parsed to lower case */
     private boolean caseSensitive;
