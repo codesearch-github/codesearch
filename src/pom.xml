@@ -16,9 +16,6 @@
         <module>plugins</module>
         <module>indexer</module>
         <module>searcher</module>
-        <module>searcher-client</module>
-        <module>searcher-server</module>
-        <module>searcher-shared</module>
     </modules>
 
     <properties>
@@ -102,7 +99,7 @@
                 <artifactId>lucene-analyzers</artifactId>
                 <version>${lucene.version}</version>
             </dependency>
-            
+
             <dependency>
                 <groupId>org.apache.lucene</groupId>
                 <artifactId>lucene-queryparser</artifactId>
