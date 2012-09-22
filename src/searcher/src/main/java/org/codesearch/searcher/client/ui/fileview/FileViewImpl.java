@@ -1,22 +1,20 @@
 /**
- * Copyright 2010 David Froehlich   <david.froehlich@businesssoftware.at>,
- *                Samuel Kogler     <samuel.kogler@gmail.com>,
- *                Stephan Stiboller <stistc06@htlkaindorf.at>
+ * Copyright 2010 David Froehlich <david.froehlich@businesssoftware.at>, Samuel
+ * Kogler <samuel.kogler@gmail.com>, Stephan Stiboller <stistc06@htlkaindorf.at>
  *
  * This file is part of Codesearch.
  *
- * Codesearch is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Codesearch is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
  *
- * Codesearch is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * Codesearch is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Codesearch.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with
+ * Codesearch. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.codesearch.searcher.client.ui.fileview;
 
@@ -30,6 +28,7 @@ import org.codesearch.searcher.shared.OutlineNode;
 import org.codesearch.searcher.shared.SidebarNode;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -54,7 +53,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 /**
  * Implementation of the File View.
- * 
+ *
  * @author Samuel Kogler
  */
 public class FileViewImpl extends Composite implements FileView {
@@ -67,7 +66,6 @@ public class FileViewImpl extends Composite implements FileView {
 
         String hidden();
     }
-
     @UiField
     MyStyle style;
     @UiField
@@ -88,20 +86,34 @@ public class FileViewImpl extends Composite implements FileView {
     DivElement focusDiv;
     @UiField
     TabLayoutPanel sidebarTabPanel;
-    /** UiBinder template. */
+    /**
+     * UiBinder template.
+     */
     private static FileViewUiBinder uiBinder = GWT.create(FileViewUiBinder.class);
-    /** The presenter for this view. */
+    /**
+     * The presenter for this view.
+     */
     private Presenter presenter;
-    /** Handler for keyboard shortcuts. */
+    /**
+     * Handler for keyboard shortcuts.
+     */
     private HandlerRegistration keyboardShortcutHandlerRegistration;
-    /** Number of lines of the displayed file */
+    /**
+     * Number of lines of the displayed file
+     */
     private int lineCount = 0;
-    /** Whether or not the focus line div is visible. */
+    /**
+     * Whether or not the focus line div is visible.
+     */
     private boolean focusDivVisible;
     private String searchTerm;
-    /** Whether or not the sidebar is visible. */
+    /**
+     * Whether or not the sidebar is visible.
+     */
     private boolean sidebarVisible = false;
-    /** The list of displayed sidebars in this view. */
+    /**
+     * The list of displayed sidebars in this view.
+     */
     private List<Sidebar> shownSidebars = new LinkedList<Sidebar>();
 
     public FileViewImpl() {
@@ -120,7 +132,9 @@ public class FileViewImpl extends Composite implements FileView {
         toggleSidebar();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void cleanup() {
         fileContentContainer.clear();
@@ -133,19 +147,25 @@ public class FileViewImpl extends Composite implements FileView {
         showFocusDiv(false);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setPresenter(FileView.Presenter presenter) {
         this.presenter = presenter;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Presenter getPresenter() {
         return presenter;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setFileContent(String fileContent, boolean binary) {
         lineNumbersContainer.setVisible(!binary);
@@ -166,21 +186,49 @@ public class FileViewImpl extends Composite implements FileView {
         HTML html = new HTML(fileContent);
         fileContentContainer.add(html);
         if (searchTerm != null && !searchTerm.isEmpty()) {
-            highlight("#fileContent", searchTerm);
+            for (String currentTerm : parseHighlightTerms(searchTerm)) {
+                highlight("#fileContent", currentTerm);
+            }
         }
     }
 
-    private native void highlight(String selector, String term)/*-{
-		$wnd.jQuery(selector).highlight(term);
+    private List<String> parseHighlightTerms(String searchTerm) {
+        List<String> highlightTerms = new LinkedList<String>();
+        String[] termParts = searchTerm.split("\"");
+        String currentTerm;
+        for (int i = 0; i < termParts.length; i++) {
+            currentTerm = termParts[i];
+            //only parse even terms, in order to ignore terms between "
+
+            currentTerm = currentTerm.replace(": ", ":"); //it's ugly and I know it
+            for (String subPart : currentTerm.split(" ")) {
+                if (i % 2 == 0) {
+                    if (!subPart.contains(":") && !subPart.trim().isEmpty()) {
+                        highlightTerms.add(subPart.replace("*", "").replace("~", "").replace("?", ""));
+                    } else {
+                        highlightTerms.add(currentTerm);
+                    }
+                }
+            }
+        }
+        return highlightTerms;
+    }
+
+    private native void highlight(String selector, String term)/*-{ 
+     $wnd.jQuery(selector).highlight(term);    
     }-*/;
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setSearchTerm(String searchTerm) {
         this.searchTerm = searchTerm;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setOutline(List<OutlineNode> outline) {
         if (outline != null) {
@@ -198,7 +246,9 @@ public class FileViewImpl extends Composite implements FileView {
         }
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setFilePath(String filePath) {
         if (filePath != null) {
@@ -212,13 +262,17 @@ public class FileViewImpl extends Composite implements FileView {
         }
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setRepository(String repository) {
         repositoryField.setText(repository);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void goToLine(int lineNumber) {
         if (lineNumber > 0 && lineNumber <= lineCount) {
@@ -236,13 +290,17 @@ public class FileViewImpl extends Composite implements FileView {
         }
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void connectEventHandlers() {
         keyboardShortcutHandlerRegistration = Event.addNativePreviewHandler(new NativePreviewHandlerImpl());
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void disconnectEventHandlers() {
         keyboardShortcutHandlerRegistration.removeHandler();
@@ -257,7 +315,8 @@ public class FileViewImpl extends Composite implements FileView {
     }
 
     /**
-     * Exports static functions to JavaScript so they can be used from HTML code.
+     * Exports static functions to JavaScript so they can be used from HTML
+     * code.
      */
     public static native void exportJSFunctions()/*-{
 		$wnd.goToLine = $entry(@org.codesearch.searcher.client.ui.fileview.FileViewImpl::staticGoToLine(I));
@@ -301,7 +360,7 @@ public class FileViewImpl extends Composite implements FileView {
 
     /**
      * Shows or hides the focused line div that highlights the focused line.
-     * 
+     *
      * @param show Whether to show the div
      */
     private void showFocusDiv(boolean show) {
@@ -314,22 +373,25 @@ public class FileViewImpl extends Composite implements FileView {
     }
 
     /**
-     * Handler class that intercepts native javascript events. Used for global hotkeys.
+     * Handler class that intercepts native javascript events. Used for global
+     * hotkeys.
      */
     private class NativePreviewHandlerImpl implements NativePreviewHandler {
 
         public NativePreviewHandlerImpl() {
         }
 
-        /** {@inheritDoc} */
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public void onPreviewNativeEvent(NativePreviewEvent event) {
             switch (event.getNativeEvent().getCharCode()) {
-            case 'g':
-                event.cancel();
-                event.consume();
-                goToLineWithDialog();
-                break;
+                case 'g':
+                    event.cancel();
+                    event.consume();
+                    goToLineWithDialog();
+                    break;
             }
         }
     }
@@ -345,7 +407,9 @@ public class FileViewImpl extends Composite implements FileView {
             this.targetLine = targetLine;
         }
 
-        /** {@inheritDoc} */
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public void onClick(ClickEvent event) {
             goToLine(targetLine);
