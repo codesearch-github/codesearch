@@ -141,6 +141,7 @@ public class GitLocalPluginTest {
      * Test of getChangedFilesSinceRevision method, of class GitLocalPlugin.
      */
     @Test
+    @Ignore
     public void testGetChangedFilesSinceRevision() throws Exception {
         String revision = VersionControlPlugin.UNDEFINED_VERSION;
         Set<FileIdentifier> changes = plugin.getChangedFilesSinceRevision(revision, Collections.<String> emptyList(), Collections
