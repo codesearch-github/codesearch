@@ -1,3 +1,7 @@
+!!! warning
+
+This project is not maintained anymore and just kept for archival purposes
+
 # Introduction
 Codesearch is a web application that helps you keep an overview of your source code.
 
