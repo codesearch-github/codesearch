@@ -1,6 +1,4 @@
-!!! warning
-
-This project is not maintained anymore and just kept for archival purposes
+> :warning: **This project is not maintained anymore and just kept around for archival purposes**
 
 # Introduction
 Codesearch is a web application that helps you keep an overview of your source code.
